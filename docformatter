@@ -8,7 +8,8 @@ import docformatter
 def main():
     """Main entry point."""
     import argparse
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=docformatter.__doc__,
+                                     version=docformatter.__version__)
     parser.add_argument('--in-place', action='store_true',
                         help='make changes to file instead of printing diff')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
