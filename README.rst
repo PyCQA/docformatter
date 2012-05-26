@@ -1,7 +1,7 @@
 docformatter
 ============
 
-Formats docstrings to follow _`PEP 257`.
+Formats docstrings to follow `PEP 257`_.
 
 .. _`PEP 257`: http://www.python.org/dev/peps/pep-0257/
 
