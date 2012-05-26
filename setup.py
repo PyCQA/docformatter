@@ -8,7 +8,7 @@ import docformatter
 with open('README.rst') as readme:
     core.setup(name='docformatter',
                version=docformatter.__version__,
-               description='Formats docstrings to follow PEP 257.',
+               description=docformatter.__doc__,
                long_description=readme.read(),
                license='Expat License',
                author='myint',
