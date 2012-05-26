@@ -1,15 +1,19 @@
-#!/usr/bin/env python
 """Formats docstrings to follow PEP 257."""
 
-import sys
 import re
-import io
 import tokenize
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+
+__version__ = '0.1'
 
 
 def format_code(source):
     """Return source code with docstrings formatted."""
-    sio = io.StringIO(source)
+    sio = StringIO(source)
     formatted = ''
     previous_token_string = ''
     previous_token_type = None
@@ -112,41 +116,3 @@ def normalize_summary(summary):
     if not summary.endswith('.'):
         summary += '.'
     return summary
-
-
-def main():
-    """Main entry point."""
-    import argparse
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--in-place', action='store_true',
-                        help='make changes to file instead of printing diff')
-    parser.add_argument('--no-backup', dest='backup', action='store_false',
-                        help='do not write backup files')
-    parser.add_argument('files', nargs='+',
-                        help='files to format')
-
-    args = parser.parse_args()
-
-    for filename in args.files:
-        with open(filename) as input_file:
-            source = input_file.read()
-            formatted_source = format_code(source)
-
-        if args.in_place:
-            if args.backup:
-                with open(filename + '.backup', 'w') as backup_file:
-                    backup_file.write(source)
-
-            with open(filename, 'w') as output_file:
-                output_file.write(formatted_source)
-        else:
-            import difflib
-            diff = difflib.unified_diff(source.split('\n'),
-                                        formatted_source.split('\n'),
-                                        'before/' + filename,
-                                        'after/' + filename)
-            sys.stdout.write('\n'.join(diff))
-
-
-if __name__ == '__main__':
-    sys.exit(main())
