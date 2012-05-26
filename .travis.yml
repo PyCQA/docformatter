@@ -1,0 +1,5 @@
+language: python
+python:
+    - "3.2"
+script:
+    - python test_docformatter.py
