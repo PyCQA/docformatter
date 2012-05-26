@@ -85,7 +85,11 @@ def indent_non_indented(line, indentation):
 
 
 def split_summary_and_description(contents):
-    """Split docstring into summary and description."""
+    """Split docstring into summary and description.
+
+    Return tuple (summary, description).
+
+    """
     split = contents.split('\n')
     if len(split) > 1 and not split[1].strip():
         return (split[0], '\n'.join(split[2:]))
@@ -108,7 +112,7 @@ def strip_docstring(docstring):
 
 
 def normalize_summary(summary):
-    """Normalize docstring summary."""
+    """Return normalized docstring summary."""
     # Remove newlines
     summary = re.sub('\s*\n\s*', ' ', summary.strip())
 

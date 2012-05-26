@@ -1,3 +1,5 @@
+"""Test suite for docformatter."""
+
 import docformatter
 import unittest
 
