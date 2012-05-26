@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Setup for docformatter."""
 
 from distutils import core
 import docformatter
