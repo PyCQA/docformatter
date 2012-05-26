@@ -168,7 +168,7 @@ def foo():
 '''
         self.assertEqual(line, docformatter.format_code(line))
 
-    def test_format_code_with_assigment_on_first_line(self):
+    def test_format_code_with_assignment_on_first_line(self):
         self.assertEqual(
 '''\
 def foo():
