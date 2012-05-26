@@ -24,7 +24,7 @@ def format_code(source):
         if start_row > last_row:
             last_column = 0
         if start_column > last_column:
-            formatted += (" " * (start_column - last_column))
+            formatted += (' ' * (start_column - last_column))
 
         if (token_type == tokenize.STRING and
                 starts_with_triple(token_string) and
