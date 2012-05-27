@@ -95,6 +95,40 @@ def foo():
     """
 '''))
 
+    def test_format_code_ignore_complex(self):
+        """We do not handle r/u/b prefixed strings."""
+        self.assertEqual(
+'''\
+def foo():
+    r"""
+    Hello foo.
+    """
+''',
+                docformatter.format_code(
+'''\
+def foo():
+    r"""
+    Hello foo.
+    """
+'''))
+
+    def test_format_code_ignore_complex_single(self):
+        """We do not handle r/u/b prefixed strings."""
+        self.assertEqual(
+"""\
+def foo():
+    r'''
+    Hello foo.
+    '''
+""",
+                docformatter.format_code(
+"""\
+def foo():
+    r'''
+    Hello foo.
+    '''
+"""))
+
     def test_format_code_with_multiple_sentences(self):
         self.assertEqual(
 '''\
