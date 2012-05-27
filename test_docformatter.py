@@ -38,6 +38,10 @@ Hello.
 """
 '''.strip()))
 
+    def test_format_docstring_with_empty_docstring(self):
+        self.assertEqual('""""""',
+                         docformatter.format_docstring('    ', '""""""'))
+
     def test_format_docstring_with_single_quotes(self):
         self.assertEqual('"""Hello."""',
                          docformatter.format_docstring('    ', """
