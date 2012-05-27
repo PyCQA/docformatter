@@ -1,8 +1,9 @@
 .*.swp
 *.pyc
-__pycache__
-.tox/
 MANIFEST
+README.html
+__pycache__/
+.tox/
 build/
 dist/
 htmlcov/
