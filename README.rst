@@ -10,9 +10,9 @@ Formats docstrings to follow `PEP 257`_.
    :target: https://secure.travis-ci.org/myint/docformatter
    :alt: Build status
 
------
-Usage
------
+-------
+Example
+-------
 
 After running::
 
@@ -28,7 +28,7 @@ this::
 
     def factorial(x):
         '''
-        
+
         Return x factorial.
 
         This uses math.factorial.
@@ -77,9 +77,14 @@ gets formatted into this::
         if factorial(10):
             launch_rocket()
 
-Options::
+-------
+Options
+-------
 
-    usage: docformatter [-h] [--in-place] [--no-backup] files [files ...]
+Below are the options::
+
+    usage: docformatter [-h] [--in-place] [--no-backup] [--version]
+                        files [files ...]
 
     Formats docstrings to follow PEP 257.
 
@@ -90,3 +95,4 @@ Options::
       -h, --help   show this help message and exit
       --in-place   make changes to file instead of printing diff
       --no-backup  do not write backup files
+      --version    show program's version number and exit
