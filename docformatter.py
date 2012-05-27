@@ -8,7 +8,7 @@ except ImportError:
     from io import StringIO
 
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 
 def format_code(source):
