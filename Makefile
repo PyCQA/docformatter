@@ -15,6 +15,10 @@ coverage:
 	@rm -f .coverage
 	@open 'htmlcov/index.html'
 
+readme:
+	@python setup.py --long-description | rst2html --strict > README.html
+	@open README.html
+
 register:
 	@python setup.py register
 	@python setup.py sdist upload
