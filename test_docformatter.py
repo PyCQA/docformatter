@@ -270,14 +270,6 @@ def foo():
 'This is the first.\nThis is the second. This is the third.'))
 
 
-def py27_and_above(func):
-    import sys
-    if sys.version_info < (2, 7):
-        return None
-    else:
-        return func
-
-
 @contextlib.contextmanager
 def temporary_file(contents):
     """Write contents to temporary file and yield it."""
@@ -294,7 +286,6 @@ def temporary_file(contents):
 
 class TestSystem(unittest.TestCase):
 
-    @py27_and_above
     def test_diff(self):
         with temporary_file('''\
 def foo():
@@ -314,7 +305,6 @@ def foo():
  
 ''', '\n'.join(output_file.getvalue().split('\n')[2:]))
 
-    @py27_and_above
     def test_in_place(self):
         with temporary_file('''\
 def foo():

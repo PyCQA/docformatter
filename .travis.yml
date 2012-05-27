@@ -4,6 +4,7 @@ python:
     - "2.7"
     - "3.2"
 install:
+    - ./scripts/travis_dependencies.bash
     - python setup.py --quiet install
     - pip --quiet install coverage
 script:
