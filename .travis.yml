@@ -4,8 +4,8 @@ python:
     - "2.7"
     - "3.2"
 install:
-    - python setup.py install
-    - pip install coverage
+    - python --quiet setup.py install
+    - pip --quiet install coverage
 script:
     - python test_docformatter.py
     - coverage run test_docformatter.py
