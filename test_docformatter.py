@@ -2,9 +2,10 @@
 
 import docformatter
 import unittest
+import contextlib
 
 
-class TestFunctions(unittest.TestCase):
+class TestUnits(unittest.TestCase):
 
     def test_strip_docstring(self):
         self.assertEqual(
@@ -247,6 +248,59 @@ def foo():
                           'This is the second. This is the third.'),
                          docformatter.split_summary_and_description(
 'This is the first.\nThis is the second. This is the third.'))
+
+
+def py27_and_above(func):
+    import sys
+    if sys.version_info < (2, 7):
+        return None
+    else:
+        return func
+
+
+@contextlib.contextmanager
+def temporary_file(contents):
+    """Write contents to temporary file and yield it."""
+    import tempfile
+    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False)
+    try:
+        f.write(contents.encode('utf8'))
+        f.close()
+        yield f.name
+    finally:
+        import os
+        os.remove(f.name)
+
+
+class TestSystem(unittest.TestCase):
+
+    @py27_and_above
+    def test_diff(self):
+        with temporary_file('''\
+def foo():
+    """
+    
+    Hello world
+    
+    """
+''') as filename:
+            import subprocess
+            p = subprocess.Popen(['./docformatter', filename],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            (output, error) = p.communicate()
+            self.assertFalse(error)
+            self.assertEqual('''\
+@@ -1,7 +1,3 @@
+ def foo():
+-    """
+-    
+-    Hello world
+-    
+-    """
++    """Hello world."""
+ 
+''', '\n'.join(output.decode('utf8').split('\n')[2:]))
 
 
 if __name__ == '__main__':
