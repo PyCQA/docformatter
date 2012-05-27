@@ -3,6 +3,10 @@
 import docformatter
 import unittest
 import contextlib
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 class TestUnits(unittest.TestCase):
@@ -279,28 +283,37 @@ class TestSystem(unittest.TestCase):
         with temporary_file('''\
 def foo():
     """
-    
     Hello world
-    
     """
 ''') as filename:
-            import subprocess
-            p = subprocess.Popen(['./docformatter', filename],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-            (output, error) = p.communicate()
-            self.assertFalse(error)
+            output_file = StringIO()
+            docformatter.main(argv=[filename], output_file=output_file)
             self.assertEqual('''\
-@@ -1,7 +1,3 @@
+@@ -1,5 +1,3 @@
  def foo():
 -    """
--    
 -    Hello world
--    
 -    """
 +    """Hello world."""
  
-''', '\n'.join(output.decode('utf8').split('\n')[2:]))
+''', '\n'.join(output_file.getvalue().split('\n')[2:]))
+
+    @py27_and_above
+    def test_in_place(self):
+        with temporary_file('''\
+def foo():
+    """
+    Hello world
+    """
+''') as filename:
+            output_file = StringIO()
+            docformatter.main(argv=['--in-place', filename],
+                              output_file=output_file)
+            with open(filename) as f:
+                self.assertEqual('''\
+def foo():
+    """Hello world."""
+''', f.read())
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 """Formats docstrings to follow PEP 257."""
 
-import sys
 import re
 import tokenize
 try:
@@ -121,15 +120,15 @@ def normalize_summary(summary):
     return summary
 
 
-def main(argv):
+def main(argv, output_file):
     """Main entry point."""
     import argparse
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     version=__version__)
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--in-place', action='store_true',
                         help='make changes to file instead of printing diff')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
                         help='do not write backup files')
+    parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
 
@@ -149,8 +148,9 @@ def main(argv):
                 output_file.write(formatted_source)
         else:
             import difflib
-            diff = difflib.unified_diff([l + '\n' for l in source.split('\n')],
-                                        [l + '\n' for l in formatted_source.split('\n')],
-                                        'before/' + filename,
-                                        'after/' + filename)
-            sys.stdout.write(''.join(diff))
+            diff = difflib.unified_diff(
+                    [l + '\n' for l in source.split('\n')],
+                    [l + '\n' for l in formatted_source.split('\n')],
+                    'before/' + filename,
+                    'after/' + filename)
+            output_file.write(''.join(diff))
