@@ -70,7 +70,7 @@ def format_docstring(indentation, docstring):
                                   for l in description.split('\n')]),
            indentation=indentation)
     else:
-        return '"""' + contents + '"""'
+        return '"""' + normalize_summary(contents) + '"""'
 
 
 def indent_non_indented(line, indentation):
@@ -114,6 +114,7 @@ def normalize_summary(summary):
     summary = re.sub('\s*\n\s*', ' ', summary.strip())
 
     # Add period at end of sentence
-    if not summary.endswith('.'):
+    if summary and not summary.endswith('.'):
         summary += '.'
+
     return summary
