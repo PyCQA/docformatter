@@ -14,16 +14,79 @@ Formats docstrings to follow `PEP 257`_.
 Usage
 -----
 
+After running::
+
+    $ docformatter example.py
+
+this::
+
+    def launch_rocket():
+        """Launch
+    the
+    rocket."""
+
+
+    def factorial(x):
+        '''
+        
+        Return x factorial.
+
+        This uses math.factorial.
+
+        '''
+        import math
+        math.factorial(x)
+
+
+    def print_factorial(x):
+        """Print x factorial"""
+        print(factorial(x))
+
+
+    def main():
+        """Main
+        function"""
+        print_factorial(5)
+        if factorial(10):
+            launch_rocket()
+
+gets formatted into this::
+
+    def launch_rocket():
+        """Launch the rocket."""
+
+
+    def factorial(x):
+        """Return x factorial.
+
+        This uses math.factorial.
+
+        """
+        import math
+        math.factorial(x)
+
+
+    def print_factorial(x):
+        """Print x factorial."""
+        print(factorial(x))
+
+
+    def main():
+        """Main function."""
+        print_factorial(5)
+        if factorial(10):
+            launch_rocket()
+
 Options::
 
-   usage: docformatter [-h] [--in-place] [--no-backup] files [files ...]
+    usage: docformatter [-h] [--in-place] [--no-backup] files [files ...]
 
-   Formats docstrings to follow PEP 257.
+    Formats docstrings to follow PEP 257.
 
-   positional arguments:
-     files        files to format
+    positional arguments:
+      files        files to format
 
-   optional arguments:
-     -h, --help   show this help message and exit
-     --in-place   make changes to file instead of printing diff
-     --no-backup  do not write backup files
+    optional arguments:
+      -h, --help   show this help message and exit
+      --in-place   make changes to file instead of printing diff
+      --no-backup  do not write backup files
