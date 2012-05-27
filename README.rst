@@ -81,7 +81,7 @@ gets formatted into this::
 Options
 -------
 
-Below are the options::
+Below is the help output::
 
     usage: docformatter [-h] [--in-place] [--no-backup] [--version]
                         files [files ...]
