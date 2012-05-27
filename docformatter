@@ -33,11 +33,11 @@ def main():
                 output_file.write(formatted_source)
         else:
             import difflib
-            diff = difflib.unified_diff(source.split('\n'),
-                                        formatted_source.split('\n'),
+            diff = difflib.unified_diff([l + '\n' for l in source.split('\n')],
+                                        [l + '\n' for l in formatted_source.split('\n')],
                                         'before/' + filename,
                                         'after/' + filename)
-            sys.stdout.write('\n'.join(diff))
+            sys.stdout.write(''.join(diff))
 
 
 if __name__ == '__main__':
