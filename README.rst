@@ -18,9 +18,7 @@ After running::
 
     $ docformatter example.py
 
-this code
-
-.. code:: python
+this code::
 
     def launch_rocket():
         """Launch
@@ -52,9 +50,7 @@ this code
         if factorial(10):
             launch_rocket()
 
-gets formatted into this
-
-.. code:: python
+gets formatted into this::
 
     def launch_rocket():
         """Launch the rocket."""
