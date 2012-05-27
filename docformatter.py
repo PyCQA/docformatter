@@ -56,9 +56,6 @@ def format_docstring(indentation, docstring):
     """Return formatted version of docstring."""
     contents = strip_docstring(docstring)
 
-    if not contents:
-        return ''
-
     summary, description = split_summary_and_description(contents)
 
     if description:
