@@ -65,6 +65,22 @@ Hello.
 '''
 """.strip()))
 
+    def test_format_docstring_with_single_quotes_multiline(self):
+        self.assertEqual('''
+    """Return x factorial.
+
+    This uses math.factorial.
+
+    """
+'''.strip(),
+                         docformatter.format_docstring('    ', """
+    '''
+    Return x factorial.
+
+    This uses math.factorial.
+    '''
+""".strip()))
+
     def test_format_code(self):
         self.assertEqual(
 '''\

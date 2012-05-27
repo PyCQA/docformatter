@@ -49,7 +49,7 @@ def format_code(source):
 def starts_with_triple(string):
     """Return True if the string starts with triple single/double quotes."""
     return (string.strip().startswith('"""') or
-            string.strip().startswith("''''"))
+            string.strip().startswith("'''"))
 
 
 def format_docstring(indentation, docstring):
