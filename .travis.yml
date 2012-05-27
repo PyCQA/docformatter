@@ -8,5 +8,5 @@ install:
     - pip --quiet install coverage
 script:
     - python test_docformatter.py
-    - coverage run test_docformatter.py
+    - coverage run --show-missing test_docformatter.py
     - coverage report
