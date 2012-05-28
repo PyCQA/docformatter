@@ -388,6 +388,25 @@ def foo():
     """Hello world."""
 ''', f.read())
 
+    def test_end_to_end(self):
+        with temporary_file('''\
+def foo():
+    """
+    Hello world
+    """
+''') as filename:
+            import subprocess
+            process = subprocess.Popen(['./docformatter', filename],
+                                       stdout=subprocess.PIPE)
+            self.assertEqual('''\
+@@ -1,4 +1,2 @@
+ def foo():
+-    """
+-    Hello world
+-    """
++    """Hello world."""
+''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+
 
 if __name__ == '__main__':
     unittest.main()
