@@ -145,7 +145,7 @@ def normalize_summary(summary):
     return summary
 
 
-def main(argv, output_file):
+def main(argv, standard_out):
     """Main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
@@ -179,4 +179,4 @@ def main(argv, output_file):
                         formatted_source.splitlines(True),
                         'before/' + filename,
                         'after/' + filename)
-                output_file.write(''.join(diff))
+                standard_out.write(''.join(diff))
