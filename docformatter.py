@@ -67,7 +67,7 @@ def format_docstring(indentation, docstring):
 {indentation}"""\
 '''.format(summary=normalize_summary(summary),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
-                                  for l in description.split('\n')]),
+                                  for l in description.splitlines()]),
            indentation=indentation)
     else:
         return '"""' + normalize_summary(contents) + '"""'
@@ -87,7 +87,7 @@ def split_summary_and_description(contents):
     Return tuple (summary, description).
 
     """
-    split = contents.split('\n')
+    split = contents.splitlines()
     if len(split) > 1 and not split[1].strip():
         return (split[0], '\n'.join(split[2:]))
     else:
@@ -149,8 +149,8 @@ def main(argv, output_file):
         else:
             import difflib
             diff = difflib.unified_diff(
-                    [l + '\n' for l in source.split('\n')],
-                    [l + '\n' for l in formatted_source.split('\n')],
+                    source.splitlines(True),
+                    formatted_source.splitlines(True),
                     'before/' + filename,
                     'after/' + filename)
             output_file.write(''.join(diff))

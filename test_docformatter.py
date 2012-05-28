@@ -330,13 +330,12 @@ def foo():
             output_file = StringIO()
             docformatter.main(argv=[filename], output_file=output_file)
             self.assertEqual('''\
-@@ -1,5 +1,3 @@
+@@ -1,4 +1,2 @@
  def foo():
 -    """
 -    Hello world
 -    """
 +    """Hello world."""
- 
 ''', '\n'.join(output_file.getvalue().split('\n')[2:]))
 
     def test_in_place(self):
