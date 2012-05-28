@@ -164,18 +164,19 @@ def main(argv, output_file):
             source = input_file.read()
             formatted_source = format_code(source)
 
-        if args.in_place:
-            if args.backup:
-                with open(filename + '.backup', 'w') as backup_file:
-                    backup_file.write(source)
+        if source != formatted_source:
+            if args.in_place:
+                if args.backup:
+                    with open(filename + '.backup', 'w') as backup_file:
+                        backup_file.write(source)
 
-            with open(filename, 'w') as output_file:
-                output_file.write(formatted_source)
-        else:
-            import difflib
-            diff = difflib.unified_diff(
-                    source.splitlines(True),
-                    formatted_source.splitlines(True),
-                    'before/' + filename,
-                    'after/' + filename)
-            output_file.write(''.join(diff))
+                with open(filename, 'w') as output_file:
+                    output_file.write(formatted_source)
+            else:
+                import difflib
+                diff = difflib.unified_diff(
+                        source.splitlines(True),
+                        formatted_source.splitlines(True),
+                        'before/' + filename,
+                        'after/' + filename)
+                output_file.write(''.join(diff))
