@@ -35,7 +35,7 @@ this code::
 
         '''
         import math
-        math.factorial(x)
+        return math.factorial(x)
 
 
     def print_factorial(x):
@@ -63,7 +63,7 @@ gets formatted into this::
 
         """
         import math
-        math.factorial(x)
+        return math.factorial(x)
 
 
     def print_factorial(x):
