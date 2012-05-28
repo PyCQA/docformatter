@@ -65,6 +65,10 @@ def format_docstring(indentation, docstring):
     """Return formatted version of docstring."""
     contents = strip_docstring(docstring)
 
+    # Skip if there are nested triple double-quotes
+    if contents.count('"""'):
+        return docstring
+
     summary, description = split_summary_and_description(contents)
 
     if description:
