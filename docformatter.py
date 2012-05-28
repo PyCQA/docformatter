@@ -8,7 +8,7 @@ except ImportError:
     from io import StringIO
 
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 def format_code(source):
@@ -17,6 +17,7 @@ def format_code(source):
     formatted = ''
     previous_token_string = ''
     previous_token_type = None
+    previous_line = ''
     last_row = 0
     last_column = -1
     for token in tokenize.generate_tokens(sio.readline):
@@ -24,6 +25,11 @@ def format_code(source):
         token_string = token[1]
         start_row, start_column = token[2]
         end_row, end_column = token[3]
+
+        # Preserve escaped newlines
+        if (start_row > last_row and
+                previous_line.endswith('\\\n')):
+            formatted += previous_line[len(previous_line.rstrip(' \t\n\r\\')):]
 
         if start_row > last_row:
             last_column = 0
@@ -39,6 +45,7 @@ def format_code(source):
 
         previous_token_string = token_string
         previous_token_type = token_type
+        previous_line = token[4]
 
         last_row = end_row
         last_column = end_column

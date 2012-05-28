@@ -95,6 +95,22 @@ def foo():
     """
 '''))
 
+    def test_format_code_with_escaped_newlines(self):
+        self.assertEqual(
+r'''def foo():
+    """Hello foo."""
+    x = \
+            1
+''',
+                docformatter.format_code(
+r'''def foo():
+    """
+    Hello foo.
+    """
+    x = \
+            1
+'''))
+
     def test_format_code_ignore_complex(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
