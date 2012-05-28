@@ -73,7 +73,7 @@ def format_docstring(indentation, docstring):
     * The BDFL recommends inserting a blank line between the last paragraph
       in a multi-line docstring and its closing quotes, placing the closing
       quotes on a line by themselves.
-    
+
     """
     contents = strip_docstring(docstring)
 
