@@ -2,6 +2,7 @@
 
 import re
 import tokenize
+import contextlib
 try:
     from StringIO import StringIO
 except ImportError:
@@ -145,6 +146,33 @@ def normalize_summary(summary):
     return summary
 
 
+@contextlib.contextmanager
+def open_with_encoding(filename, mode='r', encoding=None):
+    """Open file with proper encoding.
+
+    Return (file, encoding).
+
+    """
+    open_file = None
+    try:
+        if not encoding:
+            try:
+                # Python 3
+                with open(filename, 'rb') as input_file:
+                    encoding = tokenize.detect_encoding(input_file.readline)[0]
+            except IOError:
+                encoding = 'utf-8'
+
+        open_file = open(filename, mode=mode, encoding=encoding)
+        yield (open_file, encoding)
+    except (AttributeError, TypeError):
+        open_file = open(filename, mode=mode)
+        yield (open_file, None)
+
+    if open_file:
+        open_file.close()
+
+
 def main(argv, standard_out):
     """Main entry point."""
     import argparse
@@ -160,17 +188,20 @@ def main(argv, standard_out):
     args = parser.parse_args(argv)
 
     for filename in args.files:
-        with open(filename) as input_file:
+        with open_with_encoding(filename) as (input_file, encoding):
             source = input_file.read()
             formatted_source = format_code(source)
 
         if source != formatted_source:
             if args.in_place:
+                # Write output files with same encoding as input
                 if args.backup:
-                    with open(filename + '.backup', 'w') as backup_file:
+                    with open_with_encoding(filename + '.backup', mode='w',
+                            encoding=encoding) as (backup_file, _):
                         backup_file.write(source)
 
-                with open(filename, 'w') as output_file:
+                with open_with_encoding(filename, mode='w',
+                                        encoding=encoding) as (output_file, _):
                     output_file.write(formatted_source)
             else:
                 import difflib
