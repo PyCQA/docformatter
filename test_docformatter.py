@@ -327,6 +327,16 @@ def foo():
                          docformatter.split_summary_and_description(
 'This is the first.\nThis is the second. This is the third.'))
 
+    def test_normalize_summary(self):
+        self.assertEqual(
+                'This is a sentence.',
+                docformatter.normalize_summary('This \n\t is\na sentence'))
+
+    def test_normalize_summary_with_wrapping(self):
+        self.assertEqual(
+                'This is a\nsentence.',
+                docformatter.normalize_summary('This \n\t is\na sentence', 10))
+
 
 @contextlib.contextmanager
 def temporary_file(contents):
