@@ -94,7 +94,7 @@ Below is the help output::
 
     optional arguments:
       -h, --help            show this help message and exit
-      --in-place            make changes to file instead of printing diff
+      --in-place            make changes to files instead of printing diffs
       --no-backup           do not write backup files
       --wrap-long-summaries LENGTH
                             wrap long summary lines at this length (default: 0)
