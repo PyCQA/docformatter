@@ -3,7 +3,7 @@ check:
 	@echo .
 	@pep257.py docformatter docformatter.py setup.py
 	@echo .
-	@pylint --report=no --include-ids=yes --disable=F0401 --rcfile=/dev/null docformatter.py setup.py
+	@pylint --report=no --include-ids=yes --disable=F0401,R0914 --rcfile=/dev/null docformatter.py setup.py
 	@echo .
 	@python setup.py --long-description | rst2html --strict > /dev/null
 
