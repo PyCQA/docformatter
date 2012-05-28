@@ -111,7 +111,7 @@ r'''def foo():
             1
 '''))
 
-    def test_format_code_ignore_complex(self):
+    def test_format_code_skip_complex(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
 '''\
@@ -128,7 +128,7 @@ def foo():
     """
 '''))
 
-    def test_format_code_ignore_complex_single(self):
+    def test_format_code_skip_complex_single(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
 """\
