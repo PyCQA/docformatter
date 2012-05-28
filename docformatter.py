@@ -182,7 +182,7 @@ def main(argv, standard_out):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--in-place', action='store_true',
-                        help='make changes to file instead of printing diff')
+                        help='make changes to files instead of printing diffs')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
                         help='do not write backup files')
     parser.add_argument(
