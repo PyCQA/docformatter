@@ -145,6 +145,14 @@ def foo():
     '''
 """))
 
+    def test_format_code_skip_nested(self):
+        code = """\
+def foo():
+    '''Hello foo. \"\"\"abc\"\"\"
+    '''
+"""
+        self.assertEqual(code, docformatter.format_code(code))
+
     def test_format_code_with_multiple_sentences(self):
         self.assertEqual(
 '''\
