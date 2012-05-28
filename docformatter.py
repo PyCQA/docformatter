@@ -28,7 +28,9 @@ def format_code(source):
 
         # Preserve escaped newlines
         if (start_row > last_row and
-                previous_line.endswith('\\\n')):
+                (previous_line.endswith('\\\n') or
+                 previous_line.endswith('\\\r\n') or
+                 previous_line.endswith('\\\r'))):
             formatted += previous_line[len(previous_line.rstrip(' \t\n\r\\')):]
 
         if start_row > last_row:
