@@ -149,6 +149,7 @@ def normalize_summary(summary):
 def open_with_encoding(filename, encoding, mode='r'):
     """Open file with a specific encoding."""
     try:
+        # Python 3
         return open(filename, mode=mode, encoding=encoding)
     except TypeError:
         return open(filename, mode=mode)
