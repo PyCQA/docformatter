@@ -146,31 +146,22 @@ def normalize_summary(summary):
     return summary
 
 
-@contextlib.contextmanager
-def open_with_encoding(filename, mode='r', encoding=None):
-    """Open file with proper encoding.
-
-    Return (file, encoding).
-
-    """
-    open_file = None
+def open_with_encoding(filename, encoding, mode='r'):
+    """Open file with a specific encoding."""
     try:
-        if not encoding:
-            try:
-                # Python 3
-                with open(filename, 'rb') as input_file:
-                    encoding = tokenize.detect_encoding(input_file.readline)[0]
-            except IOError:
-                encoding = 'utf-8'
+        return open(filename, mode=mode, encoding=encoding)
+    except TypeError:
+        return open(filename, mode=mode)
 
-        open_file = open(filename, mode=mode, encoding=encoding)
-        yield (open_file, encoding)
-    except (AttributeError, TypeError):
-        open_file = open(filename, mode=mode)
-        yield (open_file, None)
 
-    if open_file:
-        open_file.close()
+def detect_encoding(filename):
+    """Return file encoding."""
+    try:
+        # Python 3
+        with open(filename, 'rb') as input_file:
+            return tokenize.detect_encoding(input_file.readline)[0]
+    except AttributeError:
+        return 'utf-8'
 
 
 def main(argv, standard_out):
@@ -188,7 +179,8 @@ def main(argv, standard_out):
     args = parser.parse_args(argv)
 
     for filename in args.files:
-        with open_with_encoding(filename) as (input_file, encoding):
+        encoding = detect_encoding(filename)
+        with open_with_encoding(filename, encoding=encoding) as input_file:
             source = input_file.read()
             formatted_source = format_code(source)
 
@@ -197,11 +189,11 @@ def main(argv, standard_out):
                 # Write output files with same encoding as input
                 if args.backup:
                     with open_with_encoding(filename + '.backup', mode='w',
-                            encoding=encoding) as (backup_file, _):
+                            encoding=encoding) as backup_file:
                         backup_file.write(source)
 
                 with open_with_encoding(filename, mode='w',
-                                        encoding=encoding) as (output_file, _):
+                                        encoding=encoding) as output_file:
                     output_file.write(formatted_source)
             else:
                 import difflib
