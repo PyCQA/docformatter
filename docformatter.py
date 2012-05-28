@@ -11,8 +11,12 @@ except ImportError:
 __version__ = '0.1.5'
 
 
-def format_code(source):
-    """Return source code with docstrings formatted."""
+def format_code(source, summary_wrap_length=0):
+    """Return source code with docstrings formatted.
+
+    Wrap summary lines if summary_wrap_length is greater than 0.
+
+    """
     sio = StringIO(source)
     formatted = ''
     previous_token_string = ''
@@ -41,7 +45,10 @@ def format_code(source):
         if (token_type == tokenize.STRING and
                 starts_with_triple(token_string) and
                 previous_token_type == tokenize.INDENT):
-            formatted += format_docstring(previous_token_string, token_string)
+            formatted += format_docstring(
+                    previous_token_string,
+                    token_string,
+                    summary_wrap_length=summary_wrap_length)
         else:
             formatted += token_string
 
@@ -61,8 +68,10 @@ def starts_with_triple(string):
             string.strip().startswith("'''"))
 
 
-def format_docstring(indentation, docstring):
+def format_docstring(indentation, docstring, summary_wrap_length=0):
     """Return formatted version of docstring.
+
+    Wrap summary lines if summary_wrap_length is greather than 0.
 
     Relevant parts of PEP 257:
     * For consistency, always use triple double quotes around docstrings.
@@ -90,12 +99,12 @@ def format_docstring(indentation, docstring):
 {description}
 
 {indentation}"""\
-'''.format(summary=normalize_summary(summary),
+'''.format(summary=normalize_summary(summary, summary_wrap_length),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
            indentation=indentation)
     else:
-        return '"""' + normalize_summary(contents) + '"""'
+        return '"""' + normalize_summary(contents, summary_wrap_length) + '"""'
 
 
 def indent_non_indented(line, indentation):
@@ -133,7 +142,7 @@ def strip_docstring(docstring):
     return docstring.split(triple, 1)[1].rsplit(triple, 1)[0].strip()
 
 
-def normalize_summary(summary):
+def normalize_summary(summary, wrap_length=0):
     """Return normalized docstring summary."""
     # Remove newlines
     summary = re.sub('\s*\n\s*', ' ', summary.strip())
@@ -141,6 +150,10 @@ def normalize_summary(summary):
     # Add period at end of sentence
     if summary and not summary.endswith('.'):
         summary += '.'
+
+    if wrap_length > 0:
+        import textwrap
+        summary = '\n'.join(textwrap.wrap(summary, width=wrap_length))
 
     return summary
 
@@ -172,6 +185,8 @@ def main(argv, standard_out):
                         help='make changes to file instead of printing diff')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
                         help='do not write backup files')
+    parser.add_argument('--wrap-long-summaries', default=0, type=int,
+                        help='wrap long summary lines at this length')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
@@ -182,7 +197,9 @@ def main(argv, standard_out):
         encoding = detect_encoding(filename)
         with open_with_encoding(filename, encoding=encoding) as input_file:
             source = input_file.read()
-            formatted_source = format_code(source)
+            formatted_source = format_code(
+                    source,
+                    summary_wrap_length=args.wrap_long_summaries)
 
         if source != formatted_source:
             if args.in_place:
