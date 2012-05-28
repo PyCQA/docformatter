@@ -2,7 +2,6 @@
 
 import re
 import tokenize
-import contextlib
 try:
     from StringIO import StringIO
 except ImportError:
