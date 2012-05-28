@@ -159,7 +159,7 @@ def normalize_summary(summary, wrap_length=0):
 
 
 def open_with_encoding(filename, encoding, mode='r'):
-    """Open file with a specific encoding."""
+    """Open and return a file with a specific encoding."""
     try:
         # Python 3
         return open(filename, mode=mode, encoding=encoding)
@@ -185,8 +185,9 @@ def main(argv, standard_out):
                         help='make changes to file instead of printing diff')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
                         help='do not write backup files')
-    parser.add_argument('--wrap-long-summaries', default=0, type=int,
-                        help='wrap long summary lines at this length')
+    parser.add_argument(
+            '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
+            help='wrap long summary lines at this length (default: 0)')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
