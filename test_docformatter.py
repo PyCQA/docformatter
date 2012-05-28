@@ -352,7 +352,7 @@ def foo():
     """
 ''') as filename:
             output_file = StringIO()
-            docformatter.main(argv=[filename], output_file=output_file)
+            docformatter.main(argv=[filename], standard_out=output_file)
             self.assertEqual('''\
 @@ -1,4 +1,2 @@
  def foo():
@@ -371,7 +371,7 @@ def foo():
 ''') as filename:
             output_file = StringIO()
             docformatter.main(argv=['--in-place', filename],
-                              output_file=output_file)
+                              standard_out=output_file)
             with open(filename) as f:
                 self.assertEqual('''\
 def foo():
