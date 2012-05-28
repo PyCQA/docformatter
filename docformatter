@@ -6,4 +6,4 @@ import docformatter
 
 
 if __name__ == '__main__':
-    sys.exit(docformatter.main(sys.argv, output_file=sys.stdout))
+    sys.exit(docformatter.main(sys.argv, standard_out=sys.stdout))
