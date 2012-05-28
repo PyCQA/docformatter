@@ -62,10 +62,22 @@ def starts_with_triple(string):
 
 
 def format_docstring(indentation, docstring):
-    """Return formatted version of docstring."""
+    """Return formatted version of docstring.
+
+    Relevant parts of PEP 257:
+    * For consistency, always use triple double quotes around docstrings.
+    * Triple quotes are used even though the string fits on one line.
+    * Multi-line docstrings consist of a summary line just like a one-line
+      docstring, followed by a blank line, followed by a more elaborate
+      description.
+    * The BDFL recommends inserting a blank line between the last paragraph
+      in a multi-line docstring and its closing quotes, placing the closing
+      quotes on a line by themselves.
+    
+    """
     contents = strip_docstring(docstring)
 
-    # Skip if there are nested triple double-quotes
+    # Skip if there are nested triple double quotes
     if contents.count('"""'):
         return docstring
 
