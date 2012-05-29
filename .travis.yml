@@ -3,10 +3,11 @@ python:
     - "2.6"
     - "2.7"
     - "3.2"
-install:
-    - ./scripts/travis_dependencies.bash
-    - python setup.py --quiet install
+before_install:
+    - ./scripts/travis_conditional_dependencies.bash
     - pip --quiet install coverage
+install:
+    - python setup.py --quiet install
 script:
     - python test_docformatter.py
     - coverage run test_docformatter.py
