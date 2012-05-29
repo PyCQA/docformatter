@@ -46,9 +46,9 @@ def format_code(source, summary_wrap_length=0):
                 starts_with_triple(token_string) and
                 previous_token_type == tokenize.INDENT):
             formatted += format_docstring(
-                    previous_token_string,
-                    token_string,
-                    summary_wrap_length=summary_wrap_length)
+                previous_token_string,
+                token_string,
+                summary_wrap_length=summary_wrap_length)
         else:
             formatted += token_string
 
@@ -188,8 +188,8 @@ def main(argv, standard_out):
     parser.add_argument('--no-backup', dest='backup', action='store_false',
                         help='do not write backup files')
     parser.add_argument(
-            '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
-            help='wrap long summary lines at this length (default: 0)')
+        '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
+        help='wrap long summary lines at this length (default: 0)')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
@@ -201,15 +201,15 @@ def main(argv, standard_out):
         with open_with_encoding(filename, encoding=encoding) as input_file:
             source = input_file.read()
             formatted_source = format_code(
-                    source,
-                    summary_wrap_length=args.wrap_long_summaries)
+                source,
+                summary_wrap_length=args.wrap_long_summaries)
 
         if source != formatted_source:
             if args.in_place:
                 # Write output files with same encoding as input
                 if args.backup:
                     with open_with_encoding(filename + '.backup', mode='w',
-                            encoding=encoding) as backup_file:
+                                            encoding=encoding) as backup_file:
                         backup_file.write(source)
 
                 with open_with_encoding(filename, mode='w',
@@ -218,8 +218,8 @@ def main(argv, standard_out):
             else:
                 import difflib
                 diff = difflib.unified_diff(
-                        source.splitlines(True),
-                        formatted_source.splitlines(True),
-                        'before/' + filename,
-                        'after/' + filename)
+                    source.splitlines(True),
+                    formatted_source.splitlines(True),
+                    'before/' + filename,
+                    'after/' + filename)
                 standard_out.write(''.join(diff))
