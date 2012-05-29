@@ -74,14 +74,14 @@ def format_docstring(indentation, docstring, summary_wrap_length=0):
     Wrap summary lines if summary_wrap_length is greater than 0.
 
     Relevant parts of PEP 257:
-    * For consistency, always use triple double quotes around docstrings.
-    * Triple quotes are used even though the string fits on one line.
-    * Multi-line docstrings consist of a summary line just like a one-line
-      docstring, followed by a blank line, followed by a more elaborate
-      description.
-    * The BDFL recommends inserting a blank line between the last paragraph
-      in a multi-line docstring and its closing quotes, placing the closing
-      quotes on a line by themselves.
+        - For consistency, always use triple double quotes around docstrings.
+        - Triple quotes are used even though the string fits on one line.
+        - Multi-line docstrings consist of a summary line just like a one-line
+          docstring, followed by a blank line, followed by a more elaborate
+          description.
+        - The BDFL recommends inserting a blank line between the last paragraph
+          in a multi-line docstring and its closing quotes, placing the closing
+          quotes on a line by themselves.
 
     """
     contents = strip_docstring(docstring)
