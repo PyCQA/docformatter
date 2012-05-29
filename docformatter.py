@@ -71,7 +71,7 @@ def starts_with_triple(string):
 def format_docstring(indentation, docstring, summary_wrap_length=0):
     """Return formatted version of docstring.
 
-    Wrap summary lines if summary_wrap_length is greather than 0.
+    Wrap summary lines if summary_wrap_length is greater than 0.
 
     Relevant parts of PEP 257:
     * For consistency, always use triple double quotes around docstrings.
@@ -153,7 +153,9 @@ def normalize_summary(summary, wrap_length=0):
 
     if wrap_length > 0:
         import textwrap
-        summary = '\n'.join(textwrap.wrap(summary, width=wrap_length))
+        # Compensate for triple quotes by temporarily prepending 3 spaces
+        summary = '\n'.join(textwrap.wrap(' ' * 3 + summary,
+                                          width=wrap_length)).strip()
 
     return summary
 

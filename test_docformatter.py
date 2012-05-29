@@ -335,7 +335,7 @@ def foo():
     def test_normalize_summary_with_wrapping(self):
         self.assertEqual(
                 'This is a\nsentence.',
-                docformatter.normalize_summary('This \n\t is\na sentence', 10))
+                docformatter.normalize_summary('This \n\t is\na sentence', 15))
 
 
 @contextlib.contextmanager
