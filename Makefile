@@ -6,6 +6,7 @@ check:
 	@pylint --report=no --include-ids=yes --disable=F0401,R0914 --rcfile=/dev/null docformatter.py setup.py
 	@echo .
 	@python setup.py --long-description | rst2html --strict > /dev/null
+	@scspell docformatter docformatter.py setup.py test_docformatter.py
 
 coverage:
 	@rm -f .coverage
