@@ -148,7 +148,7 @@ def normalize_summary(summary, wrap_length=0):
     summary = re.sub('\s*\n\s*', ' ', summary.strip())
 
     # Add period at end of sentence
-    if summary and not summary.endswith('.'):
+    if summary and summary[-1].isalnum():
         summary += '.'
 
     if wrap_length > 0:
