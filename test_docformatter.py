@@ -337,6 +337,12 @@ def foo():
                 'This is a\nsentence.',
                 docformatter.normalize_summary('This \n\t is\na sentence', 15))
 
+    def test_normalize_summary_with_different_punctuation(self):
+        summary = 'This is a question?'
+        self.assertEqual(
+                summary,
+                docformatter.normalize_summary(summary))
+
 
 @contextlib.contextmanager
 def temporary_file(contents):
