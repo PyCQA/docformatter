@@ -23,7 +23,7 @@ this code::
     def launch_rocket():
         """Launch
     the
-    rocket."""
+    rocket. Go colonize space."""
 
 
     def factorial(x):
@@ -50,10 +50,15 @@ this code::
         if factorial(10):
             launch_rocket()
 
+
 gets formatted into this::
 
     def launch_rocket():
-        """Launch the rocket."""
+        """Launch the rocket.
+
+        Go colonize space.
+
+        """
 
 
     def factorial(x):
