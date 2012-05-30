@@ -184,7 +184,7 @@ def detect_encoding(filename):
 def main(argv, standard_out):
     """Main entry point."""
     import argparse
-    parser = argparse.ArgumentParser(description=__doc__, prog=argv[0])
+    parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     parser.add_argument('--in-place', action='store_true',
                         help='make changes to files instead of printing diffs')
     parser.add_argument('--no-backup', dest='backup', action='store_false',
