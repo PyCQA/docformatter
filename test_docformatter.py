@@ -1,12 +1,18 @@
 """Test suite for docformatter."""
 
 import docformatter
-import unittest
 import contextlib
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+try:
+    # Python 2.6
+    import unittest2 as unittest
+except:
+    import unittest
 
 
 class TestUnits(unittest.TestCase):
@@ -413,6 +419,13 @@ def foo():
 -    """
 +    """Hello world."""
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+
+    def test_no_arguments(self):
+        import subprocess
+        process = subprocess.Popen(['./docformatter'],
+                                   stderr=subprocess.PIPE)
+        self.assertIn('too few arguments',
+                      process.communicate()[1].decode('utf-8'))
 
 
 if __name__ == '__main__':
