@@ -151,6 +151,7 @@ def normalize_summary(summary, wrap_length=0):
     if summary and summary[-1].isalnum():
         summary += '.'
 
+    # This is disabled by default since it goes against PEP 257
     if wrap_length > 0:
         import textwrap
         # Compensate for triple quotes by temporarily prepending 3 spaces
