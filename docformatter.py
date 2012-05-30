@@ -196,7 +196,7 @@ def main(argv, standard_out):
     parser.add_argument('files', nargs='+',
                         help='files to format')
 
-    args = parser.parse_args(argv)
+    args = parser.parse_args(argv[1:])
 
     for filename in args.files:
         encoding = detect_encoding(filename)
