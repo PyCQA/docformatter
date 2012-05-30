@@ -37,10 +37,11 @@ def format_code(source, summary_wrap_length=0):
                  previous_line.endswith('\\\r'))):
             formatted += previous_line[len(previous_line.rstrip(' \t\n\r\\')):]
 
+        # Preserve spacing
         if start_row > last_row:
             last_column = 0
         if start_column > last_column:
-            formatted += (' ' * (start_column - last_column))
+            formatted += ' ' * (start_column - last_column)
 
         if (token_type == tokenize.STRING and
                 starts_with_triple(token_string) and
