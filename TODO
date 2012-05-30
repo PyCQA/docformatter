@@ -2,3 +2,4 @@
 - Remove blank lines before and after function docstring.
 - Use raw double triple quotes if there are backslashes in the docstring.
 - Use unicode double triple quotes for non-ASCII docstrings.
+- Fix bad indentation in docstring descriptions.
