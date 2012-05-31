@@ -49,6 +49,23 @@ Hello.
 """
 '''.strip()))
 
+    def test_format_docstring_with_bad_indentation(self):
+        self.assertEqual('''"""Hello.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""Hello.
+
+This should be indented but it is not. The
+next line should be indented too. But
+    this is okay.
+    """
+'''.strip()))
+
     def test_format_docstring_with_empty_docstring(self):
         self.assertEqual('""""""',
                          docformatter.format_docstring('    ', '""""""'))
