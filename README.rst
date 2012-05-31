@@ -120,3 +120,11 @@ Below is the help output::
       --wrap-long-summaries LENGTH
                             wrap long summary lines at this length (default: 0)
       --version             show program's version number and exit
+
+------
+Issues
+------
+
+Issues can be reported on the `GitHub page`_.
+
+.. _`GitHub page`: https://github.com/myint/docformatter/issues
