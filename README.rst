@@ -10,6 +10,22 @@ Formats docstrings to follow `PEP 257`_.
    :target: https://secure.travis-ci.org/myint/docformatter
    :alt: Build status
 
+--------
+Features
+--------
+
+docformatter currently automatically formats docstrings to follow a subset of
+the PEP 257 conventions. Below are the relevant items quoted from PEP 257.
+
+- For consistency, always use triple double quotes around docstrings.
+- Triple quotes are used even though the string fits on one line.
+- Multi-line docstrings consist of a summary line just like a one-line
+  docstring, followed by a blank line, followed by a more elaborate
+  description.
+- The BDFL recommends inserting a blank line between the last paragraph
+  in a multi-line docstring and its closing quotes, placing the closing
+  quotes on a line by themselves.
+
 -------
 Example
 -------
