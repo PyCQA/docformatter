@@ -125,6 +125,6 @@ Below is the help output::
 Issues
 ------
 
-Bugs and fixes can be reported on the `GitHub page`_.
+Bugs and patches can be reported on the `GitHub page`_.
 
 .. _`GitHub page`: https://github.com/myint/docformatter/issues
