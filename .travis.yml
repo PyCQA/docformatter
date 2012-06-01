@@ -3,6 +3,7 @@ python:
     - "2.6"
     - "2.7"
     - "3.2"
+    - "pypy"
 before_install:
     - ./scripts/travis_conditional_dependencies.bash
     - pip --quiet install coverage
