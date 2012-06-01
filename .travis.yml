@@ -5,7 +5,7 @@ python:
     - "3.2"
     - "pypy"
 before_install:
-    - ./scripts/travis_conditional_dependencies.bash
+    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --quiet install argparse unittest2; fi
     - pip --quiet install coverage
 install:
     - python setup.py --quiet install
