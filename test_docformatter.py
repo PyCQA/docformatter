@@ -134,6 +134,26 @@ r'''def foo():
             1
 '''))
 
+    def test_format_code_with_comments(self):
+        self.assertEqual(
+r'''
+def foo():
+    """Hello foo."""
+    # My comment
+    # My comment with escape \
+    123
+'''.lstrip(),
+                docformatter.format_code(
+r'''
+def foo():
+    """
+    Hello foo.
+    """
+    # My comment
+    # My comment with escape \
+    123
+'''.lstrip()))
+
     def test_format_code_skip_complex(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(

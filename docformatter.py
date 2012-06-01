@@ -31,7 +31,8 @@ def format_code(source, summary_wrap_length=0):
         end_row, end_column = token[3]
 
         # Preserve escaped newlines
-        if (start_row > last_row and
+        if (not previous_line.lstrip().startswith('#') and
+            start_row > last_row and
                 (previous_line.endswith('\\\n') or
                  previous_line.endswith('\\\r\n') or
                  previous_line.endswith('\\\r'))):
