@@ -192,7 +192,7 @@ def main(argv, standard_out):
                         help='do not write backup files')
     parser.add_argument(
         '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
-        help='wrap long summary lines at this length (default: 0)')
+        help='wrap long summary lines at this length (default: %(default)s)')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
