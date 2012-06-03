@@ -125,10 +125,13 @@ def split_summary_and_description(contents):
     """
     split = contents.splitlines()
     if len(split) > 1 and not split[1].strip():
+        # Empty line separation would indicate the rest is the description.
         return (split[0], '\n'.join(split[2:]))
     elif len(split) > 1 and not split[1].strip()[0].isalnum():
+        # Symbol on second line probably is a description with a list.
         return (split[0], '\n'.join(split[1:]))
     else:
+        # Break on first sentence.
         split = re.split('\.\s', string=contents, maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + '.', split[1].strip())
