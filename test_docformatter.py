@@ -376,6 +376,12 @@ def foo():
                          docformatter.split_summary_and_description(
 'This is the first\n- one\n- two'))
 
+    def test_split_summary_and_description_with_other_symbol(self):
+        self.assertEqual(('This is the first',
+                          '@ one\n@ two'),
+                         docformatter.split_summary_and_description(
+'This is the first\n@ one\n@ two'))
+
     def test_normalize_summary(self):
         self.assertEqual(
                 'This is a sentence.',
