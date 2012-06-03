@@ -126,6 +126,8 @@ def split_summary_and_description(contents):
     split = contents.splitlines()
     if len(split) > 1 and not split[1].strip():
         return (split[0], '\n'.join(split[2:]))
+    elif len(split) > 1 and not split[1].strip()[0].isalnum():
+        return (split[0], '\n'.join(split[1:]))
     else:
         split = re.split('\.\s', string=contents, maxsplit=1)
         if len(split) == 2:
