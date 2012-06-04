@@ -521,14 +521,16 @@ def foo():
             import subprocess
             process = subprocess.Popen(['./docformatter',
                                         '--wrap-long-summaries=40',
+                                        '--pre-summary-newline',
                                         '--no-blank',
                                         filename],
                                        stdout=subprocess.PIPE)
             self.assertEqual('''\
-@@ -1,7 +1,8 @@
+@@ -1,7 +1,9 @@
  def foo():
 -    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
-+    """Hello world is a long sentence that
++    """
++    Hello world is a long sentence that
 +    will be wrapped at 40 characters
 +    because I'm using that option.
 +

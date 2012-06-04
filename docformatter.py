@@ -103,7 +103,9 @@ def format_docstring(indentation, docstring,
     summary, description = split_summary_and_description(contents)
 
     if description:
-        if not pre_summary_newline:
+        if pre_summary_newline:
+            summary = indentation + summary
+        else:
             # Compensate for triple quotes by temporarily prepending 3 spaces.
             # This temporary prepending is undone below.
             summary = 3 * ' ' + summary
