@@ -232,11 +232,20 @@ def main(argv, standard_out):
                         action='store_true',
                         help='add a newline before the summary of a '
                              'multi-line docstring')
+    parser.add_argument('--alternate-style',
+                        action='store_true',
+                        help='enables --no-blank, --pre-summary-newline, and '
+                             '--wrap-long-summaries=79')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
 
     args = parser.parse_args(argv[1:])
+
+    if args.alternate_style:
+        args.pre_summary_newline = True
+        args.post_description_blank = False
+        args.wrap_long_summaries = 79
 
     for filename in args.files:
         encoding = detect_encoding(filename)
