@@ -66,6 +66,22 @@ next line should be indented too. But
     """
 '''.strip()))
 
+    def test_format_docstring_with_no_post_description_blank(self):
+        self.assertEqual('''"""Hello.
+
+    Description.
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""
+
+Hello.
+
+    Description.
+
+
+    """
+'''.strip(), post_description_blank=False))
+
     def test_format_docstring_with_empty_docstring(self):
         self.assertEqual('""""""',
                          docformatter.format_docstring('    ', '""""""'))
