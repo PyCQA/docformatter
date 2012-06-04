@@ -105,7 +105,8 @@ Options
 Below is the help output::
 
     usage: docformatter [-h] [--in-place] [--no-backup]
-                        [--wrap-long-summaries LENGTH] [--no-blank] [--version]
+                        [--wrap-long-summaries LENGTH] [--no-blank]
+                        [--pre-summary-newline] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -120,6 +121,9 @@ Below is the help output::
       --wrap-long-summaries LENGTH
                             wrap long summary lines at this length (default: 0)
       --no-blank            do not add blank line after description
+      --pre-summary-newline
+                            add a newline before the summary of a multi-line
+                            docstring
       --version             show program's version number and exit
 
 ------
