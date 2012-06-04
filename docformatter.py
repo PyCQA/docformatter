@@ -124,7 +124,15 @@ def format_docstring(indentation, docstring,
            post_description=('\n' if post_description_blank else ''),
            indentation=indentation)
     else:
-        return '"""' + normalize_summary(contents, summary_wrap_length) + '"""'
+        if pre_summary_newline:
+            prefix = '\n' + indentation
+            suffix = '\n' + indentation
+        else:
+            prefix = ''
+            suffix = ''
+        return ('"""' + prefix +
+                normalize_summary(contents, summary_wrap_length) +
+                suffix + '"""')
 
 
 def indent_non_indented(line, indentation):
