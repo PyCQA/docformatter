@@ -11,7 +11,7 @@ except ImportError:
 __version__ = '0.1.9'
 
 
-def format_code(source, summary_wrap_length=0):
+def format_code(source, summary_wrap_length=0, post_description_blank=True):
     """Return source code with docstrings formatted.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -50,7 +50,8 @@ def format_code(source, summary_wrap_length=0):
             formatted += format_docstring(
                 previous_token_string,
                 token_string,
-                summary_wrap_length=summary_wrap_length)
+                summary_wrap_length=summary_wrap_length,
+                post_description_blank=post_description_blank)
         else:
             formatted += token_string
 
@@ -70,7 +71,9 @@ def starts_with_triple(string):
             string.strip().startswith("'''"))
 
 
-def format_docstring(indentation, docstring, summary_wrap_length=0):
+def format_docstring(indentation, docstring,
+                     summary_wrap_length=0,
+                     post_description_blank=True):
     """Return formatted version of docstring.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -98,12 +101,12 @@ def format_docstring(indentation, docstring, summary_wrap_length=0):
         return '''\
 """{summary}
 
-{description}
-
+{description}{post_description}
 {indentation}"""\
 '''.format(summary=normalize_summary(summary, summary_wrap_length),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
+           post_description=('\n' if post_description_blank else ''),
            indentation=indentation)
     else:
         return '"""' + normalize_summary(contents, summary_wrap_length) + '"""'
@@ -207,6 +210,9 @@ def main(argv, standard_out):
     parser.add_argument(
         '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
         help='wrap long summary lines at this length (default: %(default)s)')
+    parser.add_argument('--no-blank', dest='post_description_blank',
+                        action='store_false',
+                        help='do not add blank line after description')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
@@ -219,7 +225,8 @@ def main(argv, standard_out):
             source = input_file.read()
             formatted_source = format_code(
                 source,
-                summary_wrap_length=args.wrap_long_summaries)
+                summary_wrap_length=args.wrap_long_summaries,
+                post_description_blank=args.post_description_blank)
 
         if source != formatted_source:
             if args.in_place:
