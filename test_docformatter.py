@@ -82,6 +82,24 @@ Hello.
     """
 '''.strip(), post_description_blank=False))
 
+    def test_format_docstring_with_pre_summary_newline(self):
+        self.assertEqual('''"""
+    Hello.
+
+    Description.
+
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""
+
+Hello.
+
+    Description.
+
+
+    """
+'''.strip(), pre_summary_newline=True))
+
     def test_format_docstring_with_empty_docstring(self):
         self.assertEqual('""""""',
                          docformatter.format_docstring('    ', '""""""'))
@@ -410,7 +428,8 @@ def foo():
 
     def test_normalize_summary_with_wrapping_compensate_for_quotes(self):
         self.assertEqual('0\n1 2\n3 4\n5 6.',
-                docformatter.normalize_summary('0 1 2 3 4 5 6.', 4))
+                docformatter.normalize_summary('   0 1 2 3 4 5 6.',
+                                               wrap_length=4))
 
     def test_normalize_summary_with_different_punctuation(self):
         summary = 'This is a question?'
@@ -487,6 +506,37 @@ def foo():
 -    Hello world
 -    """
 +    """Hello world."""
+''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+
+    def test_end_to_end_all_options(self):
+        with temporary_file('''\
+def foo():
+    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
+    - My list item
+    - My list item
+
+
+    """
+''') as filename:
+            import subprocess
+            process = subprocess.Popen(['./docformatter',
+                                        '--wrap-long-summaries=40',
+                                        '--no-blank',
+                                        filename],
+                                       stdout=subprocess.PIPE)
+            self.assertEqual('''\
+@@ -1,7 +1,8 @@
+ def foo():
+-    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
++    """Hello world is a long sentence that
++    will be wrapped at 40 characters
++    because I'm using that option.
++
+     - My list item
+     - My list item
+-
+-
+     """
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
     def test_no_arguments(self):

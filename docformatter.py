@@ -11,7 +11,10 @@ except ImportError:
 __version__ = '0.1.9'
 
 
-def format_code(source, summary_wrap_length=0, post_description_blank=True):
+def format_code(source,
+                summary_wrap_length=0,
+                pre_summary_newline=False,
+                post_description_blank=True):
     """Return source code with docstrings formatted.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -51,6 +54,7 @@ def format_code(source, summary_wrap_length=0, post_description_blank=True):
                 previous_token_string,
                 token_string,
                 summary_wrap_length=summary_wrap_length,
+                pre_summary_newline=pre_summary_newline,
                 post_description_blank=post_description_blank)
         else:
             formatted += token_string
@@ -73,6 +77,7 @@ def starts_with_triple(string):
 
 def format_docstring(indentation, docstring,
                      summary_wrap_length=0,
+                     pre_summary_newline=False,
                      post_description_blank=True):
     """Return formatted version of docstring.
 
@@ -98,12 +103,20 @@ def format_docstring(indentation, docstring,
     summary, description = split_summary_and_description(contents)
 
     if description:
+        if not pre_summary_newline:
+            # Compensate for triple quotes by temporarily prepending 3 spaces.
+            # This temporary prepending is undone below.
+            summary = 3 * ' ' + summary
+
         return '''\
-"""{summary}
+"""{pre_summary}{summary}
 
 {description}{post_description}
 {indentation}"""\
-'''.format(summary=normalize_summary(summary, summary_wrap_length),
+'''.format(pre_summary=('\n'+  indentation if pre_summary_newline else ''),
+           summary=normalize_summary(summary,
+                                     summary_wrap_length,
+                                     indentation).lstrip(),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
            post_description=('\n' if post_description_blank else ''),
@@ -152,10 +165,10 @@ def strip_docstring(docstring):
     return docstring.split(triple, 1)[1].rsplit(triple, 1)[0].strip()
 
 
-def normalize_summary(summary, wrap_length=0):
+def normalize_summary(summary, wrap_length=0, indentation=''):
     """Return normalized docstring summary."""
     # Remove newlines
-    summary = re.sub('\s*\n\s*', ' ', summary.strip())
+    summary = re.sub('\s*\n\s*', ' ', summary.rstrip())
 
     # Add period at end of sentence
     if summary and summary[-1].isalnum():
@@ -164,9 +177,9 @@ def normalize_summary(summary, wrap_length=0):
     # This is disabled by default since it goes against PEP 257
     if wrap_length > 0:
         import textwrap
-        # Compensate for triple quotes by temporarily prepending 3 spaces
-        summary = '\n'.join(textwrap.wrap(' ' * 3 + summary,
-                                          width=wrap_length)).strip()
+        summary = '\n'.join(textwrap.wrap(summary,
+                                          width=wrap_length,
+                                          subsequent_indent=indentation)).strip()
 
     return summary
 
@@ -213,6 +226,10 @@ def main(argv, standard_out):
     parser.add_argument('--no-blank', dest='post_description_blank',
                         action='store_false',
                         help='do not add blank line after description')
+    parser.add_argument('--pre-summary-newline',
+                        action='store_true',
+                        help='add a newline before the summary of a '
+                             'multi-line docstring')
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
@@ -226,6 +243,7 @@ def main(argv, standard_out):
             formatted_source = format_code(
                 source,
                 summary_wrap_length=args.wrap_long_summaries,
+                pre_summary_newline=args.pre_summary_newline,
                 post_description_blank=args.post_description_blank)
 
         if source != formatted_source:
