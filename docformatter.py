@@ -115,7 +115,7 @@ def format_docstring(indentation, docstring,
 
 {description}{post_description}
 {indentation}"""\
-'''.format(pre_summary=('\n'+  indentation if pre_summary_newline else ''),
+'''.format(pre_summary=('\n' + indentation if pre_summary_newline else ''),
            summary=normalize_summary(summary,
                                      summary_wrap_length,
                                      indentation).lstrip(),
@@ -179,9 +179,10 @@ def normalize_summary(summary, wrap_length=0, indentation=''):
     # This is disabled by default since it goes against PEP 257
     if wrap_length > 0:
         import textwrap
-        summary = '\n'.join(textwrap.wrap(summary,
-                                          width=wrap_length,
-                                          subsequent_indent=indentation)).strip()
+        summary = '\n'.join(
+            textwrap.wrap(summary,
+                          width=wrap_length,
+                          subsequent_indent=indentation)).strip()
 
     return summary
 
