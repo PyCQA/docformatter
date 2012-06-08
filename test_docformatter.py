@@ -555,36 +555,6 @@ def foo():
      """
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
-    def test_end_to_end_alternate_style(self):
-        with temporary_file('''\
-def foo():
-    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
-    - My list item
-    - My list item
-
-
-    """
-''') as filename:
-            import subprocess
-            process = subprocess.Popen(['./docformatter',
-                                        '--alternate-style',
-                                        filename],
-                                       stdout=subprocess.PIPE)
-            self.assertEqual('''\
-@@ -1,7 +1,8 @@
- def foo():
--    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
-+    """
-+    Hello world is a long sentence that will be wrapped at 40 characters
-+    because I'm using that option.
-+
-     - My list item
-     - My list item
--
--
-     """
-''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
-
     def test_no_arguments(self):
         import subprocess
         process = subprocess.Popen(['./docformatter'],
