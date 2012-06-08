@@ -1,6 +1,3 @@
-- Allow summary to go on second line:
-  "The summary line may be on the same line as the opening quotes or on the next
-  line."
 - Add blank lines before and after class docstrings.
 - Remove blank lines before and after function docstring.
 - Use raw double triple quotes if there are backslashes in the docstring.
