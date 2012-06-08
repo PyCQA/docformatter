@@ -100,20 +100,6 @@ Hello.
     """
 '''.strip(), pre_summary_newline=True))
 
-    def test_format_docstring_with_pre_summary_newline_single(self):
-        self.assertEqual('''"""
-    Hello.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""
-
-Hello.
-
-
-
-    """
-'''.strip(), pre_summary_newline=True))
-
     def test_format_docstring_with_empty_docstring(self):
         self.assertEqual('""""""',
                          docformatter.format_docstring('    ', '""""""'))
