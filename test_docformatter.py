@@ -442,7 +442,7 @@ def foo():
 def temporary_file(contents):
     """Write contents to temporary file and yield it."""
     import tempfile
-    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False)
+    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False, dir='.')
     try:
         f.write(contents.encode('utf8'))
         f.close()
@@ -488,6 +488,10 @@ def foo():
 def foo():
     """Hello world."""
 ''', f.read())
+
+            # Clean up backup file
+            import os
+            os.remove(filename + '.backup')
 
     def test_end_to_end(self):
         with temporary_file('''\
