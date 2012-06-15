@@ -2,13 +2,21 @@
 """Setup for docformatter."""
 
 from distutils import core
-import docformatter
+
+
+def version():
+    """Return version string."""
+    with open('docformatter.py') as input_file:
+        for line in input_file:
+            if line.startswith('__version__'):
+                import ast
+                return ast.literal_eval(line.split('=')[1].strip())
 
 
 with open('README.rst') as readme:
     core.setup(name='docformatter',
-               version=docformatter.__version__,
-               description=docformatter.__doc__,
+               version=version(),
+               description='Formats docstrings to follow PEP 257.',
                long_description=readme.read(),
                license='Expat License',
                author='myint',
