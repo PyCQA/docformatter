@@ -6,6 +6,7 @@ import contextlib
 try:
     from StringIO import StringIO
 except ImportError:
+    # Python 3
     from io import StringIO
 
 try:
