@@ -16,6 +16,9 @@ coverage:
 	@rm -f .coverage
 	@open 'htmlcov/index.html'
 
+mutant:
+	@mut.py -t docformatter -u test_docformatter -mc
+
 readme:
 	@python setup.py --long-description | rst2html --strict > README.html
 	@open README.html
