@@ -14,7 +14,7 @@ coverage:
 	@coverage report
 	@coverage html
 	@rm -f .coverage
-	@open 'htmlcov/index.html'
+	@python -m webbrowser -n "file://${PWD}/htmlcov/index.html"
 
 mutant:
 	@mut.py -t docformatter -u test_docformatter -mc
