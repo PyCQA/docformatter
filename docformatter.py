@@ -125,9 +125,9 @@ def format_docstring(indentation, docstring,
            indentation=indentation)
     else:
         return wrap_summary(indentation +
-            '"""' + normalize_summary(contents) + '"""',
-            wrap_length=summary_wrap_length,
-            indentation=indentation).strip()
+                            '"""' + normalize_summary(contents) + '"""',
+                            wrap_length=summary_wrap_length,
+                            indentation=indentation).strip()
 
 
 def indent_non_indented(line, indentation):
