@@ -106,7 +106,7 @@ Below is the help output::
 
     usage: docformatter [-h] [--in-place] [--no-backup]
                         [--wrap-long-summaries LENGTH] [--no-blank]
-                        [--pre-summary-newline] [--alternate-style] [--version]
+                        [--pre-summary-newline] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -124,8 +124,6 @@ Below is the help output::
       --pre-summary-newline
                             add a newline before the summary of a multi-line
                             docstring
-      --alternate-style     enables --no-blank, --pre-summary-newline, and
-                            --wrap-long-summaries=79
       --version             show program's version number and exit
 
 ------
