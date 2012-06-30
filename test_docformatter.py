@@ -151,7 +151,6 @@ Hello.
 
                 for line in formatted_lines:
                     self.assertLessEqual(len(line), max_length)
-                    pass
 
     def test_format_code(self):
         self.assertEqual(
