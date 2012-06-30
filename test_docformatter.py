@@ -504,6 +504,28 @@ def foo():
 +    """Hello world."""
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
+    def test_end_to_end_with_wrapping(self):
+        with temporary_file('''\
+def foo():
+    """
+    Hello world this is a summary that will get wrapped
+    """
+''') as filename:
+            import subprocess
+            process = subprocess.Popen(['./docformatter',
+                                        '--wrap-long-summaries=40',
+                                        filename],
+                                       stdout=subprocess.PIPE)
+            self.assertEqual('''\
+@@ -1,4 +1,3 @@
+ def foo():
+-    """
+-    Hello world this is a summary that will get wrapped
+-    """
++    """Hello world this is a summary
++    that will get wrapped."""
+''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+
     def test_end_to_end_all_options(self):
         with temporary_file('''\
 def foo():
