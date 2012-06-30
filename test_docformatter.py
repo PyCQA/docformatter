@@ -143,14 +143,23 @@ Hello.
         min_line_length = 30
         for max_length in range(min_line_length, 100):
             for num_indents in range(0, 20):
-                formatted_lines = docformatter.format_docstring(
-                    indentation=' ' * num_indents,
+                indentation=' ' * num_indents
+                formatted_text = indentation + docformatter.format_docstring(
+                    indentation=indentation,
                     docstring=generate_random_docstring(
                         max_word_length=min_line_length // 2),
-                    summary_wrap_length=max_length).split('\n')
+                    summary_wrap_length=max_length)
 
-                for line in formatted_lines:
-                    self.assertLessEqual(len(line), max_length)
+                debug = False
+                if debug:
+                    print('-' * max_length)
+                    print(formatted_text)
+
+                for line in formatted_text.split('\n'):
+                    # It is not the formatter's fault if a word is too long to
+                    # wrap.
+                    if len(line.strip().split()[0]) > max_length:
+                        self.assertLessEqual(len(line), max_length)
 
     def test_format_code(self):
         self.assertEqual(
