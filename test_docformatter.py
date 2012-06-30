@@ -422,16 +422,6 @@ def foo():
                 'This is a sentence.',
                 docformatter.normalize_summary('This \n\t is\na sentence'))
 
-    def test_normalize_summary_with_wrapping(self):
-        self.assertEqual(
-                'This is a\nsentence.',
-                docformatter.normalize_summary('This \n\t is\na sentence', 15))
-
-    def test_normalize_summary_with_wrapping_compensate_for_quotes(self):
-        self.assertEqual('0\n1 2\n3 4\n5 6.',
-                docformatter.normalize_summary('   0 1 2 3 4 5 6.',
-                                               wrap_length=4))
-
     def test_normalize_summary_with_different_punctuation(self):
         summary = 'This is a question?'
         self.assertEqual(

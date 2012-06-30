@@ -103,12 +103,12 @@ def format_docstring(indentation, docstring,
     summary, description = split_summary_and_description(contents)
 
     if description:
+        # Compensate for triple quotes by temporarily prepending 3 spaces.
+        # This temporary prepending is undone below.
         if pre_summary_newline:
             summary = indentation + summary
         else:
-            # Compensate for triple quotes by temporarily prepending 3 spaces.
-            # This temporary prepending is undone below.
-            summary = 3 * ' ' + summary
+            summary = indentation + 3 * ' ' + summary
 
         return '''\
 """{pre_summary}{summary}
@@ -116,18 +116,18 @@ def format_docstring(indentation, docstring,
 {description}{post_description}
 {indentation}"""\
 '''.format(pre_summary=('\n' + indentation if pre_summary_newline else ''),
-           summary=normalize_summary(summary,
-                                     summary_wrap_length,
-                                     indentation).lstrip(),
+           summary=wrap_summary(normalize_summary(summary),
+                                wrap_length=summary_wrap_length,
+                                indentation=indentation).lstrip(),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
            post_description=('\n' if post_description_blank else ''),
            indentation=indentation)
     else:
-        return ('"""' + normalize_summary(contents,
-                                          summary_wrap_length,
-                                          indentation) +
-                '"""')
+        return wrap_summary(indentation +
+            '"""' + normalize_summary(contents) + '"""',
+            wrap_length=summary_wrap_length,
+            indentation=indentation).strip()
 
 
 def indent_non_indented(line, indentation):
@@ -170,7 +170,7 @@ def strip_docstring(docstring):
     return docstring.split(triple, 1)[1].rsplit(triple, 1)[0].strip()
 
 
-def normalize_summary(summary, wrap_length=0, indentation=''):
+def normalize_summary(summary):
     """Return normalized docstring summary."""
     # Remove newlines
     summary = re.sub('\s*\n\s*', ' ', summary.rstrip())
@@ -179,15 +179,19 @@ def normalize_summary(summary, wrap_length=0, indentation=''):
     if summary and summary[-1].isalnum():
         summary += '.'
 
-    # This is disabled by default since it goes against PEP 257
+    return summary
+
+
+def wrap_summary(summary, indentation, wrap_length):
+    """Return line-wrapped summary text."""
     if wrap_length > 0:
         import textwrap
-        summary = '\n'.join(
+        return '\n'.join(
             textwrap.wrap(summary,
                           width=wrap_length,
                           subsequent_indent=indentation)).strip()
-
-    return summary
+    else:
+        return summary
 
 
 def open_with_encoding(filename, encoding, mode='r'):
