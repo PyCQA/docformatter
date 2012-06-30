@@ -139,6 +139,20 @@ Hello.
     '''
 """.strip()))
 
+    def test_format_docstring_with_wrap(self):
+        min_line_length = 30
+        for max_length in range(min_line_length, 100):
+            for num_indents in range(0, 20):
+                formatted_lines = docformatter.format_docstring(
+                    indentation=' ' * num_indents,
+                    docstring=generate_random_docstring(
+                        max_word_length=min_line_length // 2),
+                    summary_wrap_length=max_length).split('\n')
+
+                for line in formatted_lines:
+                    self.assertLessEqual(len(line), max_length)
+                    pass
+
     def test_format_code(self):
         self.assertEqual(
 '''\
@@ -565,6 +579,31 @@ def foo():
                                    stderr=subprocess.PIPE)
         self.assertIn('too few arguments',
                       process.communicate()[1].decode('utf-8'))
+
+
+def generate_random_docstring(max_indentation_length=32,
+                              max_word_length=20,
+                              max_words=50):
+    """Generate single-line docstring."""
+    import random
+    if random.randint(0, 1):
+        words = []
+    else:
+        words = [generate_random_word(random.randint(0, max_word_length))
+                 for _ in range(random.randint(0, max_words))]
+
+    indentation = random.randint(0, max_indentation_length) * ' '
+    quote = '"""' if random.randint(0, 1) else "'''"
+    return (quote + indentation +
+            ' '.join(words) +
+            quote)
+
+
+def generate_random_word(word_length):
+    import random
+    return ''.join(
+        [random.choice('abcdefghijklmnoprstuvwyxzABCDEFGHIJKLMNOPRSTUVWXYZ')
+         for _ in range(word_length)])
 
 
 if __name__ == '__main__':
