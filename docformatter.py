@@ -106,9 +106,9 @@ def format_docstring(indentation, docstring,
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
         if pre_summary_newline:
-            summary = indentation + summary
+            initial_indent = indentation
         else:
-            summary = indentation + 3 * ' ' + summary
+            initial_indent = 3 * ' ' + indentation
 
         return '''\
 """{pre_summary}{summary}
@@ -118,16 +118,17 @@ def format_docstring(indentation, docstring,
 '''.format(pre_summary=('\n' + indentation if pre_summary_newline else ''),
            summary=wrap_summary(normalize_summary(summary),
                                 wrap_length=summary_wrap_length,
-                                indentation=indentation).lstrip(),
+                                initial_indent=initial_indent,
+                                subsequent_indent=indentation).lstrip(),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
            post_description=('\n' if post_description_blank else ''),
            indentation=indentation)
     else:
-        return wrap_summary(indentation +
-                            '"""' + normalize_summary(contents) + '"""',
+        return wrap_summary('"""' + normalize_summary(contents) + '"""',
                             wrap_length=summary_wrap_length,
-                            indentation=indentation).strip()
+                            initial_indent=indentation,
+                            subsequent_indent=indentation).strip()
 
 
 def indent_non_indented(line, indentation):
@@ -182,14 +183,15 @@ def normalize_summary(summary):
     return summary
 
 
-def wrap_summary(summary, indentation, wrap_length):
+def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
     """Return line-wrapped summary text."""
     if wrap_length > 0:
         import textwrap
         return '\n'.join(
             textwrap.wrap(summary,
                           width=wrap_length,
-                          subsequent_indent=indentation)).strip()
+                          initial_indent=initial_indent,
+                          subsequent_indent=subsequent_indent)).strip()
     else:
         return summary
 
