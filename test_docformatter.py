@@ -158,7 +158,7 @@ Hello.
                 for line in formatted_text.split('\n'):
                     # It is not the formatter's fault if a word is too long to
                     # wrap.
-                    if len(line.strip().split()[0]) > max_length:
+                    if len(line.split()) > 1:
                         self.assertLessEqual(len(line), max_length)
 
     def test_format_code(self):
@@ -549,6 +549,8 @@ def foo():
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
     def test_end_to_end_all_options(self):
+        self.maxDiff = None
+
         with temporary_file('''\
 def foo():
     """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
