@@ -32,6 +32,7 @@ def format_code(source,
         token_string = token[1]
         start_row, start_column = token[2]
         end_row, end_column = token[3]
+        line = token[4]
 
         # Preserve escaped newlines
         if (not previous_line.lstrip().startswith('#') and
@@ -45,7 +46,7 @@ def format_code(source,
         if start_row > last_row:
             last_column = 0
         if start_column > last_column:
-            formatted += ' ' * (start_column - last_column)
+            formatted += line[last_column:start_column]
 
         if (token_type == tokenize.STRING and
                 starts_with_triple(token_string) and
@@ -61,7 +62,7 @@ def format_code(source,
 
         previous_token_string = token_string
         previous_token_type = token_type
-        previous_line = token[4]
+        previous_line = line
 
         last_row = end_row
         last_column = end_column

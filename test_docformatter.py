@@ -175,6 +175,42 @@ def foo():
     """
 '''))
 
+    def test_format_code_with_tabs(self):
+        self.assertEqual(
+'''\
+def foo():
+\t"""Hello foo."""
+\tif True:
+\t\tx = 1
+''',
+                docformatter.format_code(
+'''\
+def foo():
+\t"""
+\tHello foo.
+\t"""
+\tif True:
+\t\tx = 1
+'''))
+
+    def test_format_code_with_mixed_tabs(self):
+        self.assertEqual(
+'''\
+def foo():
+\t"""Hello foo."""
+\tif True:
+\t    x = 1
+''',
+                docformatter.format_code(
+'''\
+def foo():
+\t"""
+\tHello foo.
+\t"""
+\tif True:
+\t    x = 1
+'''))
+
     def test_format_code_with_escaped_newlines(self):
         self.assertEqual(
 r'''def foo():
