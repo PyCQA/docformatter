@@ -623,7 +623,7 @@ def foo():
         import subprocess
         process = subprocess.Popen(['./docformatter'],
                                    stderr=subprocess.PIPE)
-        self.assertIn('too few arguments',
+        self.assertIn('arguments',
                       process.communicate()[1].decode('utf-8'))
 
 
