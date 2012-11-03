@@ -173,7 +173,7 @@ def split_summary_and_description(contents):
         return (split[0], '\n'.join(split[1:]))
     else:
         # Break on first sentence.
-        split = re.split('\.\s', string=contents, maxsplit=1)
+        split = re.split(r'\.\s', string=contents, maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + '.', split[1].strip())
         else:
@@ -193,7 +193,7 @@ def strip_docstring(docstring):
 def normalize_summary(summary):
     """Return normalized docstring summary."""
     # Remove newlines
-    summary = re.sub('\s*\n\s*', ' ', summary.rstrip())
+    summary = re.sub(r'\s*\n\s*', ' ', summary.rstrip())
 
     # Add period at end of sentence
     if summary and summary[-1].isalnum():
