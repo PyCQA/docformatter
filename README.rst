@@ -104,9 +104,8 @@ Options
 
 Below is the help output::
 
-    usage: docformatter [-h] [--in-place] [--no-backup]
-                        [--wrap-long-summaries LENGTH] [--no-blank]
-                        [--pre-summary-newline] [--version]
+    usage: docformatter [-h] [--in-place] [--wrap-long-summaries LENGTH]
+                        [--no-blank] [--pre-summary-newline] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -117,7 +116,6 @@ Below is the help output::
     optional arguments:
       -h, --help            show this help message and exit
       --in-place            make changes to files instead of printing diffs
-      --no-backup           do not write backup files
       --wrap-long-summaries LENGTH
                             wrap long summary lines at this length (default: 0)
       --no-blank            do not add blank line after description
