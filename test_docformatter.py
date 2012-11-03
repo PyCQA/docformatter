@@ -20,8 +20,8 @@ class TestUnits(unittest.TestCase):
 
     def test_strip_docstring(self):
         self.assertEqual(
-                'Hello.',
-                docformatter.strip_docstring('''
+            'Hello.',
+            docformatter.strip_docstring('''
     """Hello.
 
     """
@@ -30,8 +30,8 @@ class TestUnits(unittest.TestCase):
 
     def test_strip_docstring_with_single_quotes(self):
         self.assertEqual(
-                'Hello.',
-                docformatter.strip_docstring("""
+            'Hello.',
+            docformatter.strip_docstring("""
     '''Hello.
 
     '''
@@ -131,7 +131,7 @@ Hello.
 
     """
 '''.strip(),
-                         docformatter.format_docstring('    ', """
+            docformatter.format_docstring('    ', """
     '''
     Return x factorial.
 
@@ -143,7 +143,7 @@ Hello.
         min_line_length = 30
         for max_length in range(min_line_length, 100):
             for num_indents in range(0, 20):
-                indentation=' ' * num_indents
+                indentation = ' ' * num_indents
                 formatted_text = indentation + docformatter.format_docstring(
                     indentation=indentation,
                     docstring=generate_random_docstring(
@@ -163,12 +163,12 @@ Hello.
 
     def test_format_code(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo."""
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello foo.
@@ -177,14 +177,14 @@ def foo():
 
     def test_format_code_with_tabs(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
 \t"""Hello foo."""
 \tif True:
 \t\tx = 1
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
 \t"""
 \tHello foo.
@@ -195,14 +195,14 @@ def foo():
 
     def test_format_code_with_mixed_tabs(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
 \t"""Hello foo."""
 \tif True:
 \t    x = 1
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
 \t"""
 \tHello foo.
@@ -213,13 +213,13 @@ def foo():
 
     def test_format_code_with_escaped_newlines(self):
         self.assertEqual(
-r'''def foo():
+            r'''def foo():
     """Hello foo."""
     x = \
             1
 ''',
-                docformatter.format_code(
-r'''def foo():
+            docformatter.format_code(
+                r'''def foo():
     """
     Hello foo.
     """
@@ -229,14 +229,14 @@ r'''def foo():
 
     def test_format_code_with_comments(self):
         self.assertEqual(
-r'''
+            r'''
 def foo():
     """Hello foo."""
     # My comment
     # My comment with escape \
     123
 '''.lstrip(),
-                docformatter.format_code(
+            docformatter.format_code(
 r'''
 def foo():
     """
@@ -250,14 +250,14 @@ def foo():
     def test_format_code_skip_complex(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
-'''\
+            '''\
 def foo():
     r"""
     Hello foo.
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     r"""
     Hello foo.
@@ -267,14 +267,14 @@ def foo():
     def test_format_code_skip_complex_single(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
-"""\
+            """\
 def foo():
     r'''
     Hello foo.
     '''
 """,
-                docformatter.format_code(
-"""\
+            docformatter.format_code(
+                """\
 def foo():
     r'''
     Hello foo.
@@ -291,7 +291,7 @@ def foo():
 
     def test_format_code_with_multiple_sentences(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -299,8 +299,8 @@ def foo():
 
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello foo.
@@ -310,7 +310,7 @@ def foo():
 
     def test_format_code_with_multiple_sentences_same_line(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -318,8 +318,8 @@ def foo():
 
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello foo. This is a docstring.
@@ -328,7 +328,7 @@ def foo():
 
     def test_format_code_with_multiple_sentences_multiline_summary(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -336,8 +336,8 @@ def foo():
 
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello
@@ -347,7 +347,7 @@ def foo():
 
     def test_format_code_with_empty_lines(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -357,8 +357,8 @@ def foo():
 
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello
@@ -370,7 +370,7 @@ def foo():
 
     def test_format_code_with_trailing_whitespace(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -380,8 +380,8 @@ def foo():
 
     """
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello
@@ -400,19 +400,19 @@ def foo():
 
     def test_format_code_with_assignment_on_first_line(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     x = """Just a regular string. Alpha."""
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     x = """Just a regular string. Alpha."""
 '''))
 
     def test_format_code_with_regular_strings_too(self):
         self.assertEqual(
-'''\
+            '''\
 def foo():
     """Hello foo.
 
@@ -428,8 +428,8 @@ def foo():
     that should not be
     touched\t"""
 ''',
-                docformatter.format_code(
-'''\
+            docformatter.format_code(
+                '''\
 def foo():
     """
     Hello
@@ -449,42 +449,42 @@ def foo():
         self.assertEqual(('This is the first.',
                           'This is the second. This is the third.'),
                          docformatter.split_summary_and_description(
-'This is the first. This is the second. This is the third.'))
+                         'This is the first. This is the second. This is the third.'))
 
     def test_split_summary_and_description_complex(self):
         self.assertEqual(('This is the first',
                           'This is the second. This is the third.'),
                          docformatter.split_summary_and_description(
-'This is the first\n\nThis is the second. This is the third.'))
+                         'This is the first\n\nThis is the second. This is the third.'))
 
     def test_split_summary_and_description_more_complex(self):
         self.assertEqual(('This is the first.',
                           'This is the second. This is the third.'),
                          docformatter.split_summary_and_description(
-'This is the first.\nThis is the second. This is the third.'))
+                         'This is the first.\nThis is the second. This is the third.'))
 
     def test_split_summary_and_description_with_list(self):
         self.assertEqual(('This is the first',
                           '- one\n- two'),
                          docformatter.split_summary_and_description(
-'This is the first\n- one\n- two'))
+                         'This is the first\n- one\n- two'))
 
     def test_split_summary_and_description_with_other_symbol(self):
         self.assertEqual(('This is the first',
                           '@ one\n@ two'),
                          docformatter.split_summary_and_description(
-'This is the first\n@ one\n@ two'))
+                         'This is the first\n@ one\n@ two'))
 
     def test_normalize_summary(self):
         self.assertEqual(
-                'This is a sentence.',
-                docformatter.normalize_summary('This \n\t is\na sentence'))
+            'This is a sentence.',
+            docformatter.normalize_summary('This \n\t is\na sentence'))
 
     def test_normalize_summary_with_different_punctuation(self):
         summary = 'This is a question?'
         self.assertEqual(
-                summary,
-                docformatter.normalize_summary(summary))
+            summary,
+            docformatter.normalize_summary(summary))
 
 
 @contextlib.contextmanager
