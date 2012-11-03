@@ -14,8 +14,9 @@ Formats docstrings to follow `PEP 257`_.
 Features
 --------
 
-docformatter currently automatically formats docstrings to follow a subset of
-the PEP 257 conventions. Below are the relevant items quoted from PEP 257.
+docformatter currently automatically formats docstrings to follow a
+subset of the PEP 257 conventions. Below are the relevant items quoted
+from PEP 257.
 
 - For consistency, always use triple double quotes around docstrings.
 - Triple quotes are used even though the string fits on one line.
@@ -25,6 +26,12 @@ the PEP 257 conventions. Below are the relevant items quoted from PEP 257.
 - The BDFL recommends inserting a blank line between the last paragraph
   in a multi-line docstring and its closing quotes, placing the closing
   quotes on a line by themselves.
+
+docformatter also handles some of the PEP 8 conventions.
+
+- Don't write string literals that rely on significant trailing
+  whitespace. Such trailing whitespace is visually indistinguishable
+  and some editors (or more recently, reindent.py) will trim them.
 
 -------
 Example
