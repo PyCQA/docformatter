@@ -67,6 +67,22 @@ next line should be indented too. But
     """
 '''.strip()))
 
+    def test_format_docstring_with_trailing_whitespace(self):
+        self.assertEqual('''"""Hello.
+
+    This should be not have trailing whitespace. The
+    next line should not have trailing whitespace either.
+
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""Hello.\t
+\t
+    This should be not have trailing whitespace. The\t\t\t
+    next line should not have trailing whitespace either.\t
+\t
+    """
+'''.strip()))
+
     def test_format_docstring_with_no_post_description_blank(self):
         self.assertEqual('''"""Hello.
 
