@@ -530,18 +530,13 @@ def foo():
     """
 ''') as filename:
             output_file = StringIO()
-            try:
-                docformatter.main(argv=['my_fake_program', '--in-place', filename],
-                                  standard_out=output_file)
-                with open(filename) as f:
-                    self.assertEqual('''\
+            docformatter.main(argv=['my_fake_program', '--in-place', filename],
+                              standard_out=output_file)
+            with open(filename) as f:
+                self.assertEqual('''\
 def foo():
     """Hello world."""
 ''', f.read())
-            finally:
-                # Clean up backup file
-                import os
-                os.remove(filename + '.backup')
 
     def test_end_to_end(self):
         with temporary_file('''\
