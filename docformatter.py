@@ -216,7 +216,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def open_with_encoding(filename, encoding=None, mode='r'):
+def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
     try:
         # Python 3
