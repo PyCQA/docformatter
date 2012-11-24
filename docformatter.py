@@ -18,6 +18,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """Formats docstrings to follow PEP 257."""
 
+import codecs
 import re
 import tokenize
 try:
@@ -215,33 +216,38 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def open_with_encoding(filename, encoding, mode='r'):
-    """Open and return a file with a specific encoding."""
+def open_with_encoding(filename, encoding=None, mode='r'):
+    """Return opened file with a specific encoding."""
     try:
         # Python 3
-        return open(filename, mode=mode, encoding=encoding)
+        return open(filename, mode=mode, encoding=encoding,
+                    newline='')  # Preserve line endings
     except TypeError:
-        return open(filename, mode=mode)
+        # Python 2
+        return codecs.open(filename, mode=mode, encoding=encoding)
 
 
 def detect_encoding(filename):
     """Return file encoding."""
     try:
-        # Python 3
-        try:
-            with open(filename, 'rb') as input_file:
-                encoding = tokenize.detect_encoding(input_file.readline)[0]
+        with open(filename, 'rb') as input_file:
+            from lib2to3.pgen2 import tokenize as lib2to3_tokenize
+            encoding = lib2to3_tokenize.detect_encoding(input_file.readline)[0]
 
-                # Check for correctness of encoding
+            # Check for correctness of encoding
+            try:
                 import io
                 with io.TextIOWrapper(input_file, encoding) as wrapper:
                     wrapper.read()
+            except AttributeError:
+                # The above doesn't work on Python 2. Fall back to inefficient
+                # version.
+                with open_with_encoding(filename, encoding) as input_file:
+                    input_file.read()
 
-            return encoding
-        except (SyntaxError, LookupError, UnicodeDecodeError):
-            return 'latin-1'
-    except AttributeError:
-        return 'utf-8'
+        return encoding
+    except (SyntaxError, LookupError, UnicodeDecodeError):
+        return 'latin-1'
 
 
 def main(argv, standard_out):

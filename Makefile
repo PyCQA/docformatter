@@ -1,7 +1,7 @@
 check:
 	pep8 docformatter docformatter.py setup.py
 	pep257 docformatter docformatter.py setup.py
-	pylint --report=no --include-ids=yes --disable=F0401,R0914,E1101 --rcfile=/dev/null docformatter.py setup.py
+	pylint --report=no --include-ids=yes --disable=F0401,R0914,E1101,W0404 --rcfile=/dev/null docformatter.py setup.py
 	python setup.py --long-description | rst2html --strict > /dev/null
 	scspell docformatter docformatter.py setup.py test_docformatter.py README.rst
 
