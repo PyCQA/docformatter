@@ -283,8 +283,8 @@ def main(argv, standard_out):
             else:
                 import difflib
                 diff = difflib.unified_diff(
-                    source.splitlines(True),
-                    formatted_source.splitlines(True),
+                    StringIO(source).readlines(),
+                    StringIO(formatted_source).readlines(),
                     'before/' + filename,
                     'after/' + filename)
                 standard_out.write(''.join(diff))
