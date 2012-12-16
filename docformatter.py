@@ -218,13 +218,9 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
 
 def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
-    try:
-        # Python 3
-        return open(filename, mode=mode, encoding=encoding,
-                    newline='')  # Preserve line endings
-    except TypeError:
-        # Python 2
-        return codecs.open(filename, mode=mode, encoding=encoding)
+    import io
+    return io.open(filename, mode=mode, encoding=encoding,
+                   newline='')  # Preserve line endings
 
 
 def detect_encoding(filename):
