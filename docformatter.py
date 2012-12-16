@@ -18,7 +18,6 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """Formats docstrings to follow PEP 257."""
 
-import codecs
 import re
 import tokenize
 try:
