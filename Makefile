@@ -17,8 +17,7 @@ mutant:
 	@mut.py -t docformatter -u test_docformatter -mc
 
 readme:
-	@python setup.py --long-description | rst2html --strict > README.html
-	@python -m webbrowser -n "file://${PWD}/README.html"
+	@restview --long-description
 
 register:
 	@python setup.py register
