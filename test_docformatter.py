@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Test suite for docformatter."""
 
 import docformatter
@@ -502,19 +504,10 @@ def foo():
             summary,
             docformatter.normalize_summary(summary))
 
-
-@contextlib.contextmanager
-def temporary_file(contents):
-    """Write contents to temporary file and yield it."""
-    import tempfile
-    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False, dir='.')
-    try:
-        f.write(contents.encode('utf8'))
-        f.close()
-        yield f.name
-    finally:
-        import os
-        os.remove(f.name)
+    def test_detect_encoding_with_bad_encoding(self):
+        with temporary_file('# -*- coding: blah -*-\n') as filename:
+            self.assertEqual('latin-1',
+                             docformatter.detect_encoding(filename))
 
 
 class TestSystem(unittest.TestCase):
@@ -661,6 +654,20 @@ def generate_random_word(word_length):
     return ''.join(
         [random.choice('abcdefghijklmnoprstuvwyxzABCDEFGHIJKLMNOPRSTUVWXYZ')
          for _ in range(word_length)])
+
+
+@contextlib.contextmanager
+def temporary_file(contents):
+    """Write contents to temporary file and yield it."""
+    import tempfile
+    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False, dir='.')
+    try:
+        f.write(contents.encode('utf8'))
+        f.close()
+        yield f.name
+    finally:
+        import os
+        os.remove(f.name)
 
 
 if __name__ == '__main__':
