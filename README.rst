@@ -14,7 +14,7 @@ Formats docstrings to follow `PEP 257`_.
 Features
 --------
 
-docformatter currently automatically formats docstrings to follow a
+*docformatter* currently automatically formats docstrings to follow a
 subset of the PEP 257 conventions. Below are the relevant items quoted
 from PEP 257.
 
