@@ -41,7 +41,9 @@ After running::
 
     $ docformatter example.py
 
-this code::
+this code
+
+.. code-block:: python
 
     def launch_rocket():
         """Launch
@@ -74,7 +76,9 @@ this code::
             launch_rocket()
 
 
-gets formatted into this::
+gets formatted into this
+
+.. code-block:: python
 
     def launch_rocket():
         """Launch the rocket.
