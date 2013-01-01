@@ -254,7 +254,8 @@ def main(argv, standard_out):
                         action='store_true',
                         help='add a newline before the summary of a '
                              'multi-line docstring')
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
 
