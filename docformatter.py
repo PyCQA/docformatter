@@ -18,15 +18,18 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """Formats docstrings to follow PEP 257."""
 
+import io
 import re
 import tokenize
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 
 __version__ = '0.2.6'
+
+
+try:
+    unicode
+except NameError:
+    unicode = str
 
 
 def format_code(source,
@@ -38,7 +41,7 @@ def format_code(source,
     Wrap summary lines if summary_wrap_length is greater than 0.
 
     """
-    sio = StringIO(source)
+    sio = io.StringIO(source)
     formatted = ''
     previous_token_string = ''
     previous_token_type = None
@@ -134,14 +137,14 @@ def format_docstring(indentation, docstring,
 
 {description}{post_description}
 {indentation}"""\
-'''.format(pre_summary=('\n' + indentation if pre_summary_newline else ''),
+'''.format(pre_summary=('\n' + indentation if pre_summary_newline else unicode()),
            summary=wrap_summary(normalize_summary(summary),
                                 wrap_length=summary_wrap_length,
                                 initial_indent=initial_indent,
                                 subsequent_indent=indentation).lstrip(),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
-           post_description=('\n' if post_description_blank else ''),
+           post_description=('\n' if post_description_blank else unicode()),
            indentation=indentation)
     else:
         return wrap_summary('"""' + normalize_summary(contents) + '"""',
@@ -177,7 +180,7 @@ def split_summary_and_description(contents):
         if len(split) == 2:
             return (split[0].strip() + '.', split[1].strip())
         else:
-            return (split[0].strip(), '')
+            return (split[0].strip(), unicode())
 
 
 def strip_docstring(docstring):
@@ -279,8 +282,8 @@ def main(argv, standard_out):
             else:
                 import difflib
                 diff = difflib.unified_diff(
-                    StringIO(source).readlines(),
-                    StringIO(formatted_source).readlines(),
+                    io.StringIO(source).readlines(),
+                    io.StringIO(formatted_source).readlines(),
                     'before/' + filename,
                     'after/' + filename)
-                standard_out.write(''.join(diff))
+                standard_out.write(unicode().join(diff))
