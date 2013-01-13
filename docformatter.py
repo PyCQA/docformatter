@@ -137,7 +137,8 @@ def format_docstring(indentation, docstring,
 
 {description}{post_description}
 {indentation}"""\
-'''.format(pre_summary=('\n' + indentation if pre_summary_newline else unicode()),
+'''.format(pre_summary=('\n' + indentation if pre_summary_newline
+                        else unicode()),
            summary=wrap_summary(normalize_summary(summary),
                                 wrap_length=summary_wrap_length,
                                 initial_indent=initial_indent,
@@ -220,7 +221,6 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
 
 def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
-    import io
     return io.open(filename, mode=mode, encoding=encoding,
                    newline='')  # Preserve line endings
 
