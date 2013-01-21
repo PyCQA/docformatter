@@ -19,7 +19,7 @@ with open('README.rst') as readme:
                description='Formats docstrings to follow PEP 257.',
                long_description=readme.read(),
                license='Expat License',
-               author='myint',
+               author='Steven Myint',
                url='https://github.com/myint/docformatter',
                classifiers=['Intended Audience :: Developers',
                             'Environment :: Console',
