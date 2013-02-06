@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Setup for docformatter."""
 
+import ast
 from distutils import core
 
 
@@ -9,8 +10,7 @@ def version():
     with open('docformatter.py') as input_file:
         for line in input_file:
             if line.startswith('__version__'):
-                import ast
-                return ast.literal_eval(line.split('=')[1].strip())
+                return ast.parse(line).body[0].value.s
 
 
 with open('README.rst') as readme:
