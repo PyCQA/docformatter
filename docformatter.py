@@ -247,10 +247,10 @@ def main(argv, standard_out):
     """Main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
-    parser.add_argument('--in-place', action='store_true',
+    parser.add_argument('-i', '--in-place', action='store_true',
                         help='make changes to files instead of printing diffs')
     parser.add_argument(
-        '--wrap-long-summaries', default=0, type=int, metavar='LENGTH',
+        '--wrap-summaries', default=79, type=int, metavar='length',
         help='wrap long summary lines at this length (default: %(default)s)')
     parser.add_argument('--no-blank', dest='post_description_blank',
                         action='store_false',
@@ -272,7 +272,7 @@ def main(argv, standard_out):
             source = input_file.read()
             formatted_source = format_code(
                 source,
-                summary_wrap_length=args.wrap_long_summaries,
+                summary_wrap_length=args.wrap_summaries,
                 pre_summary_newline=args.pre_summary_newline,
                 post_description_blank=args.post_description_blank)
 

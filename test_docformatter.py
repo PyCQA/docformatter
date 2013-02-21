@@ -577,7 +577,7 @@ def foo():
 ''') as filename:
             import subprocess
             process = subprocess.Popen(['./docformatter',
-                                        '--wrap-long-summaries=40',
+                                        '--wrap-summaries=40',
                                         filename],
                                        stdout=subprocess.PIPE)
             self.assertEqual('''\
@@ -604,7 +604,7 @@ def foo():
 ''') as filename:
             import subprocess
             process = subprocess.Popen(['./docformatter',
-                                        '--wrap-long-summaries=40',
+                                        '--wrap-summaries=40',
                                         '--pre-summary-newline',
                                         '--no-blank',
                                         filename],
