@@ -18,10 +18,15 @@
 # CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 """Formats docstrings to follow PEP 257."""
 
+from __future__ import print_function
+
 import io
+import os
 import re
+import socket
 import tokenize
 
 
@@ -243,12 +248,40 @@ def detect_encoding(filename):
         return 'latin-1'
 
 
-def main(argv, standard_out):
+def format_file(filename, args, standard_out):
+    """Run format_code() on a file."""
+    encoding = detect_encoding(filename)
+    with open_with_encoding(filename, encoding=encoding) as input_file:
+        source = input_file.read()
+        formatted_source = format_code(
+            source,
+            summary_wrap_length=args.wrap_summaries,
+            pre_summary_newline=args.pre_summary_newline,
+            post_description_blank=args.post_description_blank)
+
+    if source != formatted_source:
+        if args.in_place:
+            with open_with_encoding(filename, mode='w',
+                                    encoding=encoding) as output_file:
+                output_file.write(formatted_source)
+        else:
+            import difflib
+            diff = difflib.unified_diff(
+                io.StringIO(source).readlines(),
+                io.StringIO(formatted_source).readlines(),
+                'before/' + filename,
+                'after/' + filename)
+            standard_out.write(unicode().join(diff))
+
+
+def main(argv, standard_out, standard_error):
     """Main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     parser.add_argument('-i', '--in-place', action='store_true',
                         help='make changes to files instead of printing diffs')
+    parser.add_argument('-r', '--recursive', action='store_true',
+                        help='drill down directories recursively')
     parser.add_argument(
         '--wrap-summaries', default=79, type=int, metavar='length',
         help='wrap long summary lines at this length (default: %(default)s)')
@@ -266,26 +299,22 @@ def main(argv, standard_out):
 
     args = parser.parse_args(argv[1:])
 
-    for filename in args.files:
-        encoding = detect_encoding(filename)
-        with open_with_encoding(filename, encoding=encoding) as input_file:
-            source = input_file.read()
-            formatted_source = format_code(
-                source,
-                summary_wrap_length=args.wrap_summaries,
-                pre_summary_newline=args.pre_summary_newline,
-                post_description_blank=args.post_description_blank)
-
-        if source != formatted_source:
-            if args.in_place:
-                with open_with_encoding(filename, mode='w',
-                                        encoding=encoding) as output_file:
-                    output_file.write(formatted_source)
-            else:
-                import difflib
-                diff = difflib.unified_diff(
-                    io.StringIO(source).readlines(),
-                    io.StringIO(formatted_source).readlines(),
-                    'before/' + filename,
-                    'after/' + filename)
-                standard_out.write(unicode().join(diff))
+    filenames = list(set(args.files))
+    while filenames:
+        name = filenames.pop(0)
+        if args.recursive and os.path.isdir(name):
+            for root, directories, children in os.walk(name):
+                filenames += [os.path.join(root, f) for f in children
+                              if f.endswith('.py') and
+                              not f.startswith('.')]
+                for d in directories:
+                    if d.startswith('.'):
+                        directories.remove(d)
+        else:
+            try:
+                format_file(name, args=args, standard_out=standard_out)
+            except socket.error:
+                # Broken pipe.
+                break
+            except IOError as exception:
+                print(exception, file=standard_error)

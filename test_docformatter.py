@@ -4,6 +4,7 @@
 
 import contextlib
 import io
+import tempfile
 
 try:
     # Python 2.6
@@ -523,7 +524,8 @@ def foo():
 ''') as filename:
             output_file = io.StringIO()
             docformatter.main(argv=['my_fake_program', filename],
-                              standard_out=output_file)
+                              standard_out=output_file,
+                              standard_error=None)
             self.assertEqual(unicode('''\
 @@ -1,4 +1,2 @@
  def foo():
@@ -542,12 +544,35 @@ def foo():
 ''') as filename:
             output_file = io.StringIO()
             docformatter.main(argv=['my_fake_program', '--in-place', filename],
-                              standard_out=output_file)
+                              standard_out=output_file,
+                              standard_error=None)
             with open(filename) as f:
                 self.assertEqual('''\
 def foo():
     """Hello world."""
 ''', f.read())
+
+    def test_ignore_hidden_directories(self):
+        with temporary_directory() as directory:
+            with temporary_directory(prefix='.',
+                                     directory=directory) as inner_directory:
+
+                with temporary_file('''\
+def foo():
+    """
+    Hello world
+    """
+''', directory=inner_directory):
+
+                    output_file = io.StringIO()
+                    docformatter.main(argv=['my_fake_program',
+                                            '--recursive',
+                                            directory],
+                                   standard_out=output_file,
+                                   standard_error=None)
+                    self.assertEqual(
+                        '',
+                        output_file.getvalue().strip())
 
     def test_end_to_end(self):
         with temporary_file('''\
@@ -659,10 +684,10 @@ def generate_random_word(word_length):
 
 
 @contextlib.contextmanager
-def temporary_file(contents):
+def temporary_file(contents, directory='.', prefix=''):
     """Write contents to temporary file and yield it."""
-    import tempfile
-    f = tempfile.NamedTemporaryFile(suffix='.py', delete=False, dir='.')
+    f = tempfile.NamedTemporaryFile(suffix='.py', prefix=prefix,
+                                    delete=False, dir=directory)
     try:
         f.write(contents.encode('utf8'))
         f.close()
@@ -670,6 +695,17 @@ def temporary_file(contents):
     finally:
         import os
         os.remove(f.name)
+
+
+@contextlib.contextmanager
+def temporary_directory(directory='.', prefix=''):
+    """Create temporary directory and yield its path."""
+    temp_directory = tempfile.mkdtemp(prefix=prefix, dir=directory)
+    try:
+        yield temp_directory
+    finally:
+        import shutil
+        shutil.rmtree(temp_directory)
 
 
 if __name__ == '__main__':

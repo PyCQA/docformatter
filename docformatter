@@ -27,4 +27,9 @@ import docformatter
 
 
 if __name__ == '__main__':
-    sys.exit(docformatter.main(sys.argv, standard_out=sys.stdout))
+    try:
+        sys.exit(docformatter.main(sys.argv,
+                                   standard_out=sys.stdout,
+                                   standard_error=sys.stderr))
+    except KeyboardInterrupt:
+        sys.exit(2)
