@@ -1,4 +1,3 @@
-============
 docformatter
 ============
 
@@ -10,7 +9,6 @@ Formats docstrings to follow `PEP 257`_.
    :target: https://travis-ci.org/myint/docformatter
    :alt: Build status
 
---------
 Features
 --------
 
@@ -33,7 +31,6 @@ docformatter also handles some of the PEP 8 conventions.
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
--------
 Example
 -------
 
@@ -109,13 +106,12 @@ gets formatted into this
         if factorial(10):
             launch_rocket()
 
--------
 Options
 -------
 
 Below is the help output::
 
-    usage: docformatter [-h] [-i] [--wrap-summaries length] [--no-blank]
+    usage: docformatter [-h] [-i] [-r] [--wrap-summaries length] [--no-blank]
                         [--pre-summary-newline] [--version]
                         files [files ...]
 
@@ -127,6 +123,7 @@ Below is the help output::
     optional arguments:
       -h, --help            show this help message and exit
       -i, --in-place        make changes to files instead of printing diffs
+      -r, --recursive       drill down directories recursively
       --wrap-summaries length
                             wrap long summary lines at this length (default: 79)
       --no-blank            do not add blank line after description
@@ -135,7 +132,6 @@ Below is the help output::
                             docstring
       --version             show program's version number and exit
 
-------
 Issues
 ------
 
