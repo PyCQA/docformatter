@@ -55,6 +55,15 @@ Hello.
 """
 '''.strip()))
 
+    def test_format_docstring_with_summary_that_ends_in_quote(self):
+        self.assertEqual('''""""Hello"."""''',
+                         docformatter.format_docstring('    ', '''
+"""
+
+"Hello"
+"""
+'''.strip()))
+
     def test_format_docstring_with_bad_indentation(self):
         self.assertEqual('''"""Hello.
 

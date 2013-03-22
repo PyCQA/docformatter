@@ -207,7 +207,7 @@ def normalize_summary(summary):
     summary = re.sub(r'\s*\n\s*', ' ', summary.rstrip())
 
     # Add period at end of sentence
-    if summary and summary[-1].isalnum():
+    if summary and (summary[-1].isalnum() or summary[-1] in ['"', "'"]):
         summary += '.'
 
     return summary
