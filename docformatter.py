@@ -48,6 +48,9 @@ def format_code(source,
     Wrap summary lines if summary_wrap_length is greater than 0.
 
     """
+    if not source:
+        return source
+
     sio = io.StringIO(source)
     formatted = ''
     previous_token_string = ''

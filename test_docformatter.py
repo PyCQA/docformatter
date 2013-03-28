@@ -205,6 +205,11 @@ def foo():
     """
 ''')))
 
+    def test_format_code_with_empty_string(self):
+        self.assertEqual(
+            '',
+            docformatter.format_code(''))
+
     def test_format_code_with_tabs(self):
         self.assertEqual(
             '''\
