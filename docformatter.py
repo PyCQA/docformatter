@@ -195,7 +195,7 @@ def split_summary_and_description(contents):
         for token in ['    @',
                       '    -',
                       '    *']:
-            split = contents.split(token, maxsplit=1)
+            split = contents.split(token, 1)
             if len(split) == 2:
                 return (split[0].strip(), (token + split[1]).strip())
 
