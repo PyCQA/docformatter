@@ -190,8 +190,16 @@ def split_summary_and_description(contents):
         split = re.split(r'\.\s', string=contents, maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + '.', split[1].strip())
-        else:
-            return (split[0].strip(), unicode())
+
+        # Break on first bullet-list-like text.
+        for token in ['    @',
+                      '    -',
+                      '    *']:
+            split = contents.split(token, maxsplit=1)
+            if len(split) == 2:
+                return (split[0].strip(), (token + split[1]).strip())
+
+    return (split[0].strip(), unicode())
 
 
 def strip_docstring(docstring):
