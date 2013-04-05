@@ -8,6 +8,9 @@ Formats docstrings to follow `PEP 257`_.
 .. image:: https://travis-ci.org/myint/docformatter.png?branch=master
    :target: https://travis-ci.org/myint/docformatter
    :alt: Build status
+.. image:: https://coveralls.io/repos/myint/docformatter/badge.png?branch=master
+   :target: https://coveralls.io/r/myint/docformatter
+   :alt: Test coverage status
 
 Features
 --------
