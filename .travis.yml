@@ -17,7 +17,7 @@ install:
 
 script:
     - python test_docformatter.py
-    - coverage run --omit='*/virtualenv/*' test_docformatter.py
+    - coverage run --omit='*/site-packages/*,*/distutils/*' test_docformatter.py
     - coverage report --show-missing
 
 after_script:
