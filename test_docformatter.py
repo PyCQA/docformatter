@@ -552,6 +552,13 @@ def foo():
 +    """Hello world."""
 '''), '\n'.join(output_file.getvalue().split('\n')[2:]))
 
+    def test_diff_with_nonexistent_file(self):
+        output_file = io.StringIO()
+        docformatter.main(argv=['my_fake_program', 'nonexistent_file'],
+                          standard_out=output_file,
+                          standard_error=output_file)
+        self.assertIn('no such file', output_file.getvalue().lower())
+
     def test_in_place(self):
         with temporary_file('''\
 def foo():
