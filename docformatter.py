@@ -23,7 +23,6 @@
 
 from __future__ import print_function
 
-import errno
 import io
 import os
 import re
@@ -325,6 +324,4 @@ def main(argv, standard_out, standard_error):
             try:
                 format_file(name, args=args, standard_out=standard_out)
             except IOError as exception:
-                if exception.errno == errno.EPIPE:
-                    return
                 print(exception, file=standard_error)

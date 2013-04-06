@@ -22,11 +22,15 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """docformatter utility."""
 
+import signal
 import sys
 import docformatter
 
 
 if __name__ == '__main__':
+    # Exit on broken pipe.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
     try:
         sys.exit(docformatter.main(sys.argv,
                                    standard_out=sys.stdout,
