@@ -180,11 +180,6 @@ Hello.
                         max_word_length=min_line_length // 2),
                     summary_wrap_length=max_length)
 
-                debug = False
-                if debug:
-                    print('-' * max_length)
-                    print(formatted_text)
-
                 for line in formatted_text.split('\n'):
                     # It is not the formatter's fault if a word is too long to
                     # wrap.
