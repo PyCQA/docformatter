@@ -9,7 +9,6 @@ python:
 
 before_install:
     - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --quiet install argparse unittest2; fi
-    - pip --quiet install coverage
     - pip install --quiet coverage
 
 install:
@@ -17,9 +16,10 @@ install:
 
 script:
     - python test_docformatter.py
-    - coverage run --omit='*/site-packages/*,*/distutils/*' test_docformatter.py
-    - coverage report --show-missing
 
 after_success:
+    - coverage run --include='docformatter.py,test_docformatter.py' test_docformatter.py
+    - coverage report --show-missing
+
     - pip install --quiet coveralls
     - coveralls
