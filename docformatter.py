@@ -277,11 +277,12 @@ def format_file(filename, args, standard_out):
         else:
             import difflib
             diff = difflib.unified_diff(
-                io.StringIO(source).readlines(),
-                io.StringIO(formatted_source).readlines(),
+                source.splitlines(),
+                formatted_source.splitlines(),
                 'before/' + filename,
-                'after/' + filename)
-            standard_out.write(unicode().join(diff))
+                'after/' + filename,
+                lineterm='')
+            standard_out.write(unicode('\n').join(list(diff) + ['']))
 
 
 def main(argv, standard_out, standard_error):
