@@ -1,3 +1,4 @@
+============
 docformatter
 ============
 
@@ -12,8 +13,9 @@ Formats docstrings to follow `PEP 257`_.
    :target: https://coveralls.io/r/myint/docformatter
    :alt: Test coverage status
 
+
 Features
---------
+========
 
 *docformatter* currently automatically formats docstrings to follow a
 subset of the PEP 257 conventions. Below are the relevant items quoted
@@ -34,8 +36,9 @@ docformatter also handles some of the PEP 8 conventions.
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
+
 Example
--------
+=======
 
 After running::
 
@@ -109,8 +112,9 @@ gets formatted into this
         if factorial(10):
             launch_rocket()
 
+
 Options
--------
+=======
 
 Below is the help output::
 
@@ -135,8 +139,9 @@ Below is the help output::
                             docstring
       --version             show program's version number and exit
 
+
 Issues
-------
+======
 
 Bugs and patches can be reported on the `GitHub page`_.
 
