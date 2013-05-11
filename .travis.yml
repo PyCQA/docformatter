@@ -8,7 +8,7 @@ python:
     - "3.3"
 
 before_install:
-    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --use-mirrors --quiet install argparse unittest2; fi
+    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip install --use-mirrors --quiet argparse unittest2; fi
 
 install:
     - python setup.py --quiet install
