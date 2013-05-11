@@ -475,6 +475,10 @@ def foo():
     touched\t"""
 ''')))
 
+    def test_format_code_with_syntax_error(self):
+        self.assertEqual('"""\n',
+                         docformatter.format_code(unicode('"""\n')))
+
     def test_split_summary_and_description(self):
         self.assertEqual(('This is the first.',
                           'This is the second. This is the third.'),

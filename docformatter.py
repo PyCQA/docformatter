@@ -47,6 +47,20 @@ def format_code(source,
     Wrap summary lines if summary_wrap_length is greater than 0.
 
     """
+    try:
+        return _format_code(source,
+                            summary_wrap_length=summary_wrap_length,
+                            pre_summary_newline=pre_summary_newline,
+                            post_description_blank=post_description_blank)
+    except (tokenize.TokenError, IndentationError):
+        return source
+
+
+def _format_code(source,
+                 summary_wrap_length,
+                 pre_summary_newline,
+                 post_description_blank):
+    """Return source code with docstrings formatted."""
     if not source:
         return source
 
