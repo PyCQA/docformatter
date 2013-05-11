@@ -17,9 +17,9 @@ script:
     - python test_docformatter.py
 
 after_success:
-    - pip install --quiet coverage
+    - pip install --use-mirrors --quiet coverage
     - coverage run --include='docformatter.py,test_docformatter.py' test_docformatter.py
     - coverage report --show-missing
 
-    - pip install --quiet coveralls
+    - pip install --use-mirrors --quiet coveralls
     - coveralls
