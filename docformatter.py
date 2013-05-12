@@ -185,6 +185,12 @@ def indent_non_indented(line, indentation):
         return line
 
 
+def is_probably_beginning_of_sentence(line):
+    """Return True if this line begins a new sentence."""
+    character = line.strip()[0]
+    return character.isupper() or not character.isalnum()
+
+
 def split_summary_and_description(contents):
     """Split docstring into summary and description.
 
@@ -195,7 +201,7 @@ def split_summary_and_description(contents):
     if len(split) > 1 and not split[1].strip():
         # Empty line separation would indicate the rest is the description.
         return (split[0], '\n'.join(split[2:]))
-    elif len(split) > 1 and not split[1].strip()[0].isalnum():
+    elif len(split) > 1 and is_probably_beginning_of_sentence(split[1]):
         # Symbol on second line probably is a description with a list.
         return (split[0], '\n'.join(split[1:]))
     else:

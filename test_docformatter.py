@@ -503,6 +503,12 @@ def foo():
                          docformatter.split_summary_and_description(
                          'This is the first\n- one\n- two'))
 
+    def test_split_summary_and_description_with_capital(self):
+        self.assertEqual(('This is the first',
+                          'One is two'),
+                         docformatter.split_summary_and_description(
+                         'This is the first\nOne is two'))
+
     def test_split_summary_and_description_with_list_on_other_line(self):
         self.assertEqual(('Test\n    test', '@blah'),
                          docformatter.split_summary_and_description('''\
