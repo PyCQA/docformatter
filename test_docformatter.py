@@ -519,6 +519,24 @@ def foo():
                          docformatter.split_summary_and_description(
                          'This is the first\n@ one\n@ two'))
 
+    def test_split_summary_and_description_with_colon(self):
+        self.assertEqual(('This is the first:',
+                          'one\ntwo'),
+                         docformatter.split_summary_and_description(
+                         'This is the first:\none\ntwo'))
+
+    def test_split_summary_and_description_with_exclamation(self):
+        self.assertEqual(('This is the first!',
+                          'one\ntwo'),
+                         docformatter.split_summary_and_description(
+                         'This is the first!\none\ntwo'))
+
+    def test_split_summary_and_description_with_question_mark(self):
+        self.assertEqual(('This is the first?',
+                          'one\ntwo'),
+                         docformatter.split_summary_and_description(
+                         'This is the first?\none\ntwo'))
+
     def test_normalize_summary(self):
         self.assertEqual(
             'This is a sentence.',

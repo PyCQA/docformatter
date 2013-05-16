@@ -207,9 +207,11 @@ def split_summary_and_description(contents):
         return (split[0], '\n'.join(split[1:]))
     else:
         # Break on first sentence.
-        split = re.split(r'\.\s', string=contents, maxsplit=1)
-        if len(split) == 2:
-            return (split[0].strip() + '.', split[1].strip())
+        for punctuation in '.?!:':
+            split = re.split('\\' + punctuation + r'\s', string=contents, maxsplit=1)
+            if len(split) == 2:
+                return (split[0].strip() + punctuation,
+                        split[1].strip())
 
         # Break on first bullet-list-like text.
         for token in ['    @',
