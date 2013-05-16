@@ -208,7 +208,9 @@ def split_summary_and_description(contents):
     else:
         # Break on first sentence.
         for punctuation in '.?!:':
-            split = re.split('\\' + punctuation + r'\s', string=contents, maxsplit=1)
+            split = re.split('\\' + punctuation + r'\s',
+                             string=contents,
+                             maxsplit=1)
             if len(split) == 2:
                 return (split[0].strip() + punctuation,
                         split[1].strip())
