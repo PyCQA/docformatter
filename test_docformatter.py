@@ -2,6 +2,8 @@
 
 """Test suite for docformatter."""
 
+from __future__ import unicode_literals
+
 import contextlib
 import io
 import tempfile
@@ -13,12 +15,6 @@ except ImportError:
     import unittest
 
 import docformatter
-
-
-try:
-    unicode
-except NameError:
-    unicode = str
 
 
 class TestUnits(unittest.TestCase):
@@ -193,12 +189,12 @@ def foo():
     """Hello foo."""
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello foo.
     """
-''')))
+'''))
 
     def test_format_code_with_empty_string(self):
         self.assertEqual(
@@ -214,14 +210,14 @@ def foo():
 \t\tx = 1
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
 \t"""
 \tHello foo.
 \t"""
 \tif True:
 \t\tx = 1
-''')))
+'''))
 
     def test_format_code_with_mixed_tabs(self):
         self.assertEqual(
@@ -232,14 +228,14 @@ def foo():
 \t    x = 1
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
 \t"""
 \tHello foo.
 \t"""
 \tif True:
 \t    x = 1
-''')))
+'''))
 
     def test_format_code_with_escaped_newlines(self):
         self.assertEqual(
@@ -249,13 +245,13 @@ def foo():
             1
 ''',
             docformatter.format_code(
-                unicode(r'''def foo():
+                r'''def foo():
     """
     Hello foo.
     """
     x = \
             1
-''')))
+'''))
 
     def test_format_code_with_comments(self):
         self.assertEqual(
@@ -267,7 +263,7 @@ def foo():
     123
 '''.lstrip(),
             docformatter.format_code(
-                unicode(r'''
+                r'''
 def foo():
     """
     Hello foo.
@@ -275,7 +271,7 @@ def foo():
     # My comment
     # My comment with escape \
     123
-'''.lstrip())))
+'''.lstrip()))
 
     def test_format_code_skip_complex(self):
         """We do not handle r/u/b prefixed strings."""
@@ -287,12 +283,12 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     r"""
     Hello foo.
     """
-''')))
+'''))
 
     def test_format_code_skip_complex_single(self):
         """We do not handle r/u/b prefixed strings."""
@@ -304,19 +300,19 @@ def foo():
     '''
 """,
             docformatter.format_code(
-                unicode("""\
+                """\
 def foo():
     r'''
     Hello foo.
     '''
-""")))
+"""))
 
     def test_format_code_skip_nested(self):
-        code = unicode("""\
+        code = """\
 def foo():
     '''Hello foo. \"\"\"abc\"\"\"
     '''
-""")
+"""
         self.assertEqual(code, docformatter.format_code(code))
 
     def test_format_code_with_multiple_sentences(self):
@@ -330,13 +326,13 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello foo.
     This is a docstring.
     """
-''')))
+'''))
 
     def test_format_code_with_multiple_sentences_same_line(self):
         self.assertEqual(
@@ -349,12 +345,12 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello foo. This is a docstring.
     """
-''')))
+'''))
 
     def test_format_code_with_multiple_sentences_multiline_summary(self):
         self.assertEqual(
@@ -367,13 +363,13 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello
     foo. This is a docstring.
     """
-''')))
+'''))
 
     def test_format_code_with_empty_lines(self):
         self.assertEqual(
@@ -388,7 +384,7 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello
@@ -396,7 +392,7 @@ def foo():
 
     More stuff.
     """
-''')))
+'''))
 
     def test_format_code_with_trailing_whitespace(self):
         self.assertEqual(
@@ -411,7 +407,7 @@ def foo():
     """
 ''',
             docformatter.format_code(
-                (unicode('''\
+                ('''\
 def foo():
     """
     Hello
@@ -419,13 +415,13 @@ def foo():
 
     More stuff.\t
     """
-'''))))
+''')))
 
     def test_format_code_with_no_docstring(self):
-        line = unicode('''\
+        line = '''\
 def foo():
     "Just a regular string"
-''')
+'''
         self.assertEqual(line, docformatter.format_code(line))
 
     def test_format_code_with_assignment_on_first_line(self):
@@ -435,10 +431,10 @@ def foo():
     x = """Just a regular string. Alpha."""
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     x = """Just a regular string. Alpha."""
-''')))
+'''))
 
     def test_format_code_with_regular_strings_too(self):
         self.assertEqual(
@@ -459,7 +455,7 @@ def foo():
     touched\t"""
 ''',
             docformatter.format_code(
-                unicode('''\
+                '''\
 def foo():
     """
     Hello
@@ -473,11 +469,11 @@ def foo():
     """More stuff
     that should not be
     touched\t"""
-''')))
+'''))
 
     def test_format_code_with_syntax_error(self):
         self.assertEqual('"""\n',
-                         docformatter.format_code(unicode('"""\n')))
+                         docformatter.format_code('"""\n'))
 
     def test_split_summary_and_description(self):
         self.assertEqual(('This is the first.',
@@ -553,14 +549,14 @@ def foo():
             docformatter.main(argv=['my_fake_program', filename],
                               standard_out=output_file,
                               standard_error=None)
-            self.assertEqual(unicode('''\
+            self.assertEqual('''\
 @@ -1,4 +1,2 @@
  def foo():
 -    """
 -    Hello world
 -    """
 +    """Hello world."""
-'''), '\n'.join(output_file.getvalue().split('\n')[2:]))
+''', '\n'.join(output_file.getvalue().split('\n')[2:]))
 
     def test_diff_with_nonexistent_file(self):
         output_file = io.StringIO()

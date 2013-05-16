@@ -162,14 +162,14 @@ def format_docstring(indentation, docstring,
 {description}{post_description}
 {indentation}"""\
 '''.format(pre_summary=('\n' + indentation if pre_summary_newline
-                        else unicode()),
+                        else ''),
            summary=wrap_summary(normalize_summary(summary),
                                 wrap_length=summary_wrap_length,
                                 initial_indent=initial_indent,
                                 subsequent_indent=indentation).lstrip(),
            description='\n'.join([indent_non_indented(l, indentation).rstrip()
                                   for l in description.splitlines()]),
-           post_description=('\n' if post_description_blank else unicode()),
+           post_description=('\n' if post_description_blank else ''),
            indentation=indentation)
     else:
         return wrap_summary('"""' + normalize_summary(contents) + '"""',
@@ -219,7 +219,7 @@ def split_summary_and_description(contents):
             if len(split) == 2:
                 return (split[0].strip(), (token + split[1]).strip())
 
-    return (split[0].strip(), unicode())
+    return (split[0].strip(), '')
 
 
 def strip_docstring(docstring):
@@ -303,7 +303,7 @@ def format_file(filename, args, standard_out):
                 'before/' + filename,
                 'after/' + filename,
                 lineterm='')
-            standard_out.write(unicode('\n').join(list(diff) + ['']))
+            standard_out.write('\n'.join(list(diff) + ['']))
 
 
 def main(argv, standard_out, standard_error):
