@@ -17,4 +17,4 @@ mutant:
 	@mut.py -t docformatter -u test_docformatter -mc
 
 readme:
-	@restview --long-description
+	@restview --long-description --strict
