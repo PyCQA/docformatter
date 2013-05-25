@@ -18,7 +18,3 @@ mutant:
 
 readme:
 	@restview --long-description
-
-register:
-	@python setup.py register sdist upload
-	@srm ~/.pypirc
