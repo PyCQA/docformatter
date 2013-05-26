@@ -189,7 +189,7 @@ def indent_non_indented(line, indentation):
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     # Check heuristically for a parameter list.
-    if ' - ' in line:
+    if re.search('\s-\s', line):
         return True
 
     character = line.strip()[0]
