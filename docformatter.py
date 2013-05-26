@@ -189,7 +189,7 @@ def indent_non_indented(line, indentation):
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     character = line.strip()[0]
-    return character.isupper() or not character.isalnum()
+    return character.isupper() or not character.isalnum() or '-' in line
 
 
 def split_summary_and_description(contents):
