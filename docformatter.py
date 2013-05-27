@@ -99,8 +99,13 @@ def _format_code(source,
             starts_with_triple(token_string) and
             (previous_token_type == tokenize.INDENT or only_comments_so_far)
         ):
+            if only_comments_so_far:
+                indentation = ''
+            else:
+                indentation = previous_token_string
+
             formatted += format_docstring(
-                previous_token_string,
+                indentation,
                 token_string,
                 summary_wrap_length=summary_wrap_length,
                 pre_summary_newline=pre_summary_newline,

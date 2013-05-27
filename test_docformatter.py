@@ -200,7 +200,12 @@ def foo():
         self.assertEqual(
             '''\
 #!/usr/env/bin python
-"""This is a module docstring."""
+"""This is a module docstring.
+
+1. One
+2. Two
+
+"""
 
 """But
 this
@@ -214,7 +219,11 @@ not."""
 is
 a
 module
-docstring."""
+docstring.
+
+1. One
+2. Two
+"""
 
 """But
 this
