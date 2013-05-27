@@ -94,10 +94,11 @@ def _format_code(source,
         if start_column > last_column:
             formatted += line[last_column:start_column]
 
-        if (token_type == tokenize.STRING and
-                starts_with_triple(token_string) and
-                (previous_token_type == tokenize.INDENT or
-                 only_comments_so_far)):
+        if (
+            token_type == tokenize.STRING and
+            starts_with_triple(token_string) and
+            (previous_token_type == tokenize.INDENT or only_comments_so_far)
+        ):
             formatted += format_docstring(
                 previous_token_string,
                 token_string,
@@ -194,7 +195,7 @@ def indent_non_indented(line, indentation):
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     # Check heuristically for a parameter list.
-    if re.search('\s-\s', line):
+    if re.search(r'\s-\s', line):
         return True
 
     character = line.strip()[0]
