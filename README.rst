@@ -37,6 +37,14 @@ docformatter also handles some of the PEP 8 conventions.
   and some editors (or more recently, reindent.py) will trim them.
 
 
+Installation
+============
+
+From pip::
+
+    $ pip install --upgrade docformatter
+
+
 Example
 =======
 
