@@ -4,6 +4,7 @@ check:
 	pylint --report=no --include-ids=yes --disable=C0103,R0914,W0622 --rcfile=/dev/null docformatter.py setup.py
 	python setup.py --long-description | rst2html --strict > /dev/null
 	scspell docformatter docformatter.py setup.py test_docformatter.py README.rst
+	docformatter docformatter docformatter.py setup.py
 
 coverage:
 	@rm -f .coverage
