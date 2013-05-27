@@ -72,6 +72,7 @@ def _format_code(source,
     previous_line = ''
     last_row = 0
     last_column = -1
+    only_comments_so_far = True
     for token in tokenize.generate_tokens(sio.readline):
         token_type = token[0]
         token_string = token[1]
@@ -95,7 +96,8 @@ def _format_code(source,
 
         if (token_type == tokenize.STRING and
                 starts_with_triple(token_string) and
-                previous_token_type == tokenize.INDENT):
+                (previous_token_type == tokenize.INDENT or
+                 only_comments_so_far)):
             formatted += format_docstring(
                 previous_token_string,
                 token_string,
@@ -104,6 +106,9 @@ def _format_code(source,
                 post_description_blank=post_description_blank)
         else:
             formatted += token_string
+
+        if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
+            only_comments_so_far = False
 
         previous_token_string = token_string
         previous_token_type = token_type

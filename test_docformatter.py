@@ -196,6 +196,42 @@ def foo():
     """
 '''))
 
+    def test_format_code_with_module_docstring(self):
+        self.assertEqual(
+            '''\
+#!/usr/env/bin python
+"""This is a module docstring."""
+
+"""But
+this
+is
+not."""
+''',
+            docformatter.format_code(
+            '''\
+#!/usr/env/bin python
+"""This
+is
+a
+module
+docstring."""
+
+"""But
+this
+is
+not."""
+'''))
+
+    def test_format_code_should_ignore_non_docstring(self):
+        source = '''\
+x = """This
+is
+not."""
+'''
+        self.assertEqual(
+            source,
+            docformatter.format_code(source))
+
     def test_format_code_with_empty_string(self):
         self.assertEqual(
             '',
