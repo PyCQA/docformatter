@@ -541,39 +541,42 @@ def foo():
                          docformatter.format_code('"""\n'))
 
     def test_split_summary_and_description(self):
-        self.assertEqual(('This is the first.',
-                          'This is the second. This is the third.'),
-                         docformatter.split_summary_and_description(
-                         'This is the first. This is the second. This is the third.'))
+        self.assertEqual(
+            ('This is the first.',
+             'This is the second. This is the third.'),
+            docformatter.split_summary_and_description(
+                'This is the first. This is the second. This is the third.'))
 
     def test_split_summary_and_description_complex(self):
-        self.assertEqual(('This is the first',
-                          'This is the second. This is the third.'),
-                         docformatter.split_summary_and_description(
-                         'This is the first\n\nThis is the second. This is the third.'))
+        self.assertEqual(
+            ('This is the first',
+             'This is the second. This is the third.'),
+            docformatter.split_summary_and_description(
+                'This is the first\n\nThis is the second. This is the third.'))
 
     def test_split_summary_and_description_more_complex(self):
-        self.assertEqual(('This is the first.',
-                          'This is the second. This is the third.'),
-                         docformatter.split_summary_and_description(
-                         'This is the first.\nThis is the second. This is the third.'))
+        self.assertEqual(
+            ('This is the first.',
+             'This is the second. This is the third.'),
+            docformatter.split_summary_and_description(
+                'This is the first.\nThis is the second. This is the third.'))
 
     def test_split_summary_and_description_with_list(self):
         self.assertEqual(('This is the first',
                           '- one\n- two'),
                          docformatter.split_summary_and_description(
-                         'This is the first\n- one\n- two'))
+                             'This is the first\n- one\n- two'))
 
     def test_split_summary_and_description_with_list_of_parameters(self):
         self.assertEqual(('This is the first',
                           'one - one\ntwo - two'),
                          docformatter.split_summary_and_description(
-                         'This is the first\none - one\ntwo - two'))
+                             'This is the first\none - one\ntwo - two'))
 
     def test_split_summary_and_description_with_capital(self):
         self.assertEqual(('This is the first\nWashington', ''),
                          docformatter.split_summary_and_description(
-                         'This is the first\nWashington'))
+                             'This is the first\nWashington'))
 
     def test_split_summary_and_description_with_list_on_other_line(self):
         self.assertEqual(('Test\n    test', '@blah'),
@@ -686,8 +689,8 @@ def foo():
                     docformatter.main(argv=['my_fake_program',
                                             '--recursive',
                                             directory],
-                                   standard_out=output_file,
-                                   standard_error=None)
+                                      standard_out=output_file,
+                                      standard_error=None)
                     self.assertEqual(
                         '',
                         output_file.getvalue().strip())
