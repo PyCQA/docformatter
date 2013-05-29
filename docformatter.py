@@ -204,7 +204,7 @@ def is_probably_beginning_of_sentence(line):
         return True
 
     character = line.strip()[0]
-    return character.isupper() or not character.isalnum()
+    return not character.isalnum()
 
 
 def split_summary_and_description(contents):
