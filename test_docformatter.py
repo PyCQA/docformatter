@@ -571,9 +571,9 @@ def foo():
                          'This is the first\none - one\ntwo - two'))
 
     def test_split_summary_and_description_with_capital(self):
-        self.assertEqual(('This is the first Washington', ''),
+        self.assertEqual(('This is the first\nWashington', ''),
                          docformatter.split_summary_and_description(
-                         'This is the first Washington'))
+                         'This is the first\nWashington'))
 
     def test_split_summary_and_description_with_list_on_other_line(self):
         self.assertEqual(('Test\n    test', '@blah'),
