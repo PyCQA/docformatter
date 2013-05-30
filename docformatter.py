@@ -179,20 +179,19 @@ def format_docstring(indentation, docstring,
 {description}{post_description}
 {indentation}"""\
 '''.format(
-    pre_summary=('\n' + indentation if pre_summary_newline
-                 else ''),
-    summary=wrap_summary(normalize_summary(summary),
-                         wrap_length=summary_wrap_length,
-                         initial_indent=initial_indent,
-                         subsequent_indent=indentation).lstrip(),
-    description=wrap_description(
-        '\n'.join([indent_non_indented(l, indentation).rstrip()
-                   for l in description.splitlines()]),
-        indentation=indentation,
-        wrap_length=description_wrap_length),
-    post_description=('\n' if post_description_blank else ''),
-    indentation=indentation)
-
+            pre_summary=('\n' + indentation if pre_summary_newline
+                         else ''),
+            summary=wrap_summary(normalize_summary(summary),
+                                 wrap_length=summary_wrap_length,
+                                 initial_indent=initial_indent,
+                                 subsequent_indent=indentation).lstrip(),
+            description=wrap_description(
+                '\n'.join([indent_non_indented(l, indentation).rstrip()
+                           for l in description.splitlines()]),
+                indentation=indentation,
+                wrap_length=description_wrap_length),
+            post_description=('\n' if post_description_blank else ''),
+            indentation=indentation)
     else:
         return wrap_summary('"""' + normalize_summary(contents) + '"""',
                             wrap_length=summary_wrap_length,
