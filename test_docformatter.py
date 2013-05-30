@@ -94,6 +94,51 @@ next line should be indented too. But
     """
 '''.strip(), description_wrap_length=72))
 
+    def test_format_docstring_should_ignore_numbered_lists(self):
+        docstring = '''"""Hello.
+
+    1. This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ',
+                                          docstring,
+                                          description_wrap_length=72))
+
+    def test_format_docstring_should_ignore_parameter_lists(self):
+        docstring = '''"""Hello.
+
+    foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ',
+                                          docstring,
+                                          description_wrap_length=72))
+
+    def test_format_docstring_should_ignore_multi_paragraph(self):
+        docstring = '''"""Hello.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ',
+                                          docstring,
+                                          description_wrap_length=72))
+
     def test_format_docstring_with_trailing_whitespace(self):
         self.assertEqual('''"""Hello.
 

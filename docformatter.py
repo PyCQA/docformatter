@@ -293,7 +293,10 @@ def wrap_description(text, indentation, wrap_length):
 
     """
     # Ignore possibly complicated cases.
-    if not wrap_length or re.match(r'\n\s*\n', text):
+    if (not wrap_length or
+            re.search(r'\n\s*\n', text) or
+            re.search(r'[0-9]\.', text) or
+            re.search(r'[\-*:]', text)):
         return text
 
     return indentation + '\n'.join(
