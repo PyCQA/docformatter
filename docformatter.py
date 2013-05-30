@@ -185,11 +185,9 @@ def format_docstring(indentation, docstring,
                                  wrap_length=summary_wrap_length,
                                  initial_indent=initial_indent,
                                  subsequent_indent=indentation).lstrip(),
-            description=wrap_description(
-                '\n'.join([indent_non_indented(l, indentation).rstrip()
-                           for l in description.splitlines()]),
-                indentation=indentation,
-                wrap_length=description_wrap_length),
+            description=wrap_description(description,
+                                         indentation=indentation,
+                                         wrap_length=description_wrap_length),
             post_description=('\n' if post_description_blank else ''),
             indentation=indentation)
     else:
@@ -292,6 +290,9 @@ def wrap_description(text, indentation, wrap_length):
     lists alone.
 
     """
+    text = '\n'.join([indent_non_indented(l, indentation).rstrip()
+                      for l in text.splitlines()])
+
     # Ignore possibly complicated cases.
     if (not wrap_length or
             re.search(r'\n\s*\n', text) or
