@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 import io
 import os
 import re
+import textwrap
 import tokenize
 
 
@@ -41,6 +42,7 @@ except NameError:
 
 def format_code(source,
                 summary_wrap_length=0,
+                description_wrap_length=0,
                 pre_summary_newline=False,
                 post_description_blank=True):
     """Return source code with docstrings formatted.
@@ -51,6 +53,7 @@ def format_code(source,
     try:
         return _format_code(source,
                             summary_wrap_length=summary_wrap_length,
+                            description_wrap_length=description_wrap_length,
                             pre_summary_newline=pre_summary_newline,
                             post_description_blank=post_description_blank)
     except (tokenize.TokenError, IndentationError):
@@ -59,6 +62,7 @@ def format_code(source,
 
 def _format_code(source,
                  summary_wrap_length,
+                 description_wrap_length,
                  pre_summary_newline,
                  post_description_blank):
     """Return source code with docstrings formatted."""
@@ -108,6 +112,7 @@ def _format_code(source,
                 indentation,
                 token_string,
                 summary_wrap_length=summary_wrap_length,
+                description_wrap_length=description_wrap_length,
                 pre_summary_newline=pre_summary_newline,
                 post_description_blank=post_description_blank)
         else:
@@ -134,6 +139,7 @@ def starts_with_triple(string):
 
 def format_docstring(indentation, docstring,
                      summary_wrap_length=0,
+                     description_wrap_length=0,
                      pre_summary_newline=False,
                      post_description_blank=True):
     """Return formatted version of docstring.
@@ -172,16 +178,21 @@ def format_docstring(indentation, docstring,
 
 {description}{post_description}
 {indentation}"""\
-'''.format(pre_summary=('\n' + indentation if pre_summary_newline
-                        else ''),
-           summary=wrap_summary(normalize_summary(summary),
-                                wrap_length=summary_wrap_length,
-                                initial_indent=initial_indent,
-                                subsequent_indent=indentation).lstrip(),
-           description='\n'.join([indent_non_indented(l, indentation).rstrip()
-                                  for l in description.splitlines()]),
-           post_description=('\n' if post_description_blank else ''),
-           indentation=indentation)
+'''.format(
+    pre_summary=('\n' + indentation if pre_summary_newline
+                 else ''),
+    summary=wrap_summary(normalize_summary(summary),
+                         wrap_length=summary_wrap_length,
+                         initial_indent=initial_indent,
+                         subsequent_indent=indentation).lstrip(),
+    description=wrap_description(
+        '\n'.join([indent_non_indented(l, indentation).rstrip()
+                   for l in description.splitlines()]),
+        indentation=indentation,
+        wrap_length=description_wrap_length),
+    post_description=('\n' if post_description_blank else ''),
+    indentation=indentation)
+
     else:
         return wrap_summary('"""' + normalize_summary(contents) + '"""',
                             wrap_length=summary_wrap_length,
@@ -266,7 +277,6 @@ def normalize_summary(summary):
 def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
     """Return line-wrapped summary text."""
     if wrap_length > 0:
-        import textwrap
         return '\n'.join(
             textwrap.wrap(summary,
                           width=wrap_length,
@@ -274,6 +284,24 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
                           subsequent_indent=subsequent_indent)).strip()
     else:
         return summary
+
+
+def wrap_description(text, indentation, wrap_length):
+    """Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave multi-paragraph and bulleted
+    lists alone.
+
+    """
+    # Ignore possibly complicated cases.
+    if not wrap_length or re.match(r'\n\s*\n', text):
+        return text
+
+    return indentation + '\n'.join(
+        textwrap.wrap(textwrap.dedent(text),
+                      width=wrap_length,
+                      initial_indent=indentation,
+                      subsequent_indent=indentation)).strip()
 
 
 def open_with_encoding(filename, encoding, mode='r'):
@@ -336,6 +364,9 @@ def main(argv, standard_out, standard_error):
     parser.add_argument(
         '--wrap-summaries', default=79, type=int, metavar='length',
         help='wrap long summary lines at this length (default: %(default)s)')
+    parser.add_argument(
+        '--wrap-descriptions', default=0, type=int, metavar='length',
+        help='wrap descriptions at this length (default: %(default)s)')
     parser.add_argument('--no-blank', dest='post_description_blank',
                         action='store_false',
                         help='do not add blank line after description')

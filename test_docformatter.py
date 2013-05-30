@@ -77,6 +77,23 @@ next line should be indented too. But
     """
 '''.strip()))
 
+    def test_format_docstring_with_description_wrapping(self):
+        self.assertEqual('''"""Hello.
+
+    This should be indented but it is not. The next line should be
+    indented too. But this is okay.
+
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""Hello.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """
+'''.strip(), description_wrap_length=72))
+
     def test_format_docstring_with_trailing_whitespace(self):
         self.assertEqual('''"""Hello.
 
