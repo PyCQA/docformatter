@@ -298,7 +298,7 @@ def wrap_description(text, indentation, wrap_length):
                       for l in text.splitlines()])
 
     # Ignore possibly complicated cases.
-    if (not wrap_length or
+    if (wrap_length <= 0 or
             re.search(r'\n\s*\n', text) or
             re.search(r'[0-9]\.', text) or
             re.search(r'[\-*:]', text)):
