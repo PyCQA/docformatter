@@ -286,10 +286,14 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
 def wrap_description(text, indentation, wrap_length):
     """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave multi-paragraph and bulleted
-    lists alone.
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.
 
     """
+    # Do modify doctests at all.
+    if '>' in text:
+        return text
+
     text = '\n'.join([indent_non_indented(l, indentation).rstrip()
                       for l in text.splitlines()])
 
