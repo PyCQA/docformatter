@@ -291,7 +291,7 @@ def wrap_description(text, indentation, wrap_length):
 
     """
     # Do modify doctests at all.
-    if '>' in text:
+    if '>>>' in text:
         return text
 
     text = '\n'.join([indent_non_indented(l, indentation).rstrip()
