@@ -15,6 +15,7 @@ install:
 
 script:
     - python test_docformatter.py
+    - docformatter setup.py
 
 after_success:
     - pip install --use-mirrors --quiet coverage
