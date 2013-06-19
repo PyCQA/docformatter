@@ -107,6 +107,18 @@ next line should be indented too. But
                                           docstring,
                                           description_wrap_length=72))
 
+    def test_format_docstring_should_ignore_doctests_in_summary(self):
+        docstring = '''""" 
+    >>> 4
+    4
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ',
+                                          docstring,
+                                          description_wrap_length=72))
+
     def test_format_docstring_should_ignore_numbered_lists(self):
         docstring = '''"""Hello.
 

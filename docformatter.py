@@ -163,6 +163,10 @@ def format_docstring(indentation, docstring,
     if contents.count('"""'):
         return docstring
 
+    # Do not modify things that start with doctests.
+    if contents.lstrip().startswith('>>>'):
+        return docstring
+
     summary, description = split_summary_and_description(contents)
 
     if description:
@@ -290,7 +294,7 @@ def wrap_description(text, indentation, wrap_length):
     and bulleted lists alone.
 
     """
-    # Do modify doctests at all.
+    # Do not modify doctests at all.
     if '>>>' in text:
         return text
 
