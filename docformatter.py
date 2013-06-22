@@ -76,6 +76,7 @@ def _format_code(source,
     previous_line = ''
     last_row = 0
     last_column = -1
+    last_non_whitespace_token_type = None
     only_comments_so_far = True
     for token in tokenize.generate_tokens(sio.readline):
         token_type = token[0]
@@ -85,11 +86,13 @@ def _format_code(source,
         line = token[4]
 
         # Preserve escaped newlines
-        if (not previous_line.lstrip().startswith('#') and
+        if (
+            last_non_whitespace_token_type != tokenize.COMMENT and
             start_row > last_row and
-                (previous_line.endswith('\\\n') or
-                 previous_line.endswith('\\\r\n') or
-                 previous_line.endswith('\\\r'))):
+            (previous_line.endswith('\\\n') or
+             previous_line.endswith('\\\r\n') or
+             previous_line.endswith('\\\r'))
+        ):
             formatted += previous_line[len(previous_line.rstrip(' \t\n\r\\')):]
 
         # Preserve spacing
@@ -127,6 +130,9 @@ def _format_code(source,
 
         last_row = end_row
         last_column = end_column
+
+        if token_type not in [tokenize.INDENT, tokenize.NEWLINE, tokenize.NL]:
+            last_non_whitespace_token_type = token_type
 
     return formatted
 

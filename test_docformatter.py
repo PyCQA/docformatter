@@ -405,6 +405,22 @@ def foo():
     123
 '''.lstrip()))
 
+    def test_format_code_with_escaped_newline_in_inline_comment(self):
+        self.assertEqual(
+            r'''
+def foo():
+    """Hello foo."""
+    def test_method_no_chr_92(): the501(92) # \
+'''.lstrip(),
+            docformatter.format_code(
+                r'''
+def foo():
+    """
+    Hello foo.
+    """
+    def test_method_no_chr_92(): the501(92) # \
+'''.lstrip()))
+
     def test_format_code_skip_complex(self):
         """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
