@@ -378,12 +378,14 @@ def main(argv, standard_out, standard_error):
                         help='make changes to files instead of printing diffs')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
-    parser.add_argument(
-        '--wrap-summaries', default=79, type=int, metavar='length',
-        help='wrap long summary lines at this length (default: %(default)s)')
-    parser.add_argument(
-        '--wrap-descriptions', default=0, type=int, metavar='length',
-        help='wrap descriptions at this length (default: %(default)s)')
+    parser.add_argument('--wrap-summaries', default=79, type=int,
+                        metavar='length',
+                        help='wrap long summary lines at this length '
+                             '(default: %(default)s)')
+    parser.add_argument('--wrap-descriptions', default=0, type=int,
+                        metavar='length',
+                        help='wrap descriptions at this length '
+                             '(default: %(default)s)')
     parser.add_argument('--no-blank', dest='post_description_blank',
                         action='store_false',
                         help='do not add blank line after description')
