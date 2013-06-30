@@ -141,6 +141,27 @@ Hello.
                                           docstring,
                                           description_wrap_length=72))
 
+    def test_format_docstring_should_maintain_indentation_of_doctest(self):
+        self.assertEqual(
+            '''"""Foo bar bing bang.
+
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
+
+    """''',
+            docformatter.format_docstring(
+                '    ',
+                docstring = '''"""Foo bar
+        bing bang.
+
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
+
+    """''',
+                description_wrap_length=72))
+
     def test_format_docstring_should_ignore_numbered_lists(self):
         docstring = '''"""Hello.
 
@@ -734,7 +755,8 @@ def foo():
             ("""\
 Try this and this and this and this and this and this and this at
     http://example.com/""",
-             """Parameters
+             """
+    Parameters
     ----------
     email : string"""),
             docformatter.split_summary_and_description('''\
@@ -751,7 +773,8 @@ Try this and this and this and this and this and this and this at
             ("""\
 Try this and this and this and this and this and this and this at
     this other line""",
-             """Parameters
+             """
+    Parameters
     ----------
     email : string"""),
             docformatter.split_summary_and_description('''\
@@ -922,8 +945,6 @@ def foo():
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
     def test_end_to_end_all_options(self):
-        self.maxDiff = None
-
         with temporary_file('''\
 def foo():
     """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option

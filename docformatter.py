@@ -250,7 +250,7 @@ def split_summary_and_description(contents):
         for index, line in enumerate(split):
             if not line.strip():
                 return ('\n'.join(split[:index]).strip(),
-                        '\n'.join(split[index:]).strip())
+                        '\n'.join(split[index:]).rstrip())
 
     # Break on first sentence.
     for punctuation in '.?!:':
@@ -313,6 +313,9 @@ def wrap_description(text, indentation, wrap_length):
     and bulleted lists alone.
 
     """
+    # Do not modify leading indentation unnecessarily.
+    text = text.lstrip('\n')
+
     # Do not modify doctests at all.
     if '>>>' in text:
         return text
