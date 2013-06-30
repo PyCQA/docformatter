@@ -130,7 +130,7 @@ Hello.
                                           description_wrap_length=72))
 
     def test_format_docstring_should_ignore_doctests_in_summary(self):
-        docstring = '''""" 
+        docstring = '''"""
     >>> 4
     4
 
@@ -322,7 +322,7 @@ is
 not."""
 ''',
             docformatter.format_code(
-            '''\
+                '''\
 #!/usr/env/bin python
 """This
 is
@@ -709,25 +709,25 @@ def foo():
         self.assertEqual(('This is the first',
                           '@ one\n@ two'),
                          docformatter.split_summary_and_description(
-                         'This is the first\n@ one\n@ two'))
+                             'This is the first\n@ one\n@ two'))
 
     def test_split_summary_and_description_with_colon(self):
         self.assertEqual(('This is the first:',
                           'one\ntwo'),
                          docformatter.split_summary_and_description(
-                         'This is the first:\none\ntwo'))
+                             'This is the first:\none\ntwo'))
 
     def test_split_summary_and_description_with_exclamation(self):
         self.assertEqual(('This is the first!',
                           'one\ntwo'),
                          docformatter.split_summary_and_description(
-                         'This is the first!\none\ntwo'))
+                             'This is the first!\none\ntwo'))
 
     def test_split_summary_and_description_with_question_mark(self):
         self.assertEqual(('This is the first?',
                           'one\ntwo'),
                          docformatter.split_summary_and_description(
-                         'This is the first?\none\ntwo'))
+                             'This is the first?\none\ntwo'))
 
     def test_split_summary_and_description_with_late__punctuation(self):
         self.assertEqual(
