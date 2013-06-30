@@ -242,23 +242,29 @@ def split_summary_and_description(contents):
     elif len(split) > 1 and is_probably_beginning_of_sentence(split[1]):
         # Symbol on second line probably is a description with a list.
         return (split[0], '\n'.join(split[1:]))
-    else:
-        # Break on first sentence.
-        for punctuation in '.?!:':
-            split = re.split('\\' + punctuation + r'\s',
-                             string=contents,
-                             maxsplit=1)
-            if len(split) == 2:
-                return (split[0].strip() + punctuation,
-                        split[1].strip())
 
-        # Break on first bullet-list-like text.
-        for token in ['    @',
-                      '    -',
-                      '    *']:
-            split = contents.split(token, 1)
-            if len(split) == 2:
-                return (split[0].strip(), (token + split[1]).strip())
+    if len(split) > 1:
+        for index, line in enumerate(split):
+            if not line.strip():
+                return ('\n'.join(split[:index]).strip(),
+                        '\n'.join(split[index:]).strip())
+
+    # Break on first sentence.
+    for punctuation in '.?!:':
+        split = re.split('\\' + punctuation + r'\s',
+                         string=contents,
+                         maxsplit=1)
+        if len(split) == 2:
+            return (split[0].strip() + punctuation,
+                    split[1].strip())
+
+    # Break on first bullet-list-like text.
+    for token in ['    @',
+                  '    -',
+                  '    *']:
+        split = contents.split(token, 1)
+        if len(split) == 2:
+            return (split[0].strip(), (token + split[1]).strip())
 
     return (split[0].strip(), '')
 

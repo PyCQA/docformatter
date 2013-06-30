@@ -545,9 +545,7 @@ def foo():
         self.assertEqual(
             '''\
 def foo():
-    """Hello foo.
-
-    This is a docstring.
+    """Hello foo and this is a docstring.
 
     More stuff.
 
@@ -558,7 +556,7 @@ def foo():
 def foo():
     """
     Hello
-    foo. This is a docstring.
+    foo and this is a docstring.
 
     More stuff.
     """
@@ -568,9 +566,7 @@ def foo():
         self.assertEqual(
             '''\
 def foo():
-    """Hello foo.
-
-    This is a docstring.
+    """Hello foo and this is a docstring.
 
     More stuff.
 
@@ -581,7 +577,7 @@ def foo():
 def foo():
     """
     Hello
-    foo. This is a docstring.\t
+    foo and this is a docstring.\t
 
     More stuff.\t
     """
@@ -630,9 +626,7 @@ def foo():
         self.assertEqual(
             '''\
 def foo():
-    """Hello foo.
-
-    This is a docstring.
+    """Hello foo and this is a docstring.
 
     More stuff.
 
@@ -649,7 +643,7 @@ def foo():
 def foo():
     """
     Hello
-    foo. This is a docstring.
+    foo and this is a docstring.
 
     More stuff.
     """
@@ -734,6 +728,23 @@ def foo():
                           'one\ntwo'),
                          docformatter.split_summary_and_description(
                          'This is the first?\none\ntwo'))
+
+    def test_split_summary_and_description_without_punctuation(self):
+        self.assertEqual(
+            ("""\
+Try this and this and this and this and this and this and this at
+    http://example.com/""",
+             """Parameters
+    ----------
+    email : string"""),
+            docformatter.split_summary_and_description('''\
+    Try this and this and this and this and this and this and this at
+    http://example.com/
+
+    Parameters
+    ----------
+    email : string
+'''))
 
     def test_normalize_summary(self):
         self.assertEqual(
