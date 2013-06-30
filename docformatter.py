@@ -31,7 +31,7 @@ import textwrap
 import tokenize
 
 
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 
 try:
@@ -212,12 +212,9 @@ def reindent(text, indentation):
     if '\t' not in indentation:
         text = text.expandtabs(len(indentation))
 
-    # Ignore the first line, which is a special case.
-    split_lines = text.splitlines()
-    text = textwrap.dedent('\n'.join(split_lines[1:]))
+    text = textwrap.dedent(text)
 
     return '\n'.join(
-        [indentation + split_lines[0].strip()] +
         [(indentation + line).rstrip()
          for line in text.splitlines()]).rstrip() + '\n'
 

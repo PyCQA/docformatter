@@ -834,6 +834,18 @@ Try this and this and this and this and this and this and this at
             """, indentation='    ')
         )
 
+    def test_reindent_should_maintain_indentation(self):
+        descripton = """\
+    Parameters:
+
+        - a
+        - b
+"""
+        self.assertEqual(
+            descripton,
+            docformatter.reindent(descripton, indentation='    ')
+        )
+
 
 class TestSystem(unittest.TestCase):
 
