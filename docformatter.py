@@ -222,8 +222,9 @@ def reindent(text, indentation):
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     # Check heuristically for a parameter list.
-    if re.search(r'\s-\s', line):
-        return True
+    for token in ['@', '-', '\*']:
+        if re.search(r'\s' + token + '\s', line):
+            return True
 
     character = line.strip()[0]
     return not character.isalnum()
@@ -261,14 +262,6 @@ def split_summary_and_description(contents):
         if len(split) == 2:
             return (split[0].strip() + punctuation,
                     split[1].rstrip())
-
-    # Break on first bullet-list-like text.
-    for token in ['    @',
-                  '    -',
-                  '    *']:
-        split = contents.split(token, 1)
-        if len(split) == 2:
-            return (split[0].strip(), (token + split[1]).strip())
 
     return (split[0], '\n'.join(split[1:]))
 
