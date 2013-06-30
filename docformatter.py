@@ -261,14 +261,14 @@ def split_summary_and_description(contents):
                          maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + punctuation,
-                    _find_smallest_indentation(split[1].splitlines()[1:]) +
+                    _find_shortest_indentation(split[1].splitlines()[1:]) +
                     split[1].strip())
 
     return (contents, '')
 
 
-def _find_smallest_indentation(lines):
-    """Return most smallest indentation."""
+def _find_shortest_indentation(lines):
+    """Return most shortest indentation."""
     assert not isinstance(lines, str)
 
     indentation = None
