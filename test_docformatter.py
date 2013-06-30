@@ -835,15 +835,15 @@ Try this and this and this and this and this and this and this at
         )
 
     def test_reindent_should_maintain_indentation(self):
-        descripton = """\
+        description = """\
     Parameters:
 
         - a
         - b
 """
         self.assertEqual(
-            descripton,
-            docformatter.reindent(descripton, indentation='    ')
+            description,
+            docformatter.reindent(description, indentation='    ')
         )
 
 
