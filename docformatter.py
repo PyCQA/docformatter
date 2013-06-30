@@ -236,23 +236,23 @@ def split_summary_and_description(contents):
     Return tuple (summary, description).
 
     """
-    split = contents.splitlines()
+    split_lines = contents.splitlines()
 
-    if len(split) > 1:
-        for index, _ in enumerate(split):
+    if len(split_lines) > 1:
+        for index, _ in enumerate(split_lines):
             found = False
 
-            if not split[index].strip():
+            if not split_lines[index].strip():
                 # Empty line separation would indicate the rest is the
                 # description.
                 found = True
-            elif is_probably_beginning_of_sentence(split[index]):
+            elif is_probably_beginning_of_sentence(split_lines[index]):
                 # Symbol on second line probably is a description with a list.
                 found = True
 
             if found:
-                return ('\n'.join(split[:index]).strip(),
-                        '\n'.join(split[index:]).rstrip())
+                return ('\n'.join(split_lines[:index]).strip(),
+                        '\n'.join(split_lines[index:]).rstrip())
 
     # Break on first sentence.
     for punctuation in '.?!:':
@@ -263,7 +263,7 @@ def split_summary_and_description(contents):
             return (split[0].strip() + punctuation,
                     split[1].rstrip())
 
-    return (split[0], '\n'.join(split[1:]))
+    return (contents, '')
 
 
 def strip_docstring(docstring):
