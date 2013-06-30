@@ -389,6 +389,7 @@ def format_file(filename, args, standard_out):
         formatted_source = format_code(
             source,
             summary_wrap_length=args.wrap_summaries,
+            description_wrap_length=args.wrap_descriptions,
             pre_summary_newline=args.pre_summary_newline,
             post_description_blank=args.post_description_blank)
 
