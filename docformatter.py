@@ -236,16 +236,20 @@ def split_summary_and_description(contents):
 
     """
     split = contents.splitlines()
-    if len(split) > 1 and not split[1].strip():
-        # Empty line separation would indicate the rest is the description.
-        return (split[0], '\n'.join(split[2:]))
-    elif len(split) > 1 and is_probably_beginning_of_sentence(split[1]):
-        # Symbol on second line probably is a description with a list.
-        return (split[0], '\n'.join(split[1:]))
 
     if len(split) > 1:
-        for index, line in enumerate(split):
-            if not line.strip():
+        for index, _ in enumerate(split):
+            found = False
+
+            if not split[index].strip():
+                # Empty line separation would indicate the rest is the
+                # description.
+                found = True
+            elif is_probably_beginning_of_sentence(split[index]):
+                # Symbol on second line probably is a description with a list.
+                found = True
+
+            if found:
                 return ('\n'.join(split[:index]).strip(),
                         '\n'.join(split[index:]).rstrip())
 
@@ -310,8 +314,7 @@ def wrap_description(text, indentation, wrap_length):
     and bulleted lists alone.
 
     """
-    # Do not modify leading indentation unnecessarily.
-    text = text.lstrip('\n')
+    text = strip_leading_blank_lines(text)
 
     # Do not modify doctests at all.
     if '>>>' in text:
@@ -331,6 +334,19 @@ def wrap_description(text, indentation, wrap_length):
                       width=wrap_length,
                       initial_indent=indentation,
                       subsequent_indent=indentation)).strip()
+
+
+def strip_leading_blank_lines(text):
+    """Remove leading blank lines."""
+    split = text.splitlines()
+
+    found = 0
+    for index, line in enumerate(split):
+        if line.strip():
+            found = index
+            break
+
+    return '\n'.join(split[found:])
 
 
 def open_with_encoding(filename, encoding, mode='r'):

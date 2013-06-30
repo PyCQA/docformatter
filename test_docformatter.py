@@ -690,7 +690,7 @@ def foo():
     def test_split_summary_and_description_complex(self):
         self.assertEqual(
             ('This is the first',
-             'This is the second. This is the third.'),
+             '\nThis is the second. This is the third.'),
             docformatter.split_summary_and_description(
                 'This is the first\n\nThis is the second. This is the third.'))
 
@@ -719,7 +719,7 @@ def foo():
                              'This is the first\nWashington'))
 
     def test_split_summary_and_description_with_list_on_other_line(self):
-        self.assertEqual(('Test\n    test', '@blah'),
+        self.assertEqual(('Test\n    test', '    @blah'),
                          docformatter.split_summary_and_description('''\
     Test
     test
