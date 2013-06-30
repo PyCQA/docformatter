@@ -866,6 +866,11 @@ Try this and this and this and this and this and this and this at
             docformatter.reindent(description, indentation='    ')
         )
 
+    def test_find_smallest_indentation(self):
+        self.assertEqual(
+            ' ',
+            docformatter._find_smallest_indentation(['    ', ' b', '  a']))
+
 
 class TestSystem(unittest.TestCase):
 
