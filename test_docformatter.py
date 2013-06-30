@@ -64,16 +64,38 @@ Hello.
         self.assertEqual('''"""Hello.
 
     This should be indented but it is not. The
-    next line should be indented too. But
-    this is okay.
+    next line should be indented too. And
+    this too.
 
     """''',
                          docformatter.format_docstring('    ', '''
 """Hello.
 
-This should be indented but it is not. The
-next line should be indented too. But
-    this is okay.
+ This should be indented but it is not. The
+ next line should be indented too. And
+ this too.
+    """
+'''.strip()))
+
+    def test_format_docstring_with_too_much_indentation(self):
+        self.assertEqual('''"""Hello.
+
+    This should be dedented.
+
+    1. This too.
+    2. And this.
+    3. And this.
+
+    """''',
+                         docformatter.format_docstring('    ', '''
+"""Hello.
+
+        This should be dedented.
+
+        1. This too.
+        2. And this.
+        3. And this.
+
     """
 '''.strip()))
 
@@ -728,6 +750,22 @@ def foo():
         with temporary_file('# -*- coding: blah -*-\n') as filename:
             self.assertEqual('latin-1',
                              docformatter.detect_encoding(filename))
+
+    def test_reindent(self):
+        self.assertEqual(
+            """\
+    This should be dedented.
+
+    1. This too.
+    2. And this.
+""",
+            docformatter.reindent("""\
+                This should be dedented.
+
+                1. This too.
+                2. And this.
+            """, indentation='    ')
+        )
 
 
 class TestSystem(unittest.TestCase):

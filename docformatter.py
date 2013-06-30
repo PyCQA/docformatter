@@ -207,12 +207,16 @@ def format_docstring(indentation, docstring,
                             subsequent_indent=indentation).strip()
 
 
-def indent_non_indented(line, indentation):
-    """Return indented line if it has no indentation."""
-    if line.lstrip() == line:
-        return indentation + line
-    else:
-        return line
+def reindent(text, indentation):
+    """Reindent text to match indentation."""
+    # Ignore the first line, which is a special case.
+    split_lines = text.splitlines()
+    text = textwrap.dedent('\n'.join(split_lines[1:]))
+
+    return '\n'.join(
+        [indentation + split_lines[0].strip()] +
+        [(indentation + line).rstrip()
+         for line in text.splitlines()]).rstrip() + '\n'
 
 
 def is_probably_beginning_of_sentence(line):
@@ -304,8 +308,7 @@ def wrap_description(text, indentation, wrap_length):
     if '>>>' in text:
         return text
 
-    text = '\n'.join([indent_non_indented(l, indentation).rstrip()
-                      for l in text.splitlines()])
+    text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
     if (wrap_length <= 0 or
