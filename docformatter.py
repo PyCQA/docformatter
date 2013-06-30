@@ -31,7 +31,7 @@ import textwrap
 import tokenize
 
 
-__version__ = '0.4.3'
+__version__ = '0.5'
 
 
 try:
