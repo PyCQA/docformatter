@@ -222,8 +222,8 @@ def reindent(text, indentation):
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     # Check heuristically for a parameter list.
-    for token in ['@', '-', '\*']:
-        if re.search(r'\s' + token + '\s', line):
+    for token in ['@', '-', r'\*']:
+        if re.search(r'\s' + token + r'\s', line):
             return True
 
     character = line.strip()[0]
