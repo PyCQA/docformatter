@@ -259,7 +259,7 @@ def split_summary_and_description(contents):
                          maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + punctuation,
-                    split[1].strip())
+                    split[1].rstrip())
 
     # Break on first bullet-list-like text.
     for token in ['    @',
@@ -269,7 +269,7 @@ def split_summary_and_description(contents):
         if len(split) == 2:
             return (split[0].strip(), (token + split[1]).strip())
 
-    return (split[0].strip(), '')
+    return (split[0], '\n'.join(split[1:]))
 
 
 def strip_docstring(docstring):
