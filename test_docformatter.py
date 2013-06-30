@@ -314,19 +314,19 @@ Hello.
 
     def test_format_docstring_with_weird_indentation_and_punctuation(self):
         self.assertEqual('''
-    """Creates and returns four was awakens to was created created ammonites
-    was was fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
+    """Creates and returns four was awakens to was created tracked ammonites
+    was the fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
 
-    `four' ammonites x ammonites ammonites
+    `four' falsified x falsified ammonites
     to awakens to. `created' to ancestor was four to x dynamo to was
     four ancestor to physicists().
 
     """
 '''.strip(),
             docformatter.format_docstring('    ', '''
-    """Creates and returns four was awakens to was created created
-       ammonites was was fifty, arithmetical four was pyrotechnic to
-       pyrotechnic physicists. `four' ammonites x ammonites ammonites
+    """Creates and returns four was awakens to was created tracked
+       ammonites was the fifty, arithmetical four was pyrotechnic to
+       pyrotechnic physicists. `four' falsified x falsified ammonites
        to awakens to. `created' to ancestor was four to x dynamo to was
        four ancestor to physicists().
     """
