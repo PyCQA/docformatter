@@ -238,21 +238,19 @@ def split_summary_and_description(contents):
     """
     split_lines = contents.splitlines()
 
-    if len(split_lines) > 1:
-        for index, _ in enumerate(split_lines):
-            found = False
+    for index in range(1, len(split_lines)):
+        found = False
 
-            if not split_lines[index].strip():
-                # Empty line separation would indicate the rest is the
-                # description.
-                found = True
-            elif is_probably_beginning_of_sentence(split_lines[index]):
-                # Symbol on second line probably is a description with a list.
-                found = True
+        if not split_lines[index].strip():
+            # Empty line separation would indicate the rest is the description.
+            found = True
+        elif is_probably_beginning_of_sentence(split_lines[index]):
+            # Symbol on second line probably is a description with a list.
+            found = True
 
-            if found:
-                return ('\n'.join(split_lines[:index]).strip(),
-                        '\n'.join(split_lines[index:]).rstrip())
+        if found:
+            return ('\n'.join(split_lines[:index]).strip(),
+                    '\n'.join(split_lines[index:]).rstrip())
 
     # Break on first sentence.
     for punctuation in '.?!:':
