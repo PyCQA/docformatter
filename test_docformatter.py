@@ -314,21 +314,21 @@ Hello.
 
     def test_format_docstring_with_weird_indentation_and_punctuation(self):
         self.assertEqual('''
-    """Xxxxxxx xxx xxxxxxx xxxx xxx xxxxxxx xx xxx xxxxxxx xxxxxxx xxxxxxxxx
-    xxx xxx xxxxx, xxxxxxxxxxxx xxxx xxx xxxxxxxxxxx xx xxxxxxxxxxx xxxxxxxxxx.
+    """Creates and returns four was awakens to was created created ammonites
+    was was fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
 
-    `xxxx' xxxxxxxxx x xxxxxxxxx xxxxxxxxx
-    xx xxxxxxx xx. `xxxxxxx' xx xxxxxxxx xxx xxxx xx x xxxxxx xx xxx
-    xxxx xxxxxxxx xx xxxxxxxxxx().
+    `four' ammonites x ammonites ammonites
+    to awakens to. `created' to ancestor was four to x dynamo to was
+    four ancestor to physicists().
 
     """
 '''.strip(),
             docformatter.format_docstring('    ', '''
-    """Xxxxxxx xxx xxxxxxx xxxx xxx xxxxxxx xx xxx xxxxxxx xxxxxxx
-       xxxxxxxxx xxx xxx xxxxx, xxxxxxxxxxxx xxxx xxx xxxxxxxxxxx xx
-       xxxxxxxxxxx xxxxxxxxxx. `xxxx' xxxxxxxxx x xxxxxxxxx xxxxxxxxx
-       xx xxxxxxx xx. `xxxxxxx' xx xxxxxxxx xxx xxxx xx x xxxxxx xx xxx
-       xxxx xxxxxxxx xx xxxxxxxxxx().
+    """Creates and returns four was awakens to was created created
+       ammonites was was fifty, arithmetical four was pyrotechnic to
+       pyrotechnic physicists. `four' ammonites x ammonites ammonites
+       to awakens to. `created' to ancestor was four to x dynamo to was
+       four ancestor to physicists().
     """
 '''.strip(), summary_wrap_length=79))
 
