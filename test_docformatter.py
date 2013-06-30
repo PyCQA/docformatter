@@ -312,6 +312,26 @@ Hello.
                     if len(line.split()) > 1:
                         self.assertLessEqual(len(line), max_length)
 
+    def test_format_docstring_with_weird_indentation_and_punctuation(self):
+        self.assertEqual('''
+    """Xxxxxxx xxx xxxxxxx xxxx xxx xxxxxxx xx xxx xxxxxxx xxxxxxx xxxxxxxxx
+    xxx xxx xxxxx, xxxxxxxxxxxx xxxx xxx xxxxxxxxxxx xx xxxxxxxxxxx xxxxxxxxxx.
+
+    `xxxx' xxxxxxxxx x xxxxxxxxx xxxxxxxxx
+    xx xxxxxxx xx. `xxxxxxx' xx xxxxxxxx xxx xxxx xx x xxxxxx xx xxx
+    xxxx xxxxxxxx xx xxxxxxxxxx().
+
+    """
+'''.strip(),
+            docformatter.format_docstring('    ', '''
+    """Xxxxxxx xxx xxxxxxx xxxx xxx xxxxxxx xx xxx xxxxxxx xxxxxxx
+       xxxxxxxxx xxx xxx xxxxx, xxxxxxxxxxxx xxxx xxx xxxxxxxxxxx xx
+       xxxxxxxxxxx xxxxxxxxxx. `xxxx' xxxxxxxxx x xxxxxxxxx xxxxxxxxx
+       xx xxxxxxx xx. `xxxxxxx' xx xxxxxxxx xxx xxxx xx x xxxxxx xx xxx
+       xxxx xxxxxxxx xx xxxxxxxxxx().
+    """
+'''.strip(), summary_wrap_length=79))
+
     def test_format_code(self):
         self.assertEqual(
             '''\

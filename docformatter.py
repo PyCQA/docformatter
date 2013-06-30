@@ -21,8 +21,10 @@
 
 """Formats docstrings to follow PEP 257."""
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import,
+                        division,
+                        print_function,
+                        unicode_literals)
 
 import io
 import os
@@ -259,9 +261,24 @@ def split_summary_and_description(contents):
                          maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + punctuation,
-                    split[1].rstrip())
+                    find_smallest_indentation(split[1].splitlines()[1:]) +
+                    split[1].strip())
 
     return (contents, '')
+
+
+def find_smallest_indentation(text):
+    """Return most smallest indentation in docstring text."""
+    indentation = None
+
+    for line in text:
+        if line.strip():
+            non_whitespace_index = len(line) - len(line.lstrip())
+            _indent = line[:non_whitespace_index]
+            if indentation is None or len(_indent) < len(indentation):
+                indentation = _indent
+
+    return indentation or ''
 
 
 def strip_docstring(docstring):
