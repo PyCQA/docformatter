@@ -208,7 +208,7 @@ def format_docstring(indentation, docstring,
 
 
 def reindent(text, indentation):
-    """Reindent text to match indentation."""
+    """Return reindented text that matches indentation."""
     if '\t' not in indentation:
         text = text.expandtabs(len(indentation))
 
@@ -330,7 +330,7 @@ def wrap_description(text, indentation, wrap_length):
 
 
 def strip_leading_blank_lines(text):
-    """Remove leading blank lines."""
+    """Return text with leading blank lines removed."""
     split = text.splitlines()
 
     found = 0
