@@ -795,6 +795,22 @@ Try this and this and this and this and this and this and this at
             """, indentation='    ')
         )
 
+    def test_reindent_should_expand_tabs_to_indentation(self):
+        self.assertEqual(
+            """\
+    This should be dedented.
+
+    1. This too.
+    2. And this.
+""",
+            docformatter.reindent("""\
+                This should be dedented.
+
+                1. This too.
+        \t\t2. And this.
+            """, indentation='    ')
+        )
+
 
 class TestSystem(unittest.TestCase):
 

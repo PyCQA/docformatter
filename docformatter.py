@@ -209,6 +209,9 @@ def format_docstring(indentation, docstring,
 
 def reindent(text, indentation):
     """Reindent text to match indentation."""
+    if '\t' not in indentation:
+        text = text.expandtabs(len(indentation))
+
     # Ignore the first line, which is a special case.
     split_lines = text.splitlines()
     text = textwrap.dedent('\n'.join(split_lines[1:]))
