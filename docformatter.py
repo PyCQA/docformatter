@@ -261,17 +261,19 @@ def split_summary_and_description(contents):
                          maxsplit=1)
         if len(split) == 2:
             return (split[0].strip() + punctuation,
-                    find_smallest_indentation(split[1].splitlines()[1:]) +
+                    _find_smallest_indentation(split[1].splitlines()[1:]) +
                     split[1].strip())
 
     return (contents, '')
 
 
-def find_smallest_indentation(text):
-    """Return most smallest indentation in docstring text."""
+def _find_smallest_indentation(lines):
+    """Return most smallest indentation."""
+    assert not isinstance(lines, str)
+
     indentation = None
 
-    for line in text:
+    for line in lines:
         if line.strip():
             non_whitespace_index = len(line) - len(line.lstrip())
             _indent = line[:non_whitespace_index]
