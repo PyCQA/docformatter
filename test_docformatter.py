@@ -729,7 +729,7 @@ def foo():
                          docformatter.split_summary_and_description(
                          'This is the first?\none\ntwo'))
 
-    def test_split_summary_and_description_without_punctuation(self):
+    def test_split_summary_and_description_with_late__punctuation(self):
         self.assertEqual(
             ("""\
 Try this and this and this and this and this and this and this at
@@ -740,6 +740,23 @@ Try this and this and this and this and this and this and this at
             docformatter.split_summary_and_description('''\
     Try this and this and this and this and this and this and this at
     http://example.com/
+
+    Parameters
+    ----------
+    email : string
+'''))
+
+    def test_split_summary_and_description_without__punctuation(self):
+        self.assertEqual(
+            ("""\
+Try this and this and this and this and this and this and this at
+    this other line""",
+             """Parameters
+    ----------
+    email : string"""),
+            docformatter.split_summary_and_description('''\
+    Try this and this and this and this and this and this and this at
+    this other line
 
     Parameters
     ----------
