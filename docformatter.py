@@ -293,14 +293,14 @@ def split_first_sentence(text):
 
         sentence += previous_delimiter + word
 
-        if word.endswith(('e.g.', 'i.e.',
-                          'Dr.',
-                          'Mr.', 'Mrs.', 'Ms.')):
+        if sentence.endswith(('e.g.', 'i.e.',
+                              'Dr.',
+                              'Mr.', 'Mrs.', 'Ms.')):
             # Ignore false end of sentence.
             pass
-        elif word.endswith(('.', '?', '!')):
+        elif sentence.endswith(('.', '?', '!')):
             break
-        elif word.endswith(':') and delimiter == '\n':
+        elif sentence.endswith(':') and delimiter == '\n':
             # Break on colon if it ends the line. This is a heuristic to detect
             # the beginning of some parameter list afterwards.
             break
