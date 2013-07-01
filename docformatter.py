@@ -285,16 +285,11 @@ def split_first_sentence(text):
             word = split[0]
             delimiter = split[1]
             rest = split[2]
-        elif len(split) == 1:
+        else:
+            assert len(split) == 1
             word = split[0]
             delimiter = ''
             rest = ''
-        else:
-            assert not split
-            break
-
-        if word in '\t':
-            continue
 
         sentence += previous_delimiter + word
 
