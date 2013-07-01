@@ -255,20 +255,13 @@ def split_summary_and_description(contents):
                     '\n'.join(split_lines[index:]).rstrip())
 
     # Break on first sentence.
-    for punctuation in '.?!:':
-        split = re.split('\\' + punctuation + r'\s',
-                         string=contents,
-                         maxsplit=1)
-        if len(split) == 2:
-            if (split[0] + punctuation).endswith(('e.g.', 'i.e.',
-                                                  'Dr.',
-                                                  'Mr.', 'Mrs.', 'Ms.')):
-                # Bail out on false end of sentence.
-                continue
-
-            return (split[0].strip() + punctuation,
-                    _find_shortest_indentation(split[1].splitlines()[1:]) +
-                    split[1].strip())
+    split = split_first_sentence(contents)
+    if split[0].strip() and split[1].strip():
+        return (
+            split[0].strip(),
+            _find_shortest_indentation(
+                split[1].splitlines()[1:]) + split[1].strip()
+        )
 
     if is_some_sort_of_list(contents):
         # This is probably a long list of items. We should consider it a
@@ -277,6 +270,49 @@ def split_summary_and_description(contents):
         return ('', contents)
     else:
         return (contents, '')
+
+
+def split_first_sentence(text):
+    """Split text into first sentence and the rest."""
+    sentence = ''
+    rest = text
+    delimiter = ''
+    previous_delimiter = ''
+
+    while rest:
+        split = re.split(r'(\s)', rest, maxsplit=1)
+        if len(split) == 3:
+            word = split[0]
+            delimiter = split[1]
+            rest = split[2]
+        elif len(split) == 1:
+            word = split[0]
+            delimiter = ''
+            rest = ''
+        else:
+            assert not split
+            break
+
+        if word in '\t':
+            continue
+
+        sentence += previous_delimiter + word
+
+        if word.endswith(('e.g.', 'i.e.',
+                          'Dr.',
+                          'Mr.', 'Mrs.', 'Ms.')):
+            # Ignore false end of sentence.
+            pass
+        elif word.endswith(('.', '?', '!')):
+            break
+        elif word.endswith(':') and delimiter == '\n':
+            # Break on colon if it ends the line. This is a heuristic to detect
+            # the beginning of some parameter list afterwards.
+            break
+
+        previous_delimiter = delimiter
+
+    return (sentence, delimiter + rest)
 
 
 def is_some_sort_of_list(text):

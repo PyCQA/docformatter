@@ -900,6 +900,22 @@ Try this and this and this and this and this and this and this at
             ' ',
             docformatter._find_shortest_indentation(['    ', ' b', '  a']))
 
+    def test_split_first_sentence(self):
+        self.assertEqual(
+            ('This is a sentence.', ' More stuff. And more stuff.   .!@#$%'),
+            docformatter.split_first_sentence(
+            'This is a sentence. More stuff. And more stuff.   .!@#$%'))
+
+        self.assertEqual(
+            ('This e.g. sentence.', ' More stuff. And more stuff.   .!@#$%'),
+            docformatter.split_first_sentence(
+            'This e.g. sentence. More stuff. And more stuff.   .!@#$%'))
+
+        self.assertEqual(
+            ('This is the first:', '\none\ntwo'),
+            docformatter.split_first_sentence(
+            'This is the first:\none\ntwo'))
+
 
 class TestSystem(unittest.TestCase):
 
