@@ -806,6 +806,24 @@ Try this and this and this and this and this and this and this at
     email : string
 '''))
 
+    def test_split_summary_and_description_with_column_of_items(self):
+        text = """
+        one
+        two
+        three
+        four
+        five
+        six
+        seven
+        eight
+        nine
+        ten
+        eleven
+        """
+        self.assertEqual(
+            ('', text),
+            docformatter.split_summary_and_description(text))
+
     def test_normalize_summary(self):
         self.assertEqual(
             'This is a sentence.',

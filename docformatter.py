@@ -238,7 +238,7 @@ def split_summary_and_description(contents):
     Return tuple (summary, description).
 
     """
-    split_lines = contents.splitlines()
+    split_lines = contents.rstrip().splitlines()
 
     for index in range(1, len(split_lines)):
         found = False
@@ -264,7 +264,14 @@ def split_summary_and_description(contents):
                     _find_shortest_indentation(split[1].splitlines()[1:]) +
                     split[1].strip())
 
-    return (contents, '')
+    if len(split_lines) > max([len(line.strip()) for line in split_lines] +
+                              [0]):
+        # This is probably a long list of items. We should consider it a
+        # description rather than a summary to avoid screwing up the
+        # formatting.
+        return ('', contents)
+    else:
+        return (contents, '')
 
 
 def _find_shortest_indentation(lines):
