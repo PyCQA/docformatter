@@ -824,6 +824,17 @@ Try this and this and this and this and this and this and this at
             ('', text),
             docformatter.split_summary_and_description(text))
 
+    def test_split_summary_and_description_with_abbreviation(self):
+        for text in  ['Test e.g. now'
+                      'Test i.e. now',
+                      'Test Dr. now',
+                      'Test Mr. now',
+                      'Test Mrs. now',
+                      'Test Ms. now']:
+            self.assertEqual(
+                (text, ''),
+                docformatter.split_summary_and_description(text))
+
     def test_normalize_summary(self):
         self.assertEqual(
             'This is a sentence.',

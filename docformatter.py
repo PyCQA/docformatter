@@ -260,6 +260,12 @@ def split_summary_and_description(contents):
                          string=contents,
                          maxsplit=1)
         if len(split) == 2:
+            if (split[0] + punctuation).endswith(('e.g.', 'i.e.',
+                                                  'Dr.',
+                                                  'Mr.', 'Mrs.', 'Ms.')):
+                # Bail out on false end of sentence.
+                continue
+
             return (split[0].strip() + punctuation,
                     _find_shortest_indentation(split[1].splitlines()[1:]) +
                     split[1].strip())
