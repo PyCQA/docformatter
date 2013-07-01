@@ -332,6 +332,24 @@ Hello.
     """
 '''.strip(), summary_wrap_length=79))
 
+    def test_format_docstring_should_leave_list_alone(self):
+        docstring = '''"""
+    one
+    two
+    three
+    four
+    five
+    six
+    seven
+    eight
+    nine
+    ten
+    eleven
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ', docstring))
+
     def test_format_code(self):
         self.assertEqual(
             '''\
@@ -805,24 +823,6 @@ Try this and this and this and this and this and this and this at
     ----------
     email : string
 '''))
-
-    def test_split_summary_and_description_with_column_of_items(self):
-        text = """
-        one
-        two
-        three
-        four
-        five
-        six
-        seven
-        eight
-        nine
-        ten
-        eleven
-        """
-        self.assertEqual(
-            ('', text),
-            docformatter.split_summary_and_description(text))
 
     def test_split_summary_and_description_with_abbreviation(self):
         for text in  ['Test e.g. now'

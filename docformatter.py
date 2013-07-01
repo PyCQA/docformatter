@@ -177,6 +177,10 @@ def format_docstring(indentation, docstring,
 
     summary, description = split_summary_and_description(contents)
 
+    if is_some_sort_of_list(summary):
+        # Something is probably not right with the splitting.
+        return docstring
+
     if description:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
@@ -263,13 +267,7 @@ def split_summary_and_description(contents):
                 split[1].splitlines()[1:]) + split[1].strip()
         )
 
-    if is_some_sort_of_list(contents):
-        # This is probably a long list of items. We should consider it a
-        # description rather than a summary to avoid screwing up the
-        # formatting.
-        return ('', contents)
-    else:
-        return (contents, '')
+    return (contents, '')
 
 
 def split_first_sentence(text):
