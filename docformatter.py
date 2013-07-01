@@ -264,14 +264,23 @@ def split_summary_and_description(contents):
                     _find_shortest_indentation(split[1].splitlines()[1:]) +
                     split[1].strip())
 
-    if len(split_lines) > max([len(line.strip()) for line in split_lines] +
-                              [0]):
+    if is_some_sort_of_list(contents):
         # This is probably a long list of items. We should consider it a
         # description rather than a summary to avoid screwing up the
         # formatting.
         return ('', contents)
     else:
         return (contents, '')
+
+
+def is_some_sort_of_list(text):
+    """Return True if text looks like a list."""
+    split_lines = text.rstrip().splitlines()
+    if len(split_lines) > max([len(line.strip()) for line in split_lines] +
+                              [0]):
+        return True
+
+    return False
 
 
 def _find_shortest_indentation(lines):
@@ -340,10 +349,13 @@ def wrap_description(text, indentation, wrap_length):
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
-    if (wrap_length <= 0 or
-            re.search(r'\n\s*\n', text) or
-            re.search(r'[0-9]\.', text) or
-            re.search(r'[\-*:=]', text)):
+    if (
+        wrap_length <= 0 or
+        re.search(r'\n\s*\n', text) or
+        re.search(r'[0-9]\.', text) or
+        re.search(r'[\-*:=]', text) or
+        is_some_sort_of_list(text)
+    ):
         return text
 
     return indentation + '\n'.join(
