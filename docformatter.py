@@ -306,6 +306,7 @@ def split_first_sentence(text):
             break
 
         previous_delimiter = delimiter
+        delimiter = ''
 
     return (sentence, delimiter + rest)
 
