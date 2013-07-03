@@ -1,9 +1,11 @@
-.*.swp
+*.egg
+*.egg-info/
 *.pyc
+.*.swp
+.travis-solo/
 MANIFEST
 README.html
 __pycache__/
-.travis-solo/
 build/
 dist/
 htmlcov/
