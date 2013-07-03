@@ -1,5 +1,5 @@
 # Copyright (C) 2012-2013 Steven Myint
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -8,16 +8,17 @@
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
 #
-# The above copyright notice and this permission notice shall be included
-# in all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 """Formats docstrings to follow PEP 257."""
 
@@ -31,6 +32,8 @@ import os
 import re
 import textwrap
 import tokenize
+
+import untokenize
 
 
 __version__ = '0.5.2'
@@ -71,37 +74,18 @@ def _format_code(source,
     if not source:
         return source
 
+    modified_tokens = []
+
     sio = io.StringIO(source)
-    formatted = ''
     previous_token_string = ''
     previous_token_type = None
-    previous_line = ''
-    last_row = 0
-    last_column = -1
-    last_non_whitespace_token_type = None
     only_comments_so_far = True
-    for token in tokenize.generate_tokens(sio.readline):
-        token_type = token[0]
-        token_string = token[1]
-        start_row, start_column = token[2]
-        end_row, end_column = token[3]
-        line = token[4]
 
-        # Preserve escaped newlines
-        if (
-            last_non_whitespace_token_type != tokenize.COMMENT and
-            start_row > last_row and
-            (previous_line.endswith('\\\n') or
-             previous_line.endswith('\\\r\n') or
-             previous_line.endswith('\\\r'))
-        ):
-            formatted += previous_line[len(previous_line.rstrip(' \t\n\r\\')):]
-
-        # Preserve spacing
-        if start_row > last_row:
-            last_column = 0
-        if start_column > last_column:
-            formatted += line[last_column:start_column]
+    for (token_type,
+         token_string,
+         start,
+         end,
+         line) in tokenize.generate_tokens(sio.readline):
 
         if (
             token_type == tokenize.STRING and
@@ -113,30 +97,24 @@ def _format_code(source,
             else:
                 indentation = previous_token_string
 
-            formatted += format_docstring(
+            token_string = format_docstring(
                 indentation,
                 token_string,
                 summary_wrap_length=summary_wrap_length,
                 description_wrap_length=description_wrap_length,
                 pre_summary_newline=pre_summary_newline,
                 post_description_blank=post_description_blank)
-        else:
-            formatted += token_string
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
             only_comments_so_far = False
 
         previous_token_string = token_string
         previous_token_type = token_type
-        previous_line = line
 
-        last_row = end_row
-        last_column = end_column
+        modified_tokens.append(
+            (token_type, token_string, start, end, line))
 
-        if token_type not in [tokenize.INDENT, tokenize.NEWLINE, tokenize.NL]:
-            last_non_whitespace_token_type = token_type
-
-    return formatted
+    return untokenize.untokenize(modified_tokens)
 
 
 def starts_with_triple(string):

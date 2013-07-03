@@ -5,7 +5,8 @@
 from __future__ import unicode_literals
 
 import ast
-from distutils import core
+
+from setuptools import setup
 
 
 def version():
@@ -17,19 +18,21 @@ def version():
 
 
 with open('README.rst') as readme:
-    core.setup(name='docformatter',
-               version=version(),
-               description='Formats docstrings to follow PEP 257.',
-               long_description=readme.read(),
-               license='Expat License',
-               author='Steven Myint',
-               url='https://github.com/myint/docformatter',
-               classifiers=['Intended Audience :: Developers',
-                            'Environment :: Console',
-                            'Programming Language :: Python :: 2.6',
-                            'Programming Language :: Python :: 2.7',
-                            'Programming Language :: Python :: 3',
-                            'License :: OSI Approved :: MIT License'],
-               keywords='PEP 257, pep257, style, formatter, docstrings',
-               py_modules=['docformatter'],
-               scripts=['docformatter'])
+    setup(name='docformatter',
+          version=version(),
+          description='Formats docstrings to follow PEP 257.',
+          long_description=readme.read(),
+          license='Expat License',
+          author='Steven Myint',
+          url='https://github.com/myint/docformatter',
+          classifiers=['Intended Audience :: Developers',
+                       'Environment :: Console',
+                       'Programming Language :: Python :: 2.6',
+                       'Programming Language :: Python :: 2.7',
+                       'Programming Language :: Python :: 3',
+                       'License :: OSI Approved :: MIT License'],
+          keywords='PEP 257, pep257, style, formatter, docstrings',
+          py_modules=['docformatter'],
+          scripts=['docformatter'],
+          install_requires=['untokenize'],
+          test_suite='test_docformatter')
