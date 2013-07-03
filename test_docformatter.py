@@ -1118,11 +1118,11 @@ def run_docformatter(arguments):
 
     """
     import os
-    import sys
     environ = os.environ.copy()
-    environ['PYTHONPATH'] = ':'.join(sys.path)
+    import sys
+    environ['PYTHONPATH'] = os.pathsep.join(sys.path)
     import subprocess
-    return subprocess.Popen(['./docformatter'] + arguments,
+    return subprocess.Popen([sys.executable, './docformatter'] + arguments,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              env=environ)
