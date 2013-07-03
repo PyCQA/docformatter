@@ -56,6 +56,11 @@ this code
 
 .. code-block:: python
 
+    """   Here are some examples.
+
+        This module docstring should be dedented."""
+
+
     def launch_rocket():
         """Launch
     the
@@ -90,6 +95,13 @@ this code
 gets formatted into this
 
 .. code-block:: python
+
+    """Here are some examples.
+
+    This module docstring should be dedented.
+
+    """
+
 
     def launch_rocket():
         """Launch the rocket.
