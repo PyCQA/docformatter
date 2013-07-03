@@ -992,9 +992,7 @@ def foo():
     Hello world
     """
 ''') as filename:
-            import subprocess
-            process = subprocess.Popen(['./docformatter', filename],
-                                       stdout=subprocess.PIPE)
+            process = run_docformatter([filename])
             self.assertEqual('''\
 @@ -1,4 +1,2 @@
  def foo():
@@ -1011,11 +1009,8 @@ def foo():
     Hello world this is a summary that will get wrapped
     """
 ''') as filename:
-            import subprocess
-            process = subprocess.Popen(['./docformatter',
-                                        '--wrap-summaries=40',
-                                        filename],
-                                       stdout=subprocess.PIPE)
+            process = run_docformatter(['--wrap-summaries=40',
+                                        filename])
             self.assertEqual('''\
 @@ -1,4 +1,3 @@
  def foo():
@@ -1036,13 +1031,11 @@ def foo():
 
     """
 ''') as filename:
-            import subprocess
-            process = subprocess.Popen(['./docformatter',
+            process = run_docformatter(['--wrap-summaries=40',
                                         '--wrap-summaries=40',
                                         '--pre-summary-newline',
                                         '--no-blank',
-                                        filename],
-                                       stdout=subprocess.PIPE)
+                                        filename])
             self.assertEqual('''\
 @@ -1,7 +1,9 @@
  def foo():
@@ -1060,9 +1053,7 @@ def foo():
 ''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
 
     def test_no_arguments(self):
-        import subprocess
-        process = subprocess.Popen(['./docformatter'],
-                                   stderr=subprocess.PIPE)
+        process = run_docformatter([])
         self.assertIn('arguments',
                       process.communicate()[1].decode('utf-8'))
 
@@ -1115,6 +1106,26 @@ def temporary_directory(directory='.', prefix=''):
     finally:
         import shutil
         shutil.rmtree(temp_directory)
+
+
+def run_docformatter(arguments):
+    """Run subprocess with same Python path as parent.
+
+    Return subprocess object.
+
+    This is necessary for testing under "./setup.py test" without installing
+    "untokenize".
+
+    """
+    import os
+    import sys
+    environ = os.environ.copy()
+    environ['PYTHONPATH'] = ':'.join(sys.path)
+    import subprocess
+    return subprocess.Popen(['./docformatter'] + arguments,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             env=environ)
 
 
 if __name__ == '__main__':

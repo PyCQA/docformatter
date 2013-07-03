@@ -27,6 +27,11 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+
+# TEST
+import sys
+print(sys.path, file=sys.stderr)
+
 import io
 import os
 import re
