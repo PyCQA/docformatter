@@ -138,7 +138,8 @@ Options
 
 Below is the help output::
 
-    usage: docformatter [-h] [-i] [-r] [--wrap-summaries length] [--no-blank]
+    usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
+                        [--wrap-descriptions length] [--no-blank]
                         [--pre-summary-newline] [--version]
                         files [files ...]
 
@@ -153,6 +154,8 @@ Below is the help output::
       -r, --recursive       drill down directories recursively
       --wrap-summaries length
                             wrap long summary lines at this length (default: 79)
+      --wrap-descriptions length
+                            wrap descriptions at this length (default: 0)
       --no-blank            do not add blank line after description
       --pre-summary-newline
                             add a newline before the summary of a multi-line
