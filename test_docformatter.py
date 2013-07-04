@@ -152,7 +152,7 @@ Hello.
     """''',
             docformatter.format_docstring(
                 '    ',
-                docstring = '''"""Foo bar
+                docstring='''"""Foo bar
         bing bang.
 
         >>> tests = DocTestFinder().find(_TestClass)
@@ -825,12 +825,12 @@ Try this and this and this and this and this and this and this at
 '''))
 
     def test_split_summary_and_description_with_abbreviation(self):
-        for text in  ['Test e.g. now'
-                      'Test i.e. now',
-                      'Test Dr. now',
-                      'Test Mr. now',
-                      'Test Mrs. now',
-                      'Test Ms. now']:
+        for text in ['Test e.g. now'
+                     'Test i.e. now',
+                     'Test Dr. now',
+                     'Test Mr. now',
+                     'Test Mrs. now',
+                     'Test Ms. now']:
             self.assertEqual(
                 (text, ''),
                 docformatter.split_summary_and_description(text))
@@ -904,17 +904,17 @@ Try this and this and this and this and this and this and this at
         self.assertEqual(
             ('This is a sentence.', ' More stuff. And more stuff.   .!@#$%'),
             docformatter.split_first_sentence(
-            'This is a sentence. More stuff. And more stuff.   .!@#$%'))
+                'This is a sentence. More stuff. And more stuff.   .!@#$%'))
 
         self.assertEqual(
             ('This e.g. sentence.', ' More stuff. And more stuff.   .!@#$%'),
             docformatter.split_first_sentence(
-            'This e.g. sentence. More stuff. And more stuff.   .!@#$%'))
+                'This e.g. sentence. More stuff. And more stuff.   .!@#$%'))
 
         self.assertEqual(
             ('This is the first:', '\none\ntwo'),
             docformatter.split_first_sentence(
-            'This is the first:\none\ntwo'))
+                'This is the first:\none\ntwo'))
 
 
 class TestSystem(unittest.TestCase):
@@ -1123,9 +1123,9 @@ def run_docformatter(arguments):
     environ['PYTHONPATH'] = os.pathsep.join(sys.path)
     import subprocess
     return subprocess.Popen([sys.executable, './docformatter'] + arguments,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE,
-                             env=environ)
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            env=environ)
 
 
 if __name__ == '__main__':
