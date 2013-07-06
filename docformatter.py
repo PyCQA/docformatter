@@ -454,7 +454,7 @@ def main(argv, standard_out, standard_error):
                         metavar='length',
                         help='wrap long summary lines at this length '
                              '(default: %(default)s)')
-    parser.add_argument('--wrap-descriptions', default=0, type=int,
+    parser.add_argument('--wrap-descriptions', default=72, type=int,
                         metavar='length',
                         help='wrap descriptions at this length '
                              '(default: %(default)s)')
