@@ -46,8 +46,8 @@ except NameError:
 
 
 def format_code(source,
-                summary_wrap_length=0,
-                description_wrap_length=0,
+                summary_wrap_length=79,
+                description_wrap_length=72,
                 pre_summary_newline=False,
                 post_description_blank=True):
     """Return source code with docstrings formatted.
