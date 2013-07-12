@@ -294,7 +294,11 @@ def is_some_sort_of_list(text):
                               [0]):
         return True
 
-    return False
+    return (
+        re.search(r'\n\s*\n', text) or
+        re.search(r'[0-9]\.', text) or
+        re.search(r'[\-*:=@]', text)
+    )
 
 
 def _find_shortest_indentation(lines):
@@ -363,13 +367,7 @@ def wrap_description(text, indentation, wrap_length):
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
-    if (
-        wrap_length <= 0 or
-        re.search(r'\n\s*\n', text) or
-        re.search(r'[0-9]\.', text) or
-        re.search(r'[\-*:=]', text) or
-        is_some_sort_of_list(text)
-    ):
+    if wrap_length <= 0 or is_some_sort_of_list(text):
         return text
 
     return indentation + '\n'.join(

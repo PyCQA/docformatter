@@ -916,6 +916,13 @@ Try this and this and this and this and this and this and this at
             docformatter.split_first_sentence(
                 'This is the first:\none\ntwo'))
 
+    def test_is_some_sort_of_list(self):
+        self.assertTrue(docformatter.is_some_sort_of_list("""\
+    @param
+    @param
+    @param
+"""))
+
 
 class TestSystem(unittest.TestCase):
 
