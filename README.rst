@@ -50,7 +50,7 @@ Example
 
 After running::
 
-    $ docformatter example.py
+    $ docformatter --in-place example.py
 
 this code
 
