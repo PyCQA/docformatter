@@ -250,7 +250,11 @@ def split_summary_and_description(contents):
 
 
 def split_first_sentence(text):
-    """Split text into first sentence and the rest."""
+    """Split text into first sentence and the rest.
+
+    Return a tuple (sentence, rest).
+
+    """
     sentence = ''
     rest = text
     delimiter = ''
