@@ -883,6 +883,23 @@ Try this and this and this and this and this and this and this at
             """, indentation='    ')
         )
 
+    def test_reindent_with_no_indentation_expand_tabs(self):
+        self.assertEqual(
+            """\
+The below should be indented with spaces:
+
+    1. This too.
+    2. And this.
+""",
+            docformatter.reindent("""\
+The below should be indented with spaces:
+
+\t1. This too.
+\t2. And this.
+            """, indentation='')
+        )
+
+
     def test_reindent_should_maintain_indentation(self):
         description = """\
     Parameters:

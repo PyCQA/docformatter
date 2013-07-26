@@ -194,7 +194,8 @@ def format_docstring(indentation, docstring,
 def reindent(text, indentation):
     """Return reindented text that matches indentation."""
     if '\t' not in indentation:
-        text = text.expandtabs(len(indentation))
+        spaces = len(indentation) or 4
+        text = text.expandtabs(spaces)
 
     text = textwrap.dedent(text)
 
