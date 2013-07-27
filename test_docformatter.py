@@ -879,7 +879,7 @@ Try this and this and this and this and this and this and this at
                 This should be dedented.
 
                 1. This too.
-        \t\t2. And this.
+        \t2. And this.
             """, indentation='    ')
         )
 
@@ -888,8 +888,8 @@ Try this and this and this and this and this and this and this at
             """\
 The below should be indented with spaces:
 
-    1. This too.
-    2. And this.
+        1. This too.
+        2. And this.
 """,
             docformatter.reindent("""\
 The below should be indented with spaces:
