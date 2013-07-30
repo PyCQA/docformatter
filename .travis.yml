@@ -8,7 +8,7 @@ python:
     - "3.3"
 
 before_install:
-    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip install --use-mirrors --quiet argparse unittest2; fi
+    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip install --quiet argparse unittest2; fi
 
 install:
     - python setup.py --quiet install
@@ -18,9 +18,9 @@ script:
     - docformatter docformatter
 
 after_success:
-    - pip install --use-mirrors --quiet coverage
+    - pip install --quiet coverage
     - coverage run --include='docformatter.py,test_docformatter.py' test_docformatter.py
     - coverage report --show-missing
 
-    - pip install --use-mirrors --quiet coveralls
+    - pip install --quiet coveralls
     - coveralls
