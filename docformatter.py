@@ -384,13 +384,22 @@ def wrap_description(text, indentation, wrap_length):
 
 
 def remove_section_header(text):
-    """Return text with section header removed."""
+    r"""Return text with section header removed.
+
+    >>> remove_section_header('----\nfoo\nbar\n')
+    'foo\nbar\n'
+
+    >>> remove_section_header('===\nfoo\nbar\n')
+    'foo\nbar\n'
+
+    """
+
     stripped = text.lstrip()
     first = stripped[0]
     if (
-        stripped.startswith(4 * first) and
         not first.isalnum() and
-        not first.isspace()
+        not first.isspace() and
+        not stripped.splitlines()[0].strip(first).strip()
     ):
         return stripped.lstrip(first).lstrip()
 

@@ -5,6 +5,7 @@ check:
 	check-manifest --ignore=.travis.yml,Makefile,test_acid.py,tox.ini
 	python setup.py --long-description | rst2html --strict > /dev/null
 	docformatter docformatter docformatter.py setup.py
+	python -m doctest docformatter.py
 	scspell docformatter docformatter.py setup.py test_docformatter.py README.rst
 
 coverage:
