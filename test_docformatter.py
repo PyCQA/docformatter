@@ -940,6 +940,18 @@ The below should be indented with spaces:
     @param
 """))
 
+    def test_remove_section_header(self):
+        self.assertEqual(
+            'foo\nbar\n',
+            docformatter.remove_section_header('----\nfoo\nbar\n')
+        )
+
+        line = 'foo\nbar\n'
+        self.assertEqual(line, docformatter.remove_section_header(line))
+
+        line = '    \nfoo\nbar\n'
+        self.assertEqual(line, docformatter.remove_section_header(line))
+
 
 class TestSystem(unittest.TestCase):
 

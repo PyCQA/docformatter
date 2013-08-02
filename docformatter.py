@@ -368,6 +368,8 @@ def wrap_description(text, indentation, wrap_length):
     if '>>>' in text:
         return text
 
+    text = remove_section_header(text)
+
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
@@ -379,6 +381,20 @@ def wrap_description(text, indentation, wrap_length):
                       width=wrap_length,
                       initial_indent=indentation,
                       subsequent_indent=indentation)).strip()
+
+
+def remove_section_header(text):
+    """Return text with section header removed."""
+    stripped = text.lstrip()
+    first = stripped[0]
+    if (
+        stripped.startswith(4 * first) and
+        not first.isalnum() and
+        not first.isspace()
+    ):
+        return stripped.lstrip(first).lstrip()
+
+    return text
 
 
 def strip_leading_blank_lines(text):
