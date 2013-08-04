@@ -363,12 +363,11 @@ def wrap_description(text, indentation, wrap_length):
 
     """
     text = strip_leading_blank_lines(text)
+    text = remove_section_header(text)
 
     # Do not modify doctests at all.
     if '>>>' in text:
         return text
-
-    text = remove_section_header(text)
 
     text = reindent(text, indentation).rstrip()
 
