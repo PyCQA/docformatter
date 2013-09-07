@@ -788,6 +788,19 @@ def foo():
                          docformatter.split_summary_and_description(
                              'This is the first?\none\ntwo'))
 
+    def test_split_summary_and_description_with_quote(self):
+        self.assertEqual(('This is the first\n"one".', ''),
+                         docformatter.split_summary_and_description(
+                             'This is the first\n"one".'))
+
+        self.assertEqual(("This is the first\n'one'.", ''),
+                         docformatter.split_summary_and_description(
+                             "This is the first\n'one'."))
+
+        self.assertEqual(('This is the first\n``one``.', ''),
+                         docformatter.split_summary_and_description(
+                             'This is the first\n``one``.'))
+
     def test_split_summary_and_description_with_late__punctuation(self):
         self.assertEqual(
             ("""\
