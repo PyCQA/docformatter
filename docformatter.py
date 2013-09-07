@@ -210,7 +210,7 @@ def is_probably_beginning_of_sentence(line):
         if re.search(r'\s' + token + r'\s', line):
             return True
 
-    return re.match(r'\s*[^\w"\'`]', line.strip())
+    return re.match(r'[^\w"\'`]', line.strip())
 
 
 def split_summary_and_description(contents):
