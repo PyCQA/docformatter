@@ -3,8 +3,7 @@ check:
 	pep257 docformatter docformatter.py setup.py
 	pylint \
 		--reports=no \
-		--msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' \
-		--disable=C0103,F0401,R0913,R0914,W0622 \
+		--disable=invalid-name,too-many-arguments,too-many-locals \
 		--rcfile=/dev/null \
 		docformatter.py setup.py
 	check-manifest --ignore=.travis.yml,Makefile,test_acid.py,tox.ini
