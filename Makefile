@@ -1,6 +1,6 @@
 check:
-	pep8 docformatter docformatter.py setup.py
-	pep257 docformatter docformatter.py setup.py
+	pep8 docformatter.py setup.py
+	pep257 docformatter.py setup.py
 	pylint \
 		--reports=no \
 		--disable=invalid-name,too-many-arguments,too-many-locals \
@@ -8,9 +8,9 @@ check:
 		docformatter.py setup.py
 	check-manifest --ignore=.travis.yml,Makefile,test_acid.py,tox.ini
 	python setup.py --long-description | rst2html --strict > /dev/null
-	docformatter docformatter docformatter.py setup.py
+	docformatter docformatter.py setup.py
 	python -m doctest docformatter.py
-	scspell docformatter docformatter.py setup.py test_docformatter.py README.rst
+	scspell docformatter.py setup.py test_docformatter.py README.rst
 
 coverage:
 	@coverage erase

@@ -472,7 +472,7 @@ def format_file(filename, args, standard_out):
 
 
 def _main(argv, standard_out, standard_error):
-    """Main entry point."""
+    """Internal main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     parser.add_argument('-i', '--in-place', action='store_true',
@@ -519,6 +519,7 @@ def _main(argv, standard_out, standard_error):
 
 
 def main():
+    """Main entry point."""
     try:
         # Exit on broken pipe.
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
