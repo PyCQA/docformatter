@@ -33,6 +33,7 @@ with open('README.rst') as readme:
                        'License :: OSI Approved :: MIT License'],
           keywords='PEP 257, pep257, style, formatter, docstrings',
           py_modules=['docformatter'],
-          scripts=['docformatter'],
+          entry_points={
+              'console_scripts': ['docformatter = docformatter:main']},
           install_requires=['untokenize'],
           test_suite='test_docformatter')

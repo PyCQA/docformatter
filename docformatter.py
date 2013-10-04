@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # Copyright (C) 2012-2013 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -30,6 +32,8 @@ from __future__ import (absolute_import,
 import io
 import os
 import re
+import signal
+import sys
 import textwrap
 import tokenize
 
@@ -467,7 +471,7 @@ def format_file(filename, args, standard_out):
             standard_out.write('\n'.join(list(diff) + ['']))
 
 
-def main(argv, standard_out, standard_error):
+def _main(argv, standard_out, standard_error):
     """Main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
@@ -512,3 +516,23 @@ def main(argv, standard_out, standard_error):
                 format_file(name, args=args, standard_out=standard_out)
             except IOError as exception:
                 print(unicode(exception), file=standard_error)
+
+
+def main():
+    try:
+        # Exit on broken pipe.
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    except AttributeError:  # pragma: no cover
+        # SIGPIPE is not available on Windows.
+        pass
+
+    try:
+        return _main(sys.argv,
+                     standard_out=sys.stdout,
+                     standard_error=sys.stderr)
+    except KeyboardInterrupt:
+        return 2  # pragma: no cover
+
+
+if __name__ == '__main__':
+    sys.exit(main())

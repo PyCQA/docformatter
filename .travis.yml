@@ -15,12 +15,11 @@ install:
 
 script:
     - python test_docformatter.py
-    - docformatter docformatter
+    - docformatter setup.py
 
 after_success:
     - pip install --quiet coverage
-    - coverage run --include='docformatter.py,test_docformatter.py' test_docformatter.py
-    - coverage report --show-missing
+    - make coverage
 
     - pip install --quiet coveralls
     - coveralls

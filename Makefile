@@ -13,11 +13,15 @@ check:
 	scspell docformatter docformatter.py setup.py test_docformatter.py README.rst
 
 coverage:
-	@rm -f .coverage
-	@coverage run test_docformatter.py
+	@coverage erase
+	@DOCFORMATTER_COVERAGE=1 coverage run \
+		--branch --parallel-mode --omit='*/site-packages/*' \
+		test_docformatter.py
+	@coverage combine
 	@coverage report
+
+open_coverage: coverage
 	@coverage html
-	@rm -f .coverage
 	@python -m webbrowser -n "file://${PWD}/htmlcov/index.html"
 
 mutant:

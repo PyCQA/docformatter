@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 import contextlib
 import io
+import os
+import sys
 import tempfile
 
 try:
@@ -15,6 +17,25 @@ except ImportError:
     import unittest
 
 import docformatter
+
+
+ROOT_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
+
+
+if (
+    'DOCFORMATTER_COVERAGE' in os.environ and
+    int(os.environ['DOCFORMATTER_COVERAGE'])
+):
+    DOCFORMATTER_COMMAND = ['coverage', 'run', '--branch', '--parallel',
+                            '--omit=*/site-packages/*',
+                            os.path.join(ROOT_DIRECTORY, 'docformatter.py')]
+else:
+    # We need to specify the executable to make sure the correct Python
+    # interpreter gets used.
+    DOCFORMATTER_COMMAND = [sys.executable,
+                            os.path.join(
+                                ROOT_DIRECTORY,
+                                'docformatter.py')]  # pragma: no cover
 
 
 class TestUnits(unittest.TestCase):
@@ -976,9 +997,9 @@ def foo():
     """
 ''') as filename:
             output_file = io.StringIO()
-            docformatter.main(argv=['my_fake_program', filename],
-                              standard_out=output_file,
-                              standard_error=None)
+            docformatter._main(argv=['my_fake_program', filename],
+                               standard_out=output_file,
+                               standard_error=None)
             self.assertEqual('''\
 @@ -1,4 +1,2 @@
  def foo():
@@ -990,9 +1011,9 @@ def foo():
 
     def test_diff_with_nonexistent_file(self):
         output_file = io.StringIO()
-        docformatter.main(argv=['my_fake_program', 'nonexistent_file'],
-                          standard_out=output_file,
-                          standard_error=output_file)
+        docformatter._main(argv=['my_fake_program', 'nonexistent_file'],
+                           standard_out=output_file,
+                           standard_error=output_file)
         self.assertIn('no such file', output_file.getvalue().lower())
 
     def test_in_place(self):
@@ -1003,9 +1024,9 @@ def foo():
     """
 ''') as filename:
             output_file = io.StringIO()
-            docformatter.main(argv=['my_fake_program', '--in-place', filename],
-                              standard_out=output_file,
-                              standard_error=None)
+            docformatter._main(argv=['my_fake_program', '--in-place', filename],
+                               standard_out=output_file,
+                               standard_error=None)
             with open(filename) as f:
                 self.assertEqual('''\
 def foo():
@@ -1025,11 +1046,10 @@ def foo():
 ''', directory=inner_directory):
 
                     output_file = io.StringIO()
-                    docformatter.main(argv=['my_fake_program',
-                                            '--recursive',
-                                            directory],
-                                      standard_out=output_file,
-                                      standard_error=None)
+                    docformatter._main(argv=['my_fake_program', '--recursive',
+                                             directory],
+                                       standard_out=output_file,
+                                       standard_error=None)
                     self.assertEqual(
                         '',
                         output_file.getvalue().strip())
@@ -1171,7 +1191,7 @@ def run_docformatter(arguments):
     import sys
     environ['PYTHONPATH'] = os.pathsep.join(sys.path)
     import subprocess
-    return subprocess.Popen([sys.executable, './docformatter'] + arguments,
+    return subprocess.Popen(DOCFORMATTER_COMMAND + arguments,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             env=environ)
