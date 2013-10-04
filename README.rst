@@ -9,9 +9,6 @@ Formats docstrings to follow `PEP 257`_.
 .. image:: https://travis-ci.org/myint/docformatter.png?branch=master
    :target: https://travis-ci.org/myint/docformatter
    :alt: Build status
-.. image:: https://coveralls.io/repos/myint/docformatter/badge.png?branch=master
-   :target: https://coveralls.io/r/myint/docformatter
-   :alt: Test coverage status
 
 
 Features
@@ -169,3 +166,11 @@ Issues
 Bugs and patches can be reported on the `GitHub page`_.
 
 .. _`GitHub page`: https://github.com/myint/docformatter/issues
+
+
+Links
+=====
+
+* Coveralls_
+
+.. _`Coveralls`: https://coveralls.io/r/myint/docformatter
