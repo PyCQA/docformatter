@@ -6,7 +6,7 @@ check:
 		--disable=invalid-name,too-many-arguments,too-many-locals \
 		--rcfile=/dev/null \
 		docformatter.py setup.py
-	check-manifest --ignore=.travis.yml,Makefile,test_acid.py,tox.ini
+	check-manifest
 	python setup.py --long-description | rst2html --strict > /dev/null
 	docformatter docformatter.py setup.py
 	python -m doctest docformatter.py

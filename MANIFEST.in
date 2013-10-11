@@ -1,3 +1,6 @@
 include MANIFEST.in
 include README.rst
 include test_docformatter.py
+
+exclude .travis.yml
+exclude Makefile
