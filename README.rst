@@ -152,7 +152,7 @@ Below is the help output::
       --wrap-summaries length
                             wrap long summary lines at this length (default: 79)
       --wrap-descriptions length
-                            wrap descriptions at this length (default: 0)
+                            wrap descriptions at this length (default: 72)
       --no-blank            do not add blank line after description
       --pre-summary-newline
                             add a newline before the summary of a multi-line
