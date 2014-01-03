@@ -66,6 +66,14 @@ class TestUnits(unittest.TestCase):
     def test_strip_docstring_with_empty_string(self):
         self.assertEqual('', docformatter.strip_docstring('""""""'))
 
+    def test_strip_docstring_with_escaped_quotes(self):
+        self.assertEqual("hello\\'",
+                         docformatter.strip_docstring("'hello\\''"))
+
+    def test_strip_docstring_with_escaped_double_quotes(self):
+        self.assertEqual('hello\\"',
+                         docformatter.strip_docstring('"hello\\""'))
+
     def test_strip_docstring_with_unhandled(self):
         with self.assertRaises(ValueError):
             docformatter.strip_docstring('r"""foo"""')
