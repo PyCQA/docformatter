@@ -93,7 +93,7 @@ def _format_code(source,
 
         if (
             token_type == tokenize.STRING and
-            starts_with_triple(token_string) and
+            token_string.startswith(('"', "'")) and
             (previous_token_type == tokenize.INDENT or only_comments_so_far)
         ):
             if only_comments_so_far:
@@ -119,12 +119,6 @@ def _format_code(source,
             (token_type, token_string, start, end, line))
 
     return untokenize.untokenize(modified_tokens)
-
-
-def starts_with_triple(string):
-    """Return True if the string starts with triple single/double quotes."""
-    return (string.strip().startswith('"""') or
-            string.strip().startswith("'''"))
 
 
 def format_docstring(indentation, docstring,
@@ -326,12 +320,22 @@ def _find_shortest_indentation(lines):
 
 def strip_docstring(docstring):
     """Return contents of docstring."""
-    triple = '"""'
-    if docstring.lstrip().startswith("'''"):
-        triple = "'''"
-        assert docstring.rstrip().endswith("'''")
+    docstring = docstring.strip()
 
-    return docstring.split(triple, 1)[1].rsplit(triple, 1)[0].strip()
+    if docstring.startswith("'''"):
+        quote = "'''"
+    elif docstring.startswith('"""'):
+        quote = '"""'
+    elif docstring.startswith("'"):
+        quote = "'"
+    elif docstring.startswith('"'):
+        quote = '"'
+    else:
+        return docstring
+
+    assert docstring.endswith(quote)
+
+    return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
 
 def normalize_summary(summary):

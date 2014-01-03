@@ -66,6 +66,10 @@ class TestUnits(unittest.TestCase):
     def test_strip_docstring_with_empty_string(self):
         self.assertEqual('', docformatter.strip_docstring('""""""'))
 
+    def test_strip_docstring_with_raw(self):
+        line = 'r""""""'
+        self.assertEqual(line, docformatter.strip_docstring(line))
+
     def test_format_docstring(self):
         self.assertEqual('"""Hello."""',
                          docformatter.format_docstring('    ', '''
@@ -686,10 +690,34 @@ def foo():
     """
 ''')))
 
-    def test_format_code_with_no_docstring(self):
-        line = '''\
+    def test_format_code_with_double_quote(self):
+        self.assertEqual(
+            '''\
+def foo():
+    """Just a regular string."""
+''',
+            docformatter.format_code(
+                '''\
 def foo():
     "Just a regular string"
+'''))
+
+    def test_format_code_with_single_quote(self):
+        self.assertEqual(
+            '''\
+def foo():
+    """Just a regular string."""
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    'Just a regular string'
+'''))
+
+    def test_format_code_with_should_skip_nested_triple_quotes(self):
+        line = '''\
+def foo():
+    'Just a """foo""" string'
 '''
         self.assertEqual(line, docformatter.format_code(line))
 
