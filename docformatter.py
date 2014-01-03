@@ -331,7 +331,7 @@ def strip_docstring(docstring):
     elif docstring.startswith('"'):
         quote = '"'
     else:
-        return docstring
+        raise ValueError('We only handle strings that start with quotes')
 
     assert docstring.endswith(quote)
 

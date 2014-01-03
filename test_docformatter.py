@@ -66,9 +66,13 @@ class TestUnits(unittest.TestCase):
     def test_strip_docstring_with_empty_string(self):
         self.assertEqual('', docformatter.strip_docstring('""""""'))
 
-    def test_strip_docstring_with_raw(self):
-        line = 'r""""""'
-        self.assertEqual(line, docformatter.strip_docstring(line))
+    def test_strip_docstring_with_unhandled(self):
+        with self.assertRaises(ValueError):
+            docformatter.strip_docstring('r"""foo"""')
+
+    def test_strip_docstring_with_unknown(self):
+        with self.assertRaises(ValueError):
+            docformatter.strip_docstring('foo')
 
     def test_format_docstring(self):
         self.assertEqual('"""Hello."""',
