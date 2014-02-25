@@ -399,7 +399,6 @@ def remove_section_header(text):
     'foo\nbar\n'
 
     """
-
     stripped = text.lstrip()
     first = stripped[0]
     if (
