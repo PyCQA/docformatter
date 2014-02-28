@@ -160,6 +160,20 @@ Below is the help output::
       --version             show program's version number and exit
 
 
+Wrapping descriptions
+=====================
+
+docformatter will wrap descriptions, but only in simple cases. If there is text
+that may seem like a bulleted/numbered list, docformatter will leave the
+description as is::
+
+    - Item one.
+    - Item two.
+    - Item three.
+
+This prevents the risk of the wrapping from turning things into a mess.
+
+
 Issues
 ======
 
