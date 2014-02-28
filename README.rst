@@ -164,14 +164,14 @@ Wrapping descriptions
 =====================
 
 docformatter will wrap descriptions, but only in simple cases. If there is text
-that may seem like a bulleted/numbered list, docformatter will leave the
+that seems like a bulleted/numbered list, docformatter will leave the
 description as is::
 
     - Item one.
     - Item two.
     - Item three.
 
-This prevents the risk of the wrapping from turning things into a mess.
+This prevents the risk of the wrapping turning things into a mess.
 
 
 Issues
