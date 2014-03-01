@@ -137,7 +137,7 @@ Below is the help output::
 
     usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--no-blank]
-                        [--pre-summary-newline] [--version] [--force-wrap]
+                        [--pre-summary-newline] [--force-wrap] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -157,9 +157,9 @@ Below is the help output::
       --pre-summary-newline
                             add a newline before the summary of a multi-line
                             docstring
-      --version             show program's version number and exit
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
+      --version             show program's version number and exit
 
 
 Wrapping descriptions

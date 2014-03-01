@@ -504,13 +504,13 @@ def _main(argv, standard_out, standard_error):
                         action='store_true',
                         help='add a newline before the summary of a '
                              'multi-line docstring')
+    parser.add_argument('--force-wrap', action='store_true',
+                        help='force descriptions to be wrapped even if it may '
+                             'result in a mess')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
-    parser.add_argument('--force-wrap', action='store_true',
-                        help='force descriptions to be wrapped even if it may '
-                             'result in a mess')
 
     args = parser.parse_args(argv[1:])
 
