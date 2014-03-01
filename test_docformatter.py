@@ -24,7 +24,6 @@ import docformatter
 
 ROOT_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 
-
 if (
     'DOCFORMATTER_COVERAGE' in os.environ and
     int(os.environ['DOCFORMATTER_COVERAGE'])
@@ -42,7 +41,6 @@ else:
 
 
 class TestUnits(unittest.TestCase):
-
     def test_strip_docstring(self):
         self.assertEqual(
             'Hello.',
@@ -83,6 +81,17 @@ class TestUnits(unittest.TestCase):
             docformatter.strip_docstring('foo')
 
     def test_format_docstring(self):
+        print(docformatter.format_docstring('    ', '''
+"""
+
+Hello.
+"""
+'''))
+        print(docformatter.format_docstring('    ', '''\
+"""
+num_iterations is the numer of updates - instead of a better definition of convergence.
+"""
+'''))
         self.assertEqual('"""Hello."""',
                          docformatter.format_docstring('    ', '''
 """
@@ -327,7 +336,7 @@ Hello.
 
     """
 '''.strip(),
-            docformatter.format_docstring('    ', """
+                         docformatter.format_docstring('    ', """
     '''
     Return x factorial.
 
@@ -363,7 +372,7 @@ Hello.
 
     """
 '''.strip(),
-            docformatter.format_docstring('    ', '''
+                         docformatter.format_docstring('    ', '''
     """Creates and returns four was awakens to was created tracked
        ammonites was the fifty, arithmetical four was pyrotechnic to
        pyrotechnic physicists. `four' falsified x falsified ammonites
@@ -1043,7 +1052,6 @@ num_iterations is the numer of updates - instead of a better definition of conve
 
 
 class TestSystem(unittest.TestCase):
-
     def test_diff(self):
         with temporary_file('''\
 def foo():
@@ -1092,14 +1100,12 @@ def foo():
         with temporary_directory() as directory:
             with temporary_directory(prefix='.',
                                      directory=directory) as inner_directory:
-
                 with temporary_file('''\
 def foo():
     """
     Hello world
     """
 ''', directory=inner_directory):
-
                     output_file = io.StringIO()
                     docformatter._main(argv=['my_fake_program', '--recursive',
                                              directory],
@@ -1187,6 +1193,7 @@ def generate_random_docstring(max_indentation_length=32,
                               max_words=50):
     """Generate single-line docstring."""
     import random
+
     if random.randint(0, 1):
         words = []
     else:
@@ -1202,6 +1209,7 @@ def generate_random_docstring(max_indentation_length=32,
 
 def generate_random_word(word_length):
     import random
+
     return ''.join(
         [random.choice('abcdefghijklmnoprstuvwyxzABCDEFGHIJKLMNOPRSTUVWXYZ')
          for _ in range(word_length)])
@@ -1218,6 +1226,7 @@ def temporary_file(contents, directory='.', prefix=''):
         yield f.name
     finally:
         import os
+
         os.remove(f.name)
 
 
@@ -1229,6 +1238,7 @@ def temporary_directory(directory='.', prefix=''):
         yield temp_directory
     finally:
         import shutil
+
         shutil.rmtree(temp_directory)
 
 
@@ -1242,10 +1252,13 @@ def run_docformatter(arguments):
 
     """
     import os
+
     environ = os.environ.copy()
     import sys
+
     environ['PYTHONPATH'] = os.pathsep.join(sys.path)
     import subprocess
+
     return subprocess.Popen(DOCFORMATTER_COMMAND + arguments,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
