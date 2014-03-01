@@ -1017,7 +1017,7 @@ The below should be indented with spaces:
     @param
 """))
 
-    def test_disable_list_check(self):
+    def test_force_wrap(self):
         print()
         self.assertEqual(('''\
 """num_iterations is the numer of updates -
@@ -1028,7 +1028,7 @@ The below should be indented with spaces:
 """
 num_iterations is the numer of updates - instead of a better definition of convergence.
 """\
-''', description_wrap_length=50, summary_wrap_length=50, disable_list_check=True))
+''', description_wrap_length=50, summary_wrap_length=50, force_wrap=True))
 
     def test_remove_section_header(self):
         self.assertEqual(
