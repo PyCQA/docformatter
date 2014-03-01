@@ -173,7 +173,8 @@ description as is::
     - Item two.
     - Item three.
 
-This prevents the risk of the wrapping turning things into a mess.
+This prevents the risk of the wrapping turning things into a mess. To force
+even these instances to get wrapped use ``--force-wrap``.
 
 
 Issues
