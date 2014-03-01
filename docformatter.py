@@ -53,7 +53,8 @@ def format_code(source,
                 summary_wrap_length=79,
                 description_wrap_length=72,
                 pre_summary_newline=False,
-                post_description_blank=True):
+                post_description_blank=True,
+                disable_list_check=False):
     """Return source code with docstrings formatted.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -64,7 +65,8 @@ def format_code(source,
                             summary_wrap_length=summary_wrap_length,
                             description_wrap_length=description_wrap_length,
                             pre_summary_newline=pre_summary_newline,
-                            post_description_blank=post_description_blank)
+                            post_description_blank=post_description_blank,
+                            disable_list_check=disable_list_check)
     except (tokenize.TokenError, IndentationError):
         return source
 
@@ -73,7 +75,8 @@ def _format_code(source,
                  summary_wrap_length,
                  description_wrap_length,
                  pre_summary_newline,
-                 post_description_blank):
+                 post_description_blank,
+                 disable_list_check):
     """Return source code with docstrings formatted."""
     if not source:
         return source
@@ -107,7 +110,8 @@ def _format_code(source,
                 summary_wrap_length=summary_wrap_length,
                 description_wrap_length=description_wrap_length,
                 pre_summary_newline=pre_summary_newline,
-                post_description_blank=post_description_blank)
+                post_description_blank=post_description_blank,
+                disable_list_check=disable_list_check)
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
             only_comments_so_far = False
@@ -125,7 +129,8 @@ def format_docstring(indentation, docstring,
                      summary_wrap_length=0,
                      description_wrap_length=0,
                      pre_summary_newline=False,
-                     post_description_blank=True):
+                     post_description_blank=True,
+                     disable_list_check=False):
     """Return formatted version of docstring.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -153,7 +158,7 @@ def format_docstring(indentation, docstring,
 
     summary, description = split_summary_and_description(contents)
 
-    if is_some_sort_of_list(summary):
+    if not disable_list_check and is_some_sort_of_list(summary):
         # Something is probably not right with the splitting.
         return docstring
 
@@ -179,7 +184,8 @@ def format_docstring(indentation, docstring,
                                  subsequent_indent=indentation).lstrip(),
             description=wrap_description(description,
                                          indentation=indentation,
-                                         wrap_length=description_wrap_length),
+                                         wrap_length=description_wrap_length,
+                                         disable_list_check=disable_list_check),
             post_description=('\n' if post_description_blank else ''),
             indentation=indentation)
     else:
@@ -362,7 +368,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def wrap_description(text, indentation, wrap_length):
+def wrap_description(text, indentation, wrap_length, disable_list_check):
     """Return line-wrapped description text.
 
     We only wrap simple descriptions. We leave doctests, multi-paragraph text,
@@ -379,7 +385,7 @@ def wrap_description(text, indentation, wrap_length):
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
-    if wrap_length <= 0 or is_some_sort_of_list(text):
+    if wrap_length <= 0 or (not disable_list_check and is_some_sort_of_list(text)):
         return text
 
     return indentation + '\n'.join(
@@ -456,7 +462,9 @@ def format_file(filename, args, standard_out):
             summary_wrap_length=args.wrap_summaries,
             description_wrap_length=args.wrap_descriptions,
             pre_summary_newline=args.pre_summary_newline,
-            post_description_blank=args.post_description_blank)
+            post_description_blank=args.post_description_blank,
+            disable_list_check=args.disable_list_check
+            )
 
     if source != formatted_source:
         if args.in_place:
@@ -501,6 +509,8 @@ def _main(argv, standard_out, standard_error):
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
                         help='files to format')
+    parser.add_argument('--disable-list-check', action='store_true',
+                        help='force wrap lone line ')
 
     args = parser.parse_args(argv[1:])
 
