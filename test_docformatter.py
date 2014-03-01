@@ -976,7 +976,6 @@ The below should be indented with spaces:
             """, indentation='')
         )
 
-
     def test_reindent_should_maintain_indentation(self):
         description = """\
     Parameters:
@@ -1019,13 +1018,13 @@ The below should be indented with spaces:
 
     def test_force_wrap(self):
         self.assertEqual(('''\
-"""num_iterations is the numer of updates -
+"""num_iterations is the number of updates -
     instead of a better definition of
     convergence."""\
 '''),
                          docformatter.format_docstring('    ', '''\
 """
-num_iterations is the numer of updates - instead of a better definition of convergence.
+num_iterations is the number of updates - instead of a better definition of convergence.
 """\
 ''', description_wrap_length=50, summary_wrap_length=50, force_wrap=True))
 
