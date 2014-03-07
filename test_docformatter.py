@@ -1123,7 +1123,7 @@ def foo():
 -    Hello world
 -    """
 +    """Hello world."""
-''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
     def test_end_to_end_with_wrapping(self):
         with temporary_file('''\
@@ -1142,7 +1142,7 @@ def foo():
 -    """
 +    """Hello world this is a summary
 +    that will get wrapped."""
-''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
     def test_end_to_end_all_options(self):
         with temporary_file('''\
@@ -1173,12 +1173,12 @@ def foo():
 -
 -
      """
-''', '\n'.join(process.communicate()[0].decode('utf-8').split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
     def test_no_arguments(self):
         process = run_docformatter([])
         self.assertIn('arguments',
-                      process.communicate()[1].decode('utf-8'))
+                      process.communicate()[1].decode())
 
 
 def generate_random_docstring(max_indentation_length=32,
@@ -1212,7 +1212,7 @@ def temporary_file(contents, directory='.', prefix=''):
     f = tempfile.NamedTemporaryFile(suffix='.py', prefix=prefix,
                                     delete=False, dir=directory)
     try:
-        f.write(contents.encode('utf8'))
+        f.write(contents.encode())
         f.close()
         yield f.name
     finally:
