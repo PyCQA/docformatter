@@ -1078,9 +1078,9 @@ def foo():
     """
 ''') as filename:
             output_file = io.StringIO()
-            docformatter._main(argv=['my_fake_program', '--in-place', filename],
-                               standard_out=output_file,
-                               standard_error=None)
+            docformatter._main(
+                argv=['my_fake_program', '--in-place', filename],
+                standard_out=output_file, standard_error=None)
             with open(filename) as f:
                 self.assertEqual('''\
 def foo():
