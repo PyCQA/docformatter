@@ -49,34 +49,26 @@ except NameError:
     unicode = str
 
 
-def format_code(source,
-                summary_wrap_length=79,
-                description_wrap_length=72,
-                pre_summary_newline=False,
-                post_description_blank=True,
-                force_wrap=False):
+def format_code(source, **kwargs):
     """Return source code with docstrings formatted.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
 
+    See "_format_code()" for parameters.
+
     """
     try:
-        return _format_code(source,
-                            summary_wrap_length=summary_wrap_length,
-                            description_wrap_length=description_wrap_length,
-                            pre_summary_newline=pre_summary_newline,
-                            post_description_blank=post_description_blank,
-                            force_wrap=force_wrap)
+        return _format_code(source, **kwargs)
     except (tokenize.TokenError, IndentationError):
         return source
 
 
 def _format_code(source,
-                 summary_wrap_length,
-                 description_wrap_length,
-                 pre_summary_newline,
-                 post_description_blank,
-                 force_wrap):
+                 summary_wrap_length=79,
+                 description_wrap_length=72,
+                 pre_summary_newline=False,
+                 post_description_blank=True,
+                 force_wrap=False):
     """Return source code with docstrings formatted."""
     if not source:
         return source
