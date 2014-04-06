@@ -78,6 +78,7 @@ def _format_code(source,
         assert line_range[0] > 0 and line_range[1] > 0
 
     def in_range(start, end):
+        """Return True if start/end is in line_range."""
         if line_range is None:
             return True
         return any(line_range[0] <= line_no <= line_range[1]
@@ -101,7 +102,7 @@ def _format_code(source,
             token_string.startswith(('"', "'")) and
             (previous_token_type == tokenize.INDENT or
                 only_comments_so_far) and
-            (in_range(start[0], end[0]))
+            in_range(start[0], end[0])
         ):
             if only_comments_so_far:
                 indentation = ''
@@ -514,8 +515,8 @@ def _main(argv, standard_out, standard_error):
                              'result in a mess')
     parser.add_argument('--range', metavar='line', dest='line_range',
                         default=None, type=int, nargs=2,
-                        help='apply docformatter to docstrings between these lines; '
-                             'line numbers are indexed at 1.')
+                        help='apply docformatter to docstrings between these '
+                             'lines; line numbers are indexed at 1')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
