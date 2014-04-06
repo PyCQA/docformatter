@@ -137,7 +137,8 @@ Below is the help output::
 
     usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--no-blank]
-                        [--pre-summary-newline] [--force-wrap] [--version]
+                        [--pre-summary-newline] [--force-wrap] [--range line line]
+                        [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -159,6 +160,8 @@ Below is the help output::
                             docstring
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
+      --range line line     apply docformatter to docstrings between these lines;
+                            line numbers are indexed at 1
       --version             show program's version number and exit
 
 
