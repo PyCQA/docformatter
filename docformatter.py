@@ -163,6 +163,10 @@ def format_docstring(indentation, docstring,
 
     summary, description = split_summary_and_description(contents)
 
+    # Leave docstrings with underlined summaries alone.
+    if remove_section_header(description).strip() != description.strip():
+        return docstring
+
     if not force_wrap and is_some_sort_of_list(summary):
         # Something is probably not right with the splitting.
         return docstring
@@ -381,7 +385,6 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
 
     """
     text = strip_leading_blank_lines(text)
-    text = remove_section_header(text)
 
     # Do not modify doctests at all.
     if '>>>' in text:
@@ -411,6 +414,9 @@ def remove_section_header(text):
 
     """
     stripped = text.lstrip()
+    if not stripped:
+        return text
+
     first = stripped[0]
     if (
         not first.isalnum() and

@@ -390,6 +390,18 @@ Hello.
             docstring,
             docformatter.format_docstring('    ', docstring))
 
+    def test_format_docstring_should_underlined_summaries_alone(self):
+        docstring = '''"""
+    Foo bar
+    -------
+
+    This is more.
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ', docstring))
+
     def test_format_code(self):
         self.assertEqual(
             '''\
