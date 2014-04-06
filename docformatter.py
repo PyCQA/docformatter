@@ -524,6 +524,13 @@ def _main(argv, standard_out, standard_error):
 
     args = parser.parse_args(argv[1:])
 
+    if args.line_range:
+        if args.line_range[0] <= 0:
+            parser.error('--range must be positive numbers')
+        if args.line_range[0] > args.line_range[1]:
+            parser.error('First value of --range should be less than or equal '
+                         'to the second')
+
     filenames = list(set(args.files))
     while filenames:
         name = filenames.pop(0)
