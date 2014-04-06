@@ -68,10 +68,20 @@ def _format_code(source,
                  description_wrap_length=72,
                  pre_summary_newline=False,
                  post_description_blank=True,
-                 force_wrap=False):
+                 force_wrap=False,
+                 line_range=None):
     """Return source code with docstrings formatted."""
     if not source:
         return source
+
+    if line_range is not None:
+        assert line_range[0] > 0 and line_range[1] > 0
+
+    def in_range(start, end):
+        if line_range is None:
+            return True
+        return any(line_range[0] <= line_no <= line_range[1]
+                   for line_no in range(start, end + 1))
 
     modified_tokens = []
 
@@ -89,7 +99,9 @@ def _format_code(source,
         if (
             token_type == tokenize.STRING and
             token_string.startswith(('"', "'")) and
-            (previous_token_type == tokenize.INDENT or only_comments_so_far)
+            (previous_token_type == tokenize.INDENT or
+                only_comments_so_far) and
+            (in_range(start[0], end[0]))
         ):
             if only_comments_so_far:
                 indentation = ''
@@ -455,7 +467,8 @@ def format_file(filename, args, standard_out):
             description_wrap_length=args.wrap_descriptions,
             pre_summary_newline=args.pre_summary_newline,
             post_description_blank=args.post_description_blank,
-            force_wrap=args.force_wrap)
+            force_wrap=args.force_wrap,
+            line_range=args.line_range)
 
     if source != formatted_source:
         if args.in_place:
@@ -499,6 +512,10 @@ def _main(argv, standard_out, standard_error):
     parser.add_argument('--force-wrap', action='store_true',
                         help='force descriptions to be wrapped even if it may '
                              'result in a mess')
+    parser.add_argument('--range', metavar='line', dest='line_range',
+                        default=None, type=int, nargs=2,
+                        help='apply docformatter to docstrings between these lines; '
+                             'line numbers are indexed at 1.')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',

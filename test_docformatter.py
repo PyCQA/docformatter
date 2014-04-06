@@ -404,6 +404,42 @@ def foo():
     """
 '''))
 
+    def test_format_code_range_miss(self):
+        self.assertEqual('''\
+def f(x):
+    """  This is a docstring. That should be on more lines"""
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''',
+        docformatter.format_code('''\
+def f(x):
+    """  This is a docstring. That should be on more lines"""
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''', line_range=[1, 1]))
+
+    def test_format_code_range_hit(self):
+        self.assertEqual('''\
+def f(x):
+    """This is a docstring.
+
+    That should be on more lines
+
+    """
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''',
+        docformatter.format_code('''\
+def f(x):
+    """  This is a docstring. That should be on more lines"""
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''', line_range=[1, 2]))
+
     def test_format_code_with_module_docstring(self):
         self.assertEqual(
             '''\
