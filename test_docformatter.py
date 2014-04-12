@@ -1088,6 +1088,13 @@ num_iterations is the number of updates - instead of a better definition of conv
         line = '    \nfoo\nbar\n'
         self.assertEqual(line, docformatter.remove_section_header(line))
 
+    def test_is_probably_beginning_of_sentence(self):
+        self.assertTrue(docformatter.is_probably_beginning_of_sentence(
+            '- This is part of a list.'))
+
+        self.assertFalse(docformatter.is_probably_beginning_of_sentence(
+            '(this just continues an existing sentence).'))
+
 
 class TestSystem(unittest.TestCase):
 
