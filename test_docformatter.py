@@ -1230,6 +1230,15 @@ def foo():
      """
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
+    def test_invalid_range(self):
+        process = run_docformatter(['--range', '0', '1', os.devnull])
+        self.assertIn('must be positive',
+                      process.communicate()[1].decode())
+
+        process = run_docformatter(['--range', '3', '1', os.devnull])
+        self.assertIn('should be less than',
+                      process.communicate()[1].decode())
+
     def test_no_arguments(self):
         process = run_docformatter([])
         self.assertIn('arguments',
