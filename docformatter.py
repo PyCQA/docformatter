@@ -29,6 +29,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import codecs
 import io
 import os
 import re
@@ -443,6 +444,9 @@ def strip_leading_blank_lines(text):
 
 def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
+    if filename == '-':
+        return codecs.getreader(encoding)(sys.stdin)
+
     return io.open(filename, mode=mode, encoding=encoding,
                    newline='')  # Preserve line endings
 
@@ -465,7 +469,12 @@ def detect_encoding(filename):
 
 def format_file(filename, args, standard_out):
     """Run format_code() on a file."""
-    encoding = detect_encoding(filename)
+
+    if filename == '-':
+        encoding = 'utf-8'
+    else:
+        encoding = detect_encoding(filename)
+
     with open_with_encoding(filename, encoding=encoding) as input_file:
         source = input_file.read()
         formatted_source = format_code(
@@ -477,7 +486,9 @@ def format_file(filename, args, standard_out):
             force_wrap=args.force_wrap,
             line_range=args.line_range)
 
-    if source != formatted_source:
+    if filename == '-':
+        standard_out.write(formatted_source)
+    elif source != formatted_source:
         if args.in_place:
             with open_with_encoding(filename, mode='w',
                                     encoding=encoding) as output_file:
