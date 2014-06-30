@@ -28,6 +28,7 @@ from __future__ import (absolute_import,
                         division,
                         print_function,
                         unicode_literals)
+
 import codecs
 import io
 import os
@@ -480,7 +481,6 @@ def detect_encoding(filename):
 
 def format_file(filename, args, standard_out):
     """Run format_code() on a file."""
-
     encoding = detect_encoding(filename)
     with open_with_encoding(filename, encoding=encoding) as input_file:
         source = input_file.read()
