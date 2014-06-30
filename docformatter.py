@@ -28,7 +28,6 @@ from __future__ import (absolute_import,
                         division,
                         print_function,
                         unicode_literals)
-from _io import TextIOWrapper
 import codecs
 import io
 import os
@@ -40,6 +39,10 @@ import tokenize
 
 import untokenize
 
+try:
+    from _io import TextIOWrapper
+except ImportError:
+    TextIOWrapper = None
 
 __version__ = '0.6.1'
 
@@ -445,9 +448,11 @@ def strip_leading_blank_lines(text):
 def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
     if filename == '-':
-        if isinstance(sys.stdin, TextIOWrapper):
+        # Python 3.x
+        if TextIOWrapper and isinstance(sys.stdin, TextIOWrapper):
             return sys.stdin
 
+        # Python 2.x
         return codecs.getreader(encoding)(sys.stdin)
 
     return io.open(filename, mode=mode, encoding=encoding,
