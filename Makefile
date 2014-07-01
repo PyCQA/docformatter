@@ -16,7 +16,7 @@ check:
 coverage:
 	@coverage erase
 	@DOCFORMATTER_COVERAGE=1 coverage run \
-		--branch --parallel-mode --omit='*/site-packages/*,*/pypy/*' \
+		--branch --parallel-mode --omit='*/site-packages/*,*/*pypy/*' \
 		test_docformatter.py
 	@coverage combine
 	@coverage report --show-missing
