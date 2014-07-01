@@ -19,7 +19,7 @@ coverage:
 		--branch --parallel-mode --omit='*/site-packages/*,*/pypy/*' \
 		test_docformatter.py
 	@coverage combine
-	@coverage report
+	@coverage report --show-missing
 
 open_coverage: coverage
 	@coverage html
