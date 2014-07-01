@@ -1108,7 +1108,8 @@ def foo():
             output_file = io.StringIO()
             docformatter._main(argv=['my_fake_program', filename],
                                standard_out=output_file,
-                               standard_error=None)
+                               standard_error=None,
+                               standard_in=None)
             self.assertEqual('''\
 @@ -1,4 +1,2 @@
  def foo():
@@ -1122,7 +1123,8 @@ def foo():
         output_file = io.StringIO()
         docformatter._main(argv=['my_fake_program', 'nonexistent_file'],
                            standard_out=output_file,
-                           standard_error=output_file)
+                           standard_error=output_file,
+                           standard_in=None)
         self.assertIn('no such file', output_file.getvalue().lower())
 
     def test_in_place(self):
@@ -1135,7 +1137,9 @@ def foo():
             output_file = io.StringIO()
             docformatter._main(
                 argv=['my_fake_program', '--in-place', filename],
-                standard_out=output_file, standard_error=None)
+                standard_out=output_file,
+                standard_error=None,
+                standard_in=None)
             with open(filename) as f:
                 self.assertEqual('''\
 def foo():
@@ -1158,7 +1162,8 @@ def foo():
                     docformatter._main(argv=['my_fake_program', '--recursive',
                                              directory],
                                        standard_out=output_file,
-                                       standard_error=None)
+                                       standard_error=None,
+                                       standard_in=None)
                     self.assertEqual(
                         '',
                         output_file.getvalue().strip())

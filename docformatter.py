@@ -499,7 +499,7 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
-def _main(argv, standard_out, standard_error):
+def _main(argv, standard_out, standard_error, standard_in):
     """Internal main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
@@ -546,14 +546,15 @@ def _main(argv, standard_out, standard_error):
     if '-' in args.files:
         _format_standard_in(args,
                             parser=parser,
-                            standard_out=standard_out)
+                            standard_out=standard_out,
+                            standard_in=standard_in)
     else:
         _format_files(args,
                       standard_out=standard_out,
                       standard_error=standard_error)
 
 
-def _format_standard_in(args, parser, standard_out):
+def _format_standard_in(args, parser, standard_out, standard_in):
     """Print formatted text to standard out."""
     if len(args.files) > 1:
         parser.error('cannot mix standard in and regular files')
@@ -565,10 +566,10 @@ def _format_standard_in(args, parser, standard_out):
         parser.error('--recursive cannot be used with standard input')
 
     encoding = None
-    source = sys.stdin.read()
+    source = standard_in.read()
 
     if not isinstance(source, unicode):
-        encoding = sys.stdin.encoding or locale.getpreferredencoding()
+        encoding = standard_in.encoding or locale.getpreferredencoding()
         source = source.decode(encoding)
 
     formatted_source = _format_code_with_args(source, args=args)
@@ -609,7 +610,8 @@ def main():
     try:
         return _main(sys.argv,
                      standard_out=sys.stdout,
-                     standard_error=sys.stderr)
+                     standard_error=sys.stderr,
+                     standard_in=sys.stdin)
     except KeyboardInterrupt:
         return 2  # pragma: no cover
 
