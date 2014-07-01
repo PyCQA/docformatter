@@ -1246,12 +1246,17 @@ def foo():
 
     def test_standard_in(self):
         process = run_docformatter(['-'])
-        self.assertEqual(
-            '''"""Hello world."""\n''',
-            process.communicate('''\
+
+        result = process.communicate('''\
 """
 Hello world"""
-'''.encode())[0].decode())
+'''.encode())[0].decode()
+
+        self.assertEqual(0, process.returncode)
+
+        self.assertEqual(
+            '''"""Hello world."""\n''',
+            result)
 
     def test_standard_in_with_invalid_options(self):
         process = run_docformatter(['foo.py', '-'])

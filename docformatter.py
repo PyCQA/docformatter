@@ -564,12 +564,18 @@ def _format_standard_in(args, parser, standard_out):
     if args.recursive:
         parser.error('--recursive cannot be used with standard input')
 
+    encoding = None
     source = sys.stdin.read()
-    if not isinstance(source, unicode):
-        source = source.decode(sys.stdin.encoding or
-                               locale.getpreferredencoding())
 
-    standard_out.write(_format_code_with_args(source, args=args))
+    if not isinstance(source, unicode):
+        encoding = sys.stdin.encoding or locale.getpreferredencoding()
+        source = source.decode(encoding)
+
+    formatted_source = _format_code_with_args(source, args=args)
+    if encoding:
+        formatted_source = formatted_source.encode(encoding)
+
+    standard_out.write(formatted_source)
 
 
 def _format_files(args, standard_out, standard_error):
