@@ -30,6 +30,7 @@ from __future__ import (absolute_import,
                         unicode_literals)
 
 import io
+import locale
 import os
 import re
 import signal
@@ -468,14 +469,7 @@ def format_file(filename, args, standard_out):
     encoding = detect_encoding(filename)
     with open_with_encoding(filename, encoding=encoding) as input_file:
         source = input_file.read()
-        formatted_source = format_code(
-            source,
-            summary_wrap_length=args.wrap_summaries,
-            description_wrap_length=args.wrap_descriptions,
-            pre_summary_newline=args.pre_summary_newline,
-            post_description_blank=args.post_description_blank,
-            force_wrap=args.force_wrap,
-            line_range=args.line_range)
+        formatted_source = _format_code_with_args(source, args)
 
     if source != formatted_source:
         if args.in_place:
@@ -491,6 +485,18 @@ def format_file(filename, args, standard_out):
                 'after/' + filename,
                 lineterm='')
             standard_out.write('\n'.join(list(diff) + ['']))
+
+
+def _format_code_with_args(source, args):
+    """Run format_code with parsed command-line arguments."""
+    return format_code(
+        source,
+        summary_wrap_length=args.wrap_summaries,
+        description_wrap_length=args.wrap_descriptions,
+        pre_summary_newline=args.pre_summary_newline,
+        post_description_blank=args.post_description_blank,
+        force_wrap=args.force_wrap,
+        line_range=args.line_range)
 
 
 def _main(argv, standard_out, standard_error):
@@ -526,7 +532,7 @@ def _main(argv, standard_out, standard_error):
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
-                        help='files to format')
+                        help="files to format or '-' for standard in")
 
     args = parser.parse_args(argv[1:])
 
@@ -537,6 +543,37 @@ def _main(argv, standard_out, standard_error):
             parser.error('First value of --range should be less than or equal '
                          'to the second')
 
+    if '-' in args.files:
+        _format_standard_in(args,
+                            parser=parser,
+                            standard_out=standard_out)
+    else:
+        _format_files(args,
+                      standard_out=standard_out,
+                      standard_error=standard_error)
+
+
+def _format_standard_in(args, parser, standard_out):
+    """Print formatted text to standard out."""
+    if len(args.files) > 1:
+        parser.error('cannot mix standard in and regular files')
+
+    if args.in_place:
+        parser.error('--in-place cannot be used with standard input')
+
+    if args.recursive:
+        parser.error('--recursive cannot be used with standard input')
+
+    source = sys.stdin.read()
+    if not isinstance(source, unicode):
+        source = source.decode(sys.stdin.encoding or
+                               locale.getpreferredencoding())
+
+    standard_out.write(_format_code_with_args(source, args=args))
+
+
+def _format_files(args, standard_out, standard_error):
+    """Format multiple files."""
     filenames = list(set(args.files))
     while filenames:
         name = filenames.pop(0)

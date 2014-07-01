@@ -144,7 +144,7 @@ Below is the help output::
     Formats docstrings to follow PEP 257.
 
     positional arguments:
-      files                 files to format
+      files                 files to format or '-' for standard in
 
     optional arguments:
       -h, --help            show this help message and exit

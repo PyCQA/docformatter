@@ -3,6 +3,7 @@ check:
 	pep257 docformatter.py setup.py
 	pylint \
 		--reports=no \
+		--disable=bad-continuation \
 		--disable=invalid-name,too-many-arguments,too-many-locals \
 		--rcfile=/dev/null \
 		docformatter.py setup.py

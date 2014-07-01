@@ -1244,6 +1244,28 @@ def foo():
         self.assertIn('arguments',
                       process.communicate()[1].decode())
 
+    def test_standard_in(self):
+        process = run_docformatter(['-'])
+        self.assertEqual(
+            '''"""Hello world."""\n''',
+            process.communicate('''\
+"""
+Hello world"""
+'''.encode())[0].decode())
+
+    def test_standard_in_with_invalid_options(self):
+        process = run_docformatter(['foo.py', '-'])
+        self.assertIn('cannot mix',
+                      process.communicate()[1].decode())
+
+        process = run_docformatter(['--in-place', '-'])
+        self.assertIn('cannot be used',
+                      process.communicate()[1].decode())
+
+        process = run_docformatter(['--recursive', '-'])
+        self.assertIn('cannot be used',
+                      process.communicate()[1].decode())
+
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,
@@ -1312,6 +1334,7 @@ def run_docformatter(arguments):
     return subprocess.Popen(DOCFORMATTER_COMMAND + arguments,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
+                            stdin=subprocess.PIPE,
                             env=environ)
 
 
