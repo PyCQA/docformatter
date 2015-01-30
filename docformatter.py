@@ -569,7 +569,7 @@ def _format_standard_in(args, parser, standard_out, standard_in):
     source = standard_in.read()
 
     if not isinstance(source, unicode):
-        encoding = standard_in.encoding or locale.getpreferredencoding()
+        encoding = standard_in.encoding or _get_encoding()
         source = source.decode(encoding)
 
     formatted_source = _format_code_with_args(source, args=args)
@@ -577,6 +577,11 @@ def _format_standard_in(args, parser, standard_out, standard_in):
         formatted_source = formatted_source.encode(encoding)
 
     standard_out.write(formatted_source)
+
+
+def _get_encoding():
+    """Return preferred encoding."""
+    return locale.getpreferredencoding() or sys.getdefaultencoding()
 
 
 def _format_files(args, standard_out, standard_error):
