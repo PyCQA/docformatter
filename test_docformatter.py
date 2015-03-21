@@ -10,6 +10,9 @@ from __future__ import (absolute_import,
 import contextlib
 import io
 import os
+import random
+import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -1281,7 +1284,6 @@ def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,
                               max_words=50):
     """Generate single-line docstring."""
-    import random
     if random.randint(0, 1):
         words = []
     else:
@@ -1296,7 +1298,6 @@ def generate_random_docstring(max_indentation_length=32,
 
 
 def generate_random_word(word_length):
-    import random
     return ''.join(
         [random.choice('abcdefghijklmnoprstuvwyxzABCDEFGHIJKLMNOPRSTUVWXYZ')
          for _ in range(word_length)])
@@ -1312,7 +1313,6 @@ def temporary_file(contents, directory='.', prefix=''):
         f.close()
         yield f.name
     finally:
-        import os
         os.remove(f.name)
 
 
@@ -1323,7 +1323,6 @@ def temporary_directory(directory='.', prefix=''):
     try:
         yield temp_directory
     finally:
-        import shutil
         shutil.rmtree(temp_directory)
 
 
@@ -1336,11 +1335,8 @@ def run_docformatter(arguments):
     "untokenize".
 
     """
-    import os
     environ = os.environ.copy()
-    import sys
     environ['PYTHONPATH'] = os.pathsep.join(sys.path)
-    import subprocess
     return subprocess.Popen(DOCFORMATTER_COMMAND + arguments,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
