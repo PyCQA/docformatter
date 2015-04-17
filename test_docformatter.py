@@ -427,7 +427,7 @@ def f(x):
 def g(x):
     """  Badly indented docstring"""
     pass''',
-        docformatter.format_code('''\
+                         docformatter.format_code('''\
 def f(x):
     """  This is a docstring. That should be on more lines"""
     pass
@@ -447,7 +447,7 @@ def f(x):
 def g(x):
     """  Badly indented docstring"""
     pass''',
-        docformatter.format_code('''\
+                         docformatter.format_code('''\
 def f(x):
     """  This is a docstring. That should be on more lines"""
     pass
