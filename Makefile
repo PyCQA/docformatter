@@ -4,7 +4,10 @@ check:
 	pylint \
 		--reports=no \
 		--disable=bad-continuation \
-		--disable=invalid-name,too-many-arguments,too-many-locals \
+		--disable=invalid-name \
+		--disable=no-member \
+		--disable=too-many-arguments \
+		--disable=too-many-locals \
 		--rcfile=/dev/null \
 		docformatter.py setup.py
 	check-manifest
