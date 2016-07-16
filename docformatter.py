@@ -68,7 +68,7 @@ def _format_code(source,
                  summary_wrap_length=79,
                  description_wrap_length=72,
                  pre_summary_newline=False,
-                 make_summary_multiline=False,
+                 make_summary_multi_line=False,
                  post_description_blank=True,
                  force_wrap=False,
                  line_range=None):
@@ -117,7 +117,7 @@ def _format_code(source,
                 summary_wrap_length=summary_wrap_length,
                 description_wrap_length=description_wrap_length,
                 pre_summary_newline=pre_summary_newline,
-                make_summary_multiline=make_summary_multiline,
+                make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
                 force_wrap=force_wrap)
 
@@ -137,7 +137,7 @@ def format_docstring(indentation, docstring,
                      summary_wrap_length=0,
                      description_wrap_length=0,
                      pre_summary_newline=False,
-                     make_summary_multiline=False,
+                     make_summary_multi_line=False,
                      post_description_blank=True,
                      force_wrap=False):
     """Return formatted version of docstring.
@@ -202,7 +202,7 @@ def format_docstring(indentation, docstring,
             post_description=('\n' if post_description_blank else ''),
             indentation=indentation)
     else:
-        if make_summary_multiline:
+        if make_summary_multi_line:
             beginning = '"""\n' + indentation
             ending = '\n' + indentation + '"""'
             summary_wrapped = wrap_summary(
@@ -511,7 +511,7 @@ def _format_code_with_args(source, args):
         summary_wrap_length=args.wrap_summaries,
         description_wrap_length=args.wrap_descriptions,
         pre_summary_newline=args.pre_summary_newline,
-        make_summary_multiline=args.make_summary_multiline,
+        make_summary_multi_line=args.make_summary_multi_line,
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
         line_range=args.line_range)
@@ -540,7 +540,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                         action='store_true',
                         help='add a newline before the summary of a '
                              'multi-line docstring')
-    parser.add_argument('--make-summary-multiline',
+    parser.add_argument('--make-summary-multi-line',
                         action='store_true',
                         help='add a newline before and after the summary of a '
                              'one-line docstring')

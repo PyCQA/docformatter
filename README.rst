@@ -137,8 +137,8 @@ Below is the help output::
 
     usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--no-blank]
-                        [--pre-summary-newline] [--force-wrap] [--range line line]
-                        [--version]
+                        [--pre-summary-newline] [--make-summary-multi-line]
+                        [--force-wrap] [--range line line] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -158,6 +158,9 @@ Below is the help output::
       --pre-summary-newline
                             add a newline before the summary of a multi-line
                             docstring
+      --make-summary-multi-line
+                            add a newline before and after the summary of a one-
+                            line docstring
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
       --range line line     apply docformatter to docstrings between these lines;
