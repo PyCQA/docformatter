@@ -1,5 +1,5 @@
 check:
-	pep8 docformatter.py setup.py
+	pycodestyle docformatter.py setup.py
 	pep257 docformatter.py setup.py
 	pylint \
 		--reports=no \
@@ -8,6 +8,7 @@ check:
 		--disable=no-member \
 		--disable=too-many-arguments \
 		--disable=too-many-locals \
+		--disable=too-many-return-statements \
 		--rcfile=/dev/null \
 		docformatter.py setup.py
 	check-manifest

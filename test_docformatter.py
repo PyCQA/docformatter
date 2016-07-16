@@ -1101,11 +1101,11 @@ num_iterations is the number of updates - instead of a better definition of conv
     def test_format_docstring_make_summary_multiline(self):
         self.assertEqual(('''\
 """
-    This oneline docstring will be multiline.
+    This one line docstring will be multiline.
     """\
 '''),
                          docformatter.format_docstring('    ', '''\
-"""This oneline docstring will be multiline"""\
+"""This one line docstring will be multiline"""\
 ''', make_summary_multiline=True))
 
 

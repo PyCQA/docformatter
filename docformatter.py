@@ -202,15 +202,14 @@ def format_docstring(indentation, docstring,
             post_description=('\n' if post_description_blank else ''),
             indentation=indentation)
     else:
-        beginning = '"""'
-        ending = '"""'
         if make_summary_multiline:
-            beginning = beginning + '\n' + indentation
-            ending = '\n' + indentation + ending
-            summary_wrapped = wrap_summary(normalize_summary(contents),
-                                           wrap_length=summary_wrap_length,
-                                           initial_indent=indentation,
-                                           subsequent_indent=indentation).strip()
+            beginning = '"""\n' + indentation
+            ending = '\n' + indentation + '"""'
+            summary_wrapped = wrap_summary(
+                normalize_summary(contents),
+                wrap_length=summary_wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=indentation).strip()
             return '{beginning}{summary}{ending}'.format(
                 beginning=beginning,
                 summary=summary_wrapped,
