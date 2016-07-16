@@ -1106,7 +1106,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 '''),
                          docformatter.format_docstring('    ', '''\
 """This one line docstring will be multiline"""\
-''', make_summary_multiline=True))
+''', pre_summary_newline=True))
 
 
 class TestSystem(unittest.TestCase):
