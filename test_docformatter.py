@@ -1098,6 +1098,16 @@ num_iterations is the number of updates - instead of a better definition of conv
         self.assertFalse(docformatter.is_probably_beginning_of_sentence(
             '(this just continues an existing sentence).'))
 
+    def test_format_docstring_make_summary_multiline(self):
+        self.assertEqual(('''\
+"""
+    This oneline docstring will be multiline.
+    """\
+'''),
+                         docformatter.format_docstring('    ', '''\
+"""This oneline docstring will be multiline"""\
+''', make_summary_multiline=True))
+
 
 class TestSystem(unittest.TestCase):
 
