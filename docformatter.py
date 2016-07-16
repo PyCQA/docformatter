@@ -531,11 +531,10 @@ def _main(argv, standard_out, standard_error, standard_in):
                              '(default: %(default)s)')
     parser.add_argument('--no-blank', dest='post_description_blank',
                         action='store_false',
-                        help='do not add blank line after description')
+                        help='do not add blank line after descriptions')
     parser.add_argument('--pre-summary-newline',
                         action='store_true',
-                        help='add a newline before the summary of a '
-                             'multi-line docstring')
+                        help='add a newline before summaries')
     parser.add_argument('--force-wrap', action='store_true',
                         help='force descriptions to be wrapped even if it may '
                              'result in a mess')

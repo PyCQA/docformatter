@@ -154,10 +154,9 @@ Below is the help output::
                             wrap long summary lines at this length (default: 79)
       --wrap-descriptions length
                             wrap descriptions at this length (default: 72)
-      --no-blank            do not add blank line after description
+      --no-blank            do not add blank line after descriptions
       --pre-summary-newline
-                            add a newline before the summary of a multi-line
-                            docstring
+                            add a newline before summaries
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
       --range line line     apply docformatter to docstrings between these lines;
