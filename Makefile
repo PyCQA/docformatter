@@ -1,6 +1,6 @@
 check:
 	pycodestyle docformatter.py setup.py
-	pep257 docformatter.py setup.py
+	pydocstyle docformatter.py setup.py
 	pylint \
 		--reports=no \
 		--disable=bad-continuation \
