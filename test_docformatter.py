@@ -317,7 +317,7 @@ Hello.
 '''
 """.strip()))
 
-    def test_format_docstring_with_single_quotes_multiline(self):
+    def test_format_docstring_with_single_quotes_multi_line(self):
         self.assertEqual('''
     """Return x factorial.
 
@@ -667,7 +667,7 @@ def foo():
     """
 '''))
 
-    def test_format_code_with_multiple_sentences_multiline_summary(self):
+    def test_format_code_with_multiple_sentences_multi_line_summary(self):
         self.assertEqual(
             '''\
 def foo():
@@ -1093,7 +1093,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         self.assertFalse(docformatter.is_probably_beginning_of_sentence(
             '(this just continues an existing sentence).'))
 
-    def test_format_docstring_make_summary_multiline(self):
+    def test_format_docstring_make_summary_multi_line(self):
         self.assertEqual(('''\
 """
     This one-line docstring will be multi-line.
