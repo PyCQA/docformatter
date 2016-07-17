@@ -324,15 +324,26 @@ def split_first_sentence(text):
 def is_some_sort_of_list(text):
     """Return True if text looks like a list."""
     split_lines = text.rstrip().splitlines()
+
+    # Very large number of lines but short columns probably means a list of
+    # items.
     if len(split_lines) > max([len(line.strip()) for line in split_lines] +
                               [0]):
         return True
 
-    return (
-        re.search(r'\n\s*\n', text) or
-        re.search(r'[0-9]\.', text) or
-        re.search(r'[\-*:=@]', text)
-    )
+    for line in split_lines:
+        if (
+            re.match(r'\s*$', line) or
+            # "1. item"
+            re.match(r'\s*[0-9]\.', line) or
+            # "@parameter"
+            re.match(r'\s*[\-*:=@]', line) or
+            # "parameter - description"
+            re.match(r'.*\s+[\-*:=@]\s+', line)
+        ):
+            return True
+
+    return False
 
 
 def _find_shortest_indentation(lines):
