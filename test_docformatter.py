@@ -1062,6 +1062,12 @@ The below should be indented with spaces:
     @param
 """))
 
+    def test_is_some_sort_of_code(self):
+        self.assertTrue(docformatter.is_some_sort_of_code("""\
+            GYakymOSMc=GYakymOSMW(GYakymOSMJ,GYakymOSMA,GYakymOSMr,GYakymOSMw[
+                      'abc'],GYakymOSMU,GYakymOSMq,GYakymOSMH,GYakymOSMl,svygreNveyvarf=GYakymOSME)
+"""))
+
     def test_force_wrap(self):
         self.assertEqual(('''\
 """num_iterations is the number of updates -

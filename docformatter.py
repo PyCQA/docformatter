@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2012-2015 Steven Myint
+# Copyright (C) 2012-2016 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -346,6 +346,14 @@ def is_some_sort_of_list(text):
     return False
 
 
+def is_some_sort_of_code(text):
+    """Return True if text looks like code."""
+    for word in text.split():
+        if len(word) > 50:
+            return True
+    return False
+
+
 def _find_shortest_indentation(lines):
     """Return most shortest indentation."""
     assert not isinstance(lines, str)
@@ -422,7 +430,9 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
-    if wrap_length <= 0 or (not force_wrap and is_some_sort_of_list(text)):
+    if wrap_length <= 0 or (not force_wrap and
+                            (is_some_sort_of_list(text) or
+                             is_some_sort_of_code(text))):
         return text
 
     return indentation + '\n'.join(
