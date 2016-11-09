@@ -417,8 +417,8 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
 def wrap_description(text, indentation, wrap_length, force_wrap):
     """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
-    and bulleted lists alone.
+    We only wrap simple descriptions. We leave doctests, multi-paragraph
+    text, and bulleted lists alone.
 
     """
     text = strip_leading_blank_lines(text)
