@@ -1064,8 +1064,8 @@ The below should be indented with spaces:
 
     def test_is_some_sort_of_code(self):
         self.assertTrue(docformatter.is_some_sort_of_code("""\
-            GYakymOSMc=GYakymOSMW(GYakymOSMJ,GYakymOSMA,GYakymOSMr,GYakymOSMw[
-                      'abc'],GYakymOSMU,GYakymOSMq,GYakymOSMH,GYakymOSMl,svygreNveyvarf=GYakymOSME)
+            __________=__________(__________,__________,__________,__________[
+                      '___'],__________,__________,__________,__________,______________=__________)
 """))
 
     def test_force_wrap(self):
