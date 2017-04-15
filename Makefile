@@ -5,6 +5,7 @@ check:
 		--reports=no \
 		--disable=bad-continuation \
 		--disable=invalid-name \
+		--disable=no-else-return \
 		--disable=no-member \
 		--disable=too-many-arguments \
 		--disable=too-many-locals \
