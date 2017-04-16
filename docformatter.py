@@ -29,6 +29,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import codecs
 import io
 import locale
 import os
@@ -40,6 +41,10 @@ import tokenize
 
 import untokenize
 
+try:
+    from _io import TextIOWrapper
+except ImportError:
+    TextIOWrapper = None
 
 __version__ = '0.8'
 
@@ -482,12 +487,23 @@ def strip_leading_blank_lines(text):
 
 def open_with_encoding(filename, encoding, mode='r'):
     """Return opened file with a specific encoding."""
+    if filename == '-':
+        # Python 3.x
+        if TextIOWrapper and isinstance(sys.stdin, TextIOWrapper):
+            return sys.stdin
+
+        # Python 2.x
+        return codecs.getreader(encoding)(sys.stdin)
+
     return io.open(filename, mode=mode, encoding=encoding,
                    newline='')  # Preserve line endings
 
 
 def detect_encoding(filename):
     """Return file encoding."""
+    if filename == '-':
+        return sys.stdin.encoding or 'utf-8'
+
     try:
         with open(filename, 'rb') as input_file:
             from lib2to3.pgen2 import tokenize as lib2to3_tokenize
@@ -509,7 +525,9 @@ def format_file(filename, args, standard_out):
         source = input_file.read()
         formatted_source = _format_code_with_args(source, args)
 
-    if source != formatted_source:
+    if filename == '-':
+        standard_out.write(formatted_source)
+    elif source != formatted_source:
         if args.in_place:
             with open_with_encoding(filename, mode='w',
                                     encoding=encoding) as output_file:
