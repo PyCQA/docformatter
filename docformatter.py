@@ -339,7 +339,9 @@ def is_some_sort_of_list(text):
             # "@parameter"
             re.match(r'\s*[\-*:=@]', line) or
             # "parameter - description"
-            re.match(r'.*\s+[\-*:=@]\s+', line)
+            re.match(r'.*\s+[\-*:=@]\s+', line) or
+            # "parameter: description"
+            re.match(r'\s*\S+[\-*:=@]\s+', line)
         ):
             return True
 
