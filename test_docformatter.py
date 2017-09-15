@@ -227,6 +227,19 @@ Hello.
                                           docstring,
                                           description_wrap_length=72))
 
+    def test_format_docstring_should_ignore__colon_parameter_lists(self):
+        docstring = '''"""Hello.
+
+    foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
+
+    """'''
+        self.assertEqual(
+            docstring,
+            docformatter.format_docstring('    ',
+                                          docstring,
+                                          description_wrap_length=72))
+
     def test_format_docstring_should_ignore_multi_paragraph(self):
         docstring = '''"""Hello.
 
