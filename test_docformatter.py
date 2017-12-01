@@ -347,7 +347,7 @@ Hello.
 """.strip()))
 
     def test_format_docstring_with_wrap(self):
-        min_line_length = 30
+        min_line_length = 50
         for max_length in range(min_line_length, 100):
             for num_indents in range(0, 20):
                 indentation = ' ' * num_indents
