@@ -50,6 +50,9 @@ except NameError:
     unicode = str
 
 
+HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
+
+
 def format_code(source, **kwargs):
     """Return source code with docstrings formatted.
 
@@ -325,10 +328,11 @@ def is_some_sort_of_list(text):
     """Return True if text looks like a list."""
     split_lines = text.rstrip().splitlines()
 
+    # TODO: Find a better way of doing this.
     # Very large number of lines but short columns probably means a list of
     # items.
-    if len(split_lines) > max([len(line.strip()) for line in split_lines] +
-                              [0]):
+    if len(split_lines) / max([len(line.strip()) for line in split_lines] +
+                              [1]) > HEURISTIC_MIN_LIST_ASPECT_RATIO:
         return True
 
     for line in split_lines:
@@ -341,7 +345,9 @@ def is_some_sort_of_list(text):
             # "parameter - description"
             re.match(r'.*\s+[\-*:=@]\s+', line) or
             # "parameter: description"
-            re.match(r'\s*\S+[\-*:=@]\s+', line)
+            re.match(r'\s*\S+[\-*:=@]\s+', line) or
+            # "parameter -- description"
+            re.match(r'\s*\S+\s+--\s+', line)
         ):
             return True
 
