@@ -4,10 +4,12 @@ check:
 	pylint \
 		--reports=no \
 		--disable=bad-continuation \
+		--disable=fixme \
 		--disable=invalid-name \
 		--disable=no-else-return \
 		--disable=no-member \
 		--disable=too-many-arguments \
+		--disable=too-many-boolean-expressions \
 		--disable=too-many-locals \
 		--disable=too-many-return-statements \
 		--rcfile=/dev/null \
