@@ -347,6 +347,10 @@ Hello.
 """.strip()))
 
     def test_format_docstring_with_wrap(self):
+        # This function uses `random` so make sure each run of this test is
+        # repeatable.
+        random.seed(0)
+
         min_line_length = 50
         for max_length in range(min_line_length, 100):
             for num_indents in range(0, 20):
@@ -1385,5 +1389,4 @@ def run_docformatter(arguments):
 
 
 if __name__ == '__main__':
-    random.seed(0)
     unittest.main()
