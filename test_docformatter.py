@@ -482,10 +482,8 @@ not."""
             docformatter.format_code(
                 '''\
 #!/usr/env/bin python
-"""This
-is
-a
-module
+"""This is
+a module
 docstring.
 
 1. One
@@ -1073,6 +1071,24 @@ The below should be indented with spaces:
     @param
     @param
     @param
+"""))
+
+    def test_is_some_sort_of_list_with_dashes(self):
+        self.assertTrue(docformatter.is_some_sort_of_list("""\
+    Keyword arguments:
+    real -- the real part (default 0.0)
+    imag -- the imaginary part (default 0.0)
+"""))
+
+    def test_is_some_sort_of_list_without_special_symbol(self):
+        self.assertTrue(docformatter.is_some_sort_of_list("""\
+    Example:
+      release-1.1/
+      release-1.2/
+      release-1.3/
+      release-1.4/
+      release-1.4.1/
+      release-1.5/
 """))
 
     def test_is_some_sort_of_code(self):
