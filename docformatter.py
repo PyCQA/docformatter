@@ -72,7 +72,7 @@ def _format_code(source,
                  description_wrap_length=72,
                  pre_summary_newline=False,
                  make_summary_multi_line=False,
-                 post_description_blank=True,
+                 post_description_blank=False,
                  force_wrap=False,
                  line_range=None):
     """Return source code with docstrings formatted."""
@@ -141,7 +141,7 @@ def format_docstring(indentation, docstring,
                      description_wrap_length=0,
                      pre_summary_newline=False,
                      make_summary_multi_line=False,
-                     post_description_blank=True,
+                     post_description_blank=False,
                      force_wrap=False):
     """Return formatted version of docstring.
 
