@@ -12,6 +12,7 @@ import io
 import os
 import random
 import shutil
+import string
 import subprocess
 import sys
 import tempfile
@@ -1342,9 +1343,7 @@ def generate_random_docstring(max_indentation_length=32,
 
 
 def generate_random_word(word_length):
-    return ''.join(
-        [random.choice('abcdefghijklmnoprstuvwyxzABCDEFGHIJKLMNOPRSTUVWXYZ')
-         for _ in range(word_length)])
+    return ''.join(random.sample(string.ascii_letters, word_length))
 
 
 @contextlib.contextmanager
