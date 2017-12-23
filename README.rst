@@ -23,9 +23,8 @@ from PEP 257.
 - Multi-line docstrings consist of a summary line just like a one-line
   docstring, followed by a blank line, followed by a more elaborate
   description.
-- The BDFL recommends inserting a blank line between the last paragraph
-  in a multi-line docstring and its closing quotes, placing the closing
-  quotes on a line by themselves.
+- Unless the entire docstring fits on a line, place the closing quotes
+  on a line by themselves.
 
 docformatter also handles some of the PEP 8 conventions.
 
@@ -96,7 +95,6 @@ gets formatted into this
     """Here are some examples.
 
     This module docstring should be dedented.
-
     """
 
 
@@ -104,7 +102,6 @@ gets formatted into this
         """Launch the rocket.
 
         Go colonize space.
-
         """
 
 
@@ -112,7 +109,6 @@ gets formatted into this
         """Return x factorial.
 
         This uses math.factorial.
-
         """
         import math
         return math.factorial(x)
@@ -154,7 +150,7 @@ Below is the help output::
                             wrap long summary lines at this length (default: 79)
       --wrap-descriptions length
                             wrap descriptions at this length (default: 72)
-      --no-blank            do not add blank line after description
+      --blank               add blank line after description
       --pre-summary-newline
                             add a newline before the summary of a multi-line
                             docstring

@@ -1264,10 +1264,10 @@ def foo():
             process = run_docformatter(['--wrap-summaries=40',
                                         '--wrap-summaries=40',
                                         '--pre-summary-newline',
-                                        '--no-blank',
+                                        '--blank',
                                         filename])
             self.assertEqual('''\
-@@ -1,7 +1,9 @@
+@@ -1,7 +1,10 @@
  def foo():
 -    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
 +    """
@@ -1277,7 +1277,7 @@ def foo():
 +
      - My list item
      - My list item
--
+ 
 -
      """
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
