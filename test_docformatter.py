@@ -1354,7 +1354,6 @@ def run_docformatter(arguments):
 
     This is necessary for testing under "./setup.py test" without installing
     "untokenize".
-
     """
     environ = os.environ.copy()
     environ['PYTHONPATH'] = os.pathsep.join(sys.path)
