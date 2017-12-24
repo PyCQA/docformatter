@@ -104,7 +104,6 @@ Hello.
     This should be indented but it is not. The
     next line should be indented too. And
     this too.
-
     """''',
                          docformatter.format_docstring('    ', '''
 """Hello.
@@ -123,7 +122,6 @@ Hello.
     1. This too.
     2. And this.
     3. And this.
-
     """''',
                          docformatter.format_docstring('    ', '''
 """Hello.
@@ -142,7 +140,6 @@ Hello.
 
     This should be indented but it is not. The next line should be
     indented too. But this is okay.
-
     """''',
                          docformatter.format_docstring('    ', '''
 """Hello.
@@ -159,7 +156,6 @@ Hello.
 
     >>> 4
     4
-
     """'''
         self.assertEqual(
             docstring,
@@ -186,7 +182,6 @@ Hello.
         >>> tests = DocTestFinder().find(_TestClass)
         >>> runner = DocTestRunner(verbose=False)
         >>> tests.sort(key = lambda test: test.name)
-
     """''',
             docformatter.format_docstring(
                 '    ',
@@ -206,7 +201,6 @@ Hello.
     1. This should be indented but it is not. The
     next line should be indented too. But
     this is okay.
-
     """'''
         self.assertEqual(
             docstring,
@@ -219,7 +213,6 @@ Hello.
 
     foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
     bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
-
     """'''
         self.assertEqual(
             docstring,
@@ -232,7 +225,6 @@ Hello.
 
     foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
     bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
-
     """'''
         self.assertEqual(
             docstring,
@@ -250,7 +242,6 @@ Hello.
     This should be indented but it is not. The
     next line should be indented too. But
     this is okay.
-
     """'''
         self.assertEqual(
             docstring,
@@ -263,7 +254,6 @@ Hello.
 
     This should be not have trailing whitespace. The
     next line should not have trailing whitespace either.
-
     """''',
                          docformatter.format_docstring('    ', '''
 """Hello.\t
@@ -295,7 +285,6 @@ Hello.
     Hello.
 
     Description.
-
     """''',
                          docformatter.format_docstring('    ', '''
 """
@@ -335,7 +324,6 @@ Hello.
     """Return x factorial.
 
     This uses math.factorial.
-
     """
 '''.strip(),
             docformatter.format_docstring('    ', """
@@ -375,7 +363,6 @@ Hello.
     `four' falsified x falsified ammonites
     to awakens to. `created' to ancestor was four to x dynamo to was
     four ancestor to physicists().
-
     """
 '''.strip(),
             docformatter.format_docstring('    ', '''
@@ -453,7 +440,6 @@ def f(x):
     """This is a docstring.
 
     That should be on more lines
-
     """
     pass
 def g(x):
@@ -475,7 +461,6 @@ def g(x):
 
 1. One
 2. Two
-
 """
 
 """But
@@ -652,7 +637,6 @@ def foo():
     """Hello foo.
 
     This is a docstring.
-
     """
 ''',
             docformatter.format_code(
@@ -671,7 +655,6 @@ def foo():
     """Hello foo.
 
     This is a docstring.
-
     """
 ''',
             docformatter.format_code(
@@ -689,7 +672,6 @@ def foo():
     """Hello foo.
 
     This is a docstring.
-
     """
 ''',
             docformatter.format_code(
@@ -708,7 +690,6 @@ def foo():
     """Hello foo and this is a docstring.
 
     More stuff.
-
     """
 ''',
             docformatter.format_code(
@@ -729,7 +710,6 @@ def foo():
     """Hello foo and this is a docstring.
 
     More stuff.
-
     """
 ''',
             docformatter.format_code(
@@ -751,7 +731,6 @@ def foo():
 
     one - first
     two - second
-
     """
 ''',
             docformatter.format_code(
@@ -813,7 +792,6 @@ def foo():
     """Hello foo and this is a docstring.
 
     More stuff.
-
     """
     x = """My non-docstring
     This should not touched."""
@@ -1264,10 +1242,10 @@ def foo():
             process = run_docformatter(['--wrap-summaries=40',
                                         '--wrap-summaries=40',
                                         '--pre-summary-newline',
-                                        '--no-blank',
+                                        '--blank',
                                         filename])
             self.assertEqual('''\
-@@ -1,7 +1,9 @@
+@@ -1,7 +1,10 @@
  def foo():
 -    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
 +    """
@@ -1277,7 +1255,7 @@ def foo():
 +
      - My list item
      - My list item
--
+ 
 -
      """
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))

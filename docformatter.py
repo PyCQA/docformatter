@@ -72,7 +72,7 @@ def _format_code(source,
                  description_wrap_length=72,
                  pre_summary_newline=False,
                  make_summary_multi_line=False,
-                 post_description_blank=True,
+                 post_description_blank=False,
                  force_wrap=False,
                  line_range=None):
     """Return source code with docstrings formatted."""
@@ -141,7 +141,7 @@ def format_docstring(indentation, docstring,
                      description_wrap_length=0,
                      pre_summary_newline=False,
                      make_summary_multi_line=False,
-                     post_description_blank=True,
+                     post_description_blank=False,
                      force_wrap=False):
     """Return formatted version of docstring.
 
@@ -153,10 +153,8 @@ def format_docstring(indentation, docstring,
         - Multi-line docstrings consist of a summary line just like a one-line
           docstring, followed by a blank line, followed by a more elaborate
           description.
-        - The BDFL recommends inserting a blank line between the last paragraph
-          in a multi-line docstring and its closing quotes, placing the closing
-          quotes on a line by themselves.
-
+        - Unless the entire docstring fits on a line, place the closing quotes
+          on a line by themselves.
     """
     contents = strip_docstring(docstring)
 
@@ -562,9 +560,9 @@ def _main(argv, standard_out, standard_error, standard_in):
                         metavar='length',
                         help='wrap descriptions at this length '
                              '(default: %(default)s)')
-    parser.add_argument('--no-blank', dest='post_description_blank',
-                        action='store_false',
-                        help='do not add blank line after description')
+    parser.add_argument('--blank', dest='post_description_blank',
+                        action='store_true',
+                        help='add blank line after description')
     parser.add_argument('--pre-summary-newline',
                         action='store_true',
                         help='add a newline before the summary of a '
