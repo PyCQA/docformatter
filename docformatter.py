@@ -59,7 +59,6 @@ def format_code(source, **kwargs):
     Wrap summary lines if summary_wrap_length is greater than 0.
 
     See "_format_code()" for parameters.
-
     """
     try:
         return _format_code(source, **kwargs)
@@ -249,7 +248,6 @@ def split_summary_and_description(contents):
     """Split docstring into summary and description.
 
     Return tuple (summary, description).
-
     """
     split_lines = contents.rstrip().splitlines()
 
@@ -283,7 +281,6 @@ def split_first_sentence(text):
     """Split text into first sentence and the rest.
 
     Return a tuple (sentence, rest).
-
     """
     sentence = ''
     rest = text
@@ -425,7 +422,6 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
 
     We only wrap simple descriptions. We leave doctests, multi-paragraph
     text, and bulleted lists alone.
-
     """
     text = strip_leading_blank_lines(text)
 
