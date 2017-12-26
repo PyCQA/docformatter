@@ -8,3 +8,4 @@ Patches
 - Andy Hayden (https://github.com/hayd)
 - Manuel Kaufmann (https://github.com/humitos)
 - Peter Boothe (https://github.com/pboothe)
+- Kapshuna Alexander (https://github.com/kapsh)
