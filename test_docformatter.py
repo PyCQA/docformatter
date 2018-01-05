@@ -1230,6 +1230,21 @@ def foo():
 +    that will get wrapped."""
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
+    def test_end_to_end_with_no_wrapping(self):
+        with temporary_file('''\
+def foo():
+    """Hello world is a long sentence that will not be wrapped because I turned wrapping off.
+
+    Hello world is a long sentence that will not be wrapped because I turned wrapping off.
+    """
+''') as filename:
+            process = run_docformatter(['--wrap-summaries=0',
+                                        '--wrap-description=0',
+                                        filename])
+            self.assertEqual(
+                '',
+                '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+
     def test_end_to_end_all_options(self):
         with temporary_file('''\
 def foo():

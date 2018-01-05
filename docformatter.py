@@ -550,11 +550,13 @@ def _main(argv, standard_out, standard_error, standard_in):
                         help='drill down directories recursively')
     parser.add_argument('--wrap-summaries', default=79, type=int,
                         metavar='length',
-                        help='wrap long summary lines at this length '
+                        help='wrap long summary lines at this length; '
+                             'set to 0 to disable wrapping '
                              '(default: %(default)s)')
     parser.add_argument('--wrap-descriptions', default=72, type=int,
                         metavar='length',
-                        help='wrap descriptions at this length '
+                        help='wrap descriptions at this length; '
+                             'set to 0 to disable wrapping '
                              '(default: %(default)s)')
     parser.add_argument('--blank', dest='post_description_blank',
                         action='store_true',

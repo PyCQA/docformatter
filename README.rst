@@ -132,7 +132,7 @@ Options
 Below is the help output::
 
     usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
-                        [--wrap-descriptions length] [--no-blank]
+                        [--wrap-descriptions length] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range line line] [--version]
                         files [files ...]
@@ -147,9 +147,11 @@ Below is the help output::
       -i, --in-place        make changes to files instead of printing diffs
       -r, --recursive       drill down directories recursively
       --wrap-summaries length
-                            wrap long summary lines at this length (default: 79)
+                            wrap long summary lines at this length; set to 0 to
+                            disable wrapping (default: 79)
       --wrap-descriptions length
-                            wrap descriptions at this length (default: 72)
+                            wrap descriptions at this length; set to 0 to disable
+                            wrapping (default: 72)
       --blank               add blank line after description
       --pre-summary-newline
                             add a newline before the summary of a multi-line
