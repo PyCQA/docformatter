@@ -41,7 +41,7 @@ import tokenize
 import untokenize
 
 
-__version__ = '1.0a0'
+__version__ = '1.0'
 
 
 try:
