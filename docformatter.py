@@ -241,6 +241,10 @@ def is_probably_beginning_of_sentence(line):
         if re.search(r'\s' + token + r'\s', line):
             return True
 
+        stripped_line = line.strip()
+        if stripped_line and stripped_line[0].isupper():
+            return True
+
     return re.match(r'[^\w"\'`\(\)]', line.strip())
 
 
