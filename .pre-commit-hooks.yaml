@@ -1,0 +1,6 @@
+-   id: docformatter
+    name: docformatter
+    description: 'Formats docstrings to follow PEP 257.'
+    entry: docformatter
+    language: python
+    types: [python]
