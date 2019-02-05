@@ -351,10 +351,7 @@ def is_some_sort_of_list(text):
 
 def is_some_sort_of_code(text):
     """Return True if text looks like code."""
-    for word in text.split():
-        if len(word) > 50:
-            return True
-    return False
+    return any(len(word) > 50 for word in text.split())
 
 
 def _find_shortest_indentation(lines):
@@ -376,21 +373,13 @@ def _find_shortest_indentation(lines):
 def strip_docstring(docstring):
     """Return contents of docstring."""
     docstring = docstring.strip()
+    quote_types = ["'''", '"""', "'", '"']
 
-    if docstring.startswith("'''"):
-        quote = "'''"
-    elif docstring.startswith('"""'):
-        quote = '"""'
-    elif docstring.startswith("'"):
-        quote = "'"
-    elif docstring.startswith('"'):
-        quote = '"'
-    else:
-        raise ValueError('We only handle strings that start with quotes')
+    for quote in quote_types:
+        if docstring.startswith(quote) and docstring.endswith(quote):
+            return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
-    assert docstring.endswith(quote)
-
-    return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
+    raise ValueError('We only handle strings that start with quotes')
 
 
 def normalize_summary(summary):
@@ -459,10 +448,10 @@ def remove_section_header(text):
         return text
 
     first = stripped[0]
-    if (
-        not first.isalnum() and
-        not first.isspace() and
-        not stripped.splitlines()[0].strip(first).strip()
+    if not (
+        first.isalnum() or
+        first.isspace() or
+        stripped.splitlines()[0].strip(first).strip()
     ):
         return stripped.lstrip(first).lstrip()
 
