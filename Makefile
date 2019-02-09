@@ -5,6 +5,7 @@ check:
 		--reports=no \
 		--disable=bad-continuation \
 		--disable=fixme \
+		--disable=inconsistent-return-statements \
 		--disable=invalid-name \
 		--disable=no-else-return \
 		--disable=no-member \
