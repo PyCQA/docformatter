@@ -1074,6 +1074,12 @@ The below should be indented with spaces:
       release-1.5/
 """))
 
+    def test_is_some_sort_of_list_of_parameter_list_with_newline(self):
+        self.assertTrue(docformatter.is_some_sort_of_list("""\
+Args:
+    stream (BinaryIO): Binary stream (usually a file object).
+"""))
+
     def test_is_some_sort_of_code(self):
         self.assertTrue(docformatter.is_some_sort_of_code("""\
             __________=__________(__________,__________,__________,__________[

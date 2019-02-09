@@ -341,6 +341,8 @@ def is_some_sort_of_list(text):
             re.match(r'.*\s+[\-*:=@]\s+', line) or
             # "parameter: description"
             re.match(r'\s*\S+[\-*:=@]\s+', line) or
+            # "parameter:\n    description"
+            re.match(r'\s*\S+:\s*$', line) or
             # "parameter -- description"
             re.match(r'\s*\S+\s+--\s+', line)
         ):
