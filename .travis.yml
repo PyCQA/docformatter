@@ -1,12 +1,15 @@
 language: python
 
-python:
-    - "2.7"
-    - "pypy"
-    - "3.3"
-    - "3.4"
-    - "3.5"
-    - "3.6"
+jobs:
+    include:
+        - python: "2.7"
+        - python: "pypy"
+        - python: "3.3"
+        - python: "3.4"
+        - python: "3.5"
+        - python: "3.6"
+        - python: "3.7"
+          dist: xenial
 
 env:
     -
