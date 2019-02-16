@@ -622,23 +622,37 @@ def _get_encoding():
     return locale.getpreferredencoding() or sys.getdefaultencoding()
 
 
+def find_py_files(sources, recursive):
+    """Find Python source files.
+
+    Parameters:
+        - sources: iterable with paths as strings.
+        - recursive: drill down directories if True.
+
+    Return: yields paths to found files.
+    """
+    def not_hidden(name):
+        """Return True if file 'name' isn't .hidden."""
+        return not name.startswith('.')
+
+    for name in sorted(sources):
+        if recursive and os.path.isdir(name):
+            for root, dirs, children in os.walk(unicode(name)):
+                dirs[:] = sorted(filter(not_hidden, dirs))
+                for filename in sorted(filter(not_hidden, children)):
+                    if filename.endswith('.py'):
+                        yield os.path.join(root, filename)
+        else:
+            yield name
+
+
 def _format_files(args, standard_out, standard_error):
     """Format multiple files."""
-    filenames = list(set(args.files))
-    while filenames:
-        name = filenames.pop(0)
-        if args.recursive and os.path.isdir(name):
-            for root, directories, children in os.walk(unicode(name)):
-                filenames += [os.path.join(root, f) for f in children
-                              if f.endswith('.py') and
-                              not f.startswith('.')]
-                directories[:] = [d for d in directories
-                                  if not d.startswith('.')]
-        else:
-            try:
-                format_file(name, args=args, standard_out=standard_out)
-            except IOError as exception:
-                print(unicode(exception), file=standard_error)
+    for filename in find_py_files(set(args.files), args.recursive):
+        try:
+            format_file(filename, args=args, standard_out=standard_out)
+        except IOError as exception:
+            print(unicode(exception), file=standard_error)
 
 
 def main():
