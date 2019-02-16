@@ -1323,6 +1323,46 @@ Hello world"""
         self.assertIn('cannot be used',
                       process.communicate()[1].decode())
 
+    def test_io_error_exit_code(self):
+        stderr = io.StringIO()
+        ret_code = docformatter._main(
+            argv=['my_fake_program', 'this_file_should_not_exist_please'],
+            standard_out=None, standard_error=stderr, standard_in=None)
+        self.assertEqual(ret_code, 1)
+
+    def test_check_mode_correct_docstring(self):
+        with temporary_file('''
+"""Totally fine docstring, do not report anything."""
+''') as filename:
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            ret_code = docformatter._main(
+                argv=['my_fake_program', '--check', filename],
+                standard_out=stdout, standard_error=stderr, standard_in=None)
+            self.assertEqual(ret_code, 0,
+                             msg='Exit code should be 0')  # FormatResult.ok
+            self.assertEqual(stdout.getvalue(), '',
+                             msg='Do not write to stdout')
+            self.assertEqual(stderr.getvalue(), '',
+                             msg='Do not write to stderr')
+
+    def test_check_mode_incorrect_docstring(self):
+        with temporary_file('''
+"""
+Print my path and return error code
+""" ''') as filename:
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            ret_code = docformatter._main(
+                argv=['my_fake_program', '--check', filename],
+                standard_out=stdout, standard_error=stderr, standard_in=None)
+            self.assertEqual(ret_code, 3,
+                             msg='Exit code should be 3')  # FormatResult.check_failed
+            self.assertEqual(stdout.getvalue(), '',
+                             msg='Do not write to stdout')
+            self.assertEqual(stderr.getvalue().strip(), filename,
+                             msg='Changed file should be reported')
+
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,
