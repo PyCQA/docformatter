@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2012-2018 Steven Myint
+# Copyright (C) 2012-2019 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -41,7 +41,7 @@ import tokenize
 import untokenize
 
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 
 try:
