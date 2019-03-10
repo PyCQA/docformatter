@@ -29,6 +29,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import collections
 import io
 import locale
 import os
@@ -51,6 +52,14 @@ except NameError:
 
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
+
+
+class FormatResult(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
+    """Possible exit codes."""
+    ok = 0
+    error = 1
+    interrupted = 2
+    check_failed = 3
 
 
 def format_code(source, **kwargs):
@@ -496,14 +505,19 @@ def detect_encoding(filename):
 
 
 def format_file(filename, args, standard_out):
-    """Run format_code() on a file."""
+    """Run format_code() on a file.
+
+    Return: one of the FormatResult codes.
+    """
     encoding = detect_encoding(filename)
     with open_with_encoding(filename, encoding=encoding) as input_file:
         source = input_file.read()
         formatted_source = _format_code_with_args(source, args)
 
     if source != formatted_source:
-        if args.in_place:
+        if args.check:
+            return FormatResult.check_failed
+        elif args.in_place:
             with open_with_encoding(filename, mode='w',
                                     encoding=encoding) as output_file:
                 output_file.write(formatted_source)
@@ -516,6 +530,8 @@ def format_file(filename, args, standard_out):
                 'after/' + filename,
                 lineterm='')
             standard_out.write('\n'.join(list(diff) + ['']))
+
+    return FormatResult.ok
 
 
 def _format_code_with_args(source, args):
@@ -535,8 +551,11 @@ def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
-    parser.add_argument('-i', '--in-place', action='store_true',
-                        help='make changes to files instead of printing diffs')
+    changes = parser.add_mutually_exclusive_group()
+    changes.add_argument('-i', '--in-place', action='store_true',
+                         help='make changes to files instead of printing diffs')
+    changes.add_argument('-c', '--check', action='store_true',
+                         help='only check and report incorrectly formatted files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
     parser.add_argument('--wrap-summaries', default=79, type=int,
@@ -587,9 +606,9 @@ def _main(argv, standard_out, standard_error, standard_in):
                             standard_out=standard_out,
                             standard_in=standard_in)
     else:
-        _format_files(args,
-                      standard_out=standard_out,
-                      standard_error=standard_error)
+        return _format_files(args,
+                             standard_out=standard_out,
+                             standard_error=standard_error)
 
 
 def _format_standard_in(args, parser, standard_out, standard_in):
@@ -647,12 +666,29 @@ def find_py_files(sources, recursive):
 
 
 def _format_files(args, standard_out, standard_error):
-    """Format multiple files."""
+    """Format multiple files.
+
+    Return: one of the FormatResult codes.
+    """
+    outcomes = collections.Counter()
     for filename in find_py_files(set(args.files), args.recursive):
         try:
-            format_file(filename, args=args, standard_out=standard_out)
+            result = format_file(filename, args=args, standard_out=standard_out)
+            outcomes[result] += 1
+            if result == FormatResult.check_failed:
+                print(unicode(filename), file=standard_error)
         except IOError as exception:
+            outcomes[FormatResult.error] += 1
             print(unicode(exception), file=standard_error)
+
+    return_codes = [  # in order of preference
+        FormatResult.error,
+        FormatResult.check_failed,
+        FormatResult.ok,
+    ]
+    for code in return_codes:
+        if outcomes[code]:
+            return code
 
 
 def main():
@@ -670,7 +706,7 @@ def main():
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
     except KeyboardInterrupt:
-        return 2  # pragma: no cover
+        return FormatResult.interrupted  # pragma: no cover
 
 
 if __name__ == '__main__':

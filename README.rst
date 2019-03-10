@@ -131,7 +131,7 @@ Options
 
 Below is the help output::
 
-    usage: docformatter [-h] [-i] [-r] [--wrap-summaries length]
+    usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range line line] [--version]
@@ -145,6 +145,7 @@ Below is the help output::
     optional arguments:
       -h, --help            show this help message and exit
       -i, --in-place        make changes to files instead of printing diffs
+      -c, --check           only check and report incorrectly formatted files
       -r, --recursive       drill down directories recursively
       --wrap-summaries length
                             wrap long summary lines at this length; set to 0 to
@@ -165,6 +166,11 @@ Below is the help output::
                             line numbers are indexed at 1
       --version             show program's version number and exit
 
+
+Possible exit codes:
+
+- **1** - if any error encountered
+- **3** - if any file needs to be formatted (in ``--check`` mode)
 
 Wrapping descriptions
 =====================
