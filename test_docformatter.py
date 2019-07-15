@@ -822,7 +822,7 @@ def foo():
         self.assertEqual('"""\n',
                          docformatter.format_code('"""\n'))
 
-    def test_test_format_code_dominant_line_ending_style_preserved(self):
+    def test_format_code_dominant_line_ending_style_preserved(self):
         input = '''\
 def foo():\r
     """\r
