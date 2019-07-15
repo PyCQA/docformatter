@@ -830,7 +830,7 @@ def foo():\r
     foo. This is a docstring.\r
     """\r
 '''
-        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(keepends=True)))
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(True)))
         self.assertEqual(
             '''\
 def foo():\r
