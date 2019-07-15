@@ -73,10 +73,10 @@ def format_code(source, **kwargs):
     See "_format_code()" for parameters.
     """
     try:
-        original_newline = find_newline(source.splitlines(keepends=True))
+        original_newline = find_newline(source.splitlines(True))
         code = _format_code(source, **kwargs)
 
-        return normalize_line_endings(code.splitlines(keepends=True), original_newline)
+        return normalize_line_endings(code.splitlines(True), original_newline)
     except (tokenize.TokenError, IndentationError):
         return source
 
