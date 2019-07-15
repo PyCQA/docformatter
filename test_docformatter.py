@@ -822,6 +822,25 @@ def foo():
         self.assertEqual('"""\n',
                          docformatter.format_code('"""\n'))
 
+    def test_test_format_code_dominant_line_ending_style_preserved(self):
+        input = '''\
+def foo():\r
+    """\r
+    Hello\r
+    foo. This is a docstring.\r
+    """\r
+'''
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(keepends=True)))
+        self.assertEqual(
+            '''\
+def foo():\r
+    """Hello foo.\r
+\r
+    This is a docstring.\r
+    """\r
+''',
+            docformatter.format_code(input))
+
     def test_split_summary_and_description(self):
         self.assertEqual(
             ('This is the first.',
