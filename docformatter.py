@@ -57,6 +57,7 @@ CR = '\r'
 LF = '\n'
 CRLF = '\r\n'
 
+
 class FormatResult(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
     """Possible exit codes."""
     ok = 0
