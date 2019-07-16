@@ -388,6 +388,7 @@ def _find_shortest_indentation(lines):
 
 def find_newline(source):
     """Return type of newline used in source.
+
     Input is a list of lines.
     """
     assert not isinstance(source, unicode)
@@ -405,7 +406,8 @@ def find_newline(source):
 
 def normalize_line(line, newline):
     """Return line with fixed ending, if ending was present in line.
-       Otherwise, does nothing.
+
+    Otherwise, does nothing.
     """
     stripped = line.rstrip('\n\r')
     if stripped != line:
@@ -415,6 +417,7 @@ def normalize_line(line, newline):
 
 def normalize_line_endings(lines, newline):
     """Return fixed line endings.
+
     All lines will be modified to use the most common line ending.
     """
     return "".join([normalize_line(line, newline) for line in lines])
