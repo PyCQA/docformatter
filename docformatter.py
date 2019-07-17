@@ -42,7 +42,7 @@ import tokenize
 import untokenize
 
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 
 try:
