@@ -58,8 +58,9 @@ LF = '\n'
 CRLF = '\r\n'
 
 
-class FormatResult(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
+class FormatResult(object):
     """Possible exit codes."""
+
     ok = 0
     error = 1
     interrupted = 2
@@ -387,6 +388,7 @@ def _find_shortest_indentation(lines):
 
     return indentation or ''
 
+
 def find_newline(source):
     """Return type of newline used in source.
 
@@ -421,8 +423,8 @@ def normalize_line_endings(lines, newline):
 
     All lines will be modified to use the most common line ending.
     """
-    return "".join([normalize_line(line, newline) for line in lines])
-    
+    return ''.join([normalize_line(line, newline) for line in lines])
+
 
 def strip_docstring(docstring):
     """Return contents of docstring."""
@@ -596,9 +598,11 @@ def _main(argv, standard_out, standard_error, standard_in):
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
-                         help='make changes to files instead of printing diffs')
+                         help='make changes to files instead of printing '
+                              'diffs')
     changes.add_argument('-c', '--check', action='store_true',
-                         help='only check and report incorrectly formatted files')
+                         help='only check and report incorrectly formatted '
+                              'files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
     parser.add_argument('--wrap-summaries', default=79, type=int,
@@ -687,7 +691,7 @@ def _get_encoding():
 def find_py_files(sources, recursive):
     """Find Python source files.
 
-    Parameters:
+    Parameters
         - sources: iterable with paths as strings.
         - recursive: drill down directories if True.
 
@@ -716,7 +720,8 @@ def _format_files(args, standard_out, standard_error):
     outcomes = collections.Counter()
     for filename in find_py_files(set(args.files), args.recursive):
         try:
-            result = format_file(filename, args=args, standard_out=standard_out)
+            result = format_file(filename, args=args,
+                                 standard_out=standard_out)
             outcomes[result] += 1
             if result == FormatResult.check_failed:
                 print(unicode(filename), file=standard_error)
