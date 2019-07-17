@@ -822,6 +822,57 @@ def foo():
         self.assertEqual('"""\n',
                          docformatter.format_code('"""\n'))
 
+    def test_format_code_with_syntax_error_case_slash_r(self):
+        self.assertEqual('"""\r',
+                         docformatter.format_code('"""\r'))
+
+    def test_format_code_with_syntax_error_case_slash_r_slash_n(self):
+        self.assertEqual('"""\r\n',
+                         docformatter.format_code('"""\r\n'))
+
+    def test_find_newline_only_cr(self):
+        source = ['print 1\r', 'print 2\r', 'print3\r']
+        self.assertEqual(docformatter.CR, docformatter.find_newline(source))
+
+    def test_find_newline_only_lf(self):
+        source = ['print 1\n', 'print 2\n', 'print3\n']
+        self.assertEqual(docformatter.LF, docformatter.find_newline(source))
+
+    def test_find_newline_only_crlf(self):
+        source = ['print 1\r\n', 'print 2\r\n', 'print3\r\n']
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(source))
+
+    def test_find_newline_cr1_and_lf2(self):
+        source = ['print 1\n', 'print 2\r', 'print3\n']
+        self.assertEqual(docformatter.LF, docformatter.find_newline(source))
+
+    def test_find_newline_cr1_and_crlf2(self):
+        source = ['print 1\r\n', 'print 2\r', 'print3\r\n']
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(source))
+
+    def test_find_newline_should_default_to_lf(self):
+        self.assertEqual(docformatter.LF, docformatter.find_newline([]))
+        self.assertEqual(docformatter.LF, docformatter.find_newline(['', '']))
+
+    def test_format_code_dominant_line_ending_style_preserved(self):
+        input = '''\
+def foo():\r
+    """\r
+    Hello\r
+    foo. This is a docstring.\r
+    """\r
+'''
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(True)))
+        self.assertEqual(
+            '''\
+def foo():\r
+    """Hello foo.\r
+\r
+    This is a docstring.\r
+    """\r
+''',
+            docformatter.format_code(input))
+
     def test_split_summary_and_description(self):
         self.assertEqual(
             ('This is the first.',

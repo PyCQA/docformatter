@@ -53,6 +53,10 @@ except NameError:
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
 
+CR = '\r'
+LF = '\n'
+CRLF = '\r\n'
+
 
 class FormatResult(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
     """Possible exit codes."""
@@ -70,7 +74,10 @@ def format_code(source, **kwargs):
     See "_format_code()" for parameters.
     """
     try:
-        return _format_code(source, **kwargs)
+        original_newline = find_newline(source.splitlines(True))
+        code = _format_code(source, **kwargs)
+
+        return normalize_line_endings(code.splitlines(True), original_newline)
     except (tokenize.TokenError, IndentationError):
         return source
 
@@ -380,6 +387,42 @@ def _find_shortest_indentation(lines):
 
     return indentation or ''
 
+def find_newline(source):
+    """Return type of newline used in source.
+
+    Input is a list of lines.
+    """
+    assert not isinstance(source, unicode)
+
+    counter = collections.defaultdict(int)
+    for line in source:
+        if line.endswith(CRLF):
+            counter[CRLF] += 1
+        elif line.endswith(CR):
+            counter[CR] += 1
+        elif line.endswith(LF):
+            counter[LF] += 1
+    return (sorted(counter, key=counter.get, reverse=True) or [LF])[0]
+
+
+def normalize_line(line, newline):
+    """Return line with fixed ending, if ending was present in line.
+
+    Otherwise, does nothing.
+    """
+    stripped = line.rstrip('\n\r')
+    if stripped != line:
+        return stripped + newline
+    return line
+
+
+def normalize_line_endings(lines, newline):
+    """Return fixed line endings.
+
+    All lines will be modified to use the most common line ending.
+    """
+    return "".join([normalize_line(line, newline) for line in lines])
+    
 
 def strip_docstring(docstring):
     """Return contents of docstring."""
