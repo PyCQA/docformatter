@@ -1168,6 +1168,10 @@ num_iterations is the number of updates - instead of a better definition of conv
         self.assertFalse(docformatter.is_probably_beginning_of_sentence(
             '(this just continues an existing sentence).'))
 
+    def test_is_probably_beginning_of_sentence_pydoc_ref(self):
+        self.assertFalse(docformatter.is_probably_beginning_of_sentence(
+            ':see:MyClass This is not the start of a sentence.'))
+
     def test_format_docstring_make_summary_multi_line(self):
         self.assertEqual(('''\
 """
