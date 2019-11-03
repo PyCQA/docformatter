@@ -258,7 +258,11 @@ def is_probably_beginning_of_sentence(line):
         if re.search(r'\s' + token + r'\s', line):
             return True
 
-    return re.match(r'[^\w"\'`\(\)]', line.strip())
+    stripped_line = line.strip()
+    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
+    is_pydoc_ref = re.match(r'^:\w+:', stripped_line)
+
+    return is_beginning_of_sentence and not is_pydoc_ref
 
 
 def split_summary_and_description(contents):
