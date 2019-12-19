@@ -711,6 +711,8 @@ def find_py_files(sources, recursive, exclude=None):
 
     def is_excluded(name, exclude):
         """Return True if file 'name' is excluded."""
+        if not exclude:
+            return False
         return True if re.search(re.escape(exclude), name, re.IGNORECASE) else False
 
     for name in sorted(sources):
