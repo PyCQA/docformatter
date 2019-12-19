@@ -38,6 +38,7 @@ import signal
 import sys
 import textwrap
 import tokenize
+from distutils.sysconfig import get_python_lib
 
 import untokenize
 
@@ -700,7 +701,7 @@ def find_py_files(sources, recursive, exclude=None):
     Parameters
         - sources: iterable with paths as strings.
         - recursive: drill down directories if True.
-        - exclude: string based on which directores and files are excluded.
+        - exclude: string based on which directories and files are excluded.
 
     Return: yields paths to found files.
     """

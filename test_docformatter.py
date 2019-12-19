@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import docformatter
 
@@ -1417,6 +1418,15 @@ Print my path and return error code
                              msg='Do not write to stdout')
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
+
+    def test_exclude_option(self):
+        sources = {"/root"}
+        roots = [("/root", ['folder_one', 'folder_two'], []),
+                 ("/root/folder_one", ['folder_three'], ["one.txt"]),
+                 ("/root/folder_one/folder_three", [], ["three.txt"]),
+                 ("/root/folder_two",), [], ["two.txt"]]
+        with patch.object(docformatter, "find_py_files", side_effect=roots):
+            docformatter.find_py_files(sources, True)
 
 
 def generate_random_docstring(max_indentation_length=32,
