@@ -713,13 +713,13 @@ def find_py_files(sources, recursive, exclude=None):
         """Return True if file 'name' is excluded."""
         if not exclude:
             return False
-        return True if re.search(re.escape(exclude), name, re.IGNORECASE) else False
+        return re.search(re.escape(exclude), name, re.IGNORECASE)
 
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
                 dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, get_python_lib())]
-                dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
+                dirs[:] = sorted([d for d in dirs if is_excluded(d, exclude)])
                 files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
                 for filename in files:
                     if filename.endswith('.py'):
