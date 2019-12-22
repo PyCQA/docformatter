@@ -1183,6 +1183,27 @@ num_iterations is the number of updates - instead of a better definition of conv
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
 
+    def test_exclude_option(self):
+        import docformatter
+        sources = {"/root"}
+        roots = [
+            ("/root", ['folder_one', 'folder_two'], []),
+            ("/root/folder_one", ['folder_three'], ["one.py"]),
+            ("/root/folder_one/folder_three", [], ["three.py"]),
+            ("/root/folder_two", [], ["two.py"]),
+        ]
+        with patch("os.walk", return_value=roots), patch("os.path.isdir", return_value=True):
+            test_exclude_one = list(docformatter.find_py_files(sources, True, "folder_one"))
+            self.assertEqual(test_exclude_one, ['/root/folder_two/two.py'])
+            test_exclude_two = list(docformatter.find_py_files(sources, True, "folder_two"))
+            self.assertEqual(test_exclude_two, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py'])
+            test_exclude_three = list(docformatter.find_py_files(sources, True, "folder_three"))
+            self.assertEqual(test_exclude_three, ['/root/folder_one/one.py', '/root/folder_two/two.py'])
+            test_exclude_py = list(docformatter.find_py_files(sources, True, ".py"))
+            self.assertFalse(test_exclude_py)
+
+
+
 
 class TestSystem(unittest.TestCase):
 
@@ -1418,15 +1439,6 @@ Print my path and return error code
                              msg='Do not write to stdout')
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
-
-    def test_exclude_option(self):
-        sources = {"/root"}
-        roots = [("/root", ['folder_one', 'folder_two'], []),
-                 ("/root/folder_one", ['folder_three'], ["one.txt"]),
-                 ("/root/folder_one/folder_three", [], ["three.txt"]),
-                 ("/root/folder_two",), [], ["two.txt"]]
-        with patch.object(docformatter, "find_py_files", side_effect=roots):
-            docformatter.find_py_files(sources, True)
 
 
 def generate_random_docstring(max_indentation_length=32,
