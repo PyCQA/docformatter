@@ -38,8 +38,7 @@ import signal
 import sys
 import textwrap
 import tokenize
-from distutils.sysconfig import get_python_lib
-
+import sysconfig
 import untokenize
 
 
@@ -58,6 +57,7 @@ CR = '\r'
 LF = '\n'
 CRLF = '\r\n'
 
+_PYTHON_LIBS = set(sysconfig.get_paths().values())
 
 class FormatResult(object):
     """Possible exit codes."""
@@ -718,10 +718,12 @@ def find_py_files(sources, recursive, exclude=None):
                 return True
         return False
 
+
+
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, [get_python_lib()])]
+                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)]
                 dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
                 files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
                 for filename in files:
