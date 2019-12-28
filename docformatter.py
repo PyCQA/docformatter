@@ -610,7 +610,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                               'files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
-    parser.add_argument('-e', '--exclude',
+    parser.add_argument('-e', '--exclude', action='store_true',
                         help='exclude directories and files by names')
     parser.add_argument('--wrap-summaries', default=79, type=int,
                         metavar='length',
