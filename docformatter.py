@@ -610,7 +610,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                               'files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
-    parser.add_argument('-e', '--exclude', action='store_true',
+    parser.add_argument('-e', '--exclude', nargs="*",
                         help='exclude directories and files by names')
     parser.add_argument('--wrap-summaries', default=79, type=int,
                         metavar='length',
@@ -721,7 +721,7 @@ def find_py_files(sources, recursive, exclude=None):
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, get_python_lib())]
+                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, [get_python_lib()])]
                 dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
                 files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
                 for filename in files:
