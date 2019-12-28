@@ -1202,6 +1202,8 @@ num_iterations is the number of updates - instead of a better definition of conv
             self.assertFalse(test_exclude_py)
             test_exclude_two_and_three = list(docformatter.find_py_files(sources, True, ["folder_two", "folder_three"]))
             self.assertEqual(test_exclude_two_and_three, ['/root/folder_one/one.py'])
+            test_exclude_files = list(docformatter.find_py_files(sources, True, ["one.py", "two.py"]))
+            self.assertEqual(test_exclude_files, ['/root/folder_one/folder_three/three.py'])
 
     def test_exclude_nothing(self):
         sources = {"/root"}
