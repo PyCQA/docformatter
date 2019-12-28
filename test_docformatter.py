@@ -17,7 +17,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+
+if sys.version_info >= (3, 3):
+    from unittest.mock import patch
+else:
+    from mock import patch
 
 import docformatter
 
