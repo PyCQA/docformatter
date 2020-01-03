@@ -1418,6 +1418,25 @@ Print my path and return error code
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
 
+    def test_exit_status_code(self):
+        with temporary_file('''\
+def foo():
+    """
+    Hello world
+    """
+''') as filename:
+            output_file = io.StringIO()
+            exit_code = docformatter._main(
+                argv=['my_fake_program', '--in-place', '--exit', filename],
+                standard_out=output_file,
+                standard_error=None,
+                standard_in=None)
+            with open(filename) as f:
+                self.assertEqual('''\
+def foo():
+    """Hello world."""
+''', f.read())
+            self.assertEqual(exit_code, docformatter.FormatResult.ok_file_modified)
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,

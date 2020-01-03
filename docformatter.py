@@ -65,7 +65,7 @@ class FormatResult(object):
     error = 1
     interrupted = 2
     check_failed = 3
-
+    ok_file_modified = 4
 
 def format_code(source, **kwargs):
     """Return source code with docstrings formatted.
@@ -570,6 +570,7 @@ def format_file(filename, args, standard_out):
             with open_with_encoding(filename, mode='w',
                                     encoding=encoding) as output_file:
                 output_file.write(formatted_source)
+            return FormatResult.ok_file_modified
         else:
             import difflib
             diff = difflib.unified_diff(
@@ -637,6 +638,8 @@ def _main(argv, standard_out, standard_error, standard_in):
                         default=None, type=int, nargs=2,
                         help='apply docformatter to docstrings between these '
                              'lines; line numbers are indexed at 1')
+    parser.add_argument('--exit', action='store_true',
+                        help='exit with status code 4 when file is modified')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
@@ -738,6 +741,10 @@ def _format_files(args, standard_out, standard_error):
         FormatResult.check_failed,
         FormatResult.ok,
     ]
+
+    if args.exit:
+        return_codes.insert(2, FormatResult.ok_file_modified)
+
     for code in return_codes:
         if outcomes[code]:
             return code
@@ -757,6 +764,7 @@ def main():
                      standard_out=sys.stdout,
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
+
     except KeyboardInterrupt:
         return FormatResult.interrupted  # pragma: no cover
 

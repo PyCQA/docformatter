@@ -164,6 +164,7 @@ Below is the help output::
                             in a mess
       --range line line     apply docformatter to docstrings between these lines;
                             line numbers are indexed at 1
+      --exit                exit with status code 4 when file is modified
       --version             show program's version number and exit
 
 
@@ -171,6 +172,7 @@ Possible exit codes:
 
 - **1** - if any error encountered
 - **3** - if any file needs to be formatted (in ``--check`` mode)
+- **4** - if any file has been modified (in ``--in-place`` mode with ``--exit`` flag)
 
 Wrapping descriptions
 =====================
