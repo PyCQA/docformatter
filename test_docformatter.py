@@ -1224,6 +1224,12 @@ num_iterations is the number of updates - instead of a better definition of conv
             test_exclude_nothing = list(docformatter.find_py_files(sources, True))
             self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
                                                     '/root/folder_two/two.py'])
+    def test_format_docstring_pre_summary_space(self):
+        self.assertEqual(('''""" This one-line docstring will have a leading space."""'''),
+                         docformatter.format_docstring('    ', '''\
+"""This one-line docstring will have a leading space."""\
+''', pre_summary_space=True))
+
 
 class TestSystem(unittest.TestCase):
 

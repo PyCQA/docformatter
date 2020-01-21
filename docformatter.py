@@ -91,7 +91,8 @@ def _format_code(source,
                  make_summary_multi_line=False,
                  post_description_blank=False,
                  force_wrap=False,
-                 line_range=None):
+                 line_range=None,
+                 pre_summary_space=False):
     """Return source code with docstrings formatted."""
     if not source:
         return source
@@ -139,7 +140,8 @@ def _format_code(source,
                 pre_summary_newline=pre_summary_newline,
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
-                force_wrap=force_wrap)
+                force_wrap=force_wrap,
+                pre_summary_space=pre_summary_space)
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
             only_comments_so_far = False
@@ -159,7 +161,8 @@ def format_docstring(indentation, docstring,
                      pre_summary_newline=False,
                      make_summary_multi_line=False,
                      post_description_blank=False,
-                     force_wrap=False):
+                     force_wrap=False,
+                     pre_summary_space=False):
     """Return formatted version of docstring.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -208,6 +211,7 @@ def format_docstring(indentation, docstring,
 {indentation}"""\
 '''.format(
             pre_summary=('\n' + indentation if pre_summary_newline
+                         else ' ' if pre_summary_space 
                          else ''),
             summary=wrap_summary(normalize_summary(summary),
                                  wrap_length=summary_wrap_length,
@@ -234,7 +238,8 @@ def format_docstring(indentation, docstring,
                 ending=ending
             )
         else:
-            return wrap_summary('"""' + normalize_summary(contents) + '"""',
+            beginning = '""" ' if pre_summary_space else '"""'
+            return wrap_summary(beginning + normalize_summary(contents) + '"""',
                                 wrap_length=summary_wrap_length,
                                 initial_indent=indentation,
                                 subsequent_indent=indentation).strip()
@@ -629,6 +634,10 @@ def _main(argv, standard_out, standard_error, standard_in):
                         action='store_true',
                         help='add a newline before the summary of a '
                              'multi-line docstring')
+    parser.add_argument('--pre-summary-space',
+                        action='store_true',
+                        help='add a space before the summary of a '
+                             'docstring')
     parser.add_argument('--make-summary-multi-line',
                         action='store_true',
                         help='add a newline before and after the summary of a '
