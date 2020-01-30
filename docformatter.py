@@ -621,7 +621,7 @@ class FileArgumentParser(argparse.ArgumentParser):
         for location in self.CONFIG_FILE_LOCATIONS:
             if os.path.exists(location):
                 import pdb; pdb.set_trace()
-                return super().parse_args([f'@{location}', *args])
+                return super().parse_args(['@'+location, *args])
         return super().parse_args(args)
 
     def convert_arg_line_to_args(self, arg_line):
