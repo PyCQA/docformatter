@@ -1418,6 +1418,42 @@ Print my path and return error code
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
 
+    def test_file_argument_parser(self):
+        with temporary_file('''
+[flake8]
+in-place = true
+check = true
+
+[docformatter]
+#help = true
+#in-place = true
+check = true
+#recursive = true
+#wrap-summaries = 79
+#wrap-descriptions = 72
+#blank = true
+#pre-summary-newline = true
+#make-summary-multi-line = true
+#force-wrap = true
+#range = 1,33
+#version = true
+
+[pylint]
+in-place = true
+check = true
+''') as config, temporary_file('asdf') as dummy:
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            ret_code = docformatter._main(
+                argv=['my_fake_program', '@'+config, dummy],
+                standard_out=stdout, standard_error=stderr, standard_in=None
+            )
+            self.assertIn(stdout.getvalue(), 'show this help message and exit',
+                             msg='Only write help to stdout')
+            self.assertEqual(stderr.getvalue(), '',
+                             msg='Do not write to stderr')
+            self.assertEqual(ret_code, 0,
+                             msg='Exit code should be 0')  # FormatResult.ok
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,

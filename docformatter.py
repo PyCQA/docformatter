@@ -29,6 +29,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import argparse
 import collections
 import io
 import locale
@@ -596,10 +597,72 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
+class FileArgumentParser(argparse.ArgumentParser):
+    """Allow forwarding args from ini files to cmdline."""
+    REGEX = re.compile(
+        r"^(?P<name>[\w\-]+)"  # 'word character', maybe dashed
+        r" ?= ?"  # equal sign, optionally spaced
+        # 'word character', maybe dashed, can contain commas (for arrays)
+        r"(?P<value>[\w,\-]+)$"
+    )
+    STOP = re.compile(r"^\[.+\]$")  # any 'section' from a configparser
+
+    CONFIG_FILE_LOCATIONS = [
+        'docformatterrc', 'docformatter.ini', 'docformatter.cfg', 'tox.ini'
+    ]
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('fromfile_prefix_chars', '@')
+        super().__init__(*args, **kwargs)
+        self.ini_parsing = False  # define configparser file parsing status
+
+    def parse_args(self, args,):
+        """Attempt to load a configuration file."""
+        for location in self.CONFIG_FILE_LOCATIONS:
+            if os.path.exists(location):
+                import pdb; pdb.set_trace()
+                return super().parse_args([f'@{location}', *args])
+        return super().parse_args(args)
+
+    def convert_arg_line_to_args(self, arg_line):
+        """Transform configparser line into `--arg_name arg_value`.
+
+        Start by detecting a [docformatter] section, and keep reading lines
+        until another section appears.
+        """
+
+        if not self.ini_parsing:
+            if arg_line.strip() == '[docformatter]':
+                self.ini_parsing = True
+            return ''
+
+        if self.STOP.match(arg_line):
+            self.ini_parsing = False
+            return ''
+
+        match = self.REGEX.match(arg_line)
+        if not match:
+            return ''
+
+        dct = match.groupdict()
+        name = '--'+dct['name'].strip()
+        value_ = dct['value']
+        if ',' in value_:
+            value = [
+                x.strip() for x in value_.replace(',', ' ').split()
+                if x.strip()
+            ]
+        elif value_.strip() == 'true':
+            value = ''
+        else:
+            value = value_.strip()
+
+        return [name, *value]
+
+
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
-    import argparse
-    parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
+    parser = FileArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
                          help='make changes to files instead of printing '
