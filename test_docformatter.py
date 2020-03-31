@@ -1141,13 +1141,14 @@ Args:
         self.assertEqual(('''\
 """num_iterations is the number of updates -
     instead of a better definition of
-    convergence."""\
+    convergence.
+    """\
 '''),
                          docformatter.format_docstring('    ', '''\
 """
 num_iterations is the number of updates - instead of a better definition of convergence.
 """\
-''', description_wrap_length=50, summary_wrap_length=50, force_wrap=True))
+''', description_wrap_length=49, summary_wrap_length=49, force_wrap=True))
 
     def test_remove_section_header(self):
         self.assertEqual(
@@ -1182,6 +1183,24 @@ num_iterations is the number of updates - instead of a better definition of conv
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
 
+    def test_format_docstring_for_multi_line_summary_alone(self):
+        self.assertEqual(('''\
+"""This one-line docstring will be multi-line because it's quite
+    long.
+    """\
+'''),
+                         docformatter.format_docstring('    ', '''\
+"""This one-line docstring will be multi-line because it's quite long."""\
+''', summary_wrap_length=69))
+
+    def test_format_docstring_for_one_line_summary_alone_but_too_long(self):
+        self.assertEqual(('''\
+"""This one-line docstring will not be multi-line but quotes will be below.
+    """\
+'''),
+                         docformatter.format_docstring('    ', '''\
+"""This one-line docstring will not be multi-line but quotes will be below."""\
+''', summary_wrap_length=80))
 
 class TestSystem(unittest.TestCase):
 
@@ -1282,13 +1301,13 @@ def foo():
             process = run_docformatter(['--wrap-summaries=40',
                                         filename])
             self.assertEqual('''\
-@@ -1,4 +1,3 @@
+@@ -1,4 +1,4 @@
  def foo():
--    """
++    """Hello world this is a summary
++    that will get wrapped.
+     """
 -    Hello world this is a summary that will get wrapped
 -    """
-+    """Hello world this is a summary
-+    that will get wrapped."""
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
 
     def test_end_to_end_with_no_wrapping(self):

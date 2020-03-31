@@ -233,10 +233,21 @@ def format_docstring(indentation, docstring,
                 ending=ending
             )
         else:
-            return wrap_summary('"""' + normalize_summary(contents) + '"""',
-                                wrap_length=summary_wrap_length,
-                                initial_indent=indentation,
-                                subsequent_indent=indentation).strip()
+            summary_wrapped = wrap_summary(
+                '"""' + normalize_summary(contents),
+                wrap_length=summary_wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=indentation)
+
+            summary_is_one_line = '\n' not in summary_wrapped
+            quotes_fit_on_line = len(indentation) + len(summary_wrapped) + 3 <= summary_wrap_length
+            if not summary_wrap_length or (summary_is_one_line and quotes_fit_on_line):
+                ending = '"""'
+            else:
+                ending = '\n' + indentation + '"""'
+            return '{summary}{ending}'.format(
+                summary=summary_wrapped,
+                ending=ending)
 
 
 def reindent(text, indentation):
