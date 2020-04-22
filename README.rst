@@ -209,6 +209,16 @@ You will need to install ``pre-commit`` and run ``pre-commit install``.
 
 You may alternatively use  ``args: [--check]`` if you prefer the commit to fail instead of letting *docformatter* format  docstrings automatically.
 
+PyCharm
+-------
+
+*docformatter* can be configured as a PyCharm file watcher to automatically format docstrings on saving python files.
+
+Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and configure *docformatter* as shown below:
+
+.. image:: /images/pycharm-file-watcher-configurations.png
+   :alt: PyCharm file watcher configurations
+
 
 Issues
 ======
