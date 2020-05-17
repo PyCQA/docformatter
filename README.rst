@@ -189,6 +189,39 @@ This prevents the risk of the wrapping turning things into a mess. To force
 even these instances to get wrapped use ``--force-wrap``.
 
 
+Integration
+===========
+
+Git Hook
+--------
+
+*docformatter* is configured for `pre-commit`_ and can be set up as a hook with the following ``.pre-commit-config.yaml`` configuration:
+
+.. _`pre-commit`: https://pre-commit.com/
+
+.. code-block:: yaml
+
+  - repo: https://github.com/myint/docformatter
+    rev: v1.3.1
+    hooks:
+      - id: docformatter
+        args: [--in-place]
+
+You will need to install ``pre-commit`` and run ``pre-commit install``.
+
+You may alternatively use  ``args: [--check]`` if you prefer the commit to fail instead of letting *docformatter* format  docstrings automatically.
+
+PyCharm
+-------
+
+*docformatter* can be configured as a PyCharm file watcher to automatically format docstrings on saving python files.
+
+Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and configure *docformatter* as shown below:
+
+.. image:: /images/pycharm-file-watcher-configurations.png
+   :alt: PyCharm file watcher configurations
+
+
 Issues
 ======
 
