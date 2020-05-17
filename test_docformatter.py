@@ -18,6 +18,11 @@ import sys
 import tempfile
 import unittest
 
+if sys.version_info >= (3, 3):
+    from unittest.mock import patch
+else:
+    from mock import patch
+
 import docformatter
 
 
@@ -1182,6 +1187,43 @@ num_iterations is the number of updates - instead of a better definition of conv
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
 
+    def test_exclude(self):
+        sources = {"/root"}
+        patch_data = [
+            ("/root", ['folder_one', 'folder_two'], []),
+            ("/root/folder_one", ['folder_three'], ["one.py"]),
+            ("/root/folder_one/folder_three", [], ["three.py"]),
+            ("/root/folder_two", [], ["two.py"]),
+        ]
+        with patch("os.walk", return_value=patch_data), patch("os.path.isdir", return_value=True):
+            test_exclude_one = list(docformatter.find_py_files(sources, True, ["folder_one"]))
+            self.assertEqual(test_exclude_one, ['/root/folder_two/two.py'])
+            test_exclude_two = list(docformatter.find_py_files(sources, True, ["folder_two"]))
+            self.assertEqual(test_exclude_two, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py'])
+            test_exclude_three = list(docformatter.find_py_files(sources, True, ["folder_three"]))
+            self.assertEqual(test_exclude_three, ['/root/folder_one/one.py', '/root/folder_two/two.py'])
+            test_exclude_py = list(docformatter.find_py_files(sources, True, ".py"))
+            self.assertFalse(test_exclude_py)
+            test_exclude_two_and_three = list(docformatter.find_py_files(sources, True, ["folder_two", "folder_three"]))
+            self.assertEqual(test_exclude_two_and_three, ['/root/folder_one/one.py'])
+            test_exclude_files = list(docformatter.find_py_files(sources, True, ["one.py", "two.py"]))
+            self.assertEqual(test_exclude_files, ['/root/folder_one/folder_three/three.py'])
+
+    def test_exclude_nothing(self):
+        sources = {"/root"}
+        patch_data = [
+            ("/root", ['folder_one', 'folder_two'], []),
+            ("/root/folder_one", ['folder_three'], ["one.py"]),
+            ("/root/folder_one/folder_three", [], ["three.py"]),
+            ("/root/folder_two", [], ["two.py"]),
+        ]
+        with patch("os.walk", return_value=patch_data), patch("os.path.isdir", return_value=True):
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True, []))
+            self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
+                                                    '/root/folder_two/two.py'])
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True))
+            self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
+                                                    '/root/folder_two/two.py'])
 
 class TestSystem(unittest.TestCase):
 

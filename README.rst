@@ -147,6 +147,8 @@ Below is the help output::
       -i, --in-place        make changes to files instead of printing diffs
       -c, --check           only check and report incorrectly formatted files
       -r, --recursive       drill down directories recursively
+      -e, --exclude         exclude directories and files by names
+
       --wrap-summaries length
                             wrap long summary lines at this length; set to 0 to
                             disable wrapping (default: 79)

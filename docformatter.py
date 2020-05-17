@@ -38,7 +38,7 @@ import signal
 import sys
 import textwrap
 import tokenize
-
+import sysconfig
 import untokenize
 
 
@@ -57,6 +57,7 @@ CR = '\r'
 LF = '\n'
 CRLF = '\r\n'
 
+_PYTHON_LIBS = set(sysconfig.get_paths().values())
 
 class FormatResult(object):
     """Possible exit codes."""
@@ -609,6 +610,8 @@ def _main(argv, standard_out, standard_error, standard_in):
                               'files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
+    parser.add_argument('-e', '--exclude', nargs="*",
+                        help='exclude directories and files by names')
     parser.add_argument('--wrap-summaries', default=79, type=int,
                         metavar='length',
                         help='wrap long summary lines at this length; '
@@ -692,12 +695,13 @@ def _get_encoding():
     return locale.getpreferredencoding() or sys.getdefaultencoding()
 
 
-def find_py_files(sources, recursive):
+def find_py_files(sources, recursive, exclude=None):
     """Find Python source files.
 
     Parameters
         - sources: iterable with paths as strings.
         - recursive: drill down directories if True.
+        - exclude: string based on which directories and files are excluded.
 
     Return: yields paths to found files.
     """
@@ -705,12 +709,25 @@ def find_py_files(sources, recursive):
         """Return True if file 'name' isn't .hidden."""
         return not name.startswith('.')
 
+    def is_excluded(name, exclude):
+        """Return True if file 'name' is excluded."""
+        if not exclude:
+            return False
+        for e in exclude:
+            if re.search(re.escape(str(e)), name, re.IGNORECASE):
+                return True
+        return False
+
+
+
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = sorted(filter(not_hidden, dirs))
-                for filename in sorted(filter(not_hidden, children)):
-                    if filename.endswith('.py'):
+                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)]
+                dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
+                files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
+                for filename in files:
+                    if filename.endswith('.py') and not is_excluded(root, exclude):
                         yield os.path.join(root, filename)
         else:
             yield name
@@ -722,7 +739,7 @@ def _format_files(args, standard_out, standard_error):
     Return: one of the FormatResult codes.
     """
     outcomes = collections.Counter()
-    for filename in find_py_files(set(args.files), args.recursive):
+    for filename in find_py_files(set(args.files), args.recursive, args.exclude):
         try:
             result = format_file(filename, args=args,
                                  standard_out=standard_out)
