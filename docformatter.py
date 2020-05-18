@@ -739,11 +739,12 @@ def _format_files(args, standard_out, standard_error):
     return_codes = [  # in order of preference
         FormatResult.error,
         FormatResult.check_failed,
-        FormatResult.ok,
     ]
 
     if args.exit:
-        return_codes.insert(2, FormatResult.ok_file_modified)
+        return_codes.append(FormatResult.ok_file_modified)
+
+    return_codes.append(FormatResult.ok)
 
     for code in return_codes:
         if outcomes[code]:
