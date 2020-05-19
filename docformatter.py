@@ -628,7 +628,7 @@ def _merge_args(config_args, cmd_line_args):
     merged_args["line_range"] = cmd_line_args["line_range"] or config_args["line_range"]
     if not merged_args["files"]:
         sys.stderr.write("the following arguments are required: files")
-        sys.exit(1)
+        sys.exit(FormatResult.error)
     return merged_args
 
 
