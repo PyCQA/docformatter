@@ -38,6 +38,7 @@ import signal
 import sys
 import textwrap
 import tokenize
+from argparse import Namespace
 
 import untokenize
 
@@ -596,9 +597,44 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
+def _read_config(config_name):
+    import configparser
+    args = dict()
+    config = configparser.ConfigParser()
+    home_dir = os.path.expanduser("~")
+    config.read("{}/{}".format(home_dir, config_name))
+    config.read(config_name)
+    config = config["docformatter"]
+    bool_args = {arg: config.getboolean(arg, fallback=False) for arg in {"in-place", "check", "recursive",
+                                                                         "blank", "pre-summary-newline",
+                                                                         "make-summary-multi-line", "force-wrap"}}
+    args["wrap-summaries"] = config.getint("wrap-summaries", fallback=79)
+    args["wrap-descriptions"] = config.getint("wrap-descriptions", fallback=72)
+    args.update(bool_args)
+    range_str = config.get("range")
+    args["line_range"] = None
+    if range_str:
+        range_values = range_str.split(",")
+        args["line_range"] = [int(range_values[0]), int(range_values[1])]
+    args["files"] = config.get("files").split(",")
+    return args
+
+
+def _merge_args(config_args, cmd_line_args):
+    merged_args = dict(config_args)
+    merged_args.update(cmd_line_args)
+    merged_args["files"] = cmd_line_args["files"] or config_args["files"]
+    merged_args["line_range"] = cmd_line_args["line_range"] or config_args["line_range"]
+    if not merged_args["files"]:
+        sys.stderr.write("the following arguments are required: files")
+        sys.exit(1)
+    return merged_args
+
+
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
+    config_args = _read_config(".config.ini")
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
@@ -639,10 +675,12 @@ def _main(argv, standard_out, standard_error, standard_in):
                              'lines; line numbers are indexed at 1')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
-    parser.add_argument('files', nargs='+',
+    parser.add_argument('files', nargs='?',
                         help="files to format or '-' for standard in")
 
     args = parser.parse_args(argv[1:])
+    merged_args = _merge_args(config_args, vars(args))
+    args = Namespace(**merged_args)
 
     if args.line_range:
         if args.line_range[0] <= 0:
