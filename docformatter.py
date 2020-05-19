@@ -634,7 +634,7 @@ def _merge_args(config_args, cmd_line_args):
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
-    config_args = _read_config(".config.ini")
+    config_args = _read_config(".docformatter.ini")
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',

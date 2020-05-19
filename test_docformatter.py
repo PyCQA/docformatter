@@ -17,6 +17,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from argparse import Namespace
+from unittest.mock import patch, ANY
 
 import docformatter
 
@@ -1417,6 +1419,22 @@ Print my path and return error code
                              msg='Do not write to stdout')
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
+
+    def test_global_config(self):
+        import uuid
+        config_file = ".docformatter_{}.ini".format(uuid.uuid4())
+        with open(".docformatter.example.ini", "r") as example_config_file:
+            config = example_config_file.readlines()
+        with open(config_file, "w") as file:
+            file.writelines(config)
+        with patch.object(docformatter, "_format_files") as mocked_format_file:
+             docformatter._main(["docformatter.py"],standard_out=sys.stdout,
+                     standard_error=sys.stderr,
+                     standard_in=sys.stdin)
+             args = mocked_format_file.call_args[0][0]
+             assert isinstance(args, Namespace)
+             assert args.files == ["file1", "file2", "file3"]
+        os.remove(config_file)
 
 
 def generate_random_docstring(max_indentation_length=32,
