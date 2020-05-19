@@ -615,8 +615,7 @@ def _read_config(config_name):
     range_str = config.get("range")
     args["line_range"] = None
     if range_str:
-        range_values = range_str.split(",")
-        args["line_range"] = [int(range_values[0]), int(range_values[1])]
+        args["line_range"] = [int(value) for value in range_str.split(",")]
     args["files"] = config.get("files").split(",")
     return args
 
