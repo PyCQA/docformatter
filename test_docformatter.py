@@ -1428,12 +1428,13 @@ Print my path and return error code
         with open(config_file, "w") as file:
             file.writelines(config)
         with patch.object(docformatter, "_format_files") as mocked_format_file:
-             docformatter._main(["docformatter.py"],standard_out=sys.stdout,
+             docformatter._main(["docformatter.py", "--range", "7", "14"], standard_out=sys.stdout,
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
              args = mocked_format_file.call_args[0][0]
              assert isinstance(args, Namespace)
              assert args.files == ["file1", "file2", "file3"]
+             assert args.line_range == [7, 14]
         os.remove(config_file)
 
 
