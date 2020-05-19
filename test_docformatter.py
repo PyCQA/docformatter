@@ -1474,9 +1474,9 @@ Print my path and return error code
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
              args = mocked_format_file.call_args[0][0]
-             assert isinstance(args, Namespace)
-             assert args.files == ["file1", "file2", "file3"]
-             assert args.line_range == [7, 14]
+             self.assertIsInstance(args, Namespace)
+             self.assertEqual(args.files, ["file1", "file2", "file3"])
+             self.assertEqual(args.line_range, [7, 14])
         os.remove(config_file)
 
 
