@@ -29,6 +29,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import argparse
 import collections
 import io
 import locale
@@ -36,12 +37,11 @@ import os
 import re
 import signal
 import sys
+import sysconfig
 import textwrap
 import tokenize
-from argparse import Namespace
-import sysconfig
-import untokenize
 
+import untokenize
 
 __version__ = '1.3.1'
 
@@ -59,6 +59,7 @@ LF = '\n'
 CRLF = '\r\n'
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
+
 
 class FormatResult(object):
     """Possible exit codes."""
@@ -604,9 +605,12 @@ def _read_config(config_name):
 
     Working directory config overrides 'home' directory config.
     """
-    import configparser
+    if sys.version_info >= (3, 5):
+        from configparser import ConfigParser
+    else:
+        import ConfigParser
     args = dict()
-    config = configparser.ConfigParser()
+    config = ConfigParser()
     home_dir = os.path.expanduser("~")
     config.read("{}/{}".format(home_dir, config_name))
     config.read(config_name)
@@ -697,7 +701,7 @@ def _main(argv, standard_out, standard_error, standard_in):
 
     args = parser.parse_args(argv[1:])
     merged_args = _merge_run_options(config_args, vars(args))
-    args = Namespace(**merged_args)
+    args = argparse.Namespace(**merged_args)
 
     if args.line_range:
         if args.line_range[0] <= 0:
