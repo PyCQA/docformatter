@@ -605,7 +605,7 @@ def _read_config(config_name):
 
     Working directory config overrides 'home' directory config.
     """
-    if sys.version_info >= (3, 5):
+    if sys.version_info >= (3, 0):
         from configparser import ConfigParser
     else:
         from ConfigParser import ConfigParser
