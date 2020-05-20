@@ -614,6 +614,8 @@ def _read_config(config_name):
     home_dir = os.path.expanduser("~")
     config.read("{}/{}".format(home_dir, config_name))
     config.read(config_name)
+    if "docformatter" not in config.sections():
+        return dict()
     config = config["docformatter"]
     bool_args = {arg: config.getboolean(arg, fallback=False) for arg in {"in-place", "check", "recursive",
                                                                          "blank", "pre-summary-newline",
