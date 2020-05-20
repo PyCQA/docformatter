@@ -7,6 +7,7 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
+import argparse
 import contextlib
 import io
 import os
@@ -17,8 +18,6 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from argparse import Namespace
-from unittest.mock import patch, ANY
 
 if sys.version_info >= (3, 3):
     from unittest.mock import patch
@@ -1474,7 +1473,7 @@ Print my path and return error code
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
              args = mocked_format_file.call_args[0][0]
-             self.assertIsInstance(args, Namespace)
+             self.assertIsInstance(args, argparse.Namespace)
              self.assertEqual(args.files, ["file1", "file2", "file3"])
              self.assertEqual(args.line_range, [7, 14])
         os.remove(config_file)
