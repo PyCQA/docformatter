@@ -599,6 +599,11 @@ def _format_code_with_args(source, args):
 
 
 def _read_config(config_name):
+    """Reads global config .docformatter.ini from working directory and user's
+    'home' directory.
+
+    Working directory config overrides 'home' directory config.
+    """
     import configparser
     args = dict()
     config = configparser.ConfigParser()
@@ -616,17 +621,27 @@ def _read_config(config_name):
     args["line_range"] = None
     if range_str:
         args["line_range"] = [int(value) for value in range_str.split(",")]
-    args["files"] = config.get("files").split(",")
+    args["files"] = config.get("files", fallback=None)
+    if args["files"]:
+        args["files"] = args["files"].split(",")
+    args["exclude"] = config.get("exclude", fallback=None)
+    if args["exclude"]:
+        args["exclude"] = args["exclude"].split(",")
     return args
 
 
-def _merge_args(config_args, cmd_line_args):
+def _merge_run_options(config_args, cmd_line_args):
+    """Merge the run options from command line and config files.
+
+    Highest priority have the cmd line options following by working
+    directory config file and then users 'home' directory config file.
+    """
     merged_args = dict(config_args)
     merged_args.update(cmd_line_args)
     merged_args["files"] = cmd_line_args["files"] or config_args["files"]
     merged_args["line_range"] = cmd_line_args["line_range"] or config_args["line_range"]
     if not merged_args["files"]:
-        sys.stderr.write("the following arguments are required: files")
+        sys.stderr.write("error: the following arguments are required: files")
         sys.exit(FormatResult.error)
     return merged_args
 
@@ -677,11 +692,11 @@ def _main(argv, standard_out, standard_error, standard_in):
                              'lines; line numbers are indexed at 1')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
-    parser.add_argument('files', nargs='?',
+    parser.add_argument('files', nargs='*',
                         help="files to format or '-' for standard in")
 
     args = parser.parse_args(argv[1:])
-    merged_args = _merge_args(config_args, vars(args))
+    merged_args = _merge_run_options(config_args, vars(args))
     args = Namespace(**merged_args)
 
     if args.line_range:
@@ -754,8 +769,6 @@ def find_py_files(sources, recursive, exclude=None):
             if re.search(re.escape(str(e)), name, re.IGNORECASE):
                 return True
         return False
-
-
 
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
