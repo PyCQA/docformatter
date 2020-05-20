@@ -608,7 +608,7 @@ def _read_config(config_name):
     if sys.version_info >= (3, 5):
         from configparser import ConfigParser
     else:
-        import ConfigParser
+        from ConfigParser import ConfigParser
     args = dict()
     config = ConfigParser()
     home_dir = os.path.expanduser("~")
