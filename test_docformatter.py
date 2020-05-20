@@ -1468,7 +1468,7 @@ Print my path and return error code
             config = example_config_file.readlines()
         with open(config_file, "w") as file:
             file.writelines(config)
-        with patch.object(docformatter, "_format_files") as mocked_format_file:
+        with patch("docformatter.os.getcwd", return_value="."), patch.object(docformatter, "_format_files") as mocked_format_file:
              docformatter._main(["docformatter.py", "--range", "7", "14"], standard_out=sys.stdout,
                      standard_error=sys.stderr,
                      standard_in=sys.stdin)
