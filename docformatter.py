@@ -147,6 +147,7 @@ def _format_code(source,
         previous_token_string = token_string
         previous_token_type = token_type
 
+        # prevent empty line between func def and docstring
         new_line_tokens = {tokenize.NL, tokenize.NEWLINE}
         if len(modified_tokens) > 2 and modified_tokens[-2][0] == tokenize.OP \
                 and modified_tokens[-1][0] in new_line_tokens \
