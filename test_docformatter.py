@@ -1187,6 +1187,17 @@ num_iterations is the number of updates - instead of a better definition of conv
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
 
+    def test__format_code_additional_empty_line_before_doc(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+        self.assertEqual('\n\n\ndef my_func():\n"""Summary of my function."""\npass',
+                         docformatter._format_code('\n\n\ndef my_func():\n\n"""Summary of my function."""\npass', args))
+
     def test_exclude(self):
         sources = {"/root"}
         patch_data = [

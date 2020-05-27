@@ -147,8 +147,14 @@ def _format_code(source,
         previous_token_string = token_string
         previous_token_type = token_type
 
-        modified_tokens.append(
-            (token_type, token_string, start, end, line))
+        new_line_tokens = {tokenize.NL, tokenize.NEWLINE}
+        if len(modified_tokens) > 2 and modified_tokens[-2][0] == tokenize.OP \
+                and modified_tokens[-1][0] in new_line_tokens \
+                and token_type in new_line_tokens:
+            pass
+        else:
+            modified_tokens.append(
+                (token_type, token_string, start, end, line))
 
     return untokenize.untokenize(modified_tokens)
 
@@ -717,8 +723,6 @@ def find_py_files(sources, recursive, exclude=None):
             if re.search(re.escape(str(e)), name, re.IGNORECASE):
                 return True
         return False
-
-
 
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
