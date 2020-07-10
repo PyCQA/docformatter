@@ -1018,6 +1018,12 @@ Try this and this and this and this and this and this and this at
         self.assertEqual(
             summary,
             docformatter.normalize_summary(summary))
+        
+    def test_normalize_summary_formatted_as_title(self):
+        summary = '# This is a title'
+        self.assertEqual(
+            summary,
+            docformatter.normalize_summary(summary))    
 
     def test_detect_encoding_with_bad_encoding(self):
         with temporary_file('# -*- coding: blah -*-\n') as filename:
