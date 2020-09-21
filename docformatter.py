@@ -605,13 +605,29 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
-def _read_config(config_file_path):
-    """Reads config from pyproject.toml."""
-
+def _read_toml(config_file_path):
     try:
-        config = toml.load(config_file_path)
+        return toml.load(config_file_path)
     except FileNotFoundError:
         return dict()
+
+
+def _nested_dict_update(original, update):
+    import collections.abc
+    for k, v in update.items():
+        if isinstance(v, collections.abc.Mapping):
+            original[k] = _nested_dict_update(original.get(k, {}), v)
+        else:
+            original[k] = v
+    return original
+
+
+def _read_config(config_name):
+    """Reads config from pyproject.toml."""
+    config_file_path = ["{}/{}".format(os.path.expanduser("~"), config_name), "{}/{}".format(os.getcwd(), config_name)]
+    config = dict()
+    for path in config_file_path:
+        config = _nested_dict_update(config, _read_toml(path))
     args = dict()
     if "tool" not in config or "docformatter" not in config["tool"]:
         return dict()
@@ -654,7 +670,7 @@ def _merge_run_options(config_args, cmd_line_args):
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
-    config_args = _read_config("{}/pyproject.toml".format(os.getcwd()))
+    config_args = _read_config("pyproject.toml")
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
