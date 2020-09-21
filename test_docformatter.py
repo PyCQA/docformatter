@@ -19,6 +19,8 @@ import sys
 import tempfile
 import unittest
 
+import toml
+
 if sys.version_info >= (3, 3):
     from unittest.mock import patch
 else:
@@ -1461,22 +1463,28 @@ Print my path and return error code
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
 
-    def test_global_config(self):
-        import uuid
-        config_file = ".docformatter_{}.ini".format(uuid.uuid4())
-        with open(".docformatter.example.ini", "r") as example_config_file:
-            config = example_config_file.readlines()
-        with open(config_file, "w") as file:
-            file.writelines(config)
-        with patch("docformatter.os.getcwd", return_value="."), patch.object(docformatter, "_format_files") as mocked_format_file:
-             docformatter._main(["docformatter.py", "--range", "7", "14"], standard_out=sys.stdout,
-                     standard_error=sys.stderr,
-                     standard_in=sys.stdin)
-             args = mocked_format_file.call_args[0][0]
-             self.assertIsInstance(args, argparse.Namespace)
-             self.assertEqual(args.files, ["file1", "file2", "file3"])
-             self.assertEqual(args.line_range, [7, 14])
-        os.remove(config_file)
+    def test_read_global_config(self):
+        config = toml.load("{}/{}".format(os.getcwd(), "pyproject.example.toml"))
+        with patch("docformatter.toml.load", return_value=config), \
+             patch.object(docformatter, "_format_files") as mocked_format_file:
+            docformatter._main(["docformatter.py", "--range", "7", "14"], standard_out=sys.stdout,
+                               standard_error=sys.stderr, standard_in=sys.stdin)
+            args = mocked_format_file.call_args[0][0]
+            self.assertIsInstance(args, argparse.Namespace)
+            self.assertEqual(args.files, ["file1", "file2", "file3"])
+            self.assertEqual(args.line_range, [7, 14])
+
+    def test_read_global_config_cmd_line_priority(self):
+        config = toml.load("{}/{}".format(os.getcwd(), "pyproject.example.toml"))
+        with patch("docformatter.toml.load", return_value=config), patch.object(docformatter,
+                                                                                "_format_files") as mocked_format_file:
+            docformatter._main(["docformatter.py", "--range", "7", "14", "."], standard_out=sys.stdout,
+                               standard_error=sys.stderr,
+                               standard_in=sys.stdin)
+            args = mocked_format_file.call_args[0][0]
+            self.assertIsInstance(args, argparse.Namespace)
+            self.assertEqual(args.files, ["."])
+            self.assertEqual(args.line_range, [7, 14])
 
 
 def generate_random_docstring(max_indentation_length=32,

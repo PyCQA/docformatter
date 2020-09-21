@@ -37,6 +37,6 @@ with open('README.rst') as readme:
           py_modules=['docformatter'],
           entry_points={
               'console_scripts': ['docformatter = docformatter:main']},
-          install_requires=['untokenize'],
+          install_requires=['untokenize', 'toml'],
           tests_require=['mock;python_version<"3.3"'],
           test_suite='test_docformatter')

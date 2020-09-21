@@ -41,6 +41,7 @@ import sysconfig
 import textwrap
 import tokenize
 
+import toml
 import untokenize
 
 __version__ = '1.3.1'
@@ -599,40 +600,26 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
-def _read_config(config_name):
-    """Reads global config .docformatter.ini from working directory and user's
-    'home' directory.
+def _read_config(config_file_path):
+    """Reads config from pyproject.toml."""
 
-    Working directory config overrides 'home' directory config.
-    """
-    if sys.version_info >= (3, 0):
-        from configparser import ConfigParser
-    else:
-        from ConfigParser import ConfigParser
-    args = dict()
-    config = ConfigParser()
-    home_dir = os.path.expanduser("~")
-    config.read("{}/{}".format(home_dir, config_name))
-    config.read(config_name)
-    if "docformatter" not in config.sections():
+    try:
+        config = toml.load(config_file_path)
+    except FileNotFoundError:
         return dict()
-    config = config["docformatter"]
-    bool_args = {arg: config.getboolean(arg, fallback=False) for arg in {"in-place", "check", "recursive",
-                                                                         "blank", "pre-summary-newline",
-                                                                         "make-summary-multi-line", "force-wrap"}}
-    args["wrap-summaries"] = config.getint("wrap-summaries", fallback=79)
-    args["wrap-descriptions"] = config.getint("wrap-descriptions", fallback=72)
+    args = dict()
+    if "tool" not in config or "docformatter" not in config["tool"]:
+        return dict()
+    config = config["tool"]["docformatter"]
+    bool_args = {arg: config.get(arg, False) for arg in {"in-place", "check", "recursive", "blank",
+                                                         "pre-summary-newline",
+                                                         "make-summary-multi-line", "force-wrap"}}
+    args["wrap-summaries"] = config.get("wrap-summaries", 79)
+    args["wrap-descriptions"] = config.get("wrap-descriptions", 72)
     args.update(bool_args)
-    range_str = config.get("range")
-    args["line_range"] = None
-    if range_str:
-        args["line_range"] = [int(value) for value in range_str.split(",")]
-    args["files"] = config.get("files", fallback=None)
-    if args["files"]:
-        args["files"] = args["files"].split(",")
-    args["exclude"] = config.get("exclude", fallback=None)
-    if args["exclude"]:
-        args["exclude"] = args["exclude"].split(",")
+    args["line_range"] = config.get("range", None)
+    args["files"] = config.get("files", None)
+    args["exclude"] = config.get("exclude", None)
     return args
 
 
@@ -644,8 +631,15 @@ def _merge_run_options(config_args, cmd_line_args):
     """
     merged_args = dict(config_args)
     merged_args.update(cmd_line_args)
-    merged_args["files"] = cmd_line_args["files"] or config_args["files"]
-    merged_args["line_range"] = cmd_line_args["line_range"] or config_args["line_range"]
+    if "files" in config_args and config_args["files"]:
+        merged_args["files"] = config_args["files"]
+    if "files" in cmd_line_args and cmd_line_args["files"]:
+        merged_args["files"] = cmd_line_args["files"]
+    if "line_range" in config_args and config_args["line_range"]:
+        merged_args["line_range"] = config_args["line_range"]
+    if "line_range" in cmd_line_args and cmd_line_args["line_range"]:
+        merged_args["line_range"] = cmd_line_args["line_range"]
+
     if not merged_args["files"]:
         sys.stderr.write("error: the following arguments are required: files")
         sys.exit(FormatResult.error)
@@ -655,7 +649,7 @@ def _merge_run_options(config_args, cmd_line_args):
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
-    config_args = _read_config("{}/.docformatter.ini".format(os.getcwd()))
+    config_args = _read_config("{}/pyproject.toml".format(os.getcwd()))
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
