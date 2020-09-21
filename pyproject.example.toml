@@ -1,0 +1,13 @@
+[tool.docformatter]
+    in-place = true
+    check = true
+    recursive = true
+    wrap-summaries = 79
+    wrap-descriptions = 79
+    blank = true
+    pre-summary-newline = true
+    make-summary-multi-line = true
+    force-wrap = true
+    range = [1, 5]
+    files = ["file1", "file2", "file3"]
+    exclude = ["dir1", "file1", "file2"]
