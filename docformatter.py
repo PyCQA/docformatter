@@ -29,7 +29,6 @@ from __future__ import (absolute_import,
                         print_function,
                         unicode_literals)
 
-import argparse
 import collections
 import io
 import locale
@@ -51,6 +50,12 @@ try:
     unicode
 except NameError:
     unicode = str
+
+try:
+    FileNotFoundError
+except NameError:
+    # redefine to support python 2
+    FileNotFoundError = IOError
 
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
