@@ -614,10 +614,10 @@ def _read_toml(config_file_path):
 
 def _nested_dict_update(original, update):
     if sys.version_info >= (3, 0):
-        import collections.abc.Mapping as mapping_type
+        from collections.abc import Mapping as mapping_type
         iterable = update.iteritems()
     else:
-        import collections.Mapping as mapping_type
+        from collections import Mapping as mapping_type
         iterable = update.items()
     for k, v in iterable:
         if isinstance(v, mapping_type):
