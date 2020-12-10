@@ -106,6 +106,7 @@ def is_in_range(line_range, start, end):
 def _format_code(source,
                  summary_wrap_length=79,
                  description_wrap_length=72,
+                 tab_width=1,
                  pre_summary_newline=False,
                  make_summary_multi_line=False,
                  post_description_blank=False,
@@ -153,6 +154,7 @@ def _format_code(source,
                 token_string,
                 summary_wrap_length=summary_wrap_length,
                 description_wrap_length=description_wrap_length,
+                tab_width=tab_width,
                 pre_summary_newline=pre_summary_newline,
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
@@ -173,6 +175,7 @@ def _format_code(source,
 def format_docstring(indentation, docstring,
                      summary_wrap_length=0,
                      description_wrap_length=0,
+                     tab_width=1,
                      pre_summary_newline=False,
                      make_summary_multi_line=False,
                      post_description_blank=False,
@@ -209,6 +212,11 @@ def format_docstring(indentation, docstring,
     if not force_wrap and is_some_sort_of_list(summary):
         # Something is probably not right with the splitting.
         return docstring
+
+    # Compensate for textwrap counting each tab in indentation as 1 character.
+    tab_compensation = indentation.count('\t') * (tab_width - 1)
+    summary_wrap_length -= tab_compensation
+    description_wrap_length -= tab_compensation
 
     if description:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
@@ -613,6 +621,7 @@ def _format_code_with_args(source, args):
         description_wrap_length=args.wrap_descriptions,
         pre_summary_newline=args.pre_summary_newline,
         make_summary_multi_line=args.make_summary_multi_line,
+        tab_width=args.tab_width,
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
         line_range=args.line_range)
@@ -642,6 +651,10 @@ def _main(argv, standard_out, standard_error, standard_in):
                         metavar='length',
                         help='wrap descriptions at this length; '
                              'set to 0 to disable wrapping '
+                             '(default: %(default)s)')
+    parser.add_argument('--tab-width', default=1, type=int, metavar='width',
+                        help='tabs in indentation are counted as this many '
+                             'characters when wrapping lines '
                              '(default: %(default)s)')
     parser.add_argument('--blank', dest='post_description_blank',
                         action='store_true',

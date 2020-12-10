@@ -377,6 +377,23 @@ Hello.
                     if len(line.split()) > 1:
                         self.assertLessEqual(len(line), max_length)
 
+    def test_format_docstring_with_wrap_and_tab_indentation(self):
+        self.assertEqual('''
+\t\t"""Some summary x x x
+\t\tx x x x.
+
+\t\tSome description x x x
+\t\tx x.
+\t\t"""
+'''.strip(),
+            docformatter.format_docstring('\t\t', '''
+\t\t"""
+\t\tSome summary x x x x x x x.
+
+\t\tSome description x x x x x.
+\t\t"""
+'''.strip(), summary_wrap_length=30, description_wrap_length=30, tab_width=4))
+
     def test_format_docstring_with_weird_indentation_and_punctuation(self):
         self.assertEqual('''
     """Creates and returns four was awakens to was created tracked ammonites

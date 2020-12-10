@@ -155,6 +155,8 @@ Below is the help output::
       --wrap-descriptions length
                             wrap descriptions at this length; set to 0 to disable
                             wrapping (default: 72)
+      --tab-width width     tabs in indentation are counted as this many
+                            characters when wrapping lines (default: 1)
       --blank               add blank line after description
       --pre-summary-newline
                             add a newline before the summary of a multi-line
