@@ -84,6 +84,24 @@ def format_code(source, **kwargs):
         return source
 
 
+def has_correct_length(length_range, start, end):
+    """Return True if docstring's length is in range."""
+    if length_range is None:
+        return True
+    min_length, max_length = length_range
+
+    docstring_length = end + 1 - start
+    return min_length <= docstring_length <= max_length
+
+
+def is_in_range(line_range, start, end):
+    """Return True if start/end is in line_range."""
+    if line_range is None:
+        return True
+    return any(line_range[0] <= line_no <= line_range[1]
+                for line_no in range(start, end + 1))
+
+
 def _format_code(source,
                  summary_wrap_length=79,
                  description_wrap_length=72,
@@ -91,7 +109,8 @@ def _format_code(source,
                  make_summary_multi_line=False,
                  post_description_blank=False,
                  force_wrap=False,
-                 line_range=None):
+                 line_range=None,
+                 length_range=None):
     """Return source code with docstrings formatted."""
     if not source:
         return source
@@ -99,12 +118,8 @@ def _format_code(source,
     if line_range is not None:
         assert line_range[0] > 0 and line_range[1] > 0
 
-    def in_range(start, end):
-        """Return True if start/end is in line_range."""
-        if line_range is None:
-            return True
-        return any(line_range[0] <= line_no <= line_range[1]
-                   for line_no in range(start, end + 1))
+    if length_range is not None:
+        assert length_range[0] > 0 and length_range[1] > 0
 
     modified_tokens = []
 
@@ -124,7 +139,8 @@ def _format_code(source,
             token_string.startswith(('"', "'")) and
             (previous_token_type == tokenize.INDENT or
                 only_comments_so_far) and
-            in_range(start[0], end[0])
+            is_in_range(line_range, start[0], end[0]) and
+            has_correct_length(length_range, start[0], end[0])
         ):
             if only_comments_so_far:
                 indentation = ''
@@ -640,6 +656,9 @@ def _main(argv, standard_out, standard_error, standard_in):
                         default=None, type=int, nargs=2,
                         help='apply docformatter to docstrings between these '
                              'lines; line numbers are indexed at 1')
+    parser.add_argument('--docstring-length', metavar='length', dest='length_range',
+                        default=None, type=int, nargs=2,
+                        help='apply docformatter to docstrings of given length')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
@@ -652,6 +671,13 @@ def _main(argv, standard_out, standard_error, standard_in):
             parser.error('--range must be positive numbers')
         if args.line_range[0] > args.line_range[1]:
             parser.error('First value of --range should be less than or equal '
+                         'to the second')
+
+    if args.length_range:
+        if args.length_range[0] <= 0:
+            parser.error('--docstring-length must be positive numbers')
+        if args.length_range[0] > args.length_range[1]:
+            parser.error('First value of --docstring-length should be less than or equal '
                          'to the second')
 
     if '-' in args.files:
