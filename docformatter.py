@@ -59,6 +59,7 @@ CRLF = '\r\n'
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
+
 class FormatResult(object):
     """Possible exit codes."""
 
@@ -99,7 +100,7 @@ def is_in_range(line_range, start, end):
     if line_range is None:
         return True
     return any(line_range[0] <= line_no <= line_range[1]
-                for line_no in range(start, end + 1))
+               for line_no in range(start, end + 1))
 
 
 def _format_code(source,
@@ -465,7 +466,11 @@ def normalize_summary(summary):
     summary = re.sub(r'\s*\n\s*', ' ', summary.rstrip())
 
     # Add period at end of sentence
-    if summary and (summary[-1].isalnum() or summary[-1] in ['"', "'"]) and (not summary.startswith("#")):
+    if (
+        summary and
+        (summary[-1].isalnum() or summary[-1] in ['"', "'"]) and
+        (not summary.startswith('#'))
+    ):
         summary += '.'
 
     return summary
@@ -626,7 +631,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                               'files')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='drill down directories recursively')
-    parser.add_argument('-e', '--exclude', nargs="*",
+    parser.add_argument('-e', '--exclude', nargs='*',
                         help='exclude directories and files by names')
     parser.add_argument('--wrap-summaries', default=79, type=int,
                         metavar='length',
@@ -656,9 +661,11 @@ def _main(argv, standard_out, standard_error, standard_in):
                         default=None, type=int, nargs=2,
                         help='apply docformatter to docstrings between these '
                              'lines; line numbers are indexed at 1')
-    parser.add_argument('--docstring-length', metavar='length', dest='length_range',
+    parser.add_argument('--docstring-length', metavar='length',
+                        dest='length_range',
                         default=None, type=int, nargs=2,
-                        help='apply docformatter to docstrings of given length')
+                        help='apply docformatter to docstrings of given '
+                             'length')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
@@ -677,8 +684,8 @@ def _main(argv, standard_out, standard_error, standard_in):
         if args.length_range[0] <= 0:
             parser.error('--docstring-length must be positive numbers')
         if args.length_range[0] > args.length_range[1]:
-            parser.error('First value of --docstring-length should be less than or equal '
-                         'to the second')
+            parser.error('First value of --docstring-length should be less '
+                         'than or equal to the second')
 
     if '-' in args.files:
         _format_standard_in(args,
@@ -744,16 +751,20 @@ def find_py_files(sources, recursive, exclude=None):
                 return True
         return False
 
-
-
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)]
-                dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
-                files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
+                dirs[:] = [d for d in dirs if not_hidden(
+                    d) and not is_excluded(d, _PYTHON_LIBS)]
+                dirs[:] = sorted(
+                    [d for d in dirs if not is_excluded(d, exclude)])
+                files = sorted([f for f in children if not_hidden(
+                    f) and not is_excluded(f, exclude)])
                 for filename in files:
-                    if filename.endswith('.py') and not is_excluded(root, exclude):
+                    if (
+                        filename.endswith('.py') and
+                        not is_excluded(root, exclude)
+                    ):
                         yield os.path.join(root, filename)
         else:
             yield name
@@ -765,7 +776,9 @@ def _format_files(args, standard_out, standard_error):
     Return: one of the FormatResult codes.
     """
     outcomes = collections.Counter()
-    for filename in find_py_files(set(args.files), args.recursive, args.exclude):
+    for filename in find_py_files(set(args.files),
+                                  args.recursive,
+                                  args.exclude):
         try:
             result = format_file(filename, args=args,
                                  standard_out=standard_out)

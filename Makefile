@@ -9,6 +9,7 @@ check:
 		--reports=no \
 		--disable=bad-continuation \
 		--disable=fixme \
+		--disable=import-outside-toplevel \
 		--disable=inconsistent-return-statements \
 		--disable=invalid-name \
 		--disable=no-else-return \
