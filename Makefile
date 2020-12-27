@@ -26,7 +26,6 @@ check:
 	rstcheck --report=1 README.rst
 	docformatter docformatter.py setup.py
 	python -m doctest docformatter.py
-	scspell docformatter.py setup.py test_docformatter.py README.rst
 
 coverage:
 	@coverage erase
