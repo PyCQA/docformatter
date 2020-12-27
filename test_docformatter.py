@@ -47,6 +47,22 @@ else:
 
 class TestUnits(unittest.TestCase):
 
+    def test_is_in_range(self):
+        self.assertTrue(docformatter.is_in_range(None, 1, 9))
+        self.assertTrue(docformatter.is_in_range([1, 4], 3, 5))
+        self.assertTrue(docformatter.is_in_range([1, 4], 4, 10))
+        self.assertTrue(docformatter.is_in_range([2, 10], 1, 2))
+        self.assertFalse(docformatter.is_in_range([1, 1], 2, 9))
+        self.assertFalse(docformatter.is_in_range([10, 20], 1, 9))
+
+    def test_has_correct_length(self):
+        self.assertTrue(docformatter.has_correct_length(None, 1, 9))
+        self.assertTrue(docformatter.has_correct_length([1, 3], 3, 5))
+        self.assertTrue(docformatter.has_correct_length([1, 1], 1, 1))
+        self.assertTrue(docformatter.has_correct_length([1, 10], 5, 10))
+        self.assertFalse(docformatter.has_correct_length([1, 1], 2, 9))
+        self.assertFalse(docformatter.has_correct_length([10, 20], 2, 9))
+
     def test_strip_docstring(self):
         self.assertEqual(
             'Hello.',
@@ -458,6 +474,30 @@ def f(x):
 def g(x):
     """  Badly indented docstring"""
     pass''', line_range=[1, 2]))
+
+    def test_format_code_docstring_length(self):
+        self.assertEqual('''\
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """Badly indented docstring."""
+    pass''',
+                         docformatter.format_code('''\
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''', length_range=[1, 1]))
 
     def test_format_code_with_module_docstring(self):
         self.assertEqual(
