@@ -628,8 +628,9 @@ def _nested_dict_update(original, update):
 
 
 def _read_config(config_name):
-    """Reads config from pyproject.toml."""
-    config_file_path = ["{}/{}".format(os.path.expanduser("~"), config_name), "{}/{}".format(os.getcwd(), config_name)]
+    """Read config from pyproject.toml."""
+    config_file_path = ["{}/{}".format(os.path.expanduser("~"), config_name),
+                        "{}/{}".format(os.getcwd(), config_name)]
     config = dict()
     for path in config_file_path:
         config = _nested_dict_update(config, _read_toml(path))
@@ -637,9 +638,10 @@ def _read_config(config_name):
     if "tool" not in config or "docformatter" not in config["tool"]:
         return dict()
     config = config["tool"]["docformatter"]
-    bool_args = {arg: config.get(arg, False) for arg in {"in-place", "check", "recursive", "blank",
-                                                         "pre-summary-newline",
-                                                         "make-summary-multi-line", "force-wrap"}}
+    arguments = {"in-place", "check", "recursive", "blank",
+                 "pre-summary-newline",
+                 "make-summary-multi-line", "force-wrap"}
+    bool_args = {arg: config.get(arg, False) for arg in arguments}
     args["wrap-summaries"] = config.get("wrap-summaries", 79)
     args["wrap-descriptions"] = config.get("wrap-descriptions", 72)
     args.update(bool_args)
@@ -666,9 +668,6 @@ def _merge_run_options(config_args, cmd_line_args):
     if "line_range" in cmd_line_args and cmd_line_args["line_range"]:
         merged_args["line_range"] = cmd_line_args["line_range"]
 
-    if not merged_args["files"]:
-        sys.stderr.write("error: the following arguments are required: files")
-        sys.exit(FormatResult.error)
     return merged_args
 
 
@@ -723,6 +722,11 @@ def _main(argv, standard_out, standard_error, standard_in):
 
     args = parser.parse_args(argv[1:])
     merged_args = _merge_run_options(config_args, vars(args))
+
+    if not merged_args["files"]:
+        parser.print_help(sys.stderr)
+        sys.exit()
+
     args = argparse.Namespace(**merged_args)
 
     if args.line_range:
@@ -799,11 +803,16 @@ def find_py_files(sources, recursive, exclude=None):
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [d for d in dirs if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)]
-                dirs[:] = sorted([d for d in dirs if not is_excluded(d, exclude)])
-                files = sorted([f for f in children if not_hidden(f) and not is_excluded(f, exclude)])
+                dirs[:] = [d for d in dirs if not_hidden(d)
+                           and not is_excluded(d, _PYTHON_LIBS)]
+                dirs[:] = sorted([d for d in dirs
+                                  if not is_excluded(d, exclude)])
+                files = sorted([f for f in children
+                                if not_hidden(f) and
+                                not is_excluded(f, exclude)])
                 for filename in files:
-                    if filename.endswith('.py') and not is_excluded(root, exclude):
+                    if (filename.endswith('.py') and
+                            not is_excluded(root, exclude)):
                         yield os.path.join(root, filename)
         else:
             yield name
@@ -815,7 +824,8 @@ def _format_files(args, standard_out, standard_error):
     Return: one of the FormatResult codes.
     """
     outcomes = collections.Counter()
-    for filename in find_py_files(set(args.files), args.recursive, args.exclude):
+    py_files = find_py_files(set(args.files), args.recursive, args.exclude)
+    for filename in py_files:
         try:
             result = format_file(filename, args=args,
                                  standard_out=standard_out)
