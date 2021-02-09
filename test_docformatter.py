@@ -394,6 +394,15 @@ Hello.
 \t\t"""
 '''.strip(), summary_wrap_length=30, description_wrap_length=30, tab_width=4))
 
+    def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(self):
+        self.assertEqual('''
+\t\t"""Some summary x x x
+\t\tx."""
+'''.strip(),
+            docformatter.format_docstring('\t\t', '''
+\t\t"""Some summary x x x x."""
+'''.strip(), summary_wrap_length=30, tab_width=4))
+
     def test_format_docstring_with_weird_indentation_and_punctuation(self):
         self.assertEqual('''
     """Creates and returns four was awakens to was created tracked ammonites
