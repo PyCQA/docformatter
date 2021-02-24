@@ -166,6 +166,8 @@ Below is the help output::
                             in a mess
       --range line line     apply docformatter to docstrings between these lines;
                             line numbers are indexed at 1
+      --docstring-length length length
+                            apply docformatter to docstrings of given length range
       --version             show program's version number and exit
 
 
