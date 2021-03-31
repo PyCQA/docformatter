@@ -207,8 +207,7 @@ Hello.
     """''',
             docformatter.format_docstring(
                 '    ',
-                docstring='''"""Foo bar
-        bing bang.
+                docstring='''"""Foo bar bing bang.
 
         >>> tests = DocTestFinder().find(_TestClass)
         >>> runner = DocTestRunner(verbose=False)
@@ -1048,22 +1047,32 @@ Try this and this and this and this and this and this and this at
                 (text, ''),
                 docformatter.split_summary_and_description(text))
 
+    def test_unwrap_summary(self):
+        self.assertEqual(
+            'This is a sentence.',
+            docformatter.unwrap_summary('This \n\t is\na sentence.'))
+
     def test_normalize_summary(self):
         self.assertEqual(
             'This is a sentence.',
-            docformatter.normalize_summary('This \n\t is\na sentence'))
+            docformatter.normalize_summary('This is a sentence '))
+
+    def test_normalize_summary_multiline(self):
+        self.assertEqual(
+            'This \n\t is\na sentence.',
+            docformatter.normalize_summary('This \n\t is\na sentence '))
 
     def test_normalize_summary_with_different_punctuation(self):
         summary = 'This is a question?'
         self.assertEqual(
             summary,
             docformatter.normalize_summary(summary))
-        
+
     def test_normalize_summary_formatted_as_title(self):
         summary = '# This is a title'
         self.assertEqual(
             summary,
-            docformatter.normalize_summary(summary))    
+            docformatter.normalize_summary(summary))
 
     def test_detect_encoding_with_bad_encoding(self):
         with temporary_file('# -*- coding: blah -*-\n') as filename:
@@ -1347,7 +1356,7 @@ def foo():
         with temporary_file('''\
 def foo():
     """
-    Hello world
+    Hello world 
     """
 ''') as filename:
             process = run_docformatter([filename])
@@ -1355,10 +1364,10 @@ def foo():
 @@ -1,4 +1,2 @@
  def foo():
 -    """
--    Hello world
+-    Hello world 
 -    """
 +    """Hello world."""
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
 
     def test_end_to_end_with_wrapping(self):
         with temporary_file('''\
@@ -1377,7 +1386,7 @@ def foo():
 -    """
 +    """Hello world this is a summary
 +    that will get wrapped."""
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
 
     def test_end_to_end_with_no_wrapping(self):
         with temporary_file('''\
@@ -1392,7 +1401,41 @@ def foo():
                                         filename])
             self.assertEqual(
                 '',
-                '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+                '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+
+    def test_end_to_end_with_no_wrapping_2(self):
+        with temporary_file('''\
+def foo():
+    """Hello world is a long sentence that will not
+    be wrapped because I turned wrapping off.
+
+    Hello world is a long sentence that will not
+    be wrapped because I turned wrapping off.
+    """
+''') as filename:
+            process = run_docformatter(['--wrap-summaries=0',
+                                        '--wrap-description=0',
+                                        filename])
+            self.assertEqual(
+                '',
+                '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+
+    def test_end_to_end_no_wrapping_period(self):
+        with temporary_file('''\
+def foo():
+    """Wrapping is off, but it will still add
+    the trailing period  """
+''') as filename:
+            process = run_docformatter(['--wrap-summaries=0',
+                                        filename])
+            self.assertEqual('''\
+@@ -1,3 +1,3 @@
+ def foo():
+     """Wrapping is off, but it will still add
+-    the trailing period  """
++    the trailing period."""
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+
 
     def test_end_to_end_all_options(self):
         with temporary_file('''\
@@ -1423,7 +1466,7 @@ def foo():
  
 -
      """
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
 
     def test_invalid_range(self):
         process = run_docformatter(['--range', '0', '1', os.devnull])
@@ -1445,7 +1488,7 @@ def foo():
         result = process.communicate('''\
 """
 Hello world"""
-'''.encode())[0].decode()
+'''.encode())[0].decode().replace("\r", "")
 
         self.assertEqual(0, process.returncode)
 

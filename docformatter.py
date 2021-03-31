@@ -460,10 +460,15 @@ def strip_docstring(docstring):
     raise ValueError('We only handle strings that start with quotes')
 
 
+def unwrap_summary(summary):
+    """Return summary with newlines removed in preparation for wrapping."""
+    return re.sub(r'\s*\n\s*', ' ', summary)
+
+
 def normalize_summary(summary):
     """Return normalized docstring summary."""
-    # Remove newlines
-    summary = re.sub(r'\s*\n\s*', ' ', summary.rstrip())
+    # remove trailing whitespace
+    summary = summary.rstrip()
 
     # Add period at end of sentence
     if (
@@ -480,7 +485,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
     """Return line-wrapped summary text."""
     if wrap_length > 0:
         return '\n'.join(
-            textwrap.wrap(summary,
+            textwrap.wrap(unwrap_summary(summary),
                           width=wrap_length,
                           initial_indent=initial_indent,
                           subsequent_indent=subsequent_indent)).strip()
