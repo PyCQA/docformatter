@@ -1532,6 +1532,16 @@ Print my path and return error code
             self.assertEqual(args.files, ["."])
             self.assertEqual(args.line_range, [7, 14])
 
+    def test_read_global_config_via_config_argument(self):
+        docformatter.PYPROJECT_TOML = "pyproject.example.toml"
+        config = toml.load("{}/{}".format(os.getcwd(), "pyproject.example.toml"))
+        with patch("docformatter.toml.load", return_value=config) as mocked_load, patch.object(docformatter,
+                                                                                "_format_files"):
+            docformatter._main(["docformatter.py", "--config", "./pyproject.example.toml"], standard_out=sys.stdout,
+                               standard_error=sys.stderr,
+                               standard_in=sys.stdin)
+            mocked_load.assert_called_with("./pyproject.example.toml")
+
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,

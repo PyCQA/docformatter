@@ -64,6 +64,8 @@ CR = '\r'
 LF = '\n'
 CRLF = '\r\n'
 
+PYPROJECT_TOML = "pyproject.toml"
+
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
 
@@ -647,12 +649,17 @@ def _nested_dict_update(original, update):
     return original
 
 
-def _read_config(config_name):
+def _read_config(config_name, config_file_path=None):
     """Read config from pyproject.toml."""
-    config_file_path = ["{}/{}".format(os.path.expanduser("~"), config_name),
-                        "{}/{}".format(os.getcwd(), config_name)]
+    config_file_paths = []
+    if not config_file_path:
+        config_file_paths = [
+            "{}/{}".format(os.path.expanduser("~"), config_name),
+            "{}/{}".format(os.getcwd(), config_name)]
+    else:
+        config_file_paths.append(config_file_path)
     config = dict()
-    for path in config_file_path:
+    for path in config_file_paths:
         config = _nested_dict_update(config, _read_toml(path))
     args = dict()
     if "tool" not in config or "docformatter" not in config["tool"]:
@@ -691,10 +698,14 @@ def _merge_run_options(config_args, cmd_line_args):
     return merged_args
 
 
+def _print_help_and_exit(parser):
+    parser.print_help(sys.stderr)
+    sys.exit()
+
+
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
-    config_args = _read_config("pyproject.toml")
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
@@ -740,17 +751,26 @@ def _main(argv, standard_out, standard_error, standard_in):
                         default=None, type=int, nargs=2,
                         help='apply docformatter to docstrings of given '
                              'length')
+    parser.add_argument('--config', action='store', type=str,
+                        help='path to the pyproject.toml config file')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='*',
                         help="files to format or '-' for standard in")
 
     args = parser.parse_args(argv[1:])
+
+    config_file_path = args.config
+    if config_file_path and os.path.exists(config_file_path) \
+            and not config_file_path.endswith(PYPROJECT_TOML):
+        _print_help_and_exit(parser)
+
+    config_args = _read_config(PYPROJECT_TOML,
+                               config_file_path=config_file_path)
     merged_args = _merge_run_options(config_args, vars(args))
 
     if not merged_args["files"]:
-        parser.print_help(sys.stderr)
-        sys.exit()
+        _print_help_and_exit(parser)
 
     args = argparse.Namespace(**merged_args)
 
