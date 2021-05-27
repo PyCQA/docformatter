@@ -678,13 +678,15 @@ def _read_config(config_name, config_file_path=None):
     return args
 
 
-def _merge_run_options(config_args, cmd_line_args):
+def _merge_run_options(default_args, config_args, cmd_line_args):
     """Merge the run options from command line and config files.
 
     Highest priority have the cmd line options following by working
     directory config file and then users 'home' directory config file.
     """
-    merged_args = dict(config_args)
+    merged_args = {}
+    merged_args.update(default_args)
+    merged_args.update(config_args)
     merged_args.update(cmd_line_args)
     if "files" in config_args and config_args["files"]:
         merged_args["files"] = config_args["files"]
@@ -696,6 +698,27 @@ def _merge_run_options(config_args, cmd_line_args):
         merged_args["line_range"] = cmd_line_args["line_range"]
 
     return merged_args
+
+
+def _get_passed_arguments(argv, cmd_line_args):
+    short_options = {"r": "recursive", "c": "check",
+                     "e": "exclude", "i": "in-place"}
+    passed_args = {"files": cmd_line_args["files"]}
+
+    for arg in argv[1:]:
+        if arg.startswith("-"):
+            key = arg.lstrip("-").strip().replace("-", "_")
+            if "=" in key:
+                key = key[:key.find("=")]
+            if key in short_options:
+                key = short_options[key]
+            if key == "range":
+                passed_args["line_range"] = cmd_line_args["line_range"]
+            try:
+                passed_args[key] = cmd_line_args[key]
+            except KeyError:
+                pass
+    return passed_args
 
 
 def _print_help_and_exit(parser):
@@ -760,6 +783,8 @@ def _main(argv, standard_out, standard_error, standard_in):
 
     args = parser.parse_args(argv[1:])
 
+    passed_args = _get_passed_arguments(argv, vars(args))
+
     config_file_path = args.config
     if config_file_path and os.path.exists(config_file_path) \
             and not config_file_path.endswith(PYPROJECT_TOML):
@@ -767,7 +792,8 @@ def _main(argv, standard_out, standard_error, standard_in):
 
     config_args = _read_config(PYPROJECT_TOML,
                                config_file_path=config_file_path)
-    merged_args = _merge_run_options(config_args, vars(args))
+    merged_args = _merge_run_options(vars(parser.parse_args(None)),
+                                     config_args, passed_args)
 
     if not merged_args["files"]:
         _print_help_and_exit(parser)
