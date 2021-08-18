@@ -618,9 +618,50 @@ def _format_code_with_args(source, args):
         line_range=args.line_range)
 
 
+def find_config_file(args):
+    """Find the configuration file the user specified."""
+    config_files = ["pyproject.toml"]
+    flargs = {}
+
+    config_file = args[args.index('--config') + 1]
+
+    if os.path.isfile(config_file):
+        argfile = os.path.basename(config_file)
+        for f in config_files:
+            if argfile == f:
+                flargs = read_configuration_from_file(config_file)
+
+    return flargs
+
+
+def read_configuration_from_file(configfile):
+    """Read docformatter options from a configuration file."""
+    flargs = {}
+    fullpath, ext = os.path.splitext(configfile)
+    filename = os.path.basename(fullpath)
+
+    if ext == ".toml":
+        import tomli
+
+        if filename == "pyproject":
+            with open(configfile, "rb") as f:
+                config = tomli.load(f)
+            result = config.get("tool", {}).get("docformatter", None)
+            if result is not None:
+                flargs = {k: v if isinstance(v, list) else str(v)
+                          for k, v in result.items()}
+
+    return flargs
+
+
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
+
+    flargs = {}
+    if "--config" in argv:
+        flargs = find_config_file(argv)
+
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
@@ -630,44 +671,57 @@ def _main(argv, standard_out, standard_error, standard_in):
                          help='only check and report incorrectly formatted '
                               'files')
     parser.add_argument('-r', '--recursive', action='store_true',
+                        default=bool(flargs.get('recursive', False)),
                         help='drill down directories recursively')
     parser.add_argument('-e', '--exclude', nargs='*',
                         help='exclude directories and files by names')
-    parser.add_argument('--wrap-summaries', default=79, type=int,
+    parser.add_argument('--wrap-summaries',
+                        default=int(flargs.get('wrap-summaries', 79)),
+                        type=int,
                         metavar='length',
                         help='wrap long summary lines at this length; '
                              'set to 0 to disable wrapping '
                              '(default: %(default)s)')
-    parser.add_argument('--wrap-descriptions', default=72, type=int,
+    parser.add_argument('--wrap-descriptions',
+                        default=int(flargs.get('wrap-descriptions', 72)),
+                        type=int,
                         metavar='length',
                         help='wrap descriptions at this length; '
                              'set to 0 to disable wrapping '
                              '(default: %(default)s)')
     parser.add_argument('--blank', dest='post_description_blank',
                         action='store_true',
+                        default=bool(flargs.get('blank', False)),
                         help='add blank line after description')
     parser.add_argument('--pre-summary-newline',
                         action='store_true',
+                        default=bool(flargs.get('pre-summary-newline', False)),
                         help='add a newline before the summary of a '
                              'multi-line docstring')
     parser.add_argument('--make-summary-multi-line',
                         action='store_true',
+                        default=bool(flargs.get('make-summary-multi-line',
+                                                False)),
                         help='add a newline before and after the summary of a '
                              'one-line docstring')
     parser.add_argument('--force-wrap', action='store_true',
+                        default=bool(flargs.get('force-wrap', False)),
                         help='force descriptions to be wrapped even if it may '
                              'result in a mess')
     parser.add_argument('--range', metavar='line', dest='line_range',
-                        default=None, type=int, nargs=2,
+                        default=flargs.get('range', None), type=int, nargs=2,
                         help='apply docformatter to docstrings between these '
                              'lines; line numbers are indexed at 1')
     parser.add_argument('--docstring-length', metavar='length',
                         dest='length_range',
-                        default=None, type=int, nargs=2,
+                        default=flargs.get('docstring-length', None),
+                        type=int, nargs=2,
                         help='apply docformatter to docstrings of given '
                              'length')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
+    parser.add_argument('--config',
+                        help='path to file containing docformatter options')
     parser.add_argument('files', nargs='+',
                         help="files to format or '-' for standard in")
 

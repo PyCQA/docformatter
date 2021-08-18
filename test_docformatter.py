@@ -1271,6 +1271,24 @@ num_iterations is the number of updates - instead of a better definition of conv
             self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
                                                     '/root/folder_two/two.py'])
 
+    def test_read_config_file(self):
+        f = open('pyproject.toml', 'w+')
+        try:
+            f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
+            f.close()
+            self.assertEqual(docformatter.find_config_file(['--config', 'pyproject.toml']),
+                         {'recursive': 'True', 'wrap-summaries': '82'})
+        finally:
+            os.remove(f.name)
+
+    def test_missing_config_file(self):
+        self.assertEqual(docformatter.find_config_file(['--config', 'pyproject.toml']),
+                         {})
+
+    def test_unsupported_config_file(self):
+        self.assertEqual(docformatter.find_config_file(['--config', 'tox.ini']),
+                         {})
+
 class TestSystem(unittest.TestCase):
 
     def test_diff(self):
@@ -1505,6 +1523,30 @@ Print my path and return error code
                              msg='Do not write to stdout')
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
+
+    def test_cli_override_config_file(self):
+        f = open('pyproject.toml', 'w+')
+        try:
+            f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
+            f.close()
+            with temporary_file('''\
+def foo():
+    """
+    Hello world
+    """
+''') as filename:
+                process = run_docformatter(['--wrap-summaries=79',
+                                            filename])
+                self.assertEqual('''\
+@@ -1,4 +1,2 @@
+ def foo():
+-    """
+-    Hello world
+-    """
++    """Hello world."""
+''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+        finally:
+            os.remove(f.name)
 
 
 def generate_random_docstring(max_indentation_length=32,
