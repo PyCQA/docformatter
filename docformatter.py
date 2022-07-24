@@ -665,7 +665,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                         dest='length_range',
                         default=None, type=int, nargs=2,
                         help='apply docformatter to docstrings of given '
-                             'length')
+                             'length range')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
