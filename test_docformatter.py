@@ -1305,15 +1305,9 @@ num_iterations is the number of updates - instead of a better definition of conv
                                                     '/root/folder_two/two.py'])
 
     def test_read_config_file(self):
-        f = open('./tests/_data/pyproject.toml', 'w+')
-        try:
-            f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
-            f.close()
-            self.assertEqual(docformatter.find_config_file(['--config',
-                                                            './tests/_data/pyproject.toml']),
-                         {'recursive': 'True', 'wrap-summaries': '82'})
-        finally:
-            os.remove(f.name)
+        self.assertEqual(docformatter.find_config_file(['--config',
+                                                        './tests/_data/pyproject.toml']),
+                     {'recursive': 'True', 'wrap-summaries': '82'})
 
     def test_missing_config_file(self):
         self.assertEqual(docformatter.find_config_file(['--config',
@@ -1594,17 +1588,14 @@ Print my path and return error code
                              msg='Changed file should be reported')
 
     def test_cli_override_config_file(self):
-        f = open('./tests/_data/pyproject.toml', 'w+')
-        try:
-            f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
-            f.close()
-            with temporary_file('''\
+        with temporary_file('''\
 def foo():
     """
     Hello world
     """
 ''') as filename:
                 process = run_docformatter(['--wrap-summaries=79',
+                                            '--config ./tests/_data/pyproject.toml',
                                             filename])
                 self.assertEqual('''\
 @@ -1,4 +1,2 @@
@@ -1614,8 +1605,6 @@ def foo():
 -    """
 +    """Hello world."""
 ''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
-        finally:
-            os.remove(f.name)
 
 
 def generate_random_docstring(max_indentation_length=32,
