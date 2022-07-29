@@ -10,3 +10,4 @@ Patches
 - Peter Boothe (https://github.com/pboothe)
 - Kapshuna Alexander (https://github.com/kapsh)
 - Serhiy Yevtushenko (https://github.com/serhiy-yevtushenko)
+- Doyle Rowland (https://github.com/weibullguy)
