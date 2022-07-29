@@ -49,4 +49,4 @@ setup(name='docformatter',
       install_requires=['untokenize'],
       extras_require={"tomli": ["tomli"]},
       test_suite='test_docformatter')
-
+      
