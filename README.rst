@@ -6,10 +6,6 @@ Formats docstrings to follow `PEP 257`_.
 
 .. _`PEP 257`: http://www.python.org/dev/peps/pep-0257/
 
-.. image:: https://travis-ci.org/myint/docformatter.svg?branch=master
-   :target: https://travis-ci.org/myint/docformatter
-   :alt: Build status
-
 
 Features
 ========
@@ -134,7 +130,8 @@ Below is the help output::
     usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
-                        [--force-wrap] [--range line line] [--version]
+                        [--force-wrap] [--range start_line end_line]
+                        [--docstring-length min_length max_length] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -164,8 +161,11 @@ Below is the help output::
                             line docstring
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
-      --range line line     apply docformatter to docstrings between these lines;
+      --range start_line end_line
+                            apply docformatter to docstrings between these lines;
                             line numbers are indexed at 1
+      --docstring-length min_length max_length
+                            apply docformatter to docstrings of given length range
       --version             show program's version number and exit
       --config CONFIG       path to file containing docformatter options
 
