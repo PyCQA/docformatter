@@ -86,14 +86,6 @@ class TestUnits(unittest.TestCase):
     def test_strip_docstring_with_empty_string(self):
         self.assertEqual('', docformatter.strip_docstring('""""""'))
 
-    def test_strip_docstring_with_escaped_quotes(self):
-        self.assertEqual("hello\\'",
-                         docformatter.strip_docstring("'hello\\''"))
-
-    def test_strip_docstring_with_escaped_double_quotes(self):
-        self.assertEqual('hello\\"',
-                         docformatter.strip_docstring('"hello\\""'))
-
     def test_strip_docstring_with_unhandled(self):
         with self.assertRaises(ValueError):
             docformatter.strip_docstring('r"""foo"""')
@@ -788,11 +780,45 @@ def foo():
     """
 ''')))
 
-    def test_format_code_with_double_quote(self):
+    def test_ignore_code_with_single_quote(self):
+        """Single single quote on first line of code should remain untouched.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
         self.assertEqual(
-            '''\
+                '''\
 def foo():
-    """Just a regular string."""
+    'Just a regular string'
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    'Just a regular string'
+'''))
+
+    def test_ignore_string_with_escaped_quotes(self):
+        """Strings beginning with single single quotes should raise a ValueError.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
+        with self.assertRaises(ValueError):
+            docformatter.strip_docstring("'hello\\''")
+
+    def test_ignore_code_with_double_quote(self):
+        """Single double quotes on first line of code should remain untouched.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
+        self.assertEqual(
+                '''\
+def foo():
+    "Just a regular string"
 ''',
             docformatter.format_code(
                 '''\
@@ -800,17 +826,15 @@ def foo():
     "Just a regular string"
 '''))
 
-    def test_format_code_with_single_quote(self):
-        self.assertEqual(
-            '''\
-def foo():
-    """Just a regular string."""
-''',
-            docformatter.format_code(
-                '''\
-def foo():
-    'Just a regular string'
-'''))
+    def test_strip_docstring_with_escaped_double_quotes(self):
+        """Strings beginning with single double quotes should raise a ValueError.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
+        with self.assertRaises(ValueError):
+            docformatter.strip_docstring('"hello\\""')
 
     def test_format_code_with_should_skip_nested_triple_quotes(self):
         line = '''\
@@ -1276,7 +1300,8 @@ num_iterations is the number of updates - instead of a better definition of conv
         try:
             f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
             f.close()
-            self.assertEqual(docformatter.find_config_file(['--config', 'pyproject.toml']),
+            self.assertEqual(docformatter.find_config_file(['--config',
+                                                            './tests/_data/pyproject.toml']),
                          {'recursive': 'True', 'wrap-summaries': '82'})
         finally:
             os.remove(f.name)
