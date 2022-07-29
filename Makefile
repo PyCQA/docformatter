@@ -7,7 +7,6 @@ check:
 		setup.py
 	pylint \
 		--reports=no \
-		--disable=bad-continuation \
 		--disable=fixme \
 		--disable=import-outside-toplevel \
 		--disable=inconsistent-return-statements \
