@@ -45,4 +45,5 @@ setup(name='docformatter',
         entry_points={
             'console_scripts': ['docformatter = docformatter:main']},
         install_requires=['untokenize'],
+        extras_require={"tomli": ["tomli"]},
         test_suite='test_docformatter')
