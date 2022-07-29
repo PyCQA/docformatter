@@ -41,6 +41,12 @@ import tokenize
 import sysconfig
 import untokenize
 
+try:
+    import tomli
+
+    TOMLI_INSTALLED = True
+except ImportError:
+    TOMLI_INSTALLED = False
 
 __version__ = '1.4'
 
@@ -56,6 +62,7 @@ HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
 CR = '\r'
 LF = '\n'
 CRLF = '\r\n'
+QUOTE_TYPES = ('"""', "'''", )
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
@@ -137,7 +144,7 @@ def _format_code(source,
 
         if (
             token_type == tokenize.STRING and
-            token_string.startswith(('"', "'")) and
+            token_string.startswith(QUOTE_TYPES) and
             (previous_token_type == tokenize.INDENT or
                 only_comments_so_far) and
             is_in_range(line_range, start[0], end[0]) and
@@ -193,7 +200,7 @@ def format_docstring(indentation, docstring,
     contents = strip_docstring(docstring)
 
     # Skip if there are nested triple double quotes
-    if contents.count('"""'):
+    if contents.count(QUOTE_TYPES[0]):
         return docstring
 
     # Do not modify things that start with doctests.
@@ -237,24 +244,24 @@ def format_docstring(indentation, docstring,
             post_description=('\n' if post_description_blank else ''),
             indentation=indentation)
     else:
-        if make_summary_multi_line:
-            beginning = '"""\n' + indentation
-            ending = '\n' + indentation + '"""'
-            summary_wrapped = wrap_summary(
-                normalize_summary(contents),
-                wrap_length=summary_wrap_length,
-                initial_indent=indentation,
-                subsequent_indent=indentation).strip()
-            return '{beginning}{summary}{ending}'.format(
-                beginning=beginning,
-                summary=summary_wrapped,
-                ending=ending
-            )
-        else:
+        if not make_summary_multi_line:
             return wrap_summary('"""' + normalize_summary(contents) + '"""',
                                 wrap_length=summary_wrap_length,
                                 initial_indent=indentation,
                                 subsequent_indent=indentation).strip()
+
+        beginning = '"""\n' + indentation
+        ending = '\n' + indentation + '"""'
+        summary_wrapped = wrap_summary(
+            normalize_summary(contents),
+            wrap_length=summary_wrap_length,
+            initial_indent=indentation,
+            subsequent_indent=indentation).strip()
+        return '{beginning}{summary}{ending}'.format(
+            beginning=beginning,
+            summary=summary_wrapped,
+            ending=ending
+        )
 
 
 def reindent(text, indentation):
@@ -448,16 +455,22 @@ def normalize_line_endings(lines, newline):
     return ''.join([normalize_line(line, newline) for line in lines])
 
 
-def strip_docstring(docstring):
-    """Return contents of docstring."""
-    docstring = docstring.strip()
-    quote_types = ["'''", '"""', "'", '"']
+def strip_docstring(docstring: str) -> str:
+    """Return contents of docstring.
 
-    for quote in quote_types:
+    :param docstring: the docstring, including the opening and closing triple
+        quotes.
+    :return: docstring with the triple quotes removed.
+    :rtype: str
+    """
+    docstring = docstring.strip()
+
+    for quote in QUOTE_TYPES:
         if docstring.startswith(quote) and docstring.endswith(quote):
             return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
-    raise ValueError('We only handle strings that start with quotes')
+    raise ValueError("docformatter only handles strings that start with "
+                     "triple quotes")
 
 
 def normalize_summary(summary):
@@ -594,12 +607,12 @@ def format_file(filename, args, standard_out):
                 output_file.write(formatted_source)
         else:
             import difflib
-            diff = difflib.unified_diff(
-                source.splitlines(),
-                formatted_source.splitlines(),
-                'before/' + filename,
-                'after/' + filename,
-                lineterm='')
+            diff = difflib.unified_diff(source.splitlines(),
+                                        formatted_source.splitlines(),
+                                        f'before/{filename}',
+                                        f'after/{filename}',
+                                        lineterm='')
+
             standard_out.write('\n'.join(list(diff) + ['']))
 
     return FormatResult.ok
@@ -640,16 +653,14 @@ def read_configuration_from_file(configfile):
     fullpath, ext = os.path.splitext(configfile)
     filename = os.path.basename(fullpath)
 
-    if ext == ".toml":
-        import tomli
+    if ext == ".toml" and TOMLI_INSTALLED and filename == "pyproject":
+        with open(configfile, "rb") as f:
+            config = tomli.load(f)
 
-        if filename == "pyproject":
-            with open(configfile, "rb") as f:
-                config = tomli.load(f)
-            result = config.get("tool", {}).get("docformatter", None)
-            if result is not None:
-                flargs = {k: v if isinstance(v, list) else str(v)
-                          for k, v in result.items()}
+        result = config.get("tool", {}).get("docformatter", None)
+        if result is not None:
+            flargs = {k: v if isinstance(v, list) else str(v)
+                      for k, v in result.items()}
 
     return flargs
 
@@ -658,10 +669,7 @@ def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     import argparse
 
-    flargs = {}
-    if "--config" in argv:
-        flargs = find_config_file(argv)
-
+    flargs = find_config_file(argv) if "--config" in argv else {}
     parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
     changes = parser.add_mutually_exclusive_group()
     changes.add_argument('-i', '--in-place', action='store_true',
@@ -718,8 +726,10 @@ def _main(argv, standard_out, standard_error, standard_in):
                         type=int, nargs=2,
                         help='apply docformatter to docstrings of given '
                              'length range')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s ' + __version__)
+    parser.add_argument('--version',
+                        action='version',
+                        version=f'%(prog)s {__version__}')
+
     parser.add_argument('--config',
                         help='path to file containing docformatter options')
     parser.add_argument('files', nargs='+',
