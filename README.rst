@@ -167,12 +167,27 @@ Below is the help output::
       --docstring-length min_length max_length
                             apply docformatter to docstrings of given length range
       --version             show program's version number and exit
+      --config CONFIG       path to file containing docformatter options
 
 
 Possible exit codes:
 
 - **1** - if any error encountered
 - **3** - if any file needs to be formatted (in ``--check`` mode)
+
+docformatter options can also be stored in a configuration file.  Currently only
+pyproject.toml is supported.  Add section [tool.docformatter] with options listed using
+the same name as command line options.  For example::
+
+      [tool.docformatter]
+      recursive = true
+      wrap-summaries = 82
+      blank = true
+
+Command line options take precedence.  The configuration file can be passed with a full
+path, otherwise docformatter will look in the current directory.  For example::
+
+      docformatter --config ~/.secret/path/to/pyproject.toml
 
 Wrapping descriptions
 =====================
