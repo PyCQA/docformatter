@@ -36,6 +36,9 @@ From pip::
 
     $ pip install --upgrade docformatter
 
+Or, if you want to use pyproject.toml to configure docformatter::
+
+    $ pip install --upgrade docformatter[tomli]
 
 Example
 =======

@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "docformatter"
+version = "1.4"
+description = "Formats docstrings to follow PEP 257"
+authors = ["Steven Myint"]
+maintainers = [
+    "Doyle Rowland <doyle.rowland@reliaqual.com>",
+]
+license = "Expat"
+readme = "README.rst"
+homepage = "https://github.com/PyCQA/docformatter"
+repository = "https://github.com/PyCQA/docformatter"
+documentation = "https://github.com/PyCQA/docformatter"
+keywords = [
+    "PEP 257", "pep257", "style", "formatter", "docstrings",
+]
+classifiers=[
+          'Intended Audience :: Developers',
+          'Environment :: Console',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: Implementation',
+          'Programming Language :: Python :: Implementation :: PyPy',
+          'Programming Language :: Python :: Implementation :: CPython',
+          'License :: OSI Approved :: MIT License',
+      ]
+include = ["LICENSE"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+tomli = {version="1.2.3", optional=true}
+untokenize = "^0.1.1"
+
+[tool.poetry.dev-dependencies]
+pydocstyle = "^6.1.1"
+pylint = "^2.6.0"
+pycodestyle = "^2.8.0"
+coverage = "^6.2.0"
+rstcheck = "<6.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

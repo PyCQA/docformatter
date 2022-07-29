@@ -1305,7 +1305,7 @@ num_iterations is the number of updates - instead of a better definition of conv
                                                     '/root/folder_two/two.py'])
 
     def test_read_config_file(self):
-        f = open('pyproject.toml', 'w+')
+        f = open('./tests/_data/pyproject.toml', 'w+')
         try:
             f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
             f.close()
@@ -1316,7 +1316,8 @@ num_iterations is the number of updates - instead of a better definition of conv
             os.remove(f.name)
 
     def test_missing_config_file(self):
-        self.assertEqual(docformatter.find_config_file(['--config', 'pyproject.toml']),
+        self.assertEqual(docformatter.find_config_file(['--config',
+                                                        '../pyproject.toml']),
                          {})
 
     def test_unsupported_config_file(self):
@@ -1593,7 +1594,7 @@ Print my path and return error code
                              msg='Changed file should be reported')
 
     def test_cli_override_config_file(self):
-        f = open('pyproject.toml', 'w+')
+        f = open('./tests/_data/pyproject.toml', 'w+')
         try:
             f.write('[tool.docformatter]\nrecursive = true\nwrap-summaries = 82\n')
             f.close()
