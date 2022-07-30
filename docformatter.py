@@ -150,11 +150,7 @@ def _format_code(source,
             is_in_range(line_range, start[0], end[0]) and
             has_correct_length(length_range, start[0], end[0])
         ):
-            if only_comments_so_far:
-                indentation = ''
-            else:
-                indentation = previous_token_string
-
+            indentation = '' if only_comments_so_far else previous_token_string
             token_string = format_docstring(
                 indentation,
                 token_string,
@@ -220,11 +216,7 @@ def format_docstring(indentation, docstring,
     if description:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
-        if pre_summary_newline:
-            initial_indent = indentation
-        else:
-            initial_indent = 3 * ' ' + indentation
-
+        initial_indent = indentation if pre_summary_newline else 3 * ' ' + indentation
         return '''\
 """{pre_summary}{summary}
 
@@ -335,13 +327,12 @@ def split_first_sentence(text):
 
     while rest:
         split = re.split(r'(\s)', rest, maxsplit=1)
+        word = split[0]
         if len(split) == 3:
-            word = split[0]
             delimiter = split[1]
             rest = split[2]
         else:
             assert len(split) == 1
-            word = split[0]
             delimiter = ''
             rest = ''
 
@@ -376,25 +367,30 @@ def is_some_sort_of_list(text):
                               [1]) > HEURISTIC_MIN_LIST_ASPECT_RATIO:
         return True
 
-    for line in split_lines:
-        if (
-            re.match(r'\s*$', line) or
+    return any(
+        (
+            re.match(r'\s*$', line)
+            or
             # "1. item"
-            re.match(r'\s*[0-9]\.', line) or
+            re.match(r'\s*[0-9]\.', line)
+            or
             # "@parameter"
-            re.match(r'\s*[\-*:=@]', line) or
+            re.match(r'\s*[\-*:=@]', line)
+            or
             # "parameter - description"
-            re.match(r'.*\s+[\-*:=@]\s+', line) or
+            re.match(r'.*\s+[\-*:=@]\s+', line)
+            or
             # "parameter: description"
-            re.match(r'\s*\S+[\-*:=@]\s+', line) or
+            re.match(r'\s*\S+[\-*:=@]\s+', line)
+            or
             # "parameter:\n    description"
-            re.match(r'\s*\S+:\s*$', line) or
+            re.match(r'\s*\S+:\s*$', line)
+            or
             # "parameter -- description"
             re.match(r'\s*\S+\s+--\s+', line)
-        ):
-            return True
-
-    return False
+        )
+        for line in split_lines
+    )
 
 
 def is_some_sort_of_code(text):
@@ -442,9 +438,7 @@ def normalize_line(line, newline):
     Otherwise, does nothing.
     """
     stripped = line.rstrip('\n\r')
-    if stripped != line:
-        return stripped + newline
-    return line
+    return stripped + newline if stripped != line else line
 
 
 def normalize_line_endings(lines, newline):
@@ -548,26 +542,22 @@ def remove_section_header(text):
         return text
 
     first = stripped[0]
-    if not (
-        first.isalnum() or
-        first.isspace() or
-        stripped.splitlines()[0].strip(first).strip()
-    ):
-        return stripped.lstrip(first).lstrip()
-
-    return text
+    return (
+        text
+        if (
+            first.isalnum()
+            or first.isspace()
+            or stripped.splitlines()[0].strip(first).strip()
+        )
+        else stripped.lstrip(first).lstrip()
+    )
 
 
 def strip_leading_blank_lines(text):
     """Return text with leading blank lines removed."""
     split = text.splitlines()
 
-    found = 0
-    for index, line in enumerate(split):
-        if line.strip():
-            found = index
-            break
-
+    found = next((index for index, line in enumerate(split) if line.strip()), 0)
     return '\n'.join(split[found:])
 
 
@@ -638,13 +628,13 @@ def _format_code_with_args(source, args):
 
 def find_config_file(args):
     """Find the configuration file the user specified."""
-    config_files = ["pyproject.toml"]
     flargs = {}
 
     config_file = args[args.index('--config') + 1]
 
     if os.path.isfile(config_file):
         argfile = os.path.basename(config_file)
+        config_files = ["pyproject.toml"]
         for f in config_files:
             if argfile == f:
                 flargs = read_configuration_from_file(config_file)
