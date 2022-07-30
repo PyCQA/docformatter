@@ -354,7 +354,7 @@ Hello.
 
         min_line_length = 50
         for max_length in range(min_line_length, 100):
-            for num_indents in range(0, 20):
+            for num_indents in range(20):
                 indentation = ' ' * num_indents
                 formatted_text = indentation + docformatter.format_docstring(
                     indentation=indentation,
