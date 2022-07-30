@@ -45,3 +45,31 @@ rstcheck = "<6.0.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.master]
+ignore-paths = [
+    "tests*",
+]
+
+[tool.pylint.messages_control]
+disable = [
+    "fixme",
+    "import-outside-toplevel",
+    "inconsistent-return-statements",
+    "invalid-name",
+    "no-else-return",
+    "no-member",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-boolean-expressions",
+    "too-many-locals",
+    "too-many-return-statements",
+    "useless-object-inheritance",
+]
+
+[tool.docformatter]
+wrap-summaries = 79
+wrap-descriptions = 72
+
+[tool.pydocstyle]
+convention = "pep257"
