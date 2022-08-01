@@ -24,11 +24,14 @@
 
 """Formats docstrings to follow PEP 257."""
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
 
+# Standard Library Imports
 import collections
 import io
 import locale
@@ -36,19 +39,22 @@ import os
 import re
 import signal
 import sys
+import sysconfig
 import textwrap
 import tokenize
-import sysconfig
+
+# Third Party Imports
 import untokenize
 
 try:
+    # Third Party Imports
     import tomli
 
     TOMLI_INSTALLED = True
 except ImportError:
     TOMLI_INSTALLED = False
 
-__version__ = '1.4'
+__version__ = "1.4"
 
 
 try:
@@ -57,12 +63,15 @@ except NameError:
     unicode = str
 
 
-HEURISTIC_MIN_LIST_ASPECT_RATIO = .4
+HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
-CR = '\r'
-LF = '\n'
-CRLF = '\r\n'
-QUOTE_TYPES = ('"""', "'''", )
+CR = "\r"
+LF = "\n"
+CRLF = "\r\n"
+QUOTE_TYPES = (
+    '"""',
+    "'''",
+)
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
@@ -74,6 +83,57 @@ class FormatResult(object):
     error = 1
     interrupted = 2
     check_failed = 3
+
+
+def has_correct_length(length_range, start, end):
+    """Return True if docstring's length is in range."""
+    if length_range is None:
+        return True
+    min_length, max_length = length_range
+
+    docstring_length = end + 1 - start
+    return min_length <= docstring_length <= max_length
+
+
+def is_in_range(line_range, start, end):
+    """Return True if start/end is in line_range."""
+    if line_range is None:
+        return True
+    return any(
+        line_range[0] <= line_no <= line_range[1]
+        for line_no in range(start, end + 1)
+    )
+
+
+def reindent(text, indentation):
+    """Return reindented text that matches indentation."""
+    if "\t" not in indentation:
+        text = text.expandtabs()
+
+    text = textwrap.dedent(text)
+
+    return (
+        "\n".join(
+            [(indentation + line).rstrip() for line in text.splitlines()]
+        ).rstrip()
+        + "\n"
+    )
+
+
+def _find_shortest_indentation(lines):
+    """Return most shortest indentation."""
+    assert not isinstance(lines, str)
+
+    indentation = None
+
+    for line in lines:
+        if line.strip():
+            non_whitespace_index = len(line) - len(line.lstrip())
+            _indent = line[:non_whitespace_index]
+            if indentation is None or len(_indent) < len(indentation):
+                indentation = _indent
+
+    return indentation or ""
 
 
 def format_code(source, **kwargs):
@@ -92,33 +152,17 @@ def format_code(source, **kwargs):
         return source
 
 
-def has_correct_length(length_range, start, end):
-    """Return True if docstring's length is in range."""
-    if length_range is None:
-        return True
-    min_length, max_length = length_range
-
-    docstring_length = end + 1 - start
-    return min_length <= docstring_length <= max_length
-
-
-def is_in_range(line_range, start, end):
-    """Return True if start/end is in line_range."""
-    if line_range is None:
-        return True
-    return any(line_range[0] <= line_no <= line_range[1]
-               for line_no in range(start, end + 1))
-
-
-def _format_code(source,
-                 summary_wrap_length=79,
-                 description_wrap_length=72,
-                 pre_summary_newline=False,
-                 make_summary_multi_line=False,
-                 post_description_blank=False,
-                 force_wrap=False,
-                 line_range=None,
-                 length_range=None):
+def _format_code(
+    source,
+    summary_wrap_length=79,
+    description_wrap_length=72,
+    pre_summary_newline=False,
+    make_summary_multi_line=False,
+    post_description_blank=False,
+    force_wrap=False,
+    line_range=None,
+    length_range=None,
+):
     """Return source code with docstrings formatted."""
     if not source:
         return source
@@ -132,25 +176,28 @@ def _format_code(source,
     modified_tokens = []
 
     sio = io.StringIO(source)
-    previous_token_string = ''
+    previous_token_string = ""
     previous_token_type = None
     only_comments_so_far = True
 
-    for (token_type,
-         token_string,
-         start,
-         end,
-         line) in tokenize.generate_tokens(sio.readline):
+    for (
+        token_type,
+        token_string,
+        start,
+        end,
+        line,
+    ) in tokenize.generate_tokens(sio.readline):
 
         if (
-            token_type == tokenize.STRING and
-            token_string.startswith(QUOTE_TYPES) and
-            (previous_token_type == tokenize.INDENT or
-                only_comments_so_far) and
-            is_in_range(line_range, start[0], end[0]) and
-            has_correct_length(length_range, start[0], end[0])
+            token_type == tokenize.STRING
+            and token_string.startswith(QUOTE_TYPES)
+            and (
+                previous_token_type == tokenize.INDENT or only_comments_so_far
+            )
+            and is_in_range(line_range, start[0], end[0])
+            and has_correct_length(length_range, start[0], end[0])
         ):
-            indentation = '' if only_comments_so_far else previous_token_string
+            indentation = "" if only_comments_so_far else previous_token_string
             token_string = format_docstring(
                 indentation,
                 token_string,
@@ -159,7 +206,8 @@ def _format_code(source,
                 pre_summary_newline=pre_summary_newline,
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
-                force_wrap=force_wrap)
+                force_wrap=force_wrap,
+            )
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
             only_comments_so_far = False
@@ -167,19 +215,21 @@ def _format_code(source,
         previous_token_string = token_string
         previous_token_type = token_type
 
-        modified_tokens.append(
-            (token_type, token_string, start, end, line))
+        modified_tokens.append((token_type, token_string, start, end, line))
 
     return untokenize.untokenize(modified_tokens)
 
 
-def format_docstring(indentation, docstring,
-                     summary_wrap_length=0,
-                     description_wrap_length=0,
-                     pre_summary_newline=False,
-                     make_summary_multi_line=False,
-                     post_description_blank=False,
-                     force_wrap=False):
+def format_docstring(
+    indentation,
+    docstring,
+    summary_wrap_length=0,
+    description_wrap_length=0,
+    pre_summary_newline=False,
+    make_summary_multi_line=False,
+    post_description_blank=False,
+    force_wrap=False,
+):
     """Return formatted version of docstring.
 
     Wrap summary lines if summary_wrap_length is greater than 0.
@@ -200,7 +250,7 @@ def format_docstring(indentation, docstring,
         return docstring
 
     # Do not modify things that start with doctests.
-    if contents.lstrip().startswith('>>>'):
+    if contents.lstrip().startswith(">>>"):
         return docstring
 
     summary, description = split_summary_and_description(contents)
@@ -216,68 +266,63 @@ def format_docstring(indentation, docstring,
     if description:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
-        initial_indent = indentation if pre_summary_newline else 3 * ' ' + indentation
+        initial_indent = (
+            indentation if pre_summary_newline else 3 * " " + indentation
+        )
         return '''\
 """{pre_summary}{summary}
 
 {description}{post_description}
 {indentation}"""\
 '''.format(
-            pre_summary=('\n' + indentation if pre_summary_newline
-                         else ''),
-            summary=wrap_summary(normalize_summary(summary),
-                                 wrap_length=summary_wrap_length,
-                                 initial_indent=initial_indent,
-                                 subsequent_indent=indentation).lstrip(),
-            description=wrap_description(description,
-                                         indentation=indentation,
-                                         wrap_length=description_wrap_length,
-                                         force_wrap=force_wrap),
-            post_description=('\n' if post_description_blank else ''),
-            indentation=indentation)
+            pre_summary=("\n" + indentation if pre_summary_newline else ""),
+            summary=wrap_summary(
+                normalize_summary(summary),
+                wrap_length=summary_wrap_length,
+                initial_indent=initial_indent,
+                subsequent_indent=indentation,
+            ).lstrip(),
+            description=wrap_description(
+                description,
+                indentation=indentation,
+                wrap_length=description_wrap_length,
+                force_wrap=force_wrap,
+            ),
+            post_description=("\n" if post_description_blank else ""),
+            indentation=indentation,
+        )
     else:
         if not make_summary_multi_line:
-            return wrap_summary('"""' + normalize_summary(contents) + '"""',
-                                wrap_length=summary_wrap_length,
-                                initial_indent=indentation,
-                                subsequent_indent=indentation).strip()
+            return wrap_summary(
+                '"""' + normalize_summary(contents) + '"""',
+                wrap_length=summary_wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=indentation,
+            ).strip()
 
         beginning = '"""\n' + indentation
-        ending = '\n' + indentation + '"""'
+        ending = "\n" + indentation + '"""'
         summary_wrapped = wrap_summary(
             normalize_summary(contents),
             wrap_length=summary_wrap_length,
             initial_indent=indentation,
-            subsequent_indent=indentation).strip()
-        return '{beginning}{summary}{ending}'.format(
-            beginning=beginning,
-            summary=summary_wrapped,
-            ending=ending
+            subsequent_indent=indentation,
+        ).strip()
+        return "{beginning}{summary}{ending}".format(
+            beginning=beginning, summary=summary_wrapped, ending=ending
         )
-
-
-def reindent(text, indentation):
-    """Return reindented text that matches indentation."""
-    if '\t' not in indentation:
-        text = text.expandtabs()
-
-    text = textwrap.dedent(text)
-
-    return '\n'.join(
-        [(indentation + line).rstrip()
-         for line in text.splitlines()]).rstrip() + '\n'
 
 
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
     # Check heuristically for a parameter list.
-    for token in ['@', '-', r'\*']:
-        if re.search(r'\s' + token + r'\s', line):
+    for token in ["@", "-", r"\*"]:
+        if re.search(r"\s" + token + r"\s", line):
             return True
 
     stripped_line = line.strip()
     is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
-    is_pydoc_ref = re.match(r'^:\w+:', stripped_line)
+    is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
 
     return is_beginning_of_sentence and not is_pydoc_ref
 
@@ -300,19 +345,21 @@ def split_summary_and_description(contents):
             found = True
 
         if found:
-            return ('\n'.join(split_lines[:index]).strip(),
-                    '\n'.join(split_lines[index:]).rstrip())
+            return (
+                "\n".join(split_lines[:index]).strip(),
+                "\n".join(split_lines[index:]).rstrip(),
+            )
 
     # Break on first sentence.
     split = split_first_sentence(contents)
     if split[0].strip() and split[1].strip():
         return (
             split[0].strip(),
-            _find_shortest_indentation(
-                split[1].splitlines()[1:]) + split[1].strip()
+            _find_shortest_indentation(split[1].splitlines()[1:])
+            + split[1].strip(),
         )
 
-    return (contents, '')
+    return (contents, "")
 
 
 def split_first_sentence(text):
@@ -320,38 +367,36 @@ def split_first_sentence(text):
 
     Return a tuple (sentence, rest).
     """
-    sentence = ''
+    sentence = ""
     rest = text
-    delimiter = ''
-    previous_delimiter = ''
+    delimiter = ""
+    previous_delimiter = ""
 
     while rest:
-        split = re.split(r'(\s)', rest, maxsplit=1)
+        split = re.split(r"(\s)", rest, maxsplit=1)
         word = split[0]
         if len(split) == 3:
             delimiter = split[1]
             rest = split[2]
         else:
             assert len(split) == 1
-            delimiter = ''
-            rest = ''
+            delimiter = ""
+            rest = ""
 
         sentence += previous_delimiter + word
 
-        if sentence.endswith(('e.g.', 'i.e.',
-                              'Dr.',
-                              'Mr.', 'Mrs.', 'Ms.')):
+        if sentence.endswith(("e.g.", "i.e.", "Dr.", "Mr.", "Mrs.", "Ms.")):
             # Ignore false end of sentence.
             pass
-        elif sentence.endswith(('.', '?', '!')):
+        elif sentence.endswith((".", "?", "!")):
             break
-        elif sentence.endswith(':') and delimiter == '\n':
+        elif sentence.endswith(":") and delimiter == "\n":
             # Break on colon if it ends the line. This is a heuristic to detect
             # the beginning of some parameter list afterwards.
             break
 
         previous_delimiter = delimiter
-        delimiter = ''
+        delimiter = ""
 
     return (sentence, delimiter + rest)
 
@@ -363,31 +408,34 @@ def is_some_sort_of_list(text):
     # TODO: Find a better way of doing this.
     # Very large number of lines but short columns probably means a list of
     # items.
-    if len(split_lines) / max([len(line.strip()) for line in split_lines] +
-                              [1]) > HEURISTIC_MIN_LIST_ASPECT_RATIO:
+    if (
+        len(split_lines)
+        / max([len(line.strip()) for line in split_lines] + [1])
+        > HEURISTIC_MIN_LIST_ASPECT_RATIO
+    ):
         return True
 
     return any(
         (
-            re.match(r'\s*$', line)
+            re.match(r"\s*$", line)
             or
             # "1. item"
-            re.match(r'\s*[0-9]\.', line)
+            re.match(r"\s*[0-9]\.", line)
             or
             # "@parameter"
-            re.match(r'\s*[\-*:=@]', line)
+            re.match(r"\s*[\-*:=@]", line)
             or
             # "parameter - description"
-            re.match(r'.*\s+[\-*:=@]\s+', line)
+            re.match(r".*\s+[\-*:=@]\s+", line)
             or
             # "parameter: description"
-            re.match(r'\s*\S+[\-*:=@]\s+', line)
+            re.match(r"\s*\S+[\-*:=@]\s+", line)
             or
             # "parameter:\n    description"
-            re.match(r'\s*\S+:\s*$', line)
+            re.match(r"\s*\S+:\s*$", line)
             or
             # "parameter -- description"
-            re.match(r'\s*\S+\s+--\s+', line)
+            re.match(r"\s*\S+\s+--\s+", line)
         )
         for line in split_lines
     )
@@ -396,22 +444,6 @@ def is_some_sort_of_list(text):
 def is_some_sort_of_code(text):
     """Return True if text looks like code."""
     return any(len(word) > 50 for word in text.split())
-
-
-def _find_shortest_indentation(lines):
-    """Return most shortest indentation."""
-    assert not isinstance(lines, str)
-
-    indentation = None
-
-    for line in lines:
-        if line.strip():
-            non_whitespace_index = len(line) - len(line.lstrip())
-            _indent = line[:non_whitespace_index]
-            if indentation is None or len(_indent) < len(indentation):
-                indentation = _indent
-
-    return indentation or ''
 
 
 def find_newline(source):
@@ -437,7 +469,7 @@ def normalize_line(line, newline):
 
     Otherwise, does nothing.
     """
-    stripped = line.rstrip('\n\r')
+    stripped = line.rstrip("\n\r")
     return stripped + newline if stripped != line else line
 
 
@@ -446,7 +478,7 @@ def normalize_line_endings(lines, newline):
 
     All lines will be modified to use the most common line ending.
     """
-    return ''.join([normalize_line(line, newline) for line in lines])
+    return "".join([normalize_line(line, newline) for line in lines])
 
 
 def strip_docstring(docstring: str) -> str:
@@ -463,13 +495,14 @@ def strip_docstring(docstring: str) -> str:
         if docstring.startswith(quote) and docstring.endswith(quote):
             return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
-    raise ValueError("docformatter only handles strings that start with "
-                     "triple quotes")
+    raise ValueError(
+        "docformatter only handles strings that start with " "triple quotes"
+    )
 
 
 def unwrap_summary(summary):
     """Return summary with newlines removed in preparation for wrapping."""
-    return re.sub(r'\s*\n\s*', ' ', summary)
+    return re.sub(r"\s*\n\s*", " ", summary)
 
 
 def normalize_summary(summary):
@@ -479,11 +512,11 @@ def normalize_summary(summary):
 
     # Add period at end of sentence
     if (
-        summary and
-        (summary[-1].isalnum() or summary[-1] in ['"', "'"]) and
-        (not summary.startswith('#'))
+        summary
+        and (summary[-1].isalnum() or summary[-1] in ['"', "'"])
+        and (not summary.startswith("#"))
     ):
-        summary += '.'
+        summary += "."
 
     return summary
 
@@ -491,11 +524,14 @@ def normalize_summary(summary):
 def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
     """Return line-wrapped summary text."""
     if wrap_length > 0:
-        return '\n'.join(
-            textwrap.wrap(unwrap_summary(summary),
-                          width=wrap_length,
-                          initial_indent=initial_indent,
-                          subsequent_indent=subsequent_indent)).strip()
+        return "\n".join(
+            textwrap.wrap(
+                unwrap_summary(summary),
+                width=wrap_length,
+                initial_indent=initial_indent,
+                subsequent_indent=subsequent_indent,
+            )
+        ).strip()
     else:
         return summary
 
@@ -509,22 +545,29 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
     text = strip_leading_blank_lines(text)
 
     # Do not modify doctests at all.
-    if '>>>' in text:
+    if ">>>" in text:
         return text
 
     text = reindent(text, indentation).rstrip()
 
     # Ignore possibly complicated cases.
-    if wrap_length <= 0 or (not force_wrap and
-                            (is_some_sort_of_list(text) or
-                             is_some_sort_of_code(text))):
+    if wrap_length <= 0 or (
+        not force_wrap
+        and (is_some_sort_of_list(text) or is_some_sort_of_code(text))
+    ):
         return text
 
-    return indentation + '\n'.join(
-        textwrap.wrap(textwrap.dedent(text),
-                      width=wrap_length,
-                      initial_indent=indentation,
-                      subsequent_indent=indentation)).strip()
+    return (
+        indentation
+        + "\n".join(
+            textwrap.wrap(
+                textwrap.dedent(text),
+                width=wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=indentation,
+            )
+        ).strip()
+    )
 
 
 def remove_section_header(text):
@@ -557,21 +600,26 @@ def strip_leading_blank_lines(text):
     """Return text with leading blank lines removed."""
     split = text.splitlines()
 
-    found = next((index for index, line in enumerate(split) if line.strip()), 0)
-    return '\n'.join(split[found:])
+    found = next(
+        (index for index, line in enumerate(split) if line.strip()), 0
+    )
+    return "\n".join(split[found:])
 
 
-def open_with_encoding(filename, encoding, mode='r'):
+def open_with_encoding(filename, encoding, mode="r"):
     """Return opened file with a specific encoding."""
-    return io.open(filename, mode=mode, encoding=encoding,
-                   newline='')  # Preserve line endings
+    return io.open(
+        filename, mode=mode, encoding=encoding, newline=""
+    )  # Preserve line endings
 
 
 def detect_encoding(filename):
     """Return file encoding."""
     try:
-        with open(filename, 'rb') as input_file:
+        with open(filename, "rb") as input_file:
+            # Standard Library Imports
             from lib2to3.pgen2 import tokenize as lib2to3_tokenize
+
             encoding = lib2to3_tokenize.detect_encoding(input_file.readline)[0]
 
             # Check for correctness of encoding.
@@ -580,7 +628,7 @@ def detect_encoding(filename):
 
         return encoding
     except (SyntaxError, LookupError, UnicodeDecodeError):
-        return 'latin-1'
+        return "latin-1"
 
 
 def format_file(filename, args, standard_out):
@@ -597,18 +645,23 @@ def format_file(filename, args, standard_out):
         if args.check:
             return FormatResult.check_failed
         elif args.in_place:
-            with open_with_encoding(filename, mode='w',
-                                    encoding=encoding) as output_file:
+            with open_with_encoding(
+                filename, mode="w", encoding=encoding
+            ) as output_file:
                 output_file.write(formatted_source)
         else:
+            # Standard Library Imports
             import difflib
-            diff = difflib.unified_diff(source.splitlines(),
-                                        formatted_source.splitlines(),
-                                        f'before/{filename}',
-                                        f'after/{filename}',
-                                        lineterm='')
 
-            standard_out.write('\n'.join(list(diff) + ['']))
+            diff = difflib.unified_diff(
+                source.splitlines(),
+                formatted_source.splitlines(),
+                f"before/{filename}",
+                f"after/{filename}",
+                lineterm="",
+            )
+
+            standard_out.write("\n".join(list(diff) + [""]))
 
     return FormatResult.ok
 
@@ -623,14 +676,15 @@ def _format_code_with_args(source, args):
         make_summary_multi_line=args.make_summary_multi_line,
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
-        line_range=args.line_range)
+        line_range=args.line_range,
+    )
 
 
 def find_config_file(args):
     """Find the configuration file the user specified."""
     flargs = {}
 
-    config_file = args[args.index('--config') + 1]
+    config_file = args[args.index("--config") + 1]
 
     if os.path.isfile(config_file):
         argfile = os.path.basename(config_file)
@@ -654,119 +708,165 @@ def read_configuration_from_file(configfile):
 
         result = config.get("tool", {}).get("docformatter", None)
         if result is not None:
-            flargs = {k: v if isinstance(v, list) else str(v)
-                      for k, v in result.items()}
+            flargs = {
+                k: v if isinstance(v, list) else str(v)
+                for k, v in result.items()
+            }
 
     return flargs
 
 
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
+    # Standard Library Imports
     import argparse
 
     flargs = find_config_file(argv) if "--config" in argv else {}
-    parser = argparse.ArgumentParser(description=__doc__, prog='docformatter')
+    parser = argparse.ArgumentParser(description=__doc__, prog="docformatter")
     changes = parser.add_mutually_exclusive_group()
-    changes.add_argument('-i', '--in-place', action='store_true',
-                         help='make changes to files instead of printing '
-                              'diffs')
-    changes.add_argument('-c', '--check', action='store_true',
-                         help='only check and report incorrectly formatted '
-                              'files')
-    parser.add_argument('-r', '--recursive', action='store_true',
-                        default=bool(flargs.get('recursive', False)),
-                        help='drill down directories recursively')
-    parser.add_argument('-e', '--exclude', nargs='*',
-                        help='exclude directories and files by names')
-    parser.add_argument('--wrap-summaries',
-                        default=int(flargs.get('wrap-summaries', 79)),
-                        type=int,
-                        metavar='length',
-                        help='wrap long summary lines at this length; '
-                             'set to 0 to disable wrapping '
-                             '(default: %(default)s)')
-    parser.add_argument('--wrap-descriptions',
-                        default=int(flargs.get('wrap-descriptions', 72)),
-                        type=int,
-                        metavar='length',
-                        help='wrap descriptions at this length; '
-                             'set to 0 to disable wrapping '
-                             '(default: %(default)s)')
-    parser.add_argument('--blank', dest='post_description_blank',
-                        action='store_true',
-                        default=bool(flargs.get('blank', False)),
-                        help='add blank line after description')
-    parser.add_argument('--pre-summary-newline',
-                        action='store_true',
-                        default=bool(flargs.get('pre-summary-newline', False)),
-                        help='add a newline before the summary of a '
-                             'multi-line docstring')
-    parser.add_argument('--make-summary-multi-line',
-                        action='store_true',
-                        default=bool(flargs.get('make-summary-multi-line',
-                                                False)),
-                        help='add a newline before and after the summary of a '
-                             'one-line docstring')
-    parser.add_argument('--force-wrap', action='store_true',
-                        default=bool(flargs.get('force-wrap', False)),
-                        help='force descriptions to be wrapped even if it may '
-                             'result in a mess')
-    parser.add_argument('--range', metavar='line', dest='line_range',
-                        default=flargs.get('range', None), type=int, nargs=2,
-                        help='apply docformatter to docstrings between these '
-                             'lines; line numbers are indexed at 1')
-    parser.add_argument('--docstring-length', metavar='length',
-                        dest='length_range',
-                        default=flargs.get('docstring-length', None),
-                        type=int, nargs=2,
-                        help='apply docformatter to docstrings of given '
-                             'length range')
-    parser.add_argument('--version',
-                        action='version',
-                        version=f'%(prog)s {__version__}')
+    changes.add_argument(
+        "-i",
+        "--in-place",
+        action="store_true",
+        help="make changes to files instead of printing " "diffs",
+    )
+    changes.add_argument(
+        "-c",
+        "--check",
+        action="store_true",
+        help="only check and report incorrectly formatted " "files",
+    )
+    parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        default=bool(flargs.get("recursive", False)),
+        help="drill down directories recursively",
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        nargs="*",
+        help="exclude directories and files by names",
+    )
+    parser.add_argument(
+        "--wrap-summaries",
+        default=int(flargs.get("wrap-summaries", 79)),
+        type=int,
+        metavar="length",
+        help="wrap long summary lines at this length; "
+        "set to 0 to disable wrapping "
+        "(default: %(default)s)",
+    )
+    parser.add_argument(
+        "--wrap-descriptions",
+        default=int(flargs.get("wrap-descriptions", 72)),
+        type=int,
+        metavar="length",
+        help="wrap descriptions at this length; "
+        "set to 0 to disable wrapping "
+        "(default: %(default)s)",
+    )
+    parser.add_argument(
+        "--blank",
+        dest="post_description_blank",
+        action="store_true",
+        default=bool(flargs.get("blank", False)),
+        help="add blank line after description",
+    )
+    parser.add_argument(
+        "--pre-summary-newline",
+        action="store_true",
+        default=bool(flargs.get("pre-summary-newline", False)),
+        help="add a newline before the summary of a " "multi-line docstring",
+    )
+    parser.add_argument(
+        "--make-summary-multi-line",
+        action="store_true",
+        default=bool(flargs.get("make-summary-multi-line", False)),
+        help="add a newline before and after the summary of a "
+        "one-line docstring",
+    )
+    parser.add_argument(
+        "--force-wrap",
+        action="store_true",
+        default=bool(flargs.get("force-wrap", False)),
+        help="force descriptions to be wrapped even if it may "
+        "result in a mess",
+    )
+    parser.add_argument(
+        "--range",
+        metavar="line",
+        dest="line_range",
+        default=flargs.get("range", None),
+        type=int,
+        nargs=2,
+        help="apply docformatter to docstrings between these "
+        "lines; line numbers are indexed at 1",
+    )
+    parser.add_argument(
+        "--docstring-length",
+        metavar="length",
+        dest="length_range",
+        default=flargs.get("docstring-length", None),
+        type=int,
+        nargs=2,
+        help="apply docformatter to docstrings of given " "length range",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
 
-    parser.add_argument('--config',
-                        help='path to file containing docformatter options')
-    parser.add_argument('files', nargs='+',
-                        help="files to format or '-' for standard in")
+    parser.add_argument(
+        "--config", help="path to file containing docformatter options"
+    )
+    parser.add_argument(
+        "files", nargs="+", help="files to format or '-' for standard in"
+    )
 
     args = parser.parse_args(argv[1:])
 
     if args.line_range:
         if args.line_range[0] <= 0:
-            parser.error('--range must be positive numbers')
+            parser.error("--range must be positive numbers")
         if args.line_range[0] > args.line_range[1]:
-            parser.error('First value of --range should be less than or equal '
-                         'to the second')
+            parser.error(
+                "First value of --range should be less than or equal "
+                "to the second"
+            )
 
     if args.length_range:
         if args.length_range[0] <= 0:
-            parser.error('--docstring-length must be positive numbers')
+            parser.error("--docstring-length must be positive numbers")
         if args.length_range[0] > args.length_range[1]:
-            parser.error('First value of --docstring-length should be less '
-                         'than or equal to the second')
+            parser.error(
+                "First value of --docstring-length should be less "
+                "than or equal to the second"
+            )
 
-    if '-' in args.files:
-        _format_standard_in(args,
-                            parser=parser,
-                            standard_out=standard_out,
-                            standard_in=standard_in)
+    if "-" in args.files:
+        _format_standard_in(
+            args,
+            parser=parser,
+            standard_out=standard_out,
+            standard_in=standard_in,
+        )
     else:
-        return _format_files(args,
-                             standard_out=standard_out,
-                             standard_error=standard_error)
+        return _format_files(
+            args, standard_out=standard_out, standard_error=standard_error
+        )
 
 
 def _format_standard_in(args, parser, standard_out, standard_in):
     """Print formatted text to standard out."""
     if len(args.files) > 1:
-        parser.error('cannot mix standard in and regular files')
+        parser.error("cannot mix standard in and regular files")
 
     if args.in_place:
-        parser.error('--in-place cannot be used with standard input')
+        parser.error("--in-place cannot be used with standard input")
 
     if args.recursive:
-        parser.error('--recursive cannot be used with standard input')
+        parser.error("--recursive cannot be used with standard input")
 
     encoding = None
     source = standard_in.read()
@@ -797,9 +897,10 @@ def find_py_files(sources, recursive, exclude=None):
 
     Return: yields paths to found files.
     """
+
     def not_hidden(name):
         """Return True if file 'name' isn't .hidden."""
-        return not name.startswith('.')
+        return not name.startswith(".")
 
     def is_excluded(name, exclude):
         """Return True if file 'name' is excluded."""
@@ -813,16 +914,24 @@ def find_py_files(sources, recursive, exclude=None):
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
             for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [d for d in dirs if not_hidden(
-                    d) and not is_excluded(d, _PYTHON_LIBS)]
+                dirs[:] = [
+                    d
+                    for d in dirs
+                    if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)
+                ]
                 dirs[:] = sorted(
-                    [d for d in dirs if not is_excluded(d, exclude)])
-                files = sorted([f for f in children if not_hidden(
-                    f) and not is_excluded(f, exclude)])
+                    [d for d in dirs if not is_excluded(d, exclude)]
+                )
+                files = sorted(
+                    [
+                        f
+                        for f in children
+                        if not_hidden(f) and not is_excluded(f, exclude)
+                    ]
+                )
                 for filename in files:
-                    if (
-                        filename.endswith('.py') and
-                        not is_excluded(root, exclude)
+                    if filename.endswith(".py") and not is_excluded(
+                        root, exclude
                     ):
                         yield os.path.join(root, filename)
         else:
@@ -835,12 +944,13 @@ def _format_files(args, standard_out, standard_error):
     Return: one of the FormatResult codes.
     """
     outcomes = collections.Counter()
-    for filename in find_py_files(set(args.files),
-                                  args.recursive,
-                                  args.exclude):
+    for filename in find_py_files(
+        set(args.files), args.recursive, args.exclude
+    ):
         try:
-            result = format_file(filename, args=args,
-                                 standard_out=standard_out)
+            result = format_file(
+                filename, args=args, standard_out=standard_out
+            )
             outcomes[result] += 1
             if result == FormatResult.check_failed:
                 print(unicode(filename), file=standard_error)
@@ -868,13 +978,15 @@ def main():
         pass
 
     try:
-        return _main(sys.argv,
-                     standard_out=sys.stdout,
-                     standard_error=sys.stderr,
-                     standard_in=sys.stdin)
-    except KeyboardInterrupt:
+        return _main(
+            sys.argv,
+            standard_out=sys.stdout,
+            standard_error=sys.stderr,
+            standard_in=sys.stdin,
+        )
+    except KeyboardInterrupt:  # pragma: no cover
         return FormatResult.interrupted  # pragma: no cover
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
