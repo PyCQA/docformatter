@@ -1146,7 +1146,6 @@ Print my path and return error code
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
 
-
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,
                               max_words=50):

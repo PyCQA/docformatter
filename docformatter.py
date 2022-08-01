@@ -198,6 +198,7 @@ def _format_code(
             and has_correct_length(length_range, start[0], end[0])
         ):
             indentation = "" if only_comments_so_far else previous_token_string
+
             token_string = format_docstring(
                 indentation,
                 token_string,
@@ -269,6 +270,7 @@ def format_docstring(
         initial_indent = (
             indentation if pre_summary_newline else 3 * " " + indentation
         )
+
         return '''\
 """{pre_summary}{summary}
 
@@ -374,6 +376,7 @@ def split_first_sentence(text):
 
     while rest:
         split = re.split(r"(\s)", rest, maxsplit=1)
+
         word = split[0]
         if len(split) == 3:
             delimiter = split[1]
@@ -470,6 +473,7 @@ def normalize_line(line, newline):
     Otherwise, does nothing.
     """
     stripped = line.rstrip("\n\r")
+
     return stripped + newline if stripped != line else line
 
 
