@@ -500,7 +500,7 @@ def strip_docstring(docstring: str) -> str:
             return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
     raise ValueError(
-        "docformatter only handles strings that start with " "triple quotes"
+        "docformatter only handles strings that start with triple quotes"
     )
 
 

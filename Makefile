@@ -3,9 +3,6 @@ BLACK			= $(shell which black)
 DOCFORMATTER	= $(shell which docformatter)
 ISORT       	= $(shell which isort)
 
-TESTFILE		= tests/
-TESTOPTS		= -s -x -c ./pyproject.toml --cache-clear
-
 check:
 	pycodestyle docformatter.py setup.py
 	pydocstyle docformatter.py setup.py
@@ -15,31 +12,13 @@ check:
 	docformatter docformatter.py setup.py
 	python -m doctest docformatter.py
 
-coverage.unit:
-	@echo -e "\n\t\033[1;32mRunning docformatter unit tests with coverage ...\033[0m\n"
-	COVERAGE_FILE=".coverage.unit" py.test $(TESTOPTS) -m unit \
-		--cov-config=pyproject.toml --cov=docformatter --cov-branch \
-		--cov-report=term $(TESTFILE)
-
-coverage.system:
-	@echo -e "\n\t\033[1;32mRunning docformatter system tests with coverage ...\033[0m\n"
-	COVERAGE_FILE=".coverage.system" py.test $(TESTOPTS) -m system \
-		--cov-config=pyproject.toml --cov=docformatter --cov-branch \
-		--cov-report=term $(TESTFILE)
-
 coverage:
-	@echo -e "\n\t\033[1;32mRunning full docformatter test suite with coverage ...\033[0m\n"
 	@coverage erase
-	$(MAKE) coverage.unit
-	$(MAKE) coverage.system
-	$(MAKE) coverage.old
-	@coverage combine .coverage.unit .coverage.system .coverage.old
-	@coverage xml --rcfile=pyproject.toml
-
-coverage.old:
-	COVERAGE_FILE=".coverage.old" coverage run \
-		--branch --omit='*/site-packages/*,*/*pypy/*' \
+	@DOCFORMATTER_COVERAGE=1 coverage run \
+		--branch --parallel-mode --omit='*/site-packages/*,*/*pypy/*' \
 		test_docformatter.py
+	@coverage combine
+	@coverage report --show-missing
 
 open_coverage: coverage
 	@coverage html
