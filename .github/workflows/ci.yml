@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install .[tomli]
-        pip install --quiet coverage coveralls
+        pip install --quiet coverage coveralls pytest pytest-cov mock
     - name: Run tests
       run: make coverage
     # - name: Upload Coverage
