@@ -1,3 +1,4 @@
+
 check:
 	pycodestyle docformatter.py setup.py
 	pydocstyle docformatter.py setup.py

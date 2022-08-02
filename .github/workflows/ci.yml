@@ -16,17 +16,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install .[tomli]
-        pip install --quiet coverage coveralls
-    - name: Run tests
-      run: make coverage
-    # - name: Upload Coverage
-    #   run: coveralls
-
+        python -m pip install -U pip
+        python -m pip install .[tomli]
+        python -m pip install --quiet coverage coveralls pytest pytest-cov mock tox
+    - name: Run tests with tox
+      run: |
+        tox -e py
