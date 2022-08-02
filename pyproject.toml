@@ -37,7 +37,7 @@ untokenize = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
 pydocstyle = "^6.1.1"
-pylint = "^2.6.0"
+pylint = "^2.12.0"
 pycodestyle = "^2.8.0"
 coverage = "^6.2.0"
 rstcheck = "<6.0.0"
@@ -48,6 +48,9 @@ isort = "^5.7.0"
 black = [
     {version = "^22.0.0", python = ">=3.6.2"},
     ]
+
+[tool.poetry.scripts]
+docformatter = "docformatter:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -148,3 +151,37 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 79
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist = True
+isolated_build = True
+envlist = py{36,37,38,39,310,py36}, style
+
+[testenv:py{36,37,38,39,310,py36}]
+deps =
+    pytest
+    pytest-cov
+    coverage
+    mock
+commands =
+    pip install .[tomli]
+    pytest -s -x -c ./pyproject.toml --cache-clear \
+        --cov-config=pyproject.toml --cov=docformatter \
+        --cov-branch --cov-report=term tests/
+    coverage run --branch --omit="*/site-packages/*,*/*pypy/*" \
+        test_docformatter.py
+
+[testenv:style]
+deps =
+    pycodestyle
+    pydocstyle
+    pylint
+    toml
+commands =
+    pip install .[tomli]
+    pycodestyle docformatter.py setup.py
+    pydocstyle docformatter.py setup.py
+    pylint docformatter.py setup.py
+"""

@@ -1,10 +1,3 @@
-# Find the executable in the venv (hopefully).
-BLACK			= $(shell which black)
-DOCFORMATTER	= $(shell which docformatter)
-ISORT       	= $(shell which isort)
-
-TESTFILE		= tests/
-TESTOPTS		= -s -x -c ./pyproject.toml --cache-clear
 
 check:
 	pycodestyle docformatter.py setup.py

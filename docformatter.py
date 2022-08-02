@@ -198,6 +198,7 @@ def _format_code(
             and has_correct_length(length_range, start[0], end[0])
         ):
             indentation = "" if only_comments_so_far else previous_token_string
+
             token_string = format_docstring(
                 indentation,
                 token_string,
@@ -496,7 +497,7 @@ def strip_docstring(docstring: str) -> str:
             return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
 
     raise ValueError(
-        "docformatter only handles strings that start with " "triple quotes"
+        "docformatter only handles strings that start with triple quotes"
     )
 
 

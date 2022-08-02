@@ -104,7 +104,6 @@ def foo():
     ):
         """Command line arguments override configuration file options."""
         process = run_docformatter
-        print(process.communicate())
         assert '''\
 @@ -1,4 +1,2 @@
  def foo():
