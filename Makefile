@@ -1,7 +1,3 @@
-# Find the executable in the venv (hopefully).
-BLACK			= $(shell which black)
-DOCFORMATTER	= $(shell which docformatter)
-ISORT       	= $(shell which isort)
 
 check:
 	pycodestyle docformatter.py setup.py
@@ -29,10 +25,3 @@ mutant:
 
 readme:
 	@restview --long-description --strict
-
-# This target is for use with IDE integration.
-format:
-	@echo -e "\n\t\033[1;32mAutoformatting $(SRCFILE) ...\033[0m\n"
-	$(BLACK) --fast $(SRCFILE)
-	$(ISORT) --settings-file ./pyproject.toml --atomic $(SRCFILE)
-	@python docformatter.py --in-place --config ./pyproject.toml $(SRCFILE)
