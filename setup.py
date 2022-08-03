@@ -15,7 +15,7 @@ from setuptools import setup
 
 def version():
     """Return version string."""
-    with open('docformatter.py') as input_file:
+    with open('docformatter.py', encoding="ascii") as input_file:
         for line in input_file:
             if line.startswith('__version__'):
                 return ast.parse(line).body[0].value.s
@@ -24,7 +24,7 @@ def version():
 setup(name='docformatter',
       version=version(),
       description='Formats docstrings to follow PEP 257.',
-      long_description=Path('README.rst').read_text(),
+      long_description=Path('README.rst').read_text(encoding="ascii"),
       license='Expat License',
       author='Steven Myint',
       url='https://github.com/myint/docformatter',
