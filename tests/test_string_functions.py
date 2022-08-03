@@ -150,7 +150,6 @@ The below should be indented with spaces:
         )
 
 
-
 class TestNormalizers:
     """Class for testing the string normalizing functions.
 
@@ -452,7 +451,7 @@ class TestStrippers:
     @pytest.mark.unit
     def test_strip_docstring(self):
         """Strip triple double quotes from docstring."""
-        assert "Hello." == docformatter.strip_docstring(
+        docstring, open_quote = docformatter.strip_docstring(
             '''
     """Hello.
 
@@ -460,11 +459,13 @@ class TestStrippers:
 
     '''
         )
+        assert docstring == "Hello."
+        assert open_quote == '"""'
 
     @pytest.mark.unit
     def test_strip_docstring_with_single_quotes(self):
         """Strip triple single quotes from docstring."""
-        assert "Hello." == docformatter.strip_docstring(
+        docstring, open_quote == docformatter.strip_docstring(
             """
     '''Hello.
 
@@ -472,17 +473,37 @@ class TestStrippers:
 
     """
         )
+        assert docstring == "Hello."
+        assert open_quote == '"""'
 
     @pytest.mark.unit
     def test_strip_docstring_with_empty_string(self):
         """Return series of six double quotes when passed empty string."""
-        assert "" == docformatter.strip_docstring('""""""')
+        docstring, open_quote = docformatter.strip_docstring('""""""')
+        assert docstring == ""
+        assert open_quote == '"""'
 
     @pytest.mark.unit
-    def test_strip_docstring_with_unhandled(self):
-        """Raise ValueError with raw docstrings."""
-        with pytest.raises(ValueError):
-            docformatter.strip_docstring('r"""foo"""')
+    def test_strip_docstring_with_raw_string(self):
+        """Return docstring and raw open quote."""
+        docstring, open_quote = docformatter.strip_docstring('r"""foo"""')
+        assert docstring == "foo"
+        assert open_quote == 'r"""'
+
+        docstring, open_quote = docformatter.strip_docstring("R'''foo'''")
+        assert docstring == "foo"
+        assert open_quote == 'R"""'
+
+    @pytest.mark.unit
+    def test_strip_docstring_with_unicode_string(self):
+        """Return docstring and unicode open quote."""
+        docstring, open_quote = docformatter.strip_docstring("u'''foo'''")
+        assert docstring == "foo"
+        assert open_quote == 'u"""'
+
+        docstring, open_quote = docformatter.strip_docstring('U"""foo"""')
+        assert docstring == "foo"
+        assert open_quote == 'U"""'
 
     @pytest.mark.unit
     def test_strip_docstring_with_unknown(self):
@@ -494,9 +515,8 @@ class TestStrippers:
     def test_strip_docstring_with_single_quotes(self):
         """Raise ValueError when strings begin with single single quotes.
 
-        See requirement 1, always use triple double quotes. See issue
-        #66 for example of docformatter breaking code when encountering
-        single quote.
+        See requirement #1.  See issue #66 for example of docformatter breaking
+        code when encountering single quote.
         """
         with pytest.raises(ValueError):
             docformatter.strip_docstring("'hello\\''")
@@ -505,9 +525,8 @@ class TestStrippers:
     def test_strip_docstring_with_double_quotes(self):
         """Raise ValueError when strings begin with single double quotes.
 
-        See requirement 1, always use triple double quotes. See issue
-        #66 for example of docformatter breaking code when encountering
-        single quote.
+        See requirement #1.  See issue #66 for example of docformatter
+        breaking code when encountering single quote.
         """
         with pytest.raises(ValueError):
             docformatter.strip_docstring('"hello\\""')

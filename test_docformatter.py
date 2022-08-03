@@ -578,14 +578,16 @@ def foo():
     def test_method_no_chr_92(): the501(92) # \
 '''.lstrip()))
 
-    def test_format_code_skip_complex(self):
-        """We do not handle r/u/b prefixed strings."""
+    def test_format_code_raw_docstring_double_quotes(self):
+        """Should format raw docstrings with triple double quotes.
+
+        See requirement #2.  See issue #54 for request to handle raw
+        docstrings.
+        """
         self.assertEqual(
             '''\
 def foo():
-    r"""
-    Hello foo.
-    """
+    r"""Hello foo."""
 ''',
             docformatter.format_code(
                 '''\
@@ -595,19 +597,111 @@ def foo():
     """
 '''))
 
-    def test_format_code_skip_complex_single(self):
-        """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
-            """\
+        '''\
 def foo():
-    r'''
+    R"""Hello foo."""
+''',
+            docformatter.format_code(
+            '''\
+def foo():
+    R"""
     Hello foo.
-    '''
-""",
+    """
+'''))
+
+    def test_format_code_raw_docstring_single_quotes(self):
+        """Should format raw docstrings with triple single quotes.
+
+        See requirement #2.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    r"""Hello foo."""
+''',
             docformatter.format_code(
                 """\
 def foo():
     r'''
+    Hello foo.
+    '''
+"""))
+
+        self.assertEqual(
+        '''\
+def foo():
+    R"""Hello foo."""
+''',
+           docformatter.format_code(
+            """\
+def foo():
+    R'''
+    Hello foo.
+    '''
+"""))
+
+    def test_format_code_unicode_docstring_double_quotes(self):
+        """Should format unicode docstrings with triple double quotes.
+
+        See requirement #3.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    u"""Hello foo."""
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    u"""
+    Hello foo.
+    """
+'''))
+
+        self.assertEqual(
+            '''\
+def foo():
+    U"""Hello foo."""
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    U"""
+    Hello foo.
+    """
+'''))
+
+    def test_format_code_unicode_docstring_single_quotes(self):
+        """Should format unicode docstrings with triple single quotes.
+
+        See requirement #3.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    u"""Hello foo."""
+''',
+            docformatter.format_code(
+                """\
+def foo():
+    u'''
+    Hello foo.
+    '''
+"""))
+
+        self.assertEqual(
+            '''\
+def foo():
+    U"""Hello foo."""
+''',
+            docformatter.format_code(
+                """\
+def foo():
+    U'''
     Hello foo.
     '''
 """))
