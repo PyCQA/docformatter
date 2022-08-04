@@ -176,6 +176,7 @@ def _format_code(
     force_wrap=False,
     line_range=None,
     length_range=None,
+    strict=True,
 ):
     """Return source code with docstrings formatted."""
     if not source:
@@ -222,6 +223,7 @@ def _format_code(
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
                 force_wrap=force_wrap,
+                strict=strict,
             )
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
@@ -244,6 +246,7 @@ def format_docstring(
     make_summary_multi_line=False,
     post_description_blank=False,
     force_wrap=False,
+    strict=True,
 ):
     """Return formatted version of docstring.
 
@@ -274,7 +277,7 @@ def format_docstring(
     if remove_section_header(description).strip() != description.strip():
         return docstring
 
-    if not force_wrap and is_some_sort_of_list(summary):
+    if not force_wrap and is_some_sort_of_list(summary, strict):
         # Something is probably not right with the splitting.
         return docstring
 
@@ -303,6 +306,7 @@ def format_docstring(
                 indentation=indentation,
                 wrap_length=description_wrap_length,
                 force_wrap=force_wrap,
+                strict=strict,
             ),
             post_description=("\n" if post_description_blank else ""),
             indentation=indentation,
@@ -417,7 +421,7 @@ def split_first_sentence(text):
     return sentence, delimiter + rest
 
 
-def is_some_sort_of_list(text):
+def is_some_sort_of_list(text, strict):
     """Return True if text looks like a list."""
     split_lines = text.rstrip().splitlines()
 
@@ -428,7 +432,7 @@ def is_some_sort_of_list(text):
         len(split_lines)
         / max([len(line.strip()) for line in split_lines] + [1])
         > HEURISTIC_MIN_LIST_ASPECT_RATIO
-    ):
+    ) and not strict:
         return True
 
     return any(
@@ -572,7 +576,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def wrap_description(text, indentation, wrap_length, force_wrap):
+def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     """Return line-wrapped description text.
 
     We only wrap simple descriptions. We leave doctests, multi-paragraph
@@ -589,7 +593,7 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
     # Ignore possibly complicated cases.
     if wrap_length <= 0 or (
         not force_wrap
-        and (is_some_sort_of_list(text) or is_some_sort_of_code(text))
+        and (is_some_sort_of_list(text, strict) or is_some_sort_of_code(text))
     ):
         return text
 
@@ -713,6 +717,7 @@ def _format_code_with_args(source, args):
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
         line_range=args.line_range,
+        strict=args.non_strict,
     )
 
 
@@ -850,9 +855,15 @@ def _main(argv, standard_out, standard_error, standard_in):
         help="apply docformatter to docstrings of given length range",
     )
     parser.add_argument(
+        "--non-strict",
+        action="store_true",
+        default=bool(flargs.get("non-strict", False)),
+        help="don't strictly follow reST syntax to identify lists (see issue "
+             "#67)",
+    )
+    parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
-
     parser.add_argument(
         "--config", help="path to file containing docformatter options"
     )
@@ -940,12 +951,14 @@ def find_py_files(sources, recursive, exclude=None):
 
     def is_excluded(name, exclude):
         """Return True if file 'name' is excluded."""
-        if not exclude:
-            return False
-        for e in exclude:
-            if re.search(re.escape(str(e)), name, re.IGNORECASE):
-                return True
-        return False
+        return (
+            any(
+                re.search(re.escape(str(e)), name, re.IGNORECASE)
+                for e in exclude
+            )
+            if exclude
+            else False
+        )
 
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
