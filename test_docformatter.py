@@ -356,7 +356,7 @@ Hello.
     """'''
         self.assertEqual(
             docstring,
-            docformatter.format_docstring('    ', docstring))
+            docformatter.format_docstring('    ', docstring, strict=False))
 
     def test_format_docstring_should_underlined_summaries_alone(self):
         docstring = '''"""
@@ -1058,7 +1058,8 @@ def foo():
 -    Hello world 
 -    """
 +    """Hello world."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_wrapping(self):
         with temporary_file('''\
@@ -1077,7 +1078,8 @@ def foo():
 -    """
 +    """Hello world this is a summary
 +    that will get wrapped."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_no_wrapping(self):
         with temporary_file('''\
@@ -1125,7 +1127,8 @@ def foo():
      """Wrapping is off, but it will still add
 -    the trailing period  """
 +    the trailing period."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
 
     def test_end_to_end_all_options(self):
@@ -1157,7 +1160,8 @@ def foo():
  
 -
      """
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_invalid_range(self):
         process = run_docformatter(['--range', '0', '1', os.devnull])
@@ -1182,7 +1186,6 @@ Hello world"""
 '''.encode())[0].decode().replace("\r", "")
 
         self.assertEqual(0, process.returncode)
-
         self.assertEqual(
             '''"""Hello world."""\n''',
             result)
