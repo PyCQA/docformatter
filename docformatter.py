@@ -24,6 +24,7 @@
 
 """Formats docstrings to follow PEP 257."""
 
+
 from __future__ import (
     absolute_import,
     division,
@@ -33,6 +34,7 @@ from __future__ import (
 
 # Standard Library Imports
 import collections
+import contextlib
 import io
 import locale
 import os
@@ -42,6 +44,7 @@ import sys
 import sysconfig
 import textwrap
 import tokenize
+from typing import Tuple
 
 # Third Party Imports
 import untokenize
@@ -57,9 +60,7 @@ except ImportError:
 __version__ = "1.4"
 
 
-try:
-    unicode
-except NameError:
+if sys.version_info.major == 3:
     unicode = str
 
 
@@ -68,10 +69,23 @@ HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 CR = "\r"
 LF = "\n"
 CRLF = "\r\n"
-QUOTE_TYPES = (
+STR_QUOTE_TYPES = (
     '"""',
     "'''",
 )
+RAW_QUOTE_TYPES = (
+    'r"""',
+    'R"""',
+    "r'''",
+    "R'''",
+)
+UCODE_QUOTE_TYPES = (
+    'u"""',
+    'U"""',
+    "u'''",
+    "U'''",
+)
+QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
@@ -121,7 +135,7 @@ def reindent(text, indentation):
 
 
 def _find_shortest_indentation(lines):
-    """Return most shortest indentation."""
+    """Return shortest indentation."""
     assert not isinstance(lines, str)
 
     indentation = None
@@ -244,7 +258,7 @@ def format_docstring(
         - Unless the entire docstring fits on a line, place the closing quotes
           on a line by themselves.
     """
-    contents = strip_docstring(docstring)
+    contents, open_quote = strip_docstring(docstring)
 
     # Skip if there are nested triple double quotes
     if contents.count(QUOTE_TYPES[0]):
@@ -271,11 +285,12 @@ def format_docstring(
             indentation if pre_summary_newline else 3 * " " + indentation
         )
         return '''\
-"""{pre_summary}{summary}
+{open_quote}{pre_summary}{summary}
 
 {description}{post_description}
 {indentation}"""\
 '''.format(
+            open_quote=open_quote,
             pre_summary=("\n" + indentation if pre_summary_newline else ""),
             summary=wrap_summary(
                 normalize_summary(summary),
@@ -295,7 +310,7 @@ def format_docstring(
     else:
         if not make_summary_multi_line:
             return wrap_summary(
-                '"""' + normalize_summary(contents) + '"""',
+                open_quote + normalize_summary(contents) + '"""',
                 wrap_length=summary_wrap_length,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
@@ -338,11 +353,11 @@ def split_summary_and_description(contents):
     for index in range(1, len(split_lines)):
         found = False
 
-        if not split_lines[index].strip():
-            # Empty line separation would indicate the rest is the description.
-            found = True
-        elif is_probably_beginning_of_sentence(split_lines[index]):
-            # Symbol on second line probably is a description with a list.
+        # Empty line separation would indicate the rest is the description or,
+        # symbol on second line probably is a description with a list.
+        if not split_lines[index].strip() or is_probably_beginning_of_sentence(
+            split_lines[index]
+        ):
             found = True
 
         if found:
@@ -360,7 +375,7 @@ def split_summary_and_description(contents):
             + split[1].strip(),
         )
 
-    return (contents, "")
+    return contents, ""
 
 
 def split_first_sentence(text):
@@ -399,7 +414,7 @@ def split_first_sentence(text):
         previous_delimiter = delimiter
         delimiter = ""
 
-    return (sentence, delimiter + rest)
+    return sentence, delimiter + rest
 
 
 def is_some_sort_of_list(text):
@@ -421,7 +436,7 @@ def is_some_sort_of_list(text):
             re.match(r"\s*$", line)
             or
             # "1. item"
-            re.match(r"\s*[0-9]\.", line)
+            re.match(r"\s*\d\.", line)
             or
             # "@parameter"
             re.match(r"\s*[\-*:=@]", line)
@@ -482,22 +497,42 @@ def normalize_line_endings(lines, newline):
     return "".join([normalize_line(line, newline) for line in lines])
 
 
-def strip_docstring(docstring: str) -> str:
-    """Return contents of docstring.
+def strip_docstring(docstring: str) -> Tuple[str, str]:
+    """Return contents of docstring and opening quote type.
 
-    :param docstring: the docstring, including the opening and closing triple
-        quotes.
-    :return: docstring with the triple quotes removed.
-    :rtype: str
+    Strips the docstring of its triple quotes, trailing white space,
+    and line returns.  Determines type of docstring quote (either string,
+    raw, or unicode) and returns the opening quotes, including the type
+    identifier, with single quotes replaced by double quotes.
+
+    Parameters
+    ----------
+    docstring: str
+        The docstring, including the opening and closing triple quotes.
+
+    Returns
+    -------
+    (docstring, open_quote) : tuple
+        The docstring with the triple quotes removed.
+        The opening quote type with single quotes replaced by double quotes.
+
     """
     docstring = docstring.strip()
 
     for quote in QUOTE_TYPES:
-        if docstring.startswith(quote) and docstring.endswith(quote):
-            return docstring.split(quote, 1)[1].rsplit(quote, 1)[0].strip()
+        if quote in RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES and (
+            docstring.startswith(quote) and docstring.endswith(quote[1:])
+        ):
+            return docstring.split(quote, 1)[1].rsplit(quote[1:], 1)[
+                0
+            ].strip(), quote.replace("'", '"')
+        elif docstring.startswith(quote) and docstring.endswith(quote):
+            return docstring.split(quote, 1)[1].rsplit(quote, 1)[
+                0
+            ].strip(), quote.replace("'", '"')
 
     raise ValueError(
-        "docformatter only handles strings that start with triple quotes"
+        "docformatter only handles triple-quoted (single or double) strings"
     )
 
 
@@ -624,8 +659,8 @@ def detect_encoding(filename):
             encoding = lib2to3_tokenize.detect_encoding(input_file.readline)[0]
 
             # Check for correctness of encoding.
-            with open_with_encoding(filename, encoding) as input_file:
-                input_file.read()
+            with open_with_encoding(filename, encoding) as check_file:
+                check_file.read()
 
         return encoding
     except (SyntaxError, LookupError, UnicodeDecodeError):
@@ -729,13 +764,13 @@ def _main(argv, standard_out, standard_error, standard_in):
         "-i",
         "--in-place",
         action="store_true",
-        help="make changes to files instead of printing " "diffs",
+        help="make changes to files instead of printing diffs",
     )
     changes.add_argument(
         "-c",
         "--check",
         action="store_true",
-        help="only check and report incorrectly formatted " "files",
+        help="only check and report incorrectly formatted files",
     )
     parser.add_argument(
         "-r",
@@ -779,7 +814,7 @@ def _main(argv, standard_out, standard_error, standard_in):
         "--pre-summary-newline",
         action="store_true",
         default=bool(flargs.get("pre-summary-newline", False)),
-        help="add a newline before the summary of a " "multi-line docstring",
+        help="add a newline before the summary of a multi-line docstring",
     )
     parser.add_argument(
         "--make-summary-multi-line",
@@ -812,7 +847,7 @@ def _main(argv, standard_out, standard_error, standard_in):
         default=flargs.get("docstring-length", None),
         type=int,
         nargs=2,
-        help="apply docformatter to docstrings of given " "length range",
+        help="apply docformatter to docstrings of given length range",
     )
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
@@ -971,13 +1006,10 @@ def _format_files(args, standard_out, standard_error):
 
 def main():
     """Run main entry point."""
-    try:
+    # SIGPIPE is not available on Windows.
+    with contextlib.suppress(AttributeError):
         # Exit on broken pipe.
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-    except AttributeError:  # pragma: no cover
-        # SIGPIPE is not available on Windows.
-        pass
-
     try:
         return _main(
             sys.argv,

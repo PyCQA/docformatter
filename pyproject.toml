@@ -47,7 +47,7 @@ mock = "^4.0.0"
 isort = "^5.7.0"
 black = [
     {version = "^22.0.0", python = ">=3.6.2"},
-    ]
+]
 
 [tool.poetry.scripts]
 docformatter = "docformatter:main"
@@ -180,7 +180,6 @@ deps =
     pylint
     toml
 commands =
-    pip install .[tomli]
     pycodestyle docformatter.py setup.py
     pydocstyle docformatter.py setup.py
     pylint docformatter.py setup.py
