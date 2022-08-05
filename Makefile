@@ -1,39 +1,38 @@
+
 check:
 	pycodestyle docformatter.py setup.py
-	pydocstyle \
-		--convention=pep257 \
-		--add-ignore=D413 \
-		docformatter.py \
-		setup.py
-	pylint \
-		--reports=no \
-		--disable=bad-continuation \
-		--disable=fixme \
-		--disable=inconsistent-return-statements \
-		--disable=invalid-name \
-		--disable=no-else-return \
-		--disable=no-member \
-		--disable=too-few-public-methods \
-		--disable=too-many-arguments \
-		--disable=too-many-boolean-expressions \
-		--disable=too-many-locals \
-		--disable=too-many-return-statements \
-		--disable=useless-object-inheritance \
-		--rcfile=/dev/null \
-		docformatter.py setup.py
+	pydocstyle docformatter.py setup.py
+	pylint docformatter.py setup.py
 	check-manifest
 	rstcheck --report=1 README.rst
 	docformatter docformatter.py setup.py
 	python -m doctest docformatter.py
-	scspell docformatter.py setup.py test_docformatter.py README.rst
+
+coverage.unit:
+	@echo -e "\n\t\033[1;32mRunning docformatter unit tests with coverage ...\033[0m\n"
+	COVERAGE_FILE=".coverage.unit" py.test $(TESTOPTS) -m unit \
+		--cov-config=pyproject.toml --cov=docformatter --cov-branch \
+		--cov-report=term $(TESTFILE)
+
+coverage.system:
+	@echo -e "\n\t\033[1;32mRunning docformatter system tests with coverage ...\033[0m\n"
+	COVERAGE_FILE=".coverage.system" py.test $(TESTOPTS) -m system \
+		--cov-config=pyproject.toml --cov=docformatter --cov-branch \
+		--cov-report=term $(TESTFILE)
 
 coverage:
+	@echo -e "\n\t\033[1;32mRunning full docformatter test suite with coverage ...\033[0m\n"
 	@coverage erase
-	@DOCFORMATTER_COVERAGE=1 coverage run \
-		--branch --parallel-mode --omit='*/site-packages/*,*/*pypy/*' \
+	$(MAKE) coverage.unit
+	$(MAKE) coverage.system
+	$(MAKE) coverage.old
+	@coverage combine .coverage.unit .coverage.system .coverage.old
+	@coverage xml --rcfile=pyproject.toml
+
+coverage.old:
+	COVERAGE_FILE=".coverage.old" coverage run \
+		--branch --omit='*/site-packages/*,*/*pypy/*' \
 		test_docformatter.py
-	@coverage combine
-	@coverage report --show-missing
 
 open_coverage: coverage
 	@coverage html
@@ -44,3 +43,10 @@ mutant:
 
 readme:
 	@restview --long-description --strict
+
+# This target is for use with IDE integration.
+format:
+	@echo -e "\n\t\033[1;32mAutoformatting $(SRCFILE) ...\033[0m\n"
+	$(BLACK) --fast $(SRCFILE)
+	$(ISORT) --settings-file ./pyproject.toml --atomic $(SRCFILE)
+	@python docformatter.py --in-place --config ./pyproject.toml $(SRCFILE)
