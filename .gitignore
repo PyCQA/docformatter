@@ -10,6 +10,8 @@ __pycache__/
 build/
 dist/
 htmlcov/
-.coverage
+*coverage*
+.python-version
+poetry.lock
 .idea/
 .vscode/
