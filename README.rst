@@ -185,6 +185,10 @@ Below is the help output::
       --pre-summary-newline
                             add a newline before the summary of a multi-line
                             docstring
+      --pre-summary-space
+                            add a space between the opening triple quotes and
+                            the first word in a one-line or summary line of a
+                            multi-line docstring
       --make-summary-multi-line
                             add a newline before and after the summary of a one-
                             line docstring
@@ -218,6 +222,12 @@ Command line options take precedence.  The configuration file can be passed with
 path, otherwise docformatter will look in the current directory.  For example::
 
       docformatter --config ~/.secret/path/to/pyproject.toml
+
+See the discussions in `issue_39`_ and `issue_94`_ regarding docformatter and
+black interactions.
+
+.. _`issue_39`: https://github.com/PyCQA/docformatter/issues/39
+.. _`issue_94`: https://github.com/PyCQA/docformatter/issues/94
 
 Wrapping descriptions
 =====================
@@ -275,7 +285,7 @@ Do you use *docformatter*?  What style docstrings do you use?  Add some badges t
 .. code-block::
 
 	.. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
-  	  :target: https://pycqa.github.io/docformatter/
+  	  :target: https://github.com/PyCQA/docformatter
 
 .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
 	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
