@@ -166,16 +166,16 @@ def format_code(source, **kwargs):
         return source
 
 
-def _format_code(
-    source,
-    summary_wrap_length=79,
-    description_wrap_length=72,
-    pre_summary_newline=False,
-    make_summary_multi_line=False,
-    post_description_blank=False,
-    force_wrap=False,
-    line_range=None,
+def _format_code(source,
+                 summary_wrap_length=79,
+                 description_wrap_length=72,
+                 pre_summary_newline=False,
+                 make_summary_multi_line=False,
+                 post_description_blank=False,
+                 force_wrap=False,
+                 line_range=None,
     length_range=None,
+    pre_summary_space=False,
     strict=True,
 ):
     """Return source code with docstrings formatted."""
@@ -223,6 +223,7 @@ def _format_code(
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
                 force_wrap=force_wrap,
+                pre_summary_space=pre_summary_space,
                 strict=strict,
             )
 
@@ -245,15 +246,14 @@ def _format_code(
     return untokenize.untokenize(modified_tokens)
 
 
-def format_docstring(
-    indentation,
-    docstring,
-    summary_wrap_length=0,
-    description_wrap_length=0,
-    pre_summary_newline=False,
-    make_summary_multi_line=False,
-    post_description_blank=False,
-    force_wrap=False,
+def format_docstring(indentation, docstring,
+                     summary_wrap_length=0,
+                     description_wrap_length=0,
+                     pre_summary_newline=False,
+                     make_summary_multi_line=False,
+                     post_description_blank=False,
+                     force_wrap=False,
+                     pre_summary_space=False,
     strict=True,
 ):
     """Return formatted version of docstring.
@@ -302,7 +302,9 @@ def format_docstring(
 {indentation}"""\
 '''.format(
             open_quote=open_quote,
-            pre_summary=("\n" + indentation if pre_summary_newline else ""),
+            pre_summary=('\n' + indentation if pre_summary_newline
+                         else ' ' if pre_summary_space 
+                         else ''),
             summary=wrap_summary(
                 normalize_summary(summary),
                 wrap_length=summary_wrap_length,
@@ -328,7 +330,7 @@ def format_docstring(
                 subsequent_indent=indentation,
             ).strip()
 
-        beginning = '"""\n' + indentation
+        beginning = '""" ' if pre_summary_space else '"""'
         ending = "\n" + indentation + '"""'
         summary_wrapped = wrap_summary(
             normalize_summary(contents),
@@ -339,7 +341,6 @@ def format_docstring(
         return "{beginning}{summary}{ending}".format(
             beginning=beginning, summary=summary_wrapped, ending=ending
         )
-
 
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
@@ -829,6 +830,9 @@ def _main(argv, standard_out, standard_error, standard_in):
         default=bool(flargs.get("pre-summary-newline", False)),
         help="add a newline before the summary of a multi-line docstring",
     )
+    parser.add_argument('--pre-summary-space',
+                        action='store_true',
+                        help='add a space before one-line or the summary of a multi-line docstring')
     parser.add_argument(
         "--make-summary-multi-line",
         action="store_true",
