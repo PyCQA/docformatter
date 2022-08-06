@@ -2,21 +2,43 @@
 docformatter
 ============
 
+.. |CI| image:: https://img.shields.io/github/workflow/status/PyCQA/docformatter/CI
+.. |CONTRIBUTORS| image:: https://img.shields.io/github/contributors/PyCQA/docformatter
+.. |COMMIT| image:: https://img.shields.io/github/last-commit/PyCQA/docformatter
+.. |BLACK| image:: https://img.shields.io/badge/%20style-black-000000.svg
+    :target: https://github.com/psf/black
+.. |ISORT| image:: https://img.shields.io/badge/%20imports-isort-%231674b1
+    :target: https://pycqa.github.io/isort/
+.. |SELF| image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
+    :target: https://pycqa.github.io/docformatter/
+.. |DOCSTYLE| image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
+    :target: https://numpydoc.readthedocs.io/en/latest/format.html
+
+.. |VERSION| image:: https://img.shields.io/pypi/v/docformatter
+.. |LICENSE| image:: https://img.shields.io/pypi/l/docformatter
+.. |PYVERS| image:: https://img.shields.io/pypi/pyversions/docformatter
+.. |PYMAT| image:: https://img.shields.io/pypi/format/docformatter
+.. |DD| image:: https://img.shields.io/pypi/dd/docformatter
+
++----------------+----------------------------------------------------------+
+| **Code**       + |BLACK| |ISORT|                                          +
++----------------+----------------------------------------------------------+
+| **Docstrings** + |SELF| |DOCSTYLE|                                        +
++----------------+----------------------------------------------------------+
+| **GitHub**     + |CI| |CONTRIBUTORS| |COMMIT|                             +
++----------------+----------------------------------------------------------+
+| **PyPi**       + |VERSION| |LICENSE| |PYVERS| |PYMAT| |DD|                +
++----------------+----------------------------------------------------------+
+
 Formats docstrings to follow `PEP 257`_.
 
 .. _`PEP 257`: http://www.python.org/dev/peps/pep-0257/
-
-.. image:: https://travis-ci.org/myint/docformatter.svg?branch=master
-   :target: https://travis-ci.org/myint/docformatter
-   :alt: Build status
 
 
 Features
 ========
 
-*docformatter* currently automatically formats docstrings to follow a
-subset of the PEP 257 conventions. Below are the relevant items quoted
-from PEP 257.
+*docformatter* automatically formats docstrings to follow a subset of the PEP 257 conventions. Below are the relevant items quoted from PEP 257.
 
 - For consistency, always use triple double quotes around docstrings.
 - Triple quotes are used even though the string fits on one line.
@@ -40,6 +62,9 @@ From pip::
 
     $ pip install --upgrade docformatter
 
+Or, if you want to use pyproject.toml to configure docformatter::
+
+    $ pip install --upgrade docformatter[tomli]
 
 Example
 =======
@@ -134,7 +159,8 @@ Below is the help output::
     usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
                         [--wrap-descriptions length] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
-                        [--force-wrap] [--range line line] [--version]
+                        [--force-wrap] [--range start_line end_line]
+                        [--docstring-length min_length max_length] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -164,15 +190,34 @@ Below is the help output::
                             line docstring
       --force-wrap          force descriptions to be wrapped even if it may result
                             in a mess
-      --range line line     apply docformatter to docstrings between these lines;
+      --range start_line end_line
+                            apply docformatter to docstrings between these lines;
                             line numbers are indexed at 1
+      --docstring-length min_length max_length
+                            apply docformatter to docstrings of given length range
+      --strict              strictly follow reST syntax to identify lists (see issue #67)
       --version             show program's version number and exit
+      --config CONFIG       path to file containing docformatter options
 
 
 Possible exit codes:
 
 - **1** - if any error encountered
 - **3** - if any file needs to be formatted (in ``--check`` mode)
+
+docformatter options can also be stored in a configuration file.  Currently only
+pyproject.toml is supported.  Add section [tool.docformatter] with options listed using
+the same name as command line options.  For example::
+
+      [tool.docformatter]
+      recursive = true
+      wrap-summaries = 82
+      blank = true
+
+Command line options take precedence.  The configuration file can be passed with a full
+path, otherwise docformatter will look in the current directory.  For example::
+
+      docformatter --config ~/.secret/path/to/pyproject.toml
 
 Wrapping descriptions
 =====================
@@ -218,8 +263,42 @@ PyCharm
 
 Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and configure *docformatter* as shown below:
 
-.. image:: /images/pycharm-file-watcher-configurations.png
+.. image:: ./images/pycharm-file-watcher-configurations.png
    :alt: PyCharm file watcher configurations
+
+Marketing
+=========
+Do you use *docformatter*?  What style docstrings do you use?  Add some badges to your project's **README** and let everyone know.
+
+|SELF|
+
+.. code-block::
+
+	.. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
+  	  :target: https://pycqa.github.io/docformatter/
+
+.. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+
+.. code-block::
+
+	.. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+
+|DOCSTYLE|
+
+.. code-block::
+
+	.. image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
+  	  :target: https://numpydoc.readthedocs.io/en/latest/format.html
+
+.. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+	    :target: https://www.sphinx-doc.org/en/master/usage/index.html
+
+.. code-block::
+
+	.. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+	    :target: https://www.sphinx-doc.org/en/master/usage/index.html
 
 
 Issues

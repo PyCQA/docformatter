@@ -47,45 +47,6 @@ else:
 
 class TestUnits(unittest.TestCase):
 
-    def test_strip_docstring(self):
-        self.assertEqual(
-            'Hello.',
-            docformatter.strip_docstring('''
-    """Hello.
-
-    """
-
-    '''))
-
-    def test_strip_docstring_with_single_quotes(self):
-        self.assertEqual(
-            'Hello.',
-            docformatter.strip_docstring("""
-    '''Hello.
-
-    '''
-
-    """))
-
-    def test_strip_docstring_with_empty_string(self):
-        self.assertEqual('', docformatter.strip_docstring('""""""'))
-
-    def test_strip_docstring_with_escaped_quotes(self):
-        self.assertEqual("hello\\'",
-                         docformatter.strip_docstring("'hello\\''"))
-
-    def test_strip_docstring_with_escaped_double_quotes(self):
-        self.assertEqual('hello\\"',
-                         docformatter.strip_docstring('"hello\\""'))
-
-    def test_strip_docstring_with_unhandled(self):
-        with self.assertRaises(ValueError):
-            docformatter.strip_docstring('r"""foo"""')
-
-    def test_strip_docstring_with_unknown(self):
-        with self.assertRaises(ValueError):
-            docformatter.strip_docstring('foo')
-
     def test_format_docstring(self):
         self.assertEqual('"""Hello."""',
                          docformatter.format_docstring('    ', '''
@@ -191,8 +152,7 @@ Hello.
     """''',
             docformatter.format_docstring(
                 '    ',
-                docstring='''"""Foo bar
-        bing bang.
+                docstring='''"""Foo bar bing bang.
 
         >>> tests = DocTestFinder().find(_TestClass)
         >>> runner = DocTestRunner(verbose=False)
@@ -347,7 +307,7 @@ Hello.
 
         min_line_length = 50
         for max_length in range(min_line_length, 100):
-            for num_indents in range(0, 20):
+            for num_indents in range(20):
                 indentation = ' ' * num_indents
                 formatted_text = indentation + docformatter.format_docstring(
                     indentation=indentation,
@@ -396,7 +356,7 @@ Hello.
     """'''
         self.assertEqual(
             docstring,
-            docformatter.format_docstring('    ', docstring))
+            docformatter.format_docstring('    ', docstring, strict=False))
 
     def test_format_docstring_should_underlined_summaries_alone(self):
         docstring = '''"""
@@ -458,6 +418,30 @@ def f(x):
 def g(x):
     """  Badly indented docstring"""
     pass''', line_range=[1, 2]))
+
+    def test_format_code_docstring_length(self):
+        self.assertEqual('''\
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """Badly indented docstring."""
+    pass''',
+                         docformatter.format_code('''\
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass''', length_range=[1, 1]))
 
     def test_format_code_with_module_docstring(self):
         self.assertEqual(
@@ -594,14 +578,16 @@ def foo():
     def test_method_no_chr_92(): the501(92) # \
 '''.lstrip()))
 
-    def test_format_code_skip_complex(self):
-        """We do not handle r/u/b prefixed strings."""
+    def test_format_code_raw_docstring_double_quotes(self):
+        """Should format raw docstrings with triple double quotes.
+
+        See requirement #2.  See issue #54 for request to handle raw
+        docstrings.
+        """
         self.assertEqual(
             '''\
 def foo():
-    r"""
-    Hello foo.
-    """
+    r"""Hello foo."""
 ''',
             docformatter.format_code(
                 '''\
@@ -611,19 +597,111 @@ def foo():
     """
 '''))
 
-    def test_format_code_skip_complex_single(self):
-        """We do not handle r/u/b prefixed strings."""
         self.assertEqual(
-            """\
+        '''\
 def foo():
-    r'''
+    R"""Hello foo."""
+''',
+            docformatter.format_code(
+            '''\
+def foo():
+    R"""
     Hello foo.
-    '''
-""",
+    """
+'''))
+
+    def test_format_code_raw_docstring_single_quotes(self):
+        """Should format raw docstrings with triple single quotes.
+
+        See requirement #2.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    r"""Hello foo."""
+''',
             docformatter.format_code(
                 """\
 def foo():
     r'''
+    Hello foo.
+    '''
+"""))
+
+        self.assertEqual(
+        '''\
+def foo():
+    R"""Hello foo."""
+''',
+           docformatter.format_code(
+            """\
+def foo():
+    R'''
+    Hello foo.
+    '''
+"""))
+
+    def test_format_code_unicode_docstring_double_quotes(self):
+        """Should format unicode docstrings with triple double quotes.
+
+        See requirement #3.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    u"""Hello foo."""
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    u"""
+    Hello foo.
+    """
+'''))
+
+        self.assertEqual(
+            '''\
+def foo():
+    U"""Hello foo."""
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    U"""
+    Hello foo.
+    """
+'''))
+
+    def test_format_code_unicode_docstring_single_quotes(self):
+        """Should format unicode docstrings with triple single quotes.
+
+        See requirement #3.  See issue #54 for request to handle raw
+        docstrings.
+        """
+        self.assertEqual(
+            '''\
+def foo():
+    u"""Hello foo."""
+''',
+            docformatter.format_code(
+                """\
+def foo():
+    u'''
+    Hello foo.
+    '''
+"""))
+
+        self.assertEqual(
+            '''\
+def foo():
+    U"""Hello foo."""
+''',
+            docformatter.format_code(
+                """\
+def foo():
+    U'''
     Hello foo.
     '''
 """))
@@ -748,28 +826,40 @@ def foo():
     """
 ''')))
 
-    def test_format_code_with_double_quote(self):
+    def test_ignore_code_with_single_quote(self):
+        """Single single quote on first line of code should remain untouched.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
         self.assertEqual(
-            '''\
-def foo():
-    """Just a regular string."""
-''',
-            docformatter.format_code(
                 '''\
 def foo():
-    "Just a regular string"
-'''))
-
-    def test_format_code_with_single_quote(self):
-        self.assertEqual(
-            '''\
-def foo():
-    """Just a regular string."""
+    'Just a regular string'
 ''',
             docformatter.format_code(
                 '''\
 def foo():
     'Just a regular string'
+'''))
+
+    def test_ignore_code_with_double_quote(self):
+        """Single double quotes on first line of code should remain untouched.
+
+        See requirement 1, always use triple double quotes.
+        See issue #66 for example of docformatter breaking code when encountering
+        single quote.
+        """
+        self.assertEqual(
+                '''\
+def foo():
+    "Just a regular string"
+''',
+            docformatter.format_code(
+                '''\
+def foo():
+    "Just a regular string"
 '''))
 
     def test_format_code_with_should_skip_nested_triple_quotes(self):
@@ -835,30 +925,6 @@ def foo():
         self.assertEqual('"""\r\n',
                          docformatter.format_code('"""\r\n'))
 
-    def test_find_newline_only_cr(self):
-        source = ['print 1\r', 'print 2\r', 'print3\r']
-        self.assertEqual(docformatter.CR, docformatter.find_newline(source))
-
-    def test_find_newline_only_lf(self):
-        source = ['print 1\n', 'print 2\n', 'print3\n']
-        self.assertEqual(docformatter.LF, docformatter.find_newline(source))
-
-    def test_find_newline_only_crlf(self):
-        source = ['print 1\r\n', 'print 2\r\n', 'print3\r\n']
-        self.assertEqual(docformatter.CRLF, docformatter.find_newline(source))
-
-    def test_find_newline_cr1_and_lf2(self):
-        source = ['print 1\n', 'print 2\r', 'print3\n']
-        self.assertEqual(docformatter.LF, docformatter.find_newline(source))
-
-    def test_find_newline_cr1_and_crlf2(self):
-        source = ['print 1\r\n', 'print 2\r', 'print3\r\n']
-        self.assertEqual(docformatter.CRLF, docformatter.find_newline(source))
-
-    def test_find_newline_should_default_to_lf(self):
-        self.assertEqual(docformatter.LF, docformatter.find_newline([]))
-        self.assertEqual(docformatter.LF, docformatter.find_newline(['', '']))
-
     def test_format_code_dominant_line_ending_style_preserved(self):
         input = '''\
 def foo():\r
@@ -878,269 +944,10 @@ def foo():\r
 ''',
             docformatter.format_code(input))
 
-    def test_split_summary_and_description(self):
-        self.assertEqual(
-            ('This is the first.',
-             'This is the second. This is the third.'),
-            docformatter.split_summary_and_description(
-                'This is the first. This is the second. This is the third.'))
-
-    def test_split_summary_and_description_complex(self):
-        self.assertEqual(
-            ('This is the first',
-             '\nThis is the second. This is the third.'),
-            docformatter.split_summary_and_description(
-                'This is the first\n\nThis is the second. This is the third.'))
-
-    def test_split_summary_and_description_more_complex(self):
-        self.assertEqual(
-            ('This is the first.',
-             'This is the second. This is the third.'),
-            docformatter.split_summary_and_description(
-                'This is the first.\nThis is the second. This is the third.'))
-
-    def test_split_summary_and_description_with_list(self):
-        self.assertEqual(('This is the first',
-                          '- one\n- two'),
-                         docformatter.split_summary_and_description(
-                             'This is the first\n- one\n- two'))
-
-    def test_split_summary_and_description_with_list_of_parameters(self):
-        self.assertEqual(('This is the first',
-                          'one - one\ntwo - two'),
-                         docformatter.split_summary_and_description(
-                             'This is the first\none - one\ntwo - two'))
-
-    def test_split_summary_and_description_with_capital(self):
-        self.assertEqual(('This is the first\nWashington', ''),
-                         docformatter.split_summary_and_description(
-                             'This is the first\nWashington'))
-
-    def test_split_summary_and_description_with_list_on_other_line(self):
-        self.assertEqual(('Test\n    test', '    @blah'),
-                         docformatter.split_summary_and_description('''\
-    Test
-    test
-    @blah
-'''))
-
-    def test_split_summary_and_description_with_other_symbol(self):
-        self.assertEqual(('This is the first',
-                          '@ one\n@ two'),
-                         docformatter.split_summary_and_description(
-                             'This is the first\n@ one\n@ two'))
-
-    def test_split_summary_and_description_with_colon(self):
-        self.assertEqual(('This is the first:',
-                          'one\ntwo'),
-                         docformatter.split_summary_and_description(
-                             'This is the first:\none\ntwo'))
-
-    def test_split_summary_and_description_with_exclamation(self):
-        self.assertEqual(('This is the first!',
-                          'one\ntwo'),
-                         docformatter.split_summary_and_description(
-                             'This is the first!\none\ntwo'))
-
-    def test_split_summary_and_description_with_question_mark(self):
-        self.assertEqual(('This is the first?',
-                          'one\ntwo'),
-                         docformatter.split_summary_and_description(
-                             'This is the first?\none\ntwo'))
-
-    def test_split_summary_and_description_with_quote(self):
-        self.assertEqual(('This is the first\n"one".', ''),
-                         docformatter.split_summary_and_description(
-                             'This is the first\n"one".'))
-
-        self.assertEqual(("This is the first\n'one'.", ''),
-                         docformatter.split_summary_and_description(
-                             "This is the first\n'one'."))
-
-        self.assertEqual(('This is the first\n``one``.', ''),
-                         docformatter.split_summary_and_description(
-                             'This is the first\n``one``.'))
-
-    def test_split_summary_and_description_with_late__punctuation(self):
-        self.assertEqual(
-            ("""\
-Try this and this and this and this and this and this and this at
-    http://example.com/""",
-             """
-    Parameters
-    ----------
-    email : string"""),
-            docformatter.split_summary_and_description('''\
-    Try this and this and this and this and this and this and this at
-    http://example.com/
-
-    Parameters
-    ----------
-    email : string
-'''))
-
-    def test_split_summary_and_description_without__punctuation(self):
-        self.assertEqual(
-            ("""\
-Try this and this and this and this and this and this and this at
-    this other line""",
-             """
-    Parameters
-    ----------
-    email : string"""),
-            docformatter.split_summary_and_description('''\
-    Try this and this and this and this and this and this and this at
-    this other line
-
-    Parameters
-    ----------
-    email : string
-'''))
-
-    def test_split_summary_and_description_with_abbreviation(self):
-        for text in ['Test e.g. now'
-                     'Test i.e. now',
-                     'Test Dr. now',
-                     'Test Mr. now',
-                     'Test Mrs. now',
-                     'Test Ms. now']:
-            self.assertEqual(
-                (text, ''),
-                docformatter.split_summary_and_description(text))
-
-    def test_normalize_summary(self):
+    def test_unwrap_summary(self):
         self.assertEqual(
             'This is a sentence.',
-            docformatter.normalize_summary('This \n\t is\na sentence'))
-
-    def test_normalize_summary_with_different_punctuation(self):
-        summary = 'This is a question?'
-        self.assertEqual(
-            summary,
-            docformatter.normalize_summary(summary))
-
-    def test_detect_encoding_with_bad_encoding(self):
-        with temporary_file('# -*- coding: blah -*-\n') as filename:
-            self.assertEqual('latin-1',
-                             docformatter.detect_encoding(filename))
-
-    def test_reindent(self):
-        self.assertEqual(
-            """\
-    This should be dedented.
-
-    1. This too.
-    2. And this.
-""",
-            docformatter.reindent("""\
-                This should be dedented.
-
-                1. This too.
-                2. And this.
-            """, indentation='    ')
-        )
-
-    def test_reindent_should_expand_tabs_to_indentation(self):
-        self.assertEqual(
-            """\
-    This should be dedented.
-
-    1. This too.
-    2. And this.
-""",
-            docformatter.reindent("""\
-                This should be dedented.
-
-                1. This too.
-        \t2. And this.
-            """, indentation='    ')
-        )
-
-    def test_reindent_with_no_indentation_expand_tabs(self):
-        self.assertEqual(
-            """\
-The below should be indented with spaces:
-
-        1. This too.
-        2. And this.
-""",
-            docformatter.reindent("""\
-The below should be indented with spaces:
-
-\t1. This too.
-\t2. And this.
-            """, indentation='')
-        )
-
-    def test_reindent_should_maintain_indentation(self):
-        description = """\
-    Parameters:
-
-        - a
-        - b
-"""
-        self.assertEqual(
-            description,
-            docformatter.reindent(description, indentation='    ')
-        )
-
-    def test_find_shortest_indentation(self):
-        self.assertEqual(
-            ' ',
-            docformatter._find_shortest_indentation(['    ', ' b', '  a']))
-
-    def test_split_first_sentence(self):
-        self.assertEqual(
-            ('This is a sentence.', ' More stuff. And more stuff.   .!@#$%'),
-            docformatter.split_first_sentence(
-                'This is a sentence. More stuff. And more stuff.   .!@#$%'))
-
-        self.assertEqual(
-            ('This e.g. sentence.', ' More stuff. And more stuff.   .!@#$%'),
-            docformatter.split_first_sentence(
-                'This e.g. sentence. More stuff. And more stuff.   .!@#$%'))
-
-        self.assertEqual(
-            ('This is the first:', '\none\ntwo'),
-            docformatter.split_first_sentence(
-                'This is the first:\none\ntwo'))
-
-    def test_is_some_sort_of_list(self):
-        self.assertTrue(docformatter.is_some_sort_of_list("""\
-    @param
-    @param
-    @param
-"""))
-
-    def test_is_some_sort_of_list_with_dashes(self):
-        self.assertTrue(docformatter.is_some_sort_of_list("""\
-    Keyword arguments:
-    real -- the real part (default 0.0)
-    imag -- the imaginary part (default 0.0)
-"""))
-
-    def test_is_some_sort_of_list_without_special_symbol(self):
-        self.assertTrue(docformatter.is_some_sort_of_list("""\
-    Example:
-      release-1.1/
-      release-1.2/
-      release-1.3/
-      release-1.4/
-      release-1.4.1/
-      release-1.5/
-"""))
-
-    def test_is_some_sort_of_list_of_parameter_list_with_newline(self):
-        self.assertTrue(docformatter.is_some_sort_of_list("""\
-Args:
-    stream (BinaryIO): Binary stream (usually a file object).
-"""))
-
-    def test_is_some_sort_of_code(self):
-        self.assertTrue(docformatter.is_some_sort_of_code("""\
-            __________=__________(__________,__________,__________,__________[
-                      '___'],__________,__________,__________,__________,______________=__________)
-"""))
+            docformatter.unwrap_summary('This \n\t is\na sentence.'))
 
     def test_force_wrap(self):
         self.assertEqual(('''\
@@ -1154,29 +961,6 @@ num_iterations is the number of updates - instead of a better definition of conv
 """\
 ''', description_wrap_length=50, summary_wrap_length=50, force_wrap=True))
 
-    def test_remove_section_header(self):
-        self.assertEqual(
-            'foo\nbar\n',
-            docformatter.remove_section_header('----\nfoo\nbar\n')
-        )
-
-        line = 'foo\nbar\n'
-        self.assertEqual(line, docformatter.remove_section_header(line))
-
-        line = '    \nfoo\nbar\n'
-        self.assertEqual(line, docformatter.remove_section_header(line))
-
-    def test_is_probably_beginning_of_sentence(self):
-        self.assertTrue(docformatter.is_probably_beginning_of_sentence(
-            '- This is part of a list.'))
-
-        self.assertFalse(docformatter.is_probably_beginning_of_sentence(
-            '(this just continues an existing sentence).'))
-
-    def test_is_probably_beginning_of_sentence_pydoc_ref(self):
-        self.assertFalse(docformatter.is_probably_beginning_of_sentence(
-            ':see:MyClass This is not the start of a sentence.'))
-
     def test_format_docstring_make_summary_multi_line(self):
         self.assertEqual(('''\
 """
@@ -1186,6 +970,17 @@ num_iterations is the number of updates - instead of a better definition of conv
                          docformatter.format_docstring('    ', '''\
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
+
+    def test__format_code_additional_empty_line_before_doc(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+        self.assertEqual('\n\n\ndef my_func():\n"""Summary of my function."""\npass',
+                         docformatter._format_code('\n\n\ndef my_func():\n\n"""Summary of my function."""\npass', args))
 
     def test_exclude(self):
         sources = {"/root"}
@@ -1307,7 +1102,7 @@ def foo():
         with temporary_file('''\
 def foo():
     """
-    Hello world
+    Hello world 
     """
 ''') as filename:
             process = run_docformatter([filename])
@@ -1315,10 +1110,11 @@ def foo():
 @@ -1,4 +1,2 @@
  def foo():
 -    """
--    Hello world
+-    Hello world 
 -    """
 +    """Hello world."""
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_wrapping(self):
         with temporary_file('''\
@@ -1337,7 +1133,8 @@ def foo():
 -    """
 +    """Hello world this is a summary
 +    that will get wrapped."""
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_no_wrapping(self):
         with temporary_file('''\
@@ -1352,7 +1149,42 @@ def foo():
                                         filename])
             self.assertEqual(
                 '',
-                '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+                '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+
+    def test_end_to_end_with_no_wrapping_2(self):
+        with temporary_file('''\
+def foo():
+    """Hello world is a long sentence that will not
+    be wrapped because I turned wrapping off.
+
+    Hello world is a long sentence that will not
+    be wrapped because I turned wrapping off.
+    """
+''') as filename:
+            process = run_docformatter(['--wrap-summaries=0',
+                                        '--wrap-description=0',
+                                        filename])
+            self.assertEqual(
+                '',
+                '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+
+    def test_end_to_end_no_wrapping_period(self):
+        with temporary_file('''\
+def foo():
+    """Wrapping is off, but it will still add
+    the trailing period  """
+''') as filename:
+            process = run_docformatter(['--wrap-summaries=0',
+                                        filename])
+            self.assertEqual('''\
+@@ -1,3 +1,3 @@
+ def foo():
+     """Wrapping is off, but it will still add
+-    the trailing period  """
++    the trailing period."""
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
+
 
     def test_end_to_end_all_options(self):
         with temporary_file('''\
@@ -1383,7 +1215,8 @@ def foo():
  
 -
      """
-''', '\n'.join(process.communicate()[0].decode().split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_invalid_range(self):
         process = run_docformatter(['--range', '0', '1', os.devnull])
@@ -1405,10 +1238,9 @@ def foo():
         result = process.communicate('''\
 """
 Hello world"""
-'''.encode())[0].decode()
+'''.encode())[0].decode().replace("\r", "")
 
         self.assertEqual(0, process.returncode)
-
         self.assertEqual(
             '''"""Hello world."""\n''',
             result)
@@ -1465,7 +1297,6 @@ Print my path and return error code
                              msg='Do not write to stdout')
             self.assertEqual(stderr.getvalue().strip(), filename,
                              msg='Changed file should be reported')
-
 
 def generate_random_docstring(max_indentation_length=32,
                               max_word_length=20,

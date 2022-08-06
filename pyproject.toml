@@ -1,0 +1,188 @@
+[tool.poetry]
+name = "docformatter"
+version = "1.4"
+description = "Formats docstrings to follow PEP 257"
+authors = ["Steven Myint"]
+maintainers = [
+    "Doyle Rowland <doyle.rowland@reliaqual.com>",
+]
+license = "Expat"
+readme = "README.rst"
+homepage = "https://github.com/PyCQA/docformatter"
+repository = "https://github.com/PyCQA/docformatter"
+documentation = "https://github.com/PyCQA/docformatter"
+keywords = [
+    "PEP 257", "pep257", "style", "formatter", "docstrings",
+]
+classifiers=[
+          'Intended Audience :: Developers',
+          'Environment :: Console',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: Implementation',
+          'Programming Language :: Python :: Implementation :: PyPy',
+          'Programming Language :: Python :: Implementation :: CPython',
+          'License :: OSI Approved :: MIT License',
+      ]
+include = ["LICENSE"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+tomli = {version="1.2.3", optional=true}
+untokenize = "^0.1.1"
+
+[tool.poetry.dev-dependencies]
+pydocstyle = "^6.1.1"
+pylint = "^2.12.0"
+pycodestyle = "^2.8.0"
+coverage = "^6.2.0"
+rstcheck = "<6.0.0"
+pytest = "<7.0.0"
+pytest-cov = "^3.0.0"
+mock = "^4.0.0"
+isort = "^5.7.0"
+black = [
+    {version = "^22.0.0", python = ">=3.6.2"},
+]
+
+[tool.poetry.scripts]
+docformatter = "docformatter:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.master]
+ignore-paths = [
+    "tests*",
+]
+
+[tool.pylint.messages_control]
+disable = [
+    "fixme",
+    "import-outside-toplevel",
+    "inconsistent-return-statements",
+    "invalid-name",
+    "no-else-return",
+    "no-member",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-boolean-expressions",
+    "too-many-locals",
+    "too-many-return-statements",
+    "useless-object-inheritance",
+]
+
+[tool.docformatter]
+wrap-summaries = 79
+wrap-descriptions = 72
+non-strict = false
+
+[tool.pydocstyle]
+convention = "pep257"
+
+[tool.pytest.ini_options]
+markers = [
+    "unit: mark the test as a unit test.",
+    "system: mark the test as a system test.",
+]
+
+[tool.coverage.run]
+branch = true
+cover_pylib = false
+omit = [
+    '*/site-packages/*',
+    '*/*pypy/*',
+    '*/tests/*',
+    '__init__.py',
+    'setup.py',
+]
+relative_files = true
+
+[tool.coverage.report]
+omit = [
+    '*/site-packages/*',
+    '*/*pypy/*',
+    '*/tests/*',
+    '__init__.py',
+    'setup.py',
+]
+exclude_lines = [
+	'pragma: no cover',
+	'import',
+]
+show_missing = true
+
+[tool.coverage.xml]
+output = 'coverage.xml'
+
+[tool.black]
+line-length = 79
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+known_first_party = 'docformatter'
+known_third_party = ['toml']
+import_heading_firstparty = 'docformatter Package Imports'
+import_heading_localfolder = 'docformatter Local Imports'
+import_heading_stdlib = 'Standard Library Imports'
+import_heading_thirdparty = 'Third Party Imports'
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 79
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist = True
+isolated_build = True
+envlist = py{36,37,38,39,310,py36}, style
+
+[testenv:py{36,37,38,39,310,py36}]
+deps =
+    pytest
+    pytest-cov
+    coverage
+    mock
+commands =
+    pip install .[tomli]
+    pytest -s -x -c ./pyproject.toml --cache-clear \
+        --cov-config=pyproject.toml --cov=docformatter \
+        --cov-branch --cov-report=term tests/
+    coverage run --branch --omit="*/site-packages/*,*/*pypy/*" \
+        test_docformatter.py
+
+[testenv:style]
+deps =
+    pycodestyle
+    pydocstyle
+    pylint
+    toml
+    untokenize
+commands =
+    pycodestyle docformatter.py setup.py
+    pydocstyle docformatter.py setup.py
+    pylint docformatter.py setup.py
+"""
