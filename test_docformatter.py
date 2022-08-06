@@ -382,7 +382,7 @@ Hello.
     """'''
         self.assertEqual(
             docstring,
-            docformatter.format_docstring('    ', docstring))
+            docformatter.format_docstring('    ', docstring, strict=False))
 
     def test_format_docstring_should_underlined_summaries_alone(self):
         docstring = '''"""
@@ -997,6 +997,61 @@ num_iterations is the number of updates - instead of a better definition of conv
 """This one-line docstring will be multi-line"""\
 ''', make_summary_multi_line=True))
 
+    def test__format_code_additional_empty_line_before_doc(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+        self.assertEqual('\n\n\ndef my_func():\n"""Summary of my function."""\npass',
+                         docformatter._format_code('\n\n\ndef my_func():\n\n"""Summary of my function."""\npass', args))
+
+    def test_exclude(self):
+        sources = {"/root"}
+        patch_data = [
+            ("/root", ['folder_one', 'folder_two'], []),
+            ("/root/folder_one", ['folder_three'], ["one.py"]),
+            ("/root/folder_one/folder_three", [], ["three.py"]),
+            ("/root/folder_two", [], ["two.py"]),
+        ]
+        with patch("os.walk", return_value=patch_data), patch("os.path.isdir", return_value=True):
+            test_exclude_one = list(docformatter.find_py_files(sources, True, ["folder_one"]))
+            self.assertEqual(test_exclude_one, ['/root/folder_two/two.py'])
+            test_exclude_two = list(docformatter.find_py_files(sources, True, ["folder_two"]))
+            self.assertEqual(test_exclude_two, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py'])
+            test_exclude_three = list(docformatter.find_py_files(sources, True, ["folder_three"]))
+            self.assertEqual(test_exclude_three, ['/root/folder_one/one.py', '/root/folder_two/two.py'])
+            test_exclude_py = list(docformatter.find_py_files(sources, True, ".py"))
+            self.assertFalse(test_exclude_py)
+            test_exclude_two_and_three = list(docformatter.find_py_files(sources, True, ["folder_two", "folder_three"]))
+            self.assertEqual(test_exclude_two_and_three, ['/root/folder_one/one.py'])
+            test_exclude_files = list(docformatter.find_py_files(sources, True, ["one.py", "two.py"]))
+            self.assertEqual(test_exclude_files, ['/root/folder_one/folder_three/three.py'])
+
+    def test_exclude_nothing(self):
+        sources = {"/root"}
+        patch_data = [
+            ("/root", ['folder_one', 'folder_two'], []),
+            ("/root/folder_one", ['folder_three'], ["one.py"]),
+            ("/root/folder_one/folder_three", [], ["three.py"]),
+            ("/root/folder_two", [], ["two.py"]),
+        ]
+        with patch("os.walk", return_value=patch_data), patch("os.path.isdir", return_value=True):
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True, []))
+            self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
+                                                    '/root/folder_two/two.py'])
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True))
+            self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
+                                                    '/root/folder_two/two.py'])
+    def test_format_docstring_pre_summary_space(self):
+        self.assertEqual(('''""" This one-line docstring will have a leading space."""'''),
+                         docformatter.format_docstring('    ', '''\
+"""This one-line docstring will have a leading space."""\
+''', pre_summary_space=True))
+
+
 class TestSystem(unittest.TestCase):
 
     def test_diff(self):
@@ -1084,7 +1139,8 @@ def foo():
 -    Hello world 
 -    """
 +    """Hello world."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_wrapping(self):
         with temporary_file('''\
@@ -1103,7 +1159,8 @@ def foo():
 -    """
 +    """Hello world this is a summary
 +    that will get wrapped."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_end_to_end_with_no_wrapping(self):
         with temporary_file('''\
@@ -1151,7 +1208,8 @@ def foo():
      """Wrapping is off, but it will still add
 -    the trailing period  """
 +    the trailing period."""
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
 
     def test_end_to_end_all_options(self):
@@ -1183,7 +1241,8 @@ def foo():
  
 -
      """
-''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split('\n')[2:]))
+''', '\n'.join(process.communicate()[0].decode().replace("\r", "").split(
+                '\n')[2:]))
 
     def test_invalid_range(self):
         process = run_docformatter(['--range', '0', '1', os.devnull])
@@ -1208,7 +1267,6 @@ Hello world"""
 '''.encode())[0].decode().replace("\r", "")
 
         self.assertEqual(0, process.returncode)
-
         self.assertEqual(
             '''"""Hello world."""\n''',
             result)

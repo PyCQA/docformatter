@@ -165,7 +165,6 @@ def format_code(source, **kwargs):
     except (tokenize.TokenError, IndentationError):
         return source
 
-
 def has_correct_length(length_range, start, end):
     """Return True if docstring's length is in range."""
     if length_range is None:
@@ -192,8 +191,9 @@ def _format_code(
     make_summary_multi_line=False,
     post_description_blank=False,
     force_wrap=False,
-    line_range=None,
     length_range=None,
+    pre_summary_space=False,
+    strict=True,
 ):
     """Return source code with docstrings formatted."""
     if not source:
@@ -241,6 +241,8 @@ def _format_code(
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
                 force_wrap=force_wrap,
+                pre_summary_space=pre_summary_space,
+                strict=strict,
             )
 
         if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
@@ -249,20 +251,28 @@ def _format_code(
         previous_token_string = token_string
         previous_token_type = token_type
 
-        modified_tokens.append((token_type, token_string, start, end, line))
+        # prevent empty line between func def and docstring
+        new_line_tokens = {tokenize.NL, tokenize.NEWLINE}
+        if len(modified_tokens) > 2 and modified_tokens[-2][0] == tokenize.OP \
+                and modified_tokens[-1][0] in new_line_tokens \
+                and token_type in new_line_tokens:
+            pass
+        else:
+            modified_tokens.append(
+                (token_type, token_string, start, end, line))
 
     return untokenize.untokenize(modified_tokens)
 
 
-def format_docstring(
-    indentation,
-    docstring,
-    summary_wrap_length=0,
-    description_wrap_length=0,
-    pre_summary_newline=False,
-    make_summary_multi_line=False,
-    post_description_blank=False,
-    force_wrap=False,
+def format_docstring(indentation, docstring,
+                     summary_wrap_length=0,
+                     description_wrap_length=0,
+                     pre_summary_newline=False,
+                     make_summary_multi_line=False,
+                     post_description_blank=False,
+                     force_wrap=False,
+                     pre_summary_space=False,
+    strict=True,
 ):
     """Return formatted version of docstring.
 
@@ -293,7 +303,7 @@ def format_docstring(
     if remove_section_header(description).strip() != description.strip():
         return docstring
 
-    if not force_wrap and is_some_sort_of_list(summary):
+    if not force_wrap and is_some_sort_of_list(summary, strict):
         # Something is probably not right with the splitting.
         return docstring
 
@@ -315,7 +325,9 @@ def format_docstring(
 {indentation}"""\
 '''.format(
             open_quote=open_quote,
-            pre_summary=("\n" + indentation if pre_summary_newline else ""),
+            pre_summary=('\n' + indentation if pre_summary_newline
+                         else ' ' if pre_summary_space 
+                         else ''),
             summary=wrap_summary(
                 normalize_summary(summary),
                 wrap_length=summary_wrap_length,
@@ -327,6 +339,7 @@ def format_docstring(
                 indentation=indentation,
                 wrap_length=description_wrap_length,
                 force_wrap=force_wrap,
+                strict=strict,
             ),
             post_description=("\n" if post_description_blank else ""),
             indentation=indentation,
@@ -340,7 +353,7 @@ def format_docstring(
                 subsequent_indent=indentation,
             ).strip()
 
-        beginning = '"""\n' + indentation
+        beginning = '""" ' if pre_summary_space else '"""'
         ending = "\n" + indentation + '"""'
         summary_wrapped = wrap_summary(
             normalize_summary(contents),
@@ -351,7 +364,6 @@ def format_docstring(
         return "{beginning}{summary}{ending}".format(
             beginning=beginning, summary=summary_wrapped, ending=ending
         )
-
 
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
@@ -441,7 +453,7 @@ def split_first_sentence(text):
     return sentence, delimiter + rest
 
 
-def is_some_sort_of_list(text):
+def is_some_sort_of_list(text, strict):
     """Return True if text looks like a list."""
     split_lines = text.rstrip().splitlines()
 
@@ -452,7 +464,7 @@ def is_some_sort_of_list(text):
         len(split_lines)
         / max([len(line.strip()) for line in split_lines] + [1])
         > HEURISTIC_MIN_LIST_ASPECT_RATIO
-    ):
+    ) and not strict:
         return True
 
     return any(
@@ -596,7 +608,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def wrap_description(text, indentation, wrap_length, force_wrap):
+def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     """Return line-wrapped description text.
 
     We only wrap simple descriptions. We leave doctests, multi-paragraph
@@ -613,7 +625,7 @@ def wrap_description(text, indentation, wrap_length, force_wrap):
     # Ignore possibly complicated cases.
     if wrap_length <= 0 or (
         not force_wrap
-        and (is_some_sort_of_list(text) or is_some_sort_of_code(text))
+        and (is_some_sort_of_list(text, strict) or is_some_sort_of_code(text))
     ):
         return text
 
@@ -738,6 +750,7 @@ def _format_code_with_args(source, args):
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
         line_range=args.line_range,
+        strict=args.non_strict,
     )
 
 
@@ -841,6 +854,9 @@ def _main(argv, standard_out, standard_error, standard_in):
         default=bool(flargs.get("pre-summary-newline", False)),
         help="add a newline before the summary of a multi-line docstring",
     )
+    parser.add_argument('--pre-summary-space',
+                        action='store_true',
+                        help='add a space before one-line or the summary of a multi-line docstring')
     parser.add_argument(
         "--make-summary-multi-line",
         action="store_true",
@@ -875,9 +891,15 @@ def _main(argv, standard_out, standard_error, standard_in):
         help="apply docformatter to docstrings of given length range",
     )
     parser.add_argument(
+        "--non-strict",
+        action="store_true",
+        default=bool(flargs.get("non-strict", False)),
+        help="don't strictly follow reST syntax to identify lists (see issue "
+             "#67)",
+    )
+    parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
-
     parser.add_argument(
         "--config", help="path to file containing docformatter options"
     )
@@ -965,12 +987,14 @@ def find_py_files(sources, recursive, exclude=None):
 
     def is_excluded(name, exclude):
         """Return True if file 'name' is excluded."""
-        if not exclude:
-            return False
-        for e in exclude:
-            if re.search(re.escape(str(e)), name, re.IGNORECASE):
-                return True
-        return False
+        return (
+            any(
+                re.search(re.escape(str(e)), name, re.IGNORECASE)
+                for e in exclude
+            )
+            if exclude
+            else False
+        )
 
     for name in sorted(sources):
         if recursive and os.path.isdir(name):
