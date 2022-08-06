@@ -238,7 +238,8 @@ class TestIsSomeSortdOfList:
         @param
         @param
         @param
-    """
+    """,
+            True,
         )
 
     @pytest.mark.unit
@@ -249,7 +250,8 @@ class TestIsSomeSortdOfList:
         Keyword arguments:
         real -- the real part (default 0.0)
         imag -- the imaginary part (default 0.0)
-    """
+    """,
+            True,
         )
 
     @pytest.mark.unit
@@ -264,7 +266,8 @@ class TestIsSomeSortdOfList:
           release-1.4/
           release-1.4.1/
           release-1.5/
-    """
+    """,
+            True,
         )
 
     @pytest.mark.unit
@@ -274,7 +277,38 @@ class TestIsSomeSortdOfList:
             """\
     Args:
         stream (BinaryIO): Binary stream (usually a file object).
-    """
+    """,
+            True,
+        )
+
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_strict_wrap(self):
+        """Ignore many lines of short words as a list with strict set True.
+
+        See issue #67.
+        """
+        assert not docformatter.is_some_sort_of_list(
+            """\
+        Launch
+the
+rocket.
+    """,
+            True,
+        )
+
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_non_strict_wrap(self):
+        """Identify many lines of short words as a list with strict False.
+
+        See issue #67.
+        """
+        assert docformatter.is_some_sort_of_list(
+            """\
+        Launch
+the
+rocket.
+    """,
+            False,
         )
 
 
