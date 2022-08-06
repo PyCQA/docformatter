@@ -636,8 +636,7 @@ def _main(argv, standard_out, standard_error, standard_in):
                              'multi-line docstring')
     parser.add_argument('--pre-summary-space',
                         action='store_true',
-                        help='add a space before the summary of a '
-                             'docstring')
+                        help='add a space before one-line or the summary of a multi-line docstring')
     parser.add_argument('--make-summary-multi-line',
                         action='store_true',
                         help='add a newline before and after the summary of a '
