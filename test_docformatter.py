@@ -621,7 +621,7 @@ def foo():\r
 ''',
             docformatter.format_code(input))
 
-    def test__format_code_additional_empty_line_before_doc(self):
+    def test_format_code_additional_empty_line_before_doc(self):
         args = {'summary_wrap_length': 79,
                 'description_wrap_length': 72,
                 'pre_summary_newline': False,
@@ -631,6 +631,47 @@ def foo():\r
                 'line_range': None}
         self.assertEqual('\n\n\ndef my_func():\n"""Summary of my function."""\npass',
                          docformatter._format_code('\n\n\ndef my_func():\n\n"""Summary of my function."""\npass', args))
+
+    def test_format_code_extra_newline_following_comment(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'pre_summary_space': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+
+        docstring = ('''\
+def crash_rocket(location):    # pragma: no cover
+
+    """This is a docstring following an in-line comment."""
+    return location''')
+        self.assertEqual('''\
+def crash_rocket(location):    # pragma: no cover
+    """This is a docstring following an in-line comment."""
+    return location''',
+                         docformatter._format_code(docstring))
+
+    def test_format_code_no_docstring(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'pre_summary_space': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+        docstring = ("def pytest_addoption(parser: pytest.Parser) -> "
+        "None:\n    register_toggle.pytest_addoption(parser)\n")
+        self.assertEqual(docstring,
+                         docformatter._format_code(docstring, args))
+
+        docstring = ("def pytest_addoption(parser: pytest.Parser) -> "
+                     "None:    # pragma: no cover\n    "
+                     "register_toggle.pytest_addoption(parser)\n")
+        self.assertEqual(docstring,
+                         docformatter._format_code(docstring, args))
 
     def test_exclude(self):
         sources = {"/root"}
