@@ -233,14 +233,17 @@ def _format_code(
         previous_token_string = token_string
         previous_token_type = token_type
 
-        # If the current token is a newline, the previous token was a newline,
-        # and these two sequential newlines follow a function definition,
-        # ignore the blank line.
+        # If the current token is a newline, the previous token was a
+        # newline or a comment, and these two sequential newlines follow a
+        # function definition, ignore the blank line.
         if (
             len(modified_tokens) > 2
             and token_type in {tokenize.NL, tokenize.NEWLINE}
             and modified_tokens[-1][0] in {tokenize.NL, tokenize.NEWLINE}
-            and modified_tokens[-2][1] == ":"
+            and (
+                modified_tokens[-2][1] == ":"
+                or modified_tokens[-2][0] == tokenize.COMMENT
+            )
             and modified_tokens[-2][4][:3] == "def"
         ):
             pass
