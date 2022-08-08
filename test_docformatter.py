@@ -47,355 +47,6 @@ else:
 
 class TestUnits(unittest.TestCase):
 
-    def test_format_docstring(self):
-        self.assertEqual('"""Hello."""',
-                         docformatter.format_docstring('    ', '''
-"""
-
-Hello.
-"""
-'''.strip()))
-
-    def test_format_docstring_with_summary_that_ends_in_quote(self):
-        self.assertEqual('''""""Hello"."""''',
-                         docformatter.format_docstring('    ', '''
-"""
-
-"Hello"
-"""
-'''.strip()))
-
-    def test_format_docstring_with_bad_indentation(self):
-        self.assertEqual('''"""Hello.
-
-    This should be indented but it is not. The
-    next line should be indented too. And
-    this too.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""Hello.
-
- This should be indented but it is not. The
- next line should be indented too. And
- this too.
-    """
-'''.strip()))
-
-    def test_format_docstring_with_too_much_indentation(self):
-        self.assertEqual('''"""Hello.
-
-    This should be dedented.
-
-    1. This too.
-    2. And this.
-    3. And this.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""Hello.
-
-        This should be dedented.
-
-        1. This too.
-        2. And this.
-        3. And this.
-
-    """
-'''.strip()))
-
-    def test_format_docstring_with_description_wrapping(self):
-        self.assertEqual('''"""Hello.
-
-    This should be indented but it is not. The next line should be
-    indented too. But this is okay.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""Hello.
-
-    This should be indented but it is not. The
-    next line should be indented too. But
-    this is okay.
-
-    """
-'''.strip(), description_wrap_length=72))
-
-    def test_format_docstring_should_ignore_doctests(self):
-        docstring = '''"""Hello.
-
-    >>> 4
-    4
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_should_ignore_doctests_in_summary(self):
-        docstring = '''"""
-    >>> 4
-    4
-
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_should_maintain_indentation_of_doctest(self):
-        self.assertEqual(
-            '''"""Foo bar bing bang.
-
-        >>> tests = DocTestFinder().find(_TestClass)
-        >>> runner = DocTestRunner(verbose=False)
-        >>> tests.sort(key = lambda test: test.name)
-    """''',
-            docformatter.format_docstring(
-                '    ',
-                docstring='''"""Foo bar bing bang.
-
-        >>> tests = DocTestFinder().find(_TestClass)
-        >>> runner = DocTestRunner(verbose=False)
-        >>> tests.sort(key = lambda test: test.name)
-
-    """''',
-                description_wrap_length=72))
-
-    def test_format_docstring_should_ignore_numbered_lists(self):
-        docstring = '''"""Hello.
-
-    1. This should be indented but it is not. The
-    next line should be indented too. But
-    this is okay.
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_should_ignore_parameter_lists(self):
-        docstring = '''"""Hello.
-
-    foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
-    bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_should_ignore__colon_parameter_lists(self):
-        docstring = '''"""Hello.
-
-    foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
-    bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_should_ignore_multi_paragraph(self):
-        docstring = '''"""Hello.
-
-    This should be indented but it is not. The
-    next line should be indented too. But
-    this is okay.
-
-    This should be indented but it is not. The
-    next line should be indented too. But
-    this is okay.
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ',
-                                          docstring,
-                                          description_wrap_length=72))
-
-    def test_format_docstring_with_trailing_whitespace(self):
-        self.assertEqual('''"""Hello.
-
-    This should be not have trailing whitespace. The
-    next line should not have trailing whitespace either.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""Hello.\t
-\t
-    This should be not have trailing whitespace. The\t\t\t
-    next line should not have trailing whitespace either.\t
-\t
-    """
-'''.strip()))
-
-    def test_format_docstring_with_no_post_description_blank(self):
-        self.assertEqual('''"""Hello.
-
-    Description.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""
-
-Hello.
-
-    Description.
-
-
-    """
-'''.strip(), post_description_blank=False))
-
-    def test_format_docstring_with_pre_summary_newline(self):
-        self.assertEqual('''"""
-    Hello.
-
-    Description.
-    """''',
-                         docformatter.format_docstring('    ', '''
-"""
-
-Hello.
-
-    Description.
-
-
-    """
-'''.strip(), pre_summary_newline=True))
-
-    def test_format_docstring_with_empty_docstring(self):
-        self.assertEqual('""""""',
-                         docformatter.format_docstring('    ', '""""""'))
-
-    def test_format_docstring_with_no_period(self):
-        self.assertEqual('"""Hello."""',
-                         docformatter.format_docstring('    ', '''
-"""
-
-Hello
-"""
-'''.strip()))
-
-    def test_format_docstring_with_single_quotes(self):
-        self.assertEqual('"""Hello."""',
-                         docformatter.format_docstring('    ', """
-'''
-
-Hello.
-'''
-""".strip()))
-
-    def test_format_docstring_with_single_quotes_multi_line(self):
-        self.assertEqual('''
-    """Return x factorial.
-
-    This uses math.factorial.
-    """
-'''.strip(),
-            docformatter.format_docstring('    ', """
-    '''
-    Return x factorial.
-
-    This uses math.factorial.
-    '''
-""".strip()))
-
-    def test_format_docstring_with_wrap(self):
-        # This function uses `random` so make sure each run of this test is
-        # repeatable.
-        random.seed(0)
-
-        min_line_length = 50
-        for max_length in range(min_line_length, 100):
-            for num_indents in range(20):
-                indentation = ' ' * num_indents
-                formatted_text = indentation + docformatter.format_docstring(
-                    indentation=indentation,
-                    docstring=generate_random_docstring(
-                        max_word_length=min_line_length // 2),
-                    summary_wrap_length=max_length)
-
-                for line in formatted_text.split('\n'):
-                    # It is not the formatter's fault if a word is too long to
-                    # wrap.
-                    if len(line.split()) > 1:
-                        self.assertLessEqual(len(line), max_length)
-
-    def test_format_docstring_with_wrap_and_tab_indentation(self):
-        self.assertEqual('''
-\t\t"""Some summary x x x
-\t\tx x x x.
-
-\t\tSome description x x x
-\t\tx x.
-\t\t"""
-'''.strip(),
-            docformatter.format_docstring('\t\t', '''
-\t\t"""
-\t\tSome summary x x x x x x x.
-
-\t\tSome description x x x x x.
-\t\t"""
-'''.strip(), summary_wrap_length=30, description_wrap_length=30, tab_width=4))
-
-    def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(self):
-        self.assertEqual('''
-\t\t"""Some summary x x x
-\t\tx."""
-'''.strip(),
-            docformatter.format_docstring('\t\t', '''
-\t\t"""Some summary x x x x."""
-'''.strip(), summary_wrap_length=30, tab_width=4))
-
-    def test_format_docstring_with_weird_indentation_and_punctuation(self):
-        self.assertEqual('''
-    """Creates and returns four was awakens to was created tracked ammonites
-    was the fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
-
-    `four' falsified x falsified ammonites
-    to awakens to. `created' to ancestor was four to x dynamo to was
-    four ancestor to physicists().
-    """
-'''.strip(),
-            docformatter.format_docstring('    ', '''
-    """Creates and returns four was awakens to was created tracked
-       ammonites was the fifty, arithmetical four was pyrotechnic to
-       pyrotechnic physicists. `four' falsified x falsified ammonites
-       to awakens to. `created' to ancestor was four to x dynamo to was
-       four ancestor to physicists().
-    """
-'''.strip(), summary_wrap_length=79))
-
-    def test_format_docstring_should_leave_list_alone(self):
-        docstring = '''"""
-    one
-    two
-    three
-    four
-    five
-    six
-    seven
-    eight
-    nine
-    ten
-    eleven
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ', docstring, strict=False))
-
-    def test_format_docstring_should_underlined_summaries_alone(self):
-        docstring = '''"""
-    Foo bar
-    -------
-
-    This is more.
-
-    """'''
-        self.assertEqual(
-            docstring,
-            docformatter.format_docstring('    ', docstring))
-
     def test_format_code(self):
         self.assertEqual(
             '''\
@@ -952,14 +603,14 @@ def foo():
                          docformatter.format_code('"""\r\n'))
 
     def test_format_code_dominant_line_ending_style_preserved(self):
-        input = '''\
+        goes_in = '''\
 def foo():\r
     """\r
     Hello\r
     foo. This is a docstring.\r
     """\r
 '''
-        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(True)))
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(goes_in.splitlines(True)))
         self.assertEqual(
             '''\
 def foo():\r
@@ -968,36 +619,9 @@ def foo():\r
     This is a docstring.\r
     """\r
 ''',
-            docformatter.format_code(input))
+            docformatter.format_code(goes_in))
 
-    def test_unwrap_summary(self):
-        self.assertEqual(
-            'This is a sentence.',
-            docformatter.unwrap_summary('This \n\t is\na sentence.'))
-
-    def test_force_wrap(self):
-        self.assertEqual(('''\
-"""num_iterations is the number of updates -
-    instead of a better definition of
-    convergence."""\
-'''),
-                         docformatter.format_docstring('    ', '''\
-"""
-num_iterations is the number of updates - instead of a better definition of convergence.
-"""\
-''', description_wrap_length=50, summary_wrap_length=50, force_wrap=True))
-
-    def test_format_docstring_make_summary_multi_line(self):
-        self.assertEqual(('''\
-"""
-    This one-line docstring will be multi-line.
-    """\
-'''),
-                         docformatter.format_docstring('    ', '''\
-"""This one-line docstring will be multi-line"""\
-''', make_summary_multi_line=True))
-
-    def test__format_code_additional_empty_line_before_doc(self):
+    def test_format_code_additional_empty_line_before_doc(self):
         args = {'summary_wrap_length': 79,
                 'description_wrap_length': 72,
                 'pre_summary_newline': False,
@@ -1007,6 +631,47 @@ num_iterations is the number of updates - instead of a better definition of conv
                 'line_range': None}
         self.assertEqual('\n\n\ndef my_func():\n"""Summary of my function."""\npass',
                          docformatter._format_code('\n\n\ndef my_func():\n\n"""Summary of my function."""\npass', args))
+
+    def test_format_code_extra_newline_following_comment(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'pre_summary_space': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+
+        docstring = ('''\
+def crash_rocket(location):    # pragma: no cover
+
+    """This is a docstring following an in-line comment."""
+    return location''')
+        self.assertEqual('''\
+def crash_rocket(location):    # pragma: no cover
+    """This is a docstring following an in-line comment."""
+    return location''',
+                         docformatter._format_code(docstring))
+
+    def test_format_code_no_docstring(self):
+        args = {'summary_wrap_length': 79,
+                'description_wrap_length': 72,
+                'pre_summary_newline': False,
+                'pre_summary_space': False,
+                'make_summary_multi_line': False,
+                'post_description_blank': False,
+                'force_wrap': False,
+                'line_range': None}
+        docstring = ("def pytest_addoption(parser: pytest.Parser) -> "
+        "None:\n    register_toggle.pytest_addoption(parser)\n")
+        self.assertEqual(docstring,
+                         docformatter._format_code(docstring, args))
+
+        docstring = ("def pytest_addoption(parser: pytest.Parser) -> "
+                     "None:    # pragma: no cover\n    "
+                     "register_toggle.pytest_addoption(parser)\n")
+        self.assertEqual(docstring,
+                         docformatter._format_code(docstring, args))
 
     def test_exclude(self):
         sources = {"/root"}
@@ -1045,12 +710,6 @@ num_iterations is the number of updates - instead of a better definition of conv
             test_exclude_nothing = list(docformatter.find_py_files(sources, True))
             self.assertEqual(test_exclude_nothing, ['/root/folder_one/one.py', '/root/folder_one/folder_three/three.py',
                                                     '/root/folder_two/two.py'])
-    def test_format_docstring_pre_summary_space(self):
-        self.assertEqual(('''""" This one-line docstring will have a leading space."""'''),
-                         docformatter.format_docstring('    ', '''\
-"""This one-line docstring will have a leading space."""\
-''', pre_summary_space=True))
-
 
 class TestSystem(unittest.TestCase):
 

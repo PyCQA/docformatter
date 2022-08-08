@@ -3,14 +3,16 @@ docformatter
 ============
 
 .. |CI| image:: https://img.shields.io/github/workflow/status/PyCQA/docformatter/CI
+		:target: https://github.com/PyCQA/docformatter/actions/workflows/ci.yml
 .. |CONTRIBUTORS| image:: https://img.shields.io/github/contributors/PyCQA/docformatter
+		:target: https://github.com/PyCQA/docformatter/graphs/contributors
 .. |COMMIT| image:: https://img.shields.io/github/last-commit/PyCQA/docformatter
 .. |BLACK| image:: https://img.shields.io/badge/%20style-black-000000.svg
     :target: https://github.com/psf/black
 .. |ISORT| image:: https://img.shields.io/badge/%20imports-isort-%231674b1
     :target: https://pycqa.github.io/isort/
 .. |SELF| image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
-    :target: https://pycqa.github.io/docformatter/
+    :target: https://github.com/PyCQA/docformatter
 .. |DOCSTYLE| image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
     :target: https://numpydoc.readthedocs.io/en/latest/format.html
 
@@ -160,7 +162,8 @@ Below is the help output::
                         [--wrap-descriptions length] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range start_line end_line]
-                        [--docstring-length min_length max_length] [--version]
+                        [--docstring-length min_length max_length]
+                        [--config CONFIG] [--version]
                         files [files ...]
 
     Formats docstrings to follow PEP 257.
@@ -176,52 +179,76 @@ Below is the help output::
       -e, --exclude         exclude directories and files by names
 
       --wrap-summaries length
-                            wrap long summary lines at this length; set to 0 to
-                            disable wrapping (default: 79)
+                            wrap long summary lines at this length; set
+                            to 0 to disable wrapping
+                            (default: 79)
       --wrap-descriptions length
-                            wrap descriptions at this length; set to 0 to disable
-                            wrapping (default: 72)
-      --tab-width width     tabs in indentation are counted as this many
-                            characters when wrapping lines (default: 1)
-      --blank               add blank line after description
+                            wrap descriptions at this length; set to 0 to 
+                            disable wrapping
+                            (default: 72)
+      --blank
+      											add blank line after elaborate description
+      											(default: False)
       --pre-summary-newline
-                            add a newline before the summary of a multi-line
-                            docstring
+                            add a newline before one-line or the summary of a
+                            multi-line docstring
+                            (default: False)
+      --pre-summary-space
+                            add a space between the opening triple quotes and
+                            the first word in a one-line or summary line of a
+                            multi-line docstring
+                            (default: False)
       --make-summary-multi-line
-                            add a newline before and after the summary of a one-
-                            line docstring
-      --force-wrap          force descriptions to be wrapped even if it may result
-                            in a mess
+                            add a newline before and after a one-line docstring
+                            (default: False)
+      --force-wrap
+      											force descriptions to be wrapped even if it may result
+      											in a mess
+      											(default: False)
       --range start_line end_line
-                            apply docformatter to docstrings between these lines;
+                            apply docformatter to docstrings between these lines; 
                             line numbers are indexed at 1
       --docstring-length min_length max_length
                             apply docformatter to docstrings of given length range
-      --strict              strictly follow reST syntax to identify lists (see issue #67)
-      --version             show program's version number and exit
-      --config CONFIG       path to file containing docformatter options
-
+      --non-strict
+      											do not strictly follow reST syntax to identify lists
+      											(see issue #67)
+      											(default: False)
+      --config CONFIG
+      											path to file containing docformatter options
+      											(default: ./pyproject.toml)
+      --version
+      											show program's version number and exit
 
 Possible exit codes:
 
 - **1** - if any error encountered
 - **3** - if any file needs to be formatted (in ``--check`` mode)
 
-docformatter options can also be stored in a configuration file.  Currently only
-pyproject.toml is supported.  Add section [tool.docformatter] with options listed using
-the same name as command line options.  For example::
+*docformatter* options can also be stored in a configuration file.  Currently only
+``pyproject.toml``, ``setup.cfg``, and ``tox.ini`` are supported.  The configuration file can be passed with a full path.  For example::
+
+      docformatter --config ~/.secret/path/to/pyproject.toml
+
+If no configuration file is passed explicitly, *docformatter* will search the current directory for the supported files and use the first one found.  The order of precedence is ``pyproject.toml``, ``setup.cfg``, then ``tox.ini``.
+
+Add section ``[tool.docformatter]`` with options listed using the same name as command line options.  For example:
+::
 
       [tool.docformatter]
       recursive = true
       wrap-summaries = 82
       blank = true
 
-Command line options take precedence.  The configuration file can be passed with a full
-path, otherwise docformatter will look in the current directory.  For example::
+The ``setup.cfg`` and ``tox.ini`` files will also support the ``[tool:docformatter]`` syntax.
 
-      docformatter --config ~/.secret/path/to/pyproject.toml
+See the discussions in `issue_39`_ and `issue_94`_ regarding *docformatter* and
+black interactions.
 
-Wrapping descriptions
+.. _`issue_39`: https://github.com/PyCQA/docformatter/issues/39
+.. _`issue_94`: https://github.com/PyCQA/docformatter/issues/94
+
+Wrapping Descriptions
 =====================
 
 docformatter will wrap descriptions, but only in simple cases. If there is text
@@ -248,15 +275,15 @@ Git Hook
 
 .. code-block:: yaml
 
-  - repo: https://github.com/myint/docformatter
-    rev: v1.3.1
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.4
     hooks:
       - id: docformatter
         args: [--in-place]
 
 You will need to install ``pre-commit`` and run ``pre-commit install``.
 
-You may alternatively use  ``args: [--check]`` if you prefer the commit to fail instead of letting *docformatter* format  docstrings automatically.
+Whether you use ``args: [--check]`` or ``args: [--in-place]``, the commit will fail if *docformatter* processes a change.  The ``--in-place`` option fails because pre-commit does a diff check and fails if it detects a hook changed a file.  The ``--check`` option fails because *docformatter* returns a non-zero exit code.
 
 PyCharm
 -------
@@ -268,6 +295,13 @@ Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and c
 .. image:: ./images/pycharm-file-watcher-configurations.png
    :alt: PyCharm file watcher configurations
 
+GitHub Actions
+--------------
+
+*docformatter* is one of the tools included in the `python-lint-plus`_ action.
+
+.. _`python-lint-plus`: https://github.com/marketplace/actions/python-code-style-quality-and-lint
+
 Marketing
 =========
 Do you use *docformatter*?  What style docstrings do you use?  Add some badges to your project's **README** and let everyone know.
@@ -277,7 +311,7 @@ Do you use *docformatter*?  What style docstrings do you use?  Add some badges t
 .. code-block::
 
 	.. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
-  	  :target: https://pycqa.github.io/docformatter/
+  	  :target: https://github.com/PyCQA/docformatter
 
 .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
 	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
@@ -308,7 +342,7 @@ Issues
 
 Bugs and patches can be reported on the `GitHub page`_.
 
-.. _`GitHub page`: https://github.com/myint/docformatter/issues
+.. _`GitHub page`: https://github.com/PyCQA/docformatter/issues
 
 
 Links

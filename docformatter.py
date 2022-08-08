@@ -33,6 +33,7 @@ from __future__ import (
 )
 
 # Standard Library Imports
+import argparse
 import collections
 import contextlib
 import io
@@ -44,7 +45,8 @@ import sys
 import sysconfig
 import textwrap
 import tokenize
-from typing import Tuple
+from configparser import ConfigParser
+from typing import List, Tuple, Union
 
 # Third Party Imports
 import untokenize
@@ -97,6 +99,233 @@ class FormatResult(object):
     error = 1
     interrupted = 2
     check_failed = 3
+
+
+class Configurator:
+    """Read and store all the docformatter configuration information."""
+
+    parser = None
+    """Parser object."""
+
+    flargs_dct = {}
+    """Dictionary of configuration file arguments."""
+
+    configuration_file_lst = [
+        "pyproject.toml",
+        "setup.cfg",
+        "tox.ini",
+    ]
+    """List of supported configuration files."""
+
+    args: argparse.Namespace = None
+
+    def __init__(self, args: List[Union[bool, int, str]]) -> None:
+        """Initialize a Configurator class instance.
+
+        Parameters
+        ----------
+        args : list
+            Any command line arguments passed during invocation.
+        """
+        self.args_lst = args
+        self.parser = argparse.ArgumentParser(
+            description=__doc__,
+            prog="docformatter",
+        )
+
+        try:
+            self.config_file = self.args_lst[
+                self.args_lst.index("--config") + 1
+            ]
+        except ValueError:
+            for _configuration_file in self.configuration_file_lst:
+                if os.path.isfile(_configuration_file):
+                    self.config_file = f"./{_configuration_file}"
+                    break
+
+        self._do_read_configuration_file()
+
+    def do_parse_arguments(self) -> None:
+        """Parse configuration file and command line arguments."""
+        changes = self.parser.add_mutually_exclusive_group()
+        changes.add_argument(
+            "-i",
+            "--in-place",
+            action="store_true",
+            help="make changes to files instead of printing diffs",
+        )
+        changes.add_argument(
+            "-c",
+            "--check",
+            action="store_true",
+            help="only check and report incorrectly formatted files",
+        )
+        self.parser.add_argument(
+            "-r",
+            "--recursive",
+            action="store_true",
+            default=bool(self.flargs_dct.get("recursive", False)),
+            help="drill down directories recursively",
+        )
+        self.parser.add_argument(
+            "-e",
+            "--exclude",
+            nargs="*",
+            help="exclude directories and files by names",
+        )
+        self.parser.add_argument(
+            "--wrap-summaries",
+            default=int(self.flargs_dct.get("wrap-summaries", 79)),
+            type=int,
+            metavar="length",
+            help="wrap long summary lines at this length; "
+            "set to 0 to disable wrapping "
+            "(default: %(default)s)",
+        )
+        self.parser.add_argument(
+            "--wrap-descriptions",
+            default=int(self.flargs_dct.get("wrap-descriptions", 72)),
+            type=int,
+            metavar="length",
+            help="wrap descriptions at this length; "
+            "set to 0 to disable wrapping "
+            "(default: %(default)s)",
+        )
+        self.parser.add_argument(
+            "--blank",
+            dest="post_description_blank",
+            action="store_true",
+            default=bool(self.flargs_dct.get("blank", False)),
+            help="add blank line after description",
+        )
+        self.parser.add_argument(
+            "--pre-summary-newline",
+            action="store_true",
+            default=bool(self.flargs_dct.get("pre-summary-newline", False)),
+            help="add a newline before the summary of a multi-line docstring",
+        )
+        self.parser.add_argument(
+            "--pre-summary-space",
+            action="store_true",
+            default=bool(self.flargs_dct.get("pre-summary-space", False)),
+            help="add a space after the opening triple quotes",
+        )
+        self.parser.add_argument(
+            "--make-summary-multi-line",
+            action="store_true",
+            default=bool(
+                self.flargs_dct.get("make-summary-multi-line", False)
+            ),
+            help="add a newline before and after the summary of a "
+            "one-line docstring",
+        )
+        self.parser.add_argument(
+            "--force-wrap",
+            action="store_true",
+            default=bool(self.flargs_dct.get("force-wrap", False)),
+            help="force descriptions to be wrapped even if it may "
+            "result in a mess",
+        )
+        self.parser.add_argument(
+            "--range",
+            metavar="line",
+            dest="line_range",
+            default=self.flargs_dct.get("range", None),
+            type=int,
+            nargs=2,
+            help="apply docformatter to docstrings between these "
+            "lines; line numbers are indexed at 1",
+        )
+        self.parser.add_argument(
+            "--docstring-length",
+            metavar="length",
+            dest="length_range",
+            default=self.flargs_dct.get("docstring-length", None),
+            type=int,
+            nargs=2,
+            help="apply docformatter to docstrings of given length range",
+        )
+        self.parser.add_argument(
+            "--non-strict",
+            action="store_true",
+            default=bool(self.flargs_dct.get("non-strict", False)),
+            help="don't strictly follow reST syntax to identify lists (see "
+            "issue #67)",
+        )
+        self.parser.add_argument(
+            "--config", help="path to file containing docformatter options"
+        )
+        self.parser.add_argument(
+            "--version", action="version", version=f"%(prog)s {__version__}"
+        )
+        self.parser.add_argument(
+            "files", nargs="+", help="files to format or '-' for standard in"
+        )
+
+        self.args = self.parser.parse_args(self.args_lst[1:])
+
+        if self.args.line_range:
+            if self.args.line_range[0] <= 0:
+                self.parser.error("--range must be positive numbers")
+            if self.args.line_range[0] > self.args.line_range[1]:
+                self.parser.error(
+                    "First value of --range should be less than or equal "
+                    "to the second"
+                )
+
+        if self.args.length_range:
+            if self.args.length_range[0] <= 0:
+                self.parser.error(
+                    "--docstring-length must be positive numbers"
+                )
+            if self.args.length_range[0] > self.args.length_range[1]:
+                self.parser.error(
+                    "First value of --docstring-length should be less "
+                    "than or equal to the second"
+                )
+
+    def _do_read_configuration_file(self) -> None:
+        """Read docformatter options from a configuration file."""
+        if os.path.isfile(self.config_file):
+            argfile = os.path.basename(self.config_file)
+            for f in self.configuration_file_lst:
+                if argfile == f:
+                    break
+
+        fullpath, ext = os.path.splitext(self.config_file)
+        filename = os.path.basename(fullpath)
+
+        if ext == ".toml" and TOMLI_INSTALLED and filename == "pyproject":
+            self._do_read_toml_configuration()
+
+        if (ext == ".cfg" and filename == "setup") or (
+            ext == ".ini" and filename == "tox"
+        ):
+            self._do_read_parser_configuration()
+
+    def _do_read_toml_configuration(self) -> None:
+        """Load configuration information from a *.toml file."""
+        with open(self.config_file, "rb") as f:
+            config = tomli.load(f)
+
+        result = config.get("tool", {}).get("docformatter", None)
+        if result is not None:
+            self.flargs_dct = {
+                k: v if isinstance(v, list) else str(v)
+                for k, v in result.items()
+            }
+
+    def _do_read_parser_configuration(self) -> None:
+        """Load configuration information from a *.cfg or *.ini file."""
+        config = ConfigParser()
+        config.read(self.config_file)
+
+        for _section in ["tool:docformatter", "docformatter"]:
+            if _section in config.sections():
+                self.flargs_dct = {
+                    k: v if isinstance(v, list) else str(v)
+                    for k, v in config[_section].items()
+                }
 
 
 def has_correct_length(length_range, start, end):
@@ -174,25 +403,17 @@ def has_correct_length(length_range, start, end):
     docstring_length = end + 1 - start
     return min_length <= docstring_length <= max_length
 
-
-def is_in_range(line_range, start, end):
-    """Return True if start/end is in line_range."""
-    if line_range is None:
-        return True
-    return any(line_range[0] <= line_no <= line_range[1]
-               for line_no in range(start, end + 1))
-
-
 def _format_code(
     source,
     summary_wrap_length=79,
     description_wrap_length=72,
     pre_summary_newline=False,
+    pre_summary_space=False,
     make_summary_multi_line=False,
     post_description_blank=False,
     force_wrap=False,
+    line_range=None,
     length_range=None,
-    pre_summary_space=False,
     strict=True,
 ):
     """Return source code with docstrings formatted."""
@@ -219,7 +440,6 @@ def _format_code(
         end,
         line,
     ) in tokenize.generate_tokens(sio.readline):
-
         if (
             token_type == tokenize.STRING
             and token_string.startswith(QUOTE_TYPES)
@@ -238,10 +458,10 @@ def _format_code(
                 description_wrap_length=description_wrap_length,
                 tab_width=tab_width,
                 pre_summary_newline=pre_summary_newline,
+                pre_summary_space=pre_summary_space,
                 make_summary_multi_line=make_summary_multi_line,
                 post_description_blank=post_description_blank,
                 force_wrap=force_wrap,
-                pre_summary_space=pre_summary_space,
                 strict=strict,
             )
 
@@ -251,27 +471,34 @@ def _format_code(
         previous_token_string = token_string
         previous_token_type = token_type
 
-        # prevent empty line between func def and docstring
-        new_line_tokens = {tokenize.NL, tokenize.NEWLINE}
-        if len(modified_tokens) > 2 and modified_tokens[-2][0] == tokenize.OP \
-                and modified_tokens[-1][0] in new_line_tokens \
-                and token_type in new_line_tokens:
-            pass
-        else:
+        # If the current token is a newline, the previous token was a
+        # newline or a comment, and these two sequential newlines follow a
+        # function definition, ignore the blank line.
+        if (
+            len(modified_tokens) <= 2
+            or token_type not in {tokenize.NL, tokenize.NEWLINE}
+            or modified_tokens[-1][0] not in {tokenize.NL, tokenize.NEWLINE}
+            or modified_tokens[-2][1] != ":"
+            and modified_tokens[-2][0] != tokenize.COMMENT
+            or modified_tokens[-2][4][:3] != "def"
+        ):
             modified_tokens.append(
-                (token_type, token_string, start, end, line))
+                (token_type, token_string, start, end, line)
+            )
 
     return untokenize.untokenize(modified_tokens)
 
 
-def format_docstring(indentation, docstring,
-                     summary_wrap_length=0,
-                     description_wrap_length=0,
-                     pre_summary_newline=False,
-                     make_summary_multi_line=False,
-                     post_description_blank=False,
-                     force_wrap=False,
-                     pre_summary_space=False,
+def format_docstring(
+    indentation,
+    docstring,
+    summary_wrap_length=0,
+    description_wrap_length=0,
+    pre_summary_newline=False,
+    pre_summary_space=False,
+    make_summary_multi_line=False,
+    post_description_blank=False,
+    force_wrap=False,
     strict=True,
 ):
     """Return formatted version of docstring.
@@ -288,6 +515,7 @@ def format_docstring(indentation, docstring,
           on a line by themselves.
     """
     contents, open_quote = strip_docstring(docstring)
+    open_quote = f"{open_quote} " if pre_summary_space else open_quote
 
     # Skip if there are nested triple double quotes
     if contents.count(QUOTE_TYPES[0]):
@@ -318,32 +546,27 @@ def format_docstring(indentation, docstring,
         initial_indent = (
             indentation if pre_summary_newline else 3 * " " + indentation
         )
-        return '''\
+        pre_summary = "\n" + indentation if pre_summary_newline else ""
+        summary = wrap_summary(
+            normalize_summary(summary),
+            wrap_length=summary_wrap_length,
+            initial_indent=initial_indent,
+            subsequent_indent=indentation,
+        ).lstrip()
+        description = wrap_description(
+            description,
+            indentation=indentation,
+            wrap_length=description_wrap_length,
+            force_wrap=force_wrap,
+            strict=strict,
+        )
+        post_description = "\n" if post_description_blank else ""
+        return f'''\
 {open_quote}{pre_summary}{summary}
 
 {description}{post_description}
 {indentation}"""\
-'''.format(
-            open_quote=open_quote,
-            pre_summary=('\n' + indentation if pre_summary_newline
-                         else ' ' if pre_summary_space 
-                         else ''),
-            summary=wrap_summary(
-                normalize_summary(summary),
-                wrap_length=summary_wrap_length,
-                initial_indent=initial_indent,
-                subsequent_indent=indentation,
-            ).lstrip(),
-            description=wrap_description(
-                description,
-                indentation=indentation,
-                wrap_length=description_wrap_length,
-                force_wrap=force_wrap,
-                strict=strict,
-            ),
-            post_description=("\n" if post_description_blank else ""),
-            indentation=indentation,
-        )
+'''
     else:
         if not make_summary_multi_line:
             return wrap_summary(
@@ -352,18 +575,16 @@ def format_docstring(indentation, docstring,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
             ).strip()
-
-        beginning = '""" ' if pre_summary_space else '"""'
-        ending = "\n" + indentation + '"""'
+        beginning = f"{open_quote}\n{indentation}"
+        ending = f'\n{indentation}"""'
         summary_wrapped = wrap_summary(
             normalize_summary(contents),
             wrap_length=summary_wrap_length,
             initial_indent=indentation,
             subsequent_indent=indentation,
         ).strip()
-        return "{beginning}{summary}{ending}".format(
-            beginning=beginning, summary=summary_wrapped, ending=ending
-        )
+        return f"{beginning}{summary_wrapped}{ending}"
+
 
 def is_probably_beginning_of_sentence(line):
     """Return True if this line begins a new sentence."""
@@ -551,7 +772,6 @@ def strip_docstring(docstring: str) -> Tuple[str, str]:
     (docstring, open_quote) : tuple
         The docstring with the triple quotes removed.
         The opening quote type with single quotes replaced by double quotes.
-
     """
     docstring = docstring.strip()
 
@@ -650,7 +870,6 @@ def remove_section_header(text):
 
     >>> remove_section_header('===\nfoo\nbar\n')
     'foo\nbar\n'
-
     """
     stripped = text.lstrip()
     if not stripped:
@@ -675,6 +894,7 @@ def strip_leading_blank_lines(text):
     found = next(
         (index for index, line in enumerate(split) if line.strip()), 0
     )
+
     return "\n".join(split[found:])
 
 
@@ -697,7 +917,6 @@ def detect_encoding(filename):
             # Check for correctness of encoding.
             with open_with_encoding(filename, encoding) as check_file:
                 check_file.read()
-
         return encoding
     except (SyntaxError, LookupError, UnicodeDecodeError):
         return "latin-1"
@@ -732,7 +951,6 @@ def format_file(filename, args, standard_out):
                 f"after/{filename}",
                 lineterm="",
             )
-
             standard_out.write("\n".join(list(diff) + [""]))
 
     return FormatResult.ok
@@ -745,198 +963,33 @@ def _format_code_with_args(source, args):
         summary_wrap_length=args.wrap_summaries,
         description_wrap_length=args.wrap_descriptions,
         pre_summary_newline=args.pre_summary_newline,
+        pre_summary_space=args.pre_summary_space,
         make_summary_multi_line=args.make_summary_multi_line,
         tab_width=args.tab_width,
         post_description_blank=args.post_description_blank,
         force_wrap=args.force_wrap,
         line_range=args.line_range,
-        strict=args.non_strict,
+        strict=not args.non_strict,
     )
-
-
-def find_config_file(args):
-    """Find the configuration file the user specified."""
-    flargs = {}
-
-    config_file = args[args.index("--config") + 1]
-
-    if os.path.isfile(config_file):
-        argfile = os.path.basename(config_file)
-        config_files = ["pyproject.toml"]
-        for f in config_files:
-            if argfile == f:
-                flargs = read_configuration_from_file(config_file)
-
-    return flargs
-
-
-def read_configuration_from_file(configfile):
-    """Read docformatter options from a configuration file."""
-    flargs = {}
-    fullpath, ext = os.path.splitext(configfile)
-    filename = os.path.basename(fullpath)
-
-    if ext == ".toml" and TOMLI_INSTALLED and filename == "pyproject":
-        with open(configfile, "rb") as f:
-            config = tomli.load(f)
-
-        result = config.get("tool", {}).get("docformatter", None)
-        if result is not None:
-            flargs = {
-                k: v if isinstance(v, list) else str(v)
-                for k, v in result.items()
-            }
-
-    return flargs
 
 
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
-    # Standard Library Imports
-    import argparse
+    configurator = Configurator(argv)
+    configurator.do_parse_arguments()
 
-    flargs = find_config_file(argv) if "--config" in argv else {}
-    parser = argparse.ArgumentParser(description=__doc__, prog="docformatter")
-    changes = parser.add_mutually_exclusive_group()
-    changes.add_argument(
-        "-i",
-        "--in-place",
-        action="store_true",
-        help="make changes to files instead of printing diffs",
-    )
-    changes.add_argument(
-        "-c",
-        "--check",
-        action="store_true",
-        help="only check and report incorrectly formatted files",
-    )
-    parser.add_argument(
-        "-r",
-        "--recursive",
-        action="store_true",
-        default=bool(flargs.get("recursive", False)),
-        help="drill down directories recursively",
-    )
-    parser.add_argument(
-        "-e",
-        "--exclude",
-        nargs="*",
-        help="exclude directories and files by names",
-    )
-    parser.add_argument(
-        "--wrap-summaries",
-        default=int(flargs.get("wrap-summaries", 79)),
-        type=int,
-        metavar="length",
-        help="wrap long summary lines at this length; "
-        "set to 0 to disable wrapping "
-        "(default: %(default)s)",
-    )
-    parser.add_argument(
-        "--wrap-descriptions",
-        default=int(flargs.get("wrap-descriptions", 72)),
-        type=int,
-        metavar="length",
-        help="wrap descriptions at this length; "
-        "set to 0 to disable wrapping "
-        "(default: %(default)s)",
-    )
-    parser.add_argument(
-        "--blank",
-        dest="post_description_blank",
-        action="store_true",
-        default=bool(flargs.get("blank", False)),
-        help="add blank line after description",
-    )
-    parser.add_argument(
-        "--pre-summary-newline",
-        action="store_true",
-        default=bool(flargs.get("pre-summary-newline", False)),
-        help="add a newline before the summary of a multi-line docstring",
-    )
-    parser.add_argument('--pre-summary-space',
-                        action='store_true',
-                        help='add a space before one-line or the summary of a multi-line docstring')
-    parser.add_argument(
-        "--make-summary-multi-line",
-        action="store_true",
-        default=bool(flargs.get("make-summary-multi-line", False)),
-        help="add a newline before and after the summary of a "
-        "one-line docstring",
-    )
-    parser.add_argument(
-        "--force-wrap",
-        action="store_true",
-        default=bool(flargs.get("force-wrap", False)),
-        help="force descriptions to be wrapped even if it may "
-        "result in a mess",
-    )
-    parser.add_argument(
-        "--range",
-        metavar="line",
-        dest="line_range",
-        default=flargs.get("range", None),
-        type=int,
-        nargs=2,
-        help="apply docformatter to docstrings between these "
-        "lines; line numbers are indexed at 1",
-    )
-    parser.add_argument(
-        "--docstring-length",
-        metavar="length",
-        dest="length_range",
-        default=flargs.get("docstring-length", None),
-        type=int,
-        nargs=2,
-        help="apply docformatter to docstrings of given length range",
-    )
-    parser.add_argument(
-        "--non-strict",
-        action="store_true",
-        default=bool(flargs.get("non-strict", False)),
-        help="don't strictly follow reST syntax to identify lists (see issue "
-             "#67)",
-    )
-    parser.add_argument(
-        "--version", action="version", version=f"%(prog)s {__version__}"
-    )
-    parser.add_argument(
-        "--config", help="path to file containing docformatter options"
-    )
-    parser.add_argument(
-        "files", nargs="+", help="files to format or '-' for standard in"
-    )
-
-    args = parser.parse_args(argv[1:])
-
-    if args.line_range:
-        if args.line_range[0] <= 0:
-            parser.error("--range must be positive numbers")
-        if args.line_range[0] > args.line_range[1]:
-            parser.error(
-                "First value of --range should be less than or equal "
-                "to the second"
-            )
-
-    if args.length_range:
-        if args.length_range[0] <= 0:
-            parser.error("--docstring-length must be positive numbers")
-        if args.length_range[0] > args.length_range[1]:
-            parser.error(
-                "First value of --docstring-length should be less "
-                "than or equal to the second"
-            )
-
-    if "-" in args.files:
+    if "-" in configurator.args.files:
         _format_standard_in(
-            args,
-            parser=parser,
+            configurator.args,
+            parser=configurator.parser,
             standard_out=standard_out,
             standard_in=standard_in,
         )
     else:
         return _format_files(
-            args, standard_out=standard_out, standard_error=standard_error
+            configurator.args,
+            standard_out=standard_out,
+            standard_error=standard_error,
         )
 
 
@@ -953,12 +1006,12 @@ def _format_standard_in(args, parser, standard_out, standard_in):
 
     encoding = None
     source = standard_in.read()
-
     if not isinstance(source, unicode):
         encoding = standard_in.encoding or _get_encoding()
         source = source.decode(encoding)
 
     formatted_source = _format_code_with_args(source, args=args)
+
     if encoding:
         formatted_source = formatted_source.encode(encoding)
 
@@ -1048,6 +1101,7 @@ def _format_files(args, standard_out, standard_error):
         FormatResult.check_failed,
         FormatResult.ok,
     ]
+
     for code in return_codes:
         if outcomes[code]:
             return code
