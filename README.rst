@@ -226,11 +226,11 @@ Possible exit codes:
 - **3** - if any file needs to be formatted (in ``--check`` mode)
 
 *docformatter* options can also be stored in a configuration file.  Currently only
-pyproject.toml, setup.cfg, and tox.ini are supported.  The configuration file can be passed with a full path.  For example::
+``pyproject.toml``, ``setup.cfg``, and ``tox.ini`` are supported.  The configuration file can be passed with a full path.  For example::
 
       docformatter --config ~/.secret/path/to/pyproject.toml
 
-If no configuration file is passed explicitly, *docformatter* will search the current directory for the supported files and use the first one found.  The order of precedence is pyproject.toml, setup.cfg, then tox.ini.
+If no configuration file is passed explicitly, *docformatter* will search the current directory for the supported files and use the first one found.  The order of precedence is ``pyproject.toml``, ``setup.cfg``, then ``tox.ini``.
 
 Add section ``[tool.docformatter]`` with options listed using the same name as command line options.  For example:
 ::
@@ -240,7 +240,7 @@ Add section ``[tool.docformatter]`` with options listed using the same name as c
       wrap-summaries = 82
       blank = true
 
-The setup.cfg and tox.ini files will also support the ``[tool:docformatter]`` syntax.
+The ``setup.cfg`` and ``tox.ini`` files will also support the ``[tool:docformatter]`` syntax.
 
 See the discussions in `issue_39`_ and `issue_94`_ regarding *docformatter* and
 black interactions.
