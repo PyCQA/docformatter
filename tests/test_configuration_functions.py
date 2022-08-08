@@ -42,75 +42,120 @@ import pytest
 
 # docformatter Package Imports
 import docformatter
+from docformatter import Configurator
 
 
-class TestConfigurater:
+class TestConfigurator:
     """Class for testing configuration functions."""
 
     @pytest.mark.unit
-    def test_read_config_file(self):
-        """Return docformatter configuration from pyproject.toml file."""
-        assert docformatter.find_config_file(
-            [
-                "--config",
-                "./tests/_data/pyproject.toml",
-            ]
-        ) == {
+    def test_initialize_configurator_with_default(self):
+        """Return a Configurator() instance using default pyproject.toml."""
+        unit_under_test = Configurator([])
+
+        assert unit_under_test.config_file == "./pyproject.toml"
+
+    @pytest.mark.unit
+    def test_initialize_configurator_with_pyproject_toml(self):
+        """Return a Configurator() instance loaded from a pyproject.toml."""
+        argb = [
+            "--config",
+            "./tests/_data/pyproject.toml",
+        ]
+
+        unit_under_test = Configurator(argb)
+
+        assert unit_under_test.args is None
+        assert unit_under_test.flargs_dct == {
             "recursive": "True",
             "wrap-summaries": "82",
         }
+        assert unit_under_test.configuration_file_lst == [
+            "pyproject.toml",
+            "setup.cfg",
+            "tox.ini",
+        ]
+        assert unit_under_test.args_lst == argb
+        assert unit_under_test.config_file == "./tests/_data/pyproject.toml"
 
     @pytest.mark.unit
-    def test_missing_config_file(self):
-        """Return empty configuration when file is missing."""
-        assert (
-            docformatter.find_config_file(
-                [
-                    "--config",
-                    "../../pyproject.toml",
-                ]
-            )
-            == {}
-        )
+    def test_initialize_configurator_with_setup_cfg(self):
+        """Return docformatter configuration loaded from a setup.cfg file."""
+        argb = [
+            "--config",
+            "./tests/_data/setup.cfg",
+        ]
+
+        unit_under_test = Configurator(argb)
+        unit_under_test.do_parse_arguments()
+
+        assert unit_under_test.flargs_dct == {
+            "blank": "False",
+            "wrap-summaries": "79",
+            "wrap-descriptions": "72",
+        }
+
+    @pytest.mark.unit
+    def test_initialize_configurator_with_tox_ini(self):
+        """Return docformatter configuration loaded from a tox.ini file."""
+        argb = [
+            "--config",
+            "./tests/_data/tox.ini",
+        ]
+
+        unit_under_test = Configurator(argb)
+        unit_under_test.do_parse_arguments()
+
+        assert unit_under_test.flargs_dct == {
+            "blank": "False",
+            "wrap-summaries": "79",
+            "wrap-descriptions": "72",
+        }
 
     @pytest.mark.unit
     def test_unsupported_config_file(self):
         """Return empty configuration dict when file is unsupported."""
-        assert docformatter.find_config_file(["--config", "tox.ini"]) == {}
+        argb = [
+            "--config",
+            "./tests/conf.py",
+        ]
 
-    @pytest.mark.system
-    @pytest.mark.parametrize(
-        "contents",
-        [
-            '''\
-def foo():
-    """
-    Hello world
-    """
-'''
-        ],
-    )
-    @pytest.mark.parametrize(
-        "arguments",
-        [
-            [
-                "--wrap-summaries=79",
-                "--config ./tests/_data/pyproject.toml",
-            ]
-        ],
-    )
-    def test_cli_override_config_file(
-        self, temporary_file, contents, run_docformatter, arguments
-    ):
+        unit_under_test = Configurator(argb)
+        unit_under_test.do_parse_arguments()
+
+        assert unit_under_test.flargs_dct == {}
+
+    @pytest.mark.unit
+    def test_cli_override_config_file(self):
         """Command line arguments override configuration file options."""
-        process = run_docformatter
-        assert '''\
-@@ -1,4 +1,2 @@
- def foo():
--    """
--    Hello world
--    """
-+    """Hello world."""
-''' == "\n".join(
-            process.communicate()[0].decode().split("\n")[2:]
-        )
+        argb = [
+            "--config",
+            "./tests/_data/tox.ini",
+            "--make-summary-multi-line",
+            "--blank",
+            "--wrap-summaries",
+            "88",
+        ]
+
+        unit_under_test = Configurator(argb)
+        unit_under_test.do_parse_arguments()
+
+        assert unit_under_test.flargs_dct == {
+            "blank": "False",
+            "wrap-descriptions": "72",
+            "wrap-summaries": "79",
+        }
+        assert not unit_under_test.args.in_place
+        assert not unit_under_test.args.check
+        assert not unit_under_test.args.recursive
+        assert unit_under_test.args.exclude is None
+        assert unit_under_test.args.wrap_summaries == 88
+        assert unit_under_test.args.wrap_descriptions == 72
+        assert unit_under_test.args.post_description_blank
+        assert not unit_under_test.args.pre_summary_newline
+        assert not unit_under_test.args.pre_summary_space
+        assert unit_under_test.args.make_summary_multi_line
+        assert not unit_under_test.args.force_wrap
+        assert unit_under_test.args.line_range is None
+        assert unit_under_test.args.length_range is None
+        assert not unit_under_test.args.non_strict

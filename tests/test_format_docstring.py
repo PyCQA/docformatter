@@ -26,7 +26,9 @@
 # SOFTWARE.
 """Module for testing the format_docstring() function."""
 
+
 # Standard Library Imports
+import itertools
 import random
 
 # Third Party Imports
@@ -272,22 +274,23 @@ class TestFormatWrap:
         random.seed(0)
 
         min_line_length = 50
-        for max_length in range(min_line_length, 100):
-            for num_indents in range(20):
-                indentation = " " * num_indents
-                formatted_text = indentation + docformatter.format_docstring(
-                    indentation=indentation,
-                    docstring=generate_random_docstring(
-                        max_word_length=min_line_length // 2
-                    ),
-                    summary_wrap_length=max_length,
-                )
+        for max_length, num_indents in itertools.product(
+            range(min_line_length, 100), range(20)
+        ):
+            indentation = " " * num_indents
+            formatted_text = indentation + docformatter.format_docstring(
+                indentation=indentation,
+                docstring=generate_random_docstring(
+                    max_word_length=min_line_length // 2
+                ),
+                summary_wrap_length=max_length,
+            )
 
-                for line in formatted_text.split("\n"):
-                    # It is not the formatter's fault if a word is too long to
-                    # wrap.
-                    if len(line.split()) > 1:
-                        assert len(line) <= max_length
+            for line in formatted_text.split("\n"):
+                # It is not the formatter's fault if a word is too long to
+                # wrap.
+                if len(line.split()) > 1:
+                    assert len(line) <= max_length
 
     @pytest.mark.unit
     def test_format_docstring_with_weird_indentation_and_punctuation(self):
