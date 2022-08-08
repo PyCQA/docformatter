@@ -603,14 +603,14 @@ def foo():
                          docformatter.format_code('"""\r\n'))
 
     def test_format_code_dominant_line_ending_style_preserved(self):
-        input = '''\
+        goes_in = '''\
 def foo():\r
     """\r
     Hello\r
     foo. This is a docstring.\r
     """\r
 '''
-        self.assertEqual(docformatter.CRLF, docformatter.find_newline(input.splitlines(True)))
+        self.assertEqual(docformatter.CRLF, docformatter.find_newline(goes_in.splitlines(True)))
         self.assertEqual(
             '''\
 def foo():\r
@@ -619,7 +619,7 @@ def foo():\r
     This is a docstring.\r
     """\r
 ''',
-            docformatter.format_code(input))
+            docformatter.format_code(goes_in))
 
     def test_format_code_additional_empty_line_before_doc(self):
         args = {'summary_wrap_length': 79,
