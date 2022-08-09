@@ -232,8 +232,7 @@ Possible exit codes:
 
 If no configuration file is passed explicitly, *docformatter* will search the current directory for the supported files and use the first one found.  The order of precedence is ``pyproject.toml``, ``setup.cfg``, then ``tox.ini``.
 
-Add section ``[tool.docformatter]`` with options listed using the same name as command line options.  For example:
-::
+Add section ``[tool.docformatter]`` with options listed using the same name as command line options.  For example::
 
       [tool.docformatter]
       recursive = true

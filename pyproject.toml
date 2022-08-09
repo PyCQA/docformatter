@@ -171,18 +171,21 @@ commands =
     pytest -s -x -c ./pyproject.toml --cache-clear \
         --cov-config=pyproject.toml --cov=docformatter \
         --cov-branch --cov-report=term tests/
-    coverage run --branch --omit="*/site-packages/*,*/*pypy/*" \
-        test_docformatter.py
 
 [testenv:style]
 deps =
+    docformatter
     pycodestyle
     pydocstyle
     pylint
+    rstcheck
     toml
     untokenize
 commands =
     pycodestyle docformatter.py setup.py
     pydocstyle docformatter.py setup.py
     pylint docformatter.py setup.py
+    rstcheck --report-level=1 README.rst
+    docformatter docformatter.py setup.py
+    python -m doctest docformatter.py
 """

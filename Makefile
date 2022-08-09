@@ -25,14 +25,8 @@ coverage:
 	@coverage erase
 	$(MAKE) coverage.unit
 	$(MAKE) coverage.system
-	$(MAKE) coverage.old
-	@coverage combine .coverage.unit .coverage.system .coverage.old
+	@coverage combine .coverage.unit .coverage.system
 	@coverage xml --rcfile=pyproject.toml
-
-coverage.old:
-	COVERAGE_FILE=".coverage.old" coverage run \
-		--branch --omit='*/site-packages/*,*/*pypy/*' \
-		test_docformatter.py
 
 open_coverage: coverage
 	@coverage html
@@ -43,10 +37,3 @@ mutant:
 
 readme:
 	@restview --long-description --strict
-
-# This target is for use with IDE integration.
-format:
-	@echo -e "\n\t\033[1;32mAutoformatting $(SRCFILE) ...\033[0m\n"
-	$(BLACK) --fast $(SRCFILE)
-	$(ISORT) --settings-file ./pyproject.toml --atomic $(SRCFILE)
-	@python docformatter.py --in-place --config ./pyproject.toml $(SRCFILE)
