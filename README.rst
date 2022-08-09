@@ -187,8 +187,8 @@ Below is the help output::
                             disable wrapping
                             (default: 72)
       --blank
-      											add blank line after elaborate description
-      											(default: False)
+                            add blank line after elaborate description
+                            (default: False)
       --pre-summary-newline
                             add a newline before one-line or the summary of a
                             multi-line docstring
@@ -202,23 +202,23 @@ Below is the help output::
                             add a newline before and after a one-line docstring
                             (default: False)
       --force-wrap
-      											force descriptions to be wrapped even if it may result
-      											in a mess
-      											(default: False)
+                            force descriptions to be wrapped even if it may result
+                            in a mess
+                            (default: False)
       --range start_line end_line
                             apply docformatter to docstrings between these lines; 
                             line numbers are indexed at 1
       --docstring-length min_length max_length
                             apply docformatter to docstrings of given length range
       --non-strict
-      											do not strictly follow reST syntax to identify lists
-      											(see issue #67)
-      											(default: False)
+                            do not strictly follow reST syntax to identify lists
+                            (see issue #67)
+                            (default: False)
       --config CONFIG
-      											path to file containing docformatter options
-      											(default: ./pyproject.toml)
+                            path to file containing docformatter options
+                            (default: ./pyproject.toml)
       --version
-      											show program's version number and exit
+                            show program's version number and exit
 
 Possible exit codes:
 
