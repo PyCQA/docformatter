@@ -28,6 +28,7 @@
 
 # Standard Library Imports
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -59,10 +60,20 @@ else:
 
 
 @pytest.fixture(scope="function")
-def temporary_file(contents, directory=".", prefix=""):
+def temporary_directory(directory=".", prefix=""):
+    """Create temporary directory and yield its path."""
+    temp_directory = tempfile.mkdtemp(prefix=prefix, dir=directory)
+    try:
+        yield temp_directory
+    finally:
+        shutil.rmtree(temp_directory)
+
+
+@pytest.fixture(scope="function")
+def temporary_file(contents, file_directory=".", file_prefix=""):
     """Write contents to temporary file and yield it."""
     f = tempfile.NamedTemporaryFile(
-        suffix=".py", prefix=prefix, delete=False, dir=directory
+        suffix=".py", prefix=file_prefix, delete=False, dir=file_directory
     )
     try:
         f.write(contents.encode())
@@ -77,11 +88,9 @@ def run_docformatter(arguments, temporary_file):
     """Run subprocess with same Python path as parent.
 
     Return subprocess object.
-
-    This is necessary for testing under "./setup.py test" without installing
-    "untokenize".
     """
-    arguments.append(temporary_file)
+    if "-" not in arguments:
+        arguments.append(temporary_file)
     environ = os.environ.copy()
     environ["PYTHONPATH"] = os.pathsep.join(sys.path)
     return subprocess.Popen(

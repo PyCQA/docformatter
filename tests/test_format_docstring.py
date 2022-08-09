@@ -422,6 +422,26 @@ num_iterations is the number of updates - instead of a better definition of conv
             )
         )
 
+    @pytest.mark.xfail
+    def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(
+        self,
+    ):
+        """"Should account for length of tab when wrapping.
+
+        See PR #69.
+        """
+        assert '''
+\t\t"""Some summary x x x
+\t\tx."""
+'''.strip() == docformatter.format_docstring(
+            "\t\t",
+            '''
+\t\t"""Some summary x x x x."""
+'''.strip(),
+            summary_wrap_length=30,
+            tab_width=4,
+        )
+
 
 class TestFormatStyleOptions:
     """Class for testing format_docstring() when requesting style options."""

@@ -82,7 +82,6 @@ class TestFindPyFiles:
     @pytest.mark.unit
     def test_is_excluded(self):
         """Skip excluded *.py files."""
-
         sources = {"/root"}
         patch_data = [
             ("/root", ["folder_one", "folder_two"], []),
