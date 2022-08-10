@@ -394,15 +394,6 @@ def format_code(source, **kwargs):
     except (tokenize.TokenError, IndentationError):
         return source
 
-def has_correct_length(length_range, start, end):
-    """Return True if docstring's length is in range."""
-    if length_range is None:
-        return True
-    min_length, max_length = length_range
-
-    docstring_length = end + 1 - start
-    return min_length <= docstring_length <= max_length
-
 def _format_code(
     source,
     summary_wrap_length=79,
