@@ -285,7 +285,6 @@ class TestFormatWrap:
                 ),
                 summary_wrap_length=max_length,
             )
-
             for line in formatted_text.split("\n"):
                 # It is not the formatter's fault if a word is too long to
                 # wrap.
@@ -440,6 +439,47 @@ num_iterations is the number of updates - instead of a better definition of conv
 '''.strip(),
             summary_wrap_length=30,
             tab_width=4,
+        )
+
+    @pytest.mark.unit
+    def test_format_docstring_for_multi_line_summary_alone(self):
+        """Place closing quotes on newline when wrapping one-liner."""
+        assert (
+            (
+                '''\
+"""This one-line docstring will be multi-line because it's quite
+    long.
+    """\
+'''
+            )
+            == docformatter.format_docstring(
+                "    ",
+                '''\
+"""This one-line docstring will be multi-line because it's quite long."""\
+''',
+                summary_wrap_length=69,
+                close_quotes_on_newline=True,
+            )
+        )
+
+    @pytest.mark.unit
+    def test_format_docstring_for_one_line_summary_alone_but_too_long(self):
+        """"""
+        assert (
+            (
+                '''\
+"""This one-line docstring will not be wrapped and quotes will be in-line."""\
+'''
+            )
+            == docformatter.format_docstring(
+                "    ",
+                '''\
+"""This one-line docstring will not be wrapped and quotes will be 
+in-line."""\
+''',
+                summary_wrap_length=88,
+                close_quotes_on_newline=True,
+            )
         )
 
 
