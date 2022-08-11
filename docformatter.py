@@ -192,6 +192,22 @@ class Configurator:
             "(default: %(default)s)",
         )
         self.parser.add_argument(
+            "--force-wrap",
+            action="store_true",
+            default=bool(self.flargs_dct.get("force-wrap", False)),
+            help="force descriptions to be wrapped even if it may "
+            "result in a mess (default: %(default)s)",
+        )
+        self.parser.add_argument(
+            "--tab_width",
+            type=int,
+            dest="tab_width",
+            metavar="width",
+            default=int(self.flargs_dct.get("tab-width", 1)),
+            help="tabs in indentation are this many characters when "
+                 "wrapping lines (default: %(default)s)",
+        )
+        self.parser.add_argument(
             "--blank",
             dest="post_description_blank",
             action="store_true",
@@ -230,13 +246,6 @@ class Configurator:
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
             "(default: %(default)s)",
-        )
-        self.parser.add_argument(
-            "--force-wrap",
-            action="store_true",
-            default=bool(self.flargs_dct.get("force-wrap", False)),
-            help="force descriptions to be wrapped even if it may "
-            "result in a mess (default: %(default)s)",
         )
         self.parser.add_argument(
             "--range",
@@ -412,12 +421,14 @@ def _format_code(
     source,
     summary_wrap_length=79,
     description_wrap_length=72,
+    force_wrap=False,
+    tab_width=1,
     pre_summary_newline=False,
     pre_summary_space=False,
     make_summary_multi_line=False,
     close_quotes_on_newline=False,
     post_description_blank=False,
-    force_wrap=False,
+
     line_range=None,
     length_range=None,
     strict=True,
@@ -462,12 +473,13 @@ def _format_code(
                 token_string,
                 summary_wrap_length=summary_wrap_length,
                 description_wrap_length=description_wrap_length,
+                force_wrap=force_wrap,
+                tab_width=tab_width,
                 pre_summary_newline=pre_summary_newline,
                 pre_summary_space=pre_summary_space,
                 make_summary_multi_line=make_summary_multi_line,
                 close_quotes_on_newline=close_quotes_on_newline,
                 post_description_blank=post_description_blank,
-                force_wrap=force_wrap,
                 strict=strict,
             )
 
@@ -500,12 +512,13 @@ def format_docstring(
     docstring,
     summary_wrap_length=0,
     description_wrap_length=0,
+    force_wrap=False,
+    tab_width=1,
     pre_summary_newline=False,
     pre_summary_space=False,
     make_summary_multi_line=False,
     close_quotes_on_newline=False,
     post_description_blank=False,
-    force_wrap=False,
     strict=True,
 ):
     """Return formatted version of docstring.
@@ -541,6 +554,11 @@ def format_docstring(
     if not force_wrap and is_some_sort_of_list(summary, strict):
         # Something is probably not right with the splitting.
         return docstring
+
+    # Compensate for textwrap counting each tab in indentation as 1 character.
+    tab_compensation = indentation.count('\t') * (tab_width - 1)
+    summary_wrap_length -= tab_compensation
+    description_wrap_length -= tab_compensation
 
     if description:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
@@ -970,12 +988,13 @@ def _format_code_with_args(source, args):
         source,
         summary_wrap_length=args.wrap_summaries,
         description_wrap_length=args.wrap_descriptions,
+        force_wrap=args.force_wrap,
+        tab_width=args.tab_width,
         pre_summary_newline=args.pre_summary_newline,
         pre_summary_space=args.pre_summary_space,
         make_summary_multi_line=args.make_summary_multi_line,
         close_quotes_on_newline=args.close_quotes_on_newline,
         post_description_blank=args.post_description_blank,
-        force_wrap=args.force_wrap,
         line_range=args.line_range,
         strict=not args.non_strict,
     )

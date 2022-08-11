@@ -207,8 +207,10 @@ Below is the help output::
                             (default: False)
       --force-wrap
                             force descriptions to be wrapped even if it may result
-                            in a mess
-                            (default: False)
+                            in a mess (default: False)
+      --tab_width width
+                            tabs in indentation are this many characters when
+                            wrapping lines (default: 1)
       --range start_line end_line
                             apply docformatter to docstrings between these lines; 
                             line numbers are indexed at 1
@@ -295,7 +297,7 @@ PyCharm
 
 Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and configure *docformatter* as shown below:
 
-.. image:: ./images/pycharm-file-watcher-configurations.png
+.. image:: https://github.com/PyCQA/docformatter/blob/master/docs/images/pycharm-file-watcher-configurations.png?raw=true
    :alt: PyCharm file watcher configurations
 
 GitHub Actions

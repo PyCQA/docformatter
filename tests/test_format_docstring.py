@@ -421,7 +421,7 @@ num_iterations is the number of updates - instead of a better definition of conv
             )
         )
 
-    @pytest.mark.xfail
+    @pytest.mark.unit
     def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(
         self,
     ):
