@@ -208,7 +208,7 @@ Below is the help output::
       --force-wrap
                             force descriptions to be wrapped even if it may result
                             in a mess (default: False)
-			--tab_width width
+      --tab_width width
                             tabs in indentation are this many characters when
                             wrapping lines (default: 1)
       --range start_line end_line
