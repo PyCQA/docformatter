@@ -36,11 +36,11 @@ Formats docstrings to follow `PEP 257`_.
 
 .. _`PEP 257`: http://www.python.org/dev/peps/pep-0257/
 
-
 Features
 ========
 
-*docformatter* automatically formats docstrings to follow a subset of the PEP 257 conventions. Below are the relevant items quoted from PEP 257.
+``docformatter`` automatically formats docstrings to follow a subset of the PEP
+257 conventions. Below are the relevant items quoted from PEP 257.
 
 - For consistency, always use triple double quotes around docstrings.
 - Triple quotes are used even though the string fits on one line.
@@ -50,12 +50,15 @@ Features
 - Unless the entire docstring fits on a line, place the closing quotes
   on a line by themselves.
 
-docformatter also handles some of the PEP 8 conventions.
+``docformatter`` also handles some of the PEP 8 conventions.
 
 - Don't write string literals that rely on significant trailing
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
+See the `REQUIREMENTS`_ document for more details.
+
+.. _`REQUIREMENTS`: docs/REQUIREMENTS.rst
 
 Installation
 ============
