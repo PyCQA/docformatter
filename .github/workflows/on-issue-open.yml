@@ -8,7 +8,7 @@ jobs:
   label_issue_backlog:
     runs-on: ubuntu-latest
     steps:
-      - name: Add backlog label
+      - name: Add fresh new label
         uses: andymckay/labeler@master
         with:
           add-labels: "fresh"
