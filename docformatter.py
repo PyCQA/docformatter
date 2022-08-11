@@ -248,13 +248,6 @@ class Configurator:
             "(default: %(default)s)",
         )
         self.parser.add_argument(
-            "--force-wrap",
-            action="store_true",
-            default=bool(self.flargs_dct.get("force-wrap", False)),
-            help="force descriptions to be wrapped even if it may "
-            "result in a mess (default: %(default)s)",
-        )
-        self.parser.add_argument(
             "--range",
             metavar="line",
             dest="line_range",

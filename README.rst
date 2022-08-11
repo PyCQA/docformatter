@@ -207,8 +207,10 @@ Below is the help output::
                             (default: False)
       --force-wrap
                             force descriptions to be wrapped even if it may result
-                            in a mess
-                            (default: False)
+                            in a mess (default: False)
+			--tab_width width
+                            tabs in indentation are this many characters when
+                            wrapping lines (default: 1)
       --range start_line end_line
                             apply docformatter to docstrings between these lines; 
                             line numbers are indexed at 1
