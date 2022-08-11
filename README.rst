@@ -201,6 +201,10 @@ Below is the help output::
       --make-summary-multi-line
                             add a newline before and after a one-line docstring
                             (default: False)
+      --close-quotes-on-newline
+                            place closing triple quotes on a new-line when a 
+                            one-line docstring wraps to two or more lines
+                            (default: False)
       --force-wrap
                             force descriptions to be wrapped even if it may result
                             in a mess

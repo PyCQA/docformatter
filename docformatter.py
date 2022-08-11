@@ -218,13 +218,15 @@ class Configurator:
             "--pre-summary-newline",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-newline", False)),
-            help="add a newline before the summary of a multi-line docstring (default: %(default)s)",
+            help="add a newline before the summary of a multi-line docstring "
+            "(default: %(default)s)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-space", False)),
-            help="add a space after the opening triple quotes (default: %(default)s)",
+            help="add a space after the opening triple quotes "
+            "(default: %(default)s)",
         )
         self.parser.add_argument(
             "--make-summary-multi-line",
@@ -232,8 +234,25 @@ class Configurator:
             default=bool(
                 self.flargs_dct.get("make-summary-multi-line", False)
             ),
-            help="add a newline before and after the summary of a "
-            "one-line docstring (default: %(default)s)",
+            help="add a newline before and after the summary of a one-line "
+            "docstring (default: %(default)s)",
+        )
+        self.parser.add_argument(
+            "--close-quotes-on-newline",
+            action="store_true",
+            default=bool(
+                self.flargs_dct.get("close-quotes-on-newline", False)
+            ),
+            help="place closing triple quotes on a new-line when a "
+            "one-line docstring wraps to two or more lines "
+            "(default: %(default)s)",
+        )
+        self.parser.add_argument(
+            "--force-wrap",
+            action="store_true",
+            default=bool(self.flargs_dct.get("force-wrap", False)),
+            help="force descriptions to be wrapped even if it may "
+            "result in a mess (default: %(default)s)",
         )
         self.parser.add_argument(
             "--range",
@@ -243,7 +262,7 @@ class Configurator:
             type=int,
             nargs=2,
             help="apply docformatter to docstrings between these "
-            "lines; line numbers are indexed at 1",
+            "lines; line numbers are indexed at 1 (default: %(default)s)",
         )
         self.parser.add_argument(
             "--docstring-length",
@@ -252,7 +271,8 @@ class Configurator:
             default=self.flargs_dct.get("docstring-length", None),
             type=int,
             nargs=2,
-            help="apply docformatter to docstrings of given length range",
+            help="apply docformatter to docstrings of given length range "
+            "(default: %(default)s)",
         )
         self.parser.add_argument(
             "--non-strict",
@@ -413,6 +433,7 @@ def _format_code(
     pre_summary_newline=False,
     pre_summary_space=False,
     make_summary_multi_line=False,
+    close_quotes_on_newline=False,
     post_description_blank=False,
 
     line_range=None,
@@ -464,6 +485,7 @@ def _format_code(
                 pre_summary_newline=pre_summary_newline,
                 pre_summary_space=pre_summary_space,
                 make_summary_multi_line=make_summary_multi_line,
+                close_quotes_on_newline=close_quotes_on_newline,
                 post_description_blank=post_description_blank,
                 strict=strict,
             )
@@ -502,6 +524,7 @@ def format_docstring(
     pre_summary_newline=False,
     pre_summary_space=False,
     make_summary_multi_line=False,
+    close_quotes_on_newline=False,
     post_description_blank=False,
     strict=True,
 ):
@@ -573,21 +596,29 @@ def format_docstring(
 '''
     else:
         if not make_summary_multi_line:
-            return wrap_summary(
+            summary_wrapped = wrap_summary(
                 open_quote + normalize_summary(contents) + '"""',
                 wrap_length=summary_wrap_length,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
             ).strip()
-        beginning = f"{open_quote}\n{indentation}"
-        ending = f'\n{indentation}"""'
-        summary_wrapped = wrap_summary(
-            normalize_summary(contents),
-            wrap_length=summary_wrap_length,
-            initial_indent=indentation,
-            subsequent_indent=indentation,
-        ).strip()
-        return f"{beginning}{summary_wrapped}{ending}"
+            if close_quotes_on_newline and "\n" in summary_wrapped:
+                summary_wrapped = (
+                    f"{summary_wrapped[:-3]}"
+                    f"\n{indentation}"
+                    f"{summary_wrapped[-3:]}"
+                )
+            return summary_wrapped
+        else:
+            beginning = f"{open_quote}\n{indentation}"
+            ending = f'\n{indentation}"""'
+            summary_wrapped = wrap_summary(
+                normalize_summary(contents),
+                wrap_length=summary_wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=indentation,
+            ).strip()
+            return f"{beginning}{summary_wrapped}{ending}"
 
 
 def is_probably_beginning_of_sentence(line):
@@ -820,13 +851,11 @@ def normalize_summary(summary):
 def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
     """Return line-wrapped summary text."""
     if wrap_length > 0:
-        return "\n".join(
-            textwrap.wrap(
-                unwrap_summary(summary),
-                width=wrap_length,
-                initial_indent=initial_indent,
-                subsequent_indent=subsequent_indent,
-            )
+        return textwrap.fill(
+            unwrap_summary(summary),
+            width=wrap_length,
+            initial_indent=initial_indent,
+            subsequent_indent=subsequent_indent,
         ).strip()
     else:
         return summary
@@ -971,6 +1000,7 @@ def _format_code_with_args(source, args):
         pre_summary_newline=args.pre_summary_newline,
         pre_summary_space=args.pre_summary_space,
         make_summary_multi_line=args.make_summary_multi_line,
+        close_quotes_on_newline=args.close_quotes_on_newline,
         post_description_blank=args.post_description_blank,
         line_range=args.line_range,
         strict=not args.non_strict,
