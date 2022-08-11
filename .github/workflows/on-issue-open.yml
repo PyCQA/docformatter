@@ -1,0 +1,14 @@
+name: Issue Open Workflow
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label_issue_backlog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add backlog label
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "fresh"
