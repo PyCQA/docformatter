@@ -59,7 +59,7 @@ try:
 except ImportError:
     TOMLI_INSTALLED = False
 
-__version__ = "1.5.0-rc1"
+__version__ = "1.5.0"
 
 
 if sys.version_info.major == 3:
