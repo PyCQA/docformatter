@@ -291,7 +291,7 @@ PyCharm
 
 Head over to ``Preferences > Tools > File Watchers``, click the ``+`` icon and configure *docformatter* as shown below:
 
-.. image:: ./images/pycharm-file-watcher-configurations.png
+.. image:: https://github.com/PyCQA/docformatter/blob/master/docs/images/pycharm-file-watcher-configurations.png?raw=true
    :alt: PyCharm file watcher configurations
 
 GitHub Actions
