@@ -1,0 +1,75 @@
+# This workflow runs when a version tag is pushed.
+#
+# - Job 1:
+#     - Get new tag.
+#     - Update CHANGELOG.md
+#     - Update VERSION, pyproject.toml, and docs/conf.py with new version.
+#     - Set PR variables.
+#     - Cut PR to merge files and create release/* branch.
+name: Push Version Tag Workflow
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  request-release:
+    name: Request Release PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Get new tag
+        id: newversion
+        run: |
+          new_tag=${GITHUB_REF/refs\/tags\//}
+          echo "::set-output name=new_version::$(echo $new_tag)"
+          echo "New tag is: $new_tag"
+          echo "GitHub ref: ${{ github.ref }}"
+
+      - name: Generate release changelog
+        uses: heinrichreimer/github-changelog-generator-action@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: "v1.3.1"
+          excludeTags: "latest"
+          breakingLabel: "Breaking Changes"
+          breakingLabels: "V: major"
+          enhancementLabel: "New Features"
+          enhancementLabels: "V: minor"
+          bugsLabel: "Bug Fixes"
+          bugLabels: "V: patch"
+          excludeLabels: "release"
+          issues: false
+          issuesWoLabels: false
+          maxIssues: 100
+          pullRequests: true
+          prWoLabels: false
+          author: true
+          unreleased: true
+          compareLink: true
+          stripGeneratorNotice: true
+          verbose: true
+
+      - name: Update VERSION, pyproject.toml, and docs/conf.py
+        uses: vemel/nextversion@main
+        with:
+          path: ./pyproject.toml
+          result: ${{ steps.newversion.outputs.new_version }}
+          update: |
+            ./pyproject.toml
+
+      - name: Request release pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: "release: ${{ steps.newversion.outputs.new_version }}"
+          title: "release: ${{ steps.newversion.outputs.new_version }}"
+          body: "Please cut release ${{ steps.newversion.outputs.new_version }}"
+          branch: "release/${{ steps.newversion.outputs.new_version }}"
+          base: master
+          labels: release

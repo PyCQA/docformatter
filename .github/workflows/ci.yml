@@ -29,3 +29,17 @@ jobs:
     - name: Run tests with tox
       run: |
         tox -e py
+    - name: Create Coveralls report
+      uses: miurahr/coveralls-python-action@patch-pyprject-toml
+      with:
+        parallel: true
+
+  upload_coveralls:
+    name: Upload Results to Coveralls
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload coverage report to Coveralls
+        uses: miurahr/coveralls-python-action@patch-pyprject-toml
+        with:
+          parallel-finished: true
