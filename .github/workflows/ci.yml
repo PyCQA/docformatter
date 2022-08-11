@@ -29,7 +29,6 @@ jobs:
     - name: Run tests with tox
       run: |
         tox -e py
-        -
     - name: Create Coveralls report
       uses: miurahr/coveralls-python-action@patch-pyprject-toml
       with:
