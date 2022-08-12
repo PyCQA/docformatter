@@ -58,7 +58,9 @@ Features
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
-See the the full documentation at read-the-docs.
+See the the full documentation at `read-the-docs`_.
+
+.. _read-the-docs: https://docformatter.readthedocs.io
 
 Installation
 ============
