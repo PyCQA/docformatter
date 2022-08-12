@@ -12,6 +12,7 @@ Welcome to docformatter!
 
    usage
    requirements
+   license
 
 Indices and tables
 ==================

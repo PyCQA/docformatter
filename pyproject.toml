@@ -173,6 +173,7 @@ commands =
     pytest -s -x -c ./pyproject.toml --cache-clear \
         --cov-config=pyproject.toml --cov=docformatter \
         --cov-branch --cov-report=term tests/
+    coverage xml --rcfile=pyproject.toml
 
 [testenv:style]
 deps =
