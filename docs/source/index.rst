@@ -10,8 +10,16 @@ Welcome to docformatter!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    usage
+   configuration
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Miscellaneous:
+
    requirements
+   faq
    authors
    license
 
