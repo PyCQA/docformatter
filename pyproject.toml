@@ -168,6 +168,8 @@ deps =
     pytest-cov
     coverage
     mock
+setenv =
+    COVERAGE_FILE={toxinidir}/.coverage
 commands =
     pip install .[tomli]
     pytest -s -x -c ./pyproject.toml --cache-clear \
