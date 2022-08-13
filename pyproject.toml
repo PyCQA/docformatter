@@ -40,7 +40,6 @@ black = [
     {version = "^22.0.0", python = ">=3.6.2"},
 ]
 coverage = {extras = ["toml"], version = "^6.2.0"}
-docformatter = "^1.4"
 isort = "^5.7.0"
 mock = "^4.0.0"
 pycodestyle = "^2.8.0"
@@ -50,6 +49,10 @@ pytest = "<7.0.0"
 pytest-cov = "^3.0.0"
 rstcheck = "<6.0.0"
 Sphinx = "^5.0.0"
+twine = [
+    {version="<4.0.0", python = "<3.7"},
+    {version="^4.0.0", python = ">=3.7"},
+]
 
 [tool.poetry.scripts]
 docformatter = "docformatter:main"
