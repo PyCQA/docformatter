@@ -46,9 +46,10 @@ import sysconfig
 import textwrap
 import tokenize
 from configparser import ConfigParser
-from typing import List, Tuple, Union
+from typing import List, TextIO, Tuple, Union
 
 # Third Party Imports
+import _io
 import untokenize
 
 try:
@@ -92,7 +93,7 @@ QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
 
-class FormatResult(object):
+class FormatResult:
     """Possible exit codes."""
 
     ok = 0
@@ -207,7 +208,7 @@ class Configurator:
             metavar="width",
             default=int(self.flargs_dct.get("tab-width", 1)),
             help="tabs in indentation are this many characters when "
-                 "wrapping lines (default: %(default)s)",
+            "wrapping lines (default: %(default)s)",
         )
         self.parser.add_argument(
             "--blank",
@@ -351,6 +352,368 @@ class Configurator:
                 }
 
 
+class Formator:
+    """Format docstrings."""
+
+    parser = None
+    """Parser object."""
+
+    args: argparse.Namespace = None
+
+    def __init__(
+        self,
+            args: argparse.Namespace,
+            stderror: TextIO,
+            stdin: TextIO,
+            stdout: TextIO,
+    ) -> None:
+        """Initialize a Formattor instance.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Any command line arguments passed during invocation or
+            configuration file options.
+        stderror : TextIO
+            The standard error device.  Typically, the screen.
+        stdin :  TextIO
+            The standard input device.  Typically, the keyboard.
+        stdout : TextIO
+            The standard output device.  Typically, the screen.
+
+        Returns
+        -------
+        object
+        """
+        self.args = args
+        self.stderror: TextIO = stderror
+        self.stdin: TextIOr = stdin
+        self.stdout: TextIO = stdout
+
+    def do_format_standard_in(self, parser: argparse.ArgumentParser):
+        """Print formatted text to standard out.
+
+        Parameters
+        ----------
+        parser: argparse.ArgumentParser
+            The argument parser containing the formatting options.
+        """
+        if len(self.args.files) > 1:
+            parser.error("cannot mix standard in and regular files")
+
+        if self.args.in_place:
+            parser.error("--in-place cannot be used with standard input")
+
+        if self.args.recursive:
+            parser.error("--recursive cannot be used with standard input")
+
+        encoding = None
+        source = self.stdin.read()
+        if not isinstance(source, unicode):
+            encoding = self.stdin.encoding or _get_encoding()
+            source = source.decode(encoding)
+
+        formatted_source = _format_code_with_args(source, args=self.args)
+
+        if encoding:
+            formatted_source = formatted_source.encode(encoding)
+
+        self.stdout.write(formatted_source)
+
+    def do_format_files(self):
+        """Format multiple files.
+
+        Return
+        ------
+        code: int
+            One of the FormatResult codes.
+        """
+        outcomes = collections.Counter()
+        for filename in find_py_files(
+            set(self.args.files), self.args.recursive, self.args.exclude
+        ):
+            try:
+                result = self._do_format_file(filename)
+                outcomes[result] += 1
+                if result == FormatResult.check_failed:
+                    print(unicode(filename), file=self.stderror)
+            except IOError as exception:
+                outcomes[FormatResult.error] += 1
+                print(unicode(exception), file=self.stderror)
+
+        return_codes = [  # in order of preference
+            FormatResult.error,
+            FormatResult.check_failed,
+            FormatResult.ok,
+        ]
+
+        for code in return_codes:
+            if outcomes[code]:
+                return code
+
+    def _do_format_file(self, filename):
+        """Run format_code() on a file.
+
+        Parameters
+        ----------
+        filename: str
+            The path to the file to be formatted.
+
+        Return
+        ------
+        code: int
+            One of the FormatResult codes.
+        """
+        encoding = detect_encoding(filename)
+        with open_with_encoding(filename, encoding=encoding) as input_file:
+            source = input_file.read()
+            formatted_source = self._do_format_code(source)
+
+        if source != formatted_source:
+            if self.args.check:
+                return FormatResult.check_failed
+            elif self.args.in_place:
+                with open_with_encoding(
+                    filename, mode="w", encoding=encoding
+                ) as output_file:
+                    output_file.write(formatted_source)
+            else:
+                # Standard Library Imports
+                import difflib
+
+                diff = difflib.unified_diff(
+                    source.splitlines(),
+                    formatted_source.splitlines(),
+                    f"before/{filename}",
+                    f"after/{filename}",
+                    lineterm="",
+                )
+                self.stdout.write("\n".join(list(diff) + [""]))
+
+        return FormatResult.ok
+
+    def _do_format_code(self, source):
+        """Return source code with docstrings formatted.
+
+        Parameters
+        ----------
+        source: str
+            The text from the source file.
+        """
+        try:
+            original_newline = find_newline(source.splitlines(True))
+            code = self._format_code(source)
+
+            return normalize_line_endings(
+                code.splitlines(True), original_newline
+            )
+        except (tokenize.TokenError, IndentationError):
+            return source
+
+    def _format_code(
+        self,
+        source,
+    ):
+        """Return source code with docstrings formatted.
+
+        Parameters
+        ----------
+        source: str
+            The source code string.
+
+        Returns
+        -------
+        formatted_source: str
+            The source code with formatted docstrings.
+        """
+        if not source:
+            return source
+
+        if self.args.line_range is not None:
+            assert self.args.line_range[0] > 0 and self.args.line_range[1] > 0
+
+        if self.args.length_range is not None:
+            assert (
+                self.args.length_range[0] > 0 and self.args.length_range[1] > 0
+            )
+
+        modified_tokens = []
+
+        sio = io.StringIO(source)
+        previous_token_string = ""
+        previous_token_type = None
+        only_comments_so_far = True
+
+        try:
+            for (
+                token_type,
+                token_string,
+                start,
+                end,
+                line,
+            ) in tokenize.generate_tokens(sio.readline):
+                if (
+                    token_type == tokenize.STRING
+                    and token_string.startswith(QUOTE_TYPES)
+                    and (
+                        previous_token_type == tokenize.INDENT
+                        or only_comments_so_far
+                    )
+                    and is_in_range(self.args.line_range, start[0], end[0])
+                    and has_correct_length(
+                        self.args.length_range, start[0], end[0]
+                    )
+                ):
+                    indentation = (
+                        "" if only_comments_so_far else previous_token_string
+                    )
+                    token_string = self._do_format_docstring(
+                        indentation,
+                        token_string,
+                    )
+
+                if token_type not in [
+                    tokenize.COMMENT,
+                    tokenize.NEWLINE,
+                    tokenize.NL,
+                ]:
+                    only_comments_so_far = False
+
+                previous_token_string = token_string
+                previous_token_type = token_type
+
+                # If the current token is a newline, the previous token was a
+                # newline or a comment, and these two sequential newlines follow a
+                # function definition, ignore the blank line.
+                if (
+                    len(modified_tokens) <= 2
+                    or token_type not in {tokenize.NL, tokenize.NEWLINE}
+                    or modified_tokens[-1][0]
+                    not in {tokenize.NL, tokenize.NEWLINE}
+                    or modified_tokens[-2][1] != ":"
+                    and modified_tokens[-2][0] != tokenize.COMMENT
+                    or modified_tokens[-2][4][:3] != "def"
+                ):
+                    modified_tokens.append(
+                        (token_type, token_string, start, end, line)
+                    )
+
+            return untokenize.untokenize(modified_tokens)
+        except tokenize.TokenError:
+            return source
+
+    def _do_format_docstring(
+        self,
+        indentation: str,
+        docstring: str,
+    ) -> str:
+        """Return formatted version of docstring.
+
+        Parameters
+        ----------
+        indentation: str
+            The indentation characters for the docstring.
+        docstring: str
+            The docstring itself.
+
+        Returns
+        -------
+        docstring_formatted: str
+            The docstring formatted according the various options.
+        """
+        contents, open_quote = strip_docstring(docstring)
+        open_quote = (
+            f"{open_quote} " if self.args.pre_summary_space else open_quote
+        )
+
+        # Skip if there are nested triple double quotes
+        if contents.count(QUOTE_TYPES[0]):
+            return docstring
+
+        # Do not modify things that start with doctests.
+        if contents.lstrip().startswith(">>>"):
+            return docstring
+
+        summary, description = split_summary_and_description(contents)
+
+        # Leave docstrings with underlined summaries alone.
+        if remove_section_header(description).strip() != description.strip():
+            return docstring
+
+        if not self.args.force_wrap and is_some_sort_of_list(
+            summary,
+            self.args.non_strict,
+        ):
+            # Something is probably not right with the splitting.
+            return docstring
+
+        # Compensate for textwrap counting each tab in indentation as 1
+        # character.
+        tab_compensation = indentation.count("\t") * (self.args.tab_width - 1)
+        self.args.wrap_summaries -= tab_compensation
+        self.args.wrap_descriptions -= tab_compensation
+
+        if description:
+            # Compensate for triple quotes by temporarily prepending 3 spaces.
+            # This temporary prepending is undone below.
+            initial_indent = (
+                indentation
+                if self.args.pre_summary_newline
+                else 3 * " " + indentation
+            )
+            pre_summary = (
+                "\n" + indentation if self.args.pre_summary_newline else ""
+            )
+            summary = wrap_summary(
+                normalize_summary(summary),
+                wrap_length=self.args.wrap_summaries,
+                initial_indent=initial_indent,
+                subsequent_indent=indentation,
+            ).lstrip()
+            description = wrap_description(
+                description,
+                indentation=indentation,
+                wrap_length=self.args.wrap_descriptions,
+                force_wrap=self.args.force_wrap,
+                strict=self.args.non_strict,
+            )
+            post_description = "\n" if self.args.post_description_blank else ""
+            return f'''\
+{open_quote}{pre_summary}{summary}
+
+{description}{post_description}
+{indentation}"""\
+'''
+        else:
+            if not self.args.make_summary_multi_line:
+                summary_wrapped = wrap_summary(
+                    open_quote + normalize_summary(contents) + '"""',
+                    wrap_length=self.args.wrap_summaries,
+                    initial_indent=indentation,
+                    subsequent_indent=indentation,
+                ).strip()
+                if (
+                    self.args.close_quotes_on_newline
+                    and "\n" in summary_wrapped
+                ):
+                    summary_wrapped = (
+                        f"{summary_wrapped[:-3]}"
+                        f"\n{indentation}"
+                        f"{summary_wrapped[-3:]}"
+                    )
+                return summary_wrapped
+            else:
+                beginning = f"{open_quote}\n{indentation}"
+                ending = f'\n{indentation}"""'
+                summary_wrapped = wrap_summary(
+                    normalize_summary(contents),
+                    wrap_length=self.args.wrap_summaries,
+                    initial_indent=indentation,
+                    subsequent_indent=indentation,
+                ).strip()
+                return f"{beginning}{summary_wrapped}{ending}"
+
+
 def has_correct_length(length_range, start, end):
     """Return True if docstring's length is in range."""
     if length_range is None:
@@ -400,219 +763,6 @@ def _find_shortest_indentation(lines):
                 indentation = _indent
 
     return indentation or ""
-
-
-def format_code(source, **kwargs):
-    """Return source code with docstrings formatted.
-
-    Wrap summary lines if summary_wrap_length is greater than 0.
-
-    See "_format_code()" for parameters.
-    """
-    try:
-        original_newline = find_newline(source.splitlines(True))
-        code = _format_code(source, **kwargs)
-
-        return normalize_line_endings(code.splitlines(True), original_newline)
-    except (tokenize.TokenError, IndentationError):
-        return source
-
-
-def _format_code(
-    source,
-    summary_wrap_length=79,
-    description_wrap_length=72,
-    force_wrap=False,
-    tab_width=1,
-    pre_summary_newline=False,
-    pre_summary_space=False,
-    make_summary_multi_line=False,
-    close_quotes_on_newline=False,
-    post_description_blank=False,
-
-    line_range=None,
-    length_range=None,
-    strict=True,
-):
-    """Return source code with docstrings formatted."""
-    if not source:
-        return source
-
-    if line_range is not None:
-        assert line_range[0] > 0 and line_range[1] > 0
-
-    if length_range is not None:
-        assert length_range[0] > 0 and length_range[1] > 0
-
-    modified_tokens = []
-
-    sio = io.StringIO(source)
-    previous_token_string = ""
-    previous_token_type = None
-    only_comments_so_far = True
-
-    for (
-        token_type,
-        token_string,
-        start,
-        end,
-        line,
-    ) in tokenize.generate_tokens(sio.readline):
-        if (
-            token_type == tokenize.STRING
-            and token_string.startswith(QUOTE_TYPES)
-            and (
-                previous_token_type == tokenize.INDENT or only_comments_so_far
-            )
-            and is_in_range(line_range, start[0], end[0])
-            and has_correct_length(length_range, start[0], end[0])
-        ):
-            indentation = "" if only_comments_so_far else previous_token_string
-
-            token_string = format_docstring(
-                indentation,
-                token_string,
-                summary_wrap_length=summary_wrap_length,
-                description_wrap_length=description_wrap_length,
-                force_wrap=force_wrap,
-                tab_width=tab_width,
-                pre_summary_newline=pre_summary_newline,
-                pre_summary_space=pre_summary_space,
-                make_summary_multi_line=make_summary_multi_line,
-                close_quotes_on_newline=close_quotes_on_newline,
-                post_description_blank=post_description_blank,
-                strict=strict,
-            )
-
-        if token_type not in [tokenize.COMMENT, tokenize.NEWLINE, tokenize.NL]:
-            only_comments_so_far = False
-
-        previous_token_string = token_string
-        previous_token_type = token_type
-
-        # If the current token is a newline, the previous token was a
-        # newline or a comment, and these two sequential newlines follow a
-        # function definition, ignore the blank line.
-        if (
-            len(modified_tokens) <= 2
-            or token_type not in {tokenize.NL, tokenize.NEWLINE}
-            or modified_tokens[-1][0] not in {tokenize.NL, tokenize.NEWLINE}
-            or modified_tokens[-2][1] != ":"
-            and modified_tokens[-2][0] != tokenize.COMMENT
-            or modified_tokens[-2][4][:3] != "def"
-        ):
-            modified_tokens.append(
-                (token_type, token_string, start, end, line)
-            )
-
-    return untokenize.untokenize(modified_tokens)
-
-
-def format_docstring(
-    indentation,
-    docstring,
-    summary_wrap_length=0,
-    description_wrap_length=0,
-    force_wrap=False,
-    tab_width=1,
-    pre_summary_newline=False,
-    pre_summary_space=False,
-    make_summary_multi_line=False,
-    close_quotes_on_newline=False,
-    post_description_blank=False,
-    strict=True,
-):
-    """Return formatted version of docstring.
-
-    Wrap summary lines if summary_wrap_length is greater than 0.
-
-    Relevant parts of PEP 257:
-        - For consistency, always use triple double quotes around docstrings.
-        - Triple quotes are used even though the string fits on one line.
-        - Multi-line docstrings consist of a summary line just like a one-line
-          docstring, followed by a blank line, followed by a more elaborate
-          description.
-        - Unless the entire docstring fits on a line, place the closing quotes
-          on a line by themselves.
-    """
-    contents, open_quote = strip_docstring(docstring)
-    open_quote = f"{open_quote} " if pre_summary_space else open_quote
-
-    # Skip if there are nested triple double quotes
-    if contents.count(QUOTE_TYPES[0]):
-        return docstring
-
-    # Do not modify things that start with doctests.
-    if contents.lstrip().startswith(">>>"):
-        return docstring
-
-    summary, description = split_summary_and_description(contents)
-
-    # Leave docstrings with underlined summaries alone.
-    if remove_section_header(description).strip() != description.strip():
-        return docstring
-
-    if not force_wrap and is_some_sort_of_list(summary, strict):
-        # Something is probably not right with the splitting.
-        return docstring
-
-    # Compensate for textwrap counting each tab in indentation as 1 character.
-    tab_compensation = indentation.count('\t') * (tab_width - 1)
-    summary_wrap_length -= tab_compensation
-    description_wrap_length -= tab_compensation
-
-    if description:
-        # Compensate for triple quotes by temporarily prepending 3 spaces.
-        # This temporary prepending is undone below.
-        initial_indent = (
-            indentation if pre_summary_newline else 3 * " " + indentation
-        )
-        pre_summary = "\n" + indentation if pre_summary_newline else ""
-        summary = wrap_summary(
-            normalize_summary(summary),
-            wrap_length=summary_wrap_length,
-            initial_indent=initial_indent,
-            subsequent_indent=indentation,
-        ).lstrip()
-        description = wrap_description(
-            description,
-            indentation=indentation,
-            wrap_length=description_wrap_length,
-            force_wrap=force_wrap,
-            strict=strict,
-        )
-        post_description = "\n" if post_description_blank else ""
-        return f'''\
-{open_quote}{pre_summary}{summary}
-
-{description}{post_description}
-{indentation}"""\
-'''
-    else:
-        if not make_summary_multi_line:
-            summary_wrapped = wrap_summary(
-                open_quote + normalize_summary(contents) + '"""',
-                wrap_length=summary_wrap_length,
-                initial_indent=indentation,
-                subsequent_indent=indentation,
-            ).strip()
-            if close_quotes_on_newline and "\n" in summary_wrapped:
-                summary_wrapped = (
-                    f"{summary_wrapped[:-3]}"
-                    f"\n{indentation}"
-                    f"{summary_wrapped[-3:]}"
-                )
-            return summary_wrapped
-        else:
-            beginning = f"{open_quote}\n{indentation}"
-            ending = f'\n{indentation}"""'
-            summary_wrapped = wrap_summary(
-                normalize_summary(contents),
-                wrap_length=summary_wrap_length,
-                initial_indent=indentation,
-                subsequent_indent=indentation,
-            ).strip()
-            return f"{beginning}{summary_wrapped}{ending}"
 
 
 def is_probably_beginning_of_sentence(line):
@@ -949,101 +1099,24 @@ def detect_encoding(filename):
         return "latin-1"
 
 
-def format_file(filename, args, standard_out):
-    """Run format_code() on a file.
-
-    Return: one of the FormatResult codes.
-    """
-    encoding = detect_encoding(filename)
-    with open_with_encoding(filename, encoding=encoding) as input_file:
-        source = input_file.read()
-        formatted_source = _format_code_with_args(source, args)
-
-    if source != formatted_source:
-        if args.check:
-            return FormatResult.check_failed
-        elif args.in_place:
-            with open_with_encoding(
-                filename, mode="w", encoding=encoding
-            ) as output_file:
-                output_file.write(formatted_source)
-        else:
-            # Standard Library Imports
-            import difflib
-
-            diff = difflib.unified_diff(
-                source.splitlines(),
-                formatted_source.splitlines(),
-                f"before/{filename}",
-                f"after/{filename}",
-                lineterm="",
-            )
-            standard_out.write("\n".join(list(diff) + [""]))
-
-    return FormatResult.ok
-
-
-def _format_code_with_args(source, args):
-    """Run format_code with parsed command-line arguments."""
-    return format_code(
-        source,
-        summary_wrap_length=args.wrap_summaries,
-        description_wrap_length=args.wrap_descriptions,
-        force_wrap=args.force_wrap,
-        tab_width=args.tab_width,
-        pre_summary_newline=args.pre_summary_newline,
-        pre_summary_space=args.pre_summary_space,
-        make_summary_multi_line=args.make_summary_multi_line,
-        close_quotes_on_newline=args.close_quotes_on_newline,
-        post_description_blank=args.post_description_blank,
-        line_range=args.line_range,
-        strict=not args.non_strict,
-    )
-
-
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     configurator = Configurator(argv)
     configurator.do_parse_arguments()
 
+    formator = Formator(
+        configurator.args,
+        stderror=standard_error,
+        stdin=standard_in,
+        stdout=standard_out,
+    )
+
     if "-" in configurator.args.files:
-        _format_standard_in(
-            configurator.args,
-            parser=configurator.parser,
-            standard_out=standard_out,
-            standard_in=standard_in,
+        formator.do_format_standard_in(
+            configurator.parser,
         )
     else:
-        return _format_files(
-            configurator.args,
-            standard_out=standard_out,
-            standard_error=standard_error,
-        )
-
-
-def _format_standard_in(args, parser, standard_out, standard_in):
-    """Print formatted text to standard out."""
-    if len(args.files) > 1:
-        parser.error("cannot mix standard in and regular files")
-
-    if args.in_place:
-        parser.error("--in-place cannot be used with standard input")
-
-    if args.recursive:
-        parser.error("--recursive cannot be used with standard input")
-
-    encoding = None
-    source = standard_in.read()
-    if not isinstance(source, unicode):
-        encoding = standard_in.encoding or _get_encoding()
-        source = source.decode(encoding)
-
-    formatted_source = _format_code_with_args(source, args=args)
-
-    if encoding:
-        formatted_source = formatted_source.encode(encoding)
-
-    standard_out.write(formatted_source)
+        return formator.do_format_files()
 
 
 def _get_encoding():
@@ -1102,37 +1175,6 @@ def find_py_files(sources, recursive, exclude=None):
                         yield os.path.join(root, filename)
         else:
             yield name
-
-
-def _format_files(args, standard_out, standard_error):
-    """Format multiple files.
-
-    Return: one of the FormatResult codes.
-    """
-    outcomes = collections.Counter()
-    for filename in find_py_files(
-        set(args.files), args.recursive, args.exclude
-    ):
-        try:
-            result = format_file(
-                filename, args=args, standard_out=standard_out
-            )
-            outcomes[result] += 1
-            if result == FormatResult.check_failed:
-                print(unicode(filename), file=standard_error)
-        except IOError as exception:
-            outcomes[FormatResult.error] += 1
-            print(unicode(exception), file=standard_error)
-
-    return_codes = [  # in order of preference
-        FormatResult.error,
-        FormatResult.check_failed,
-        FormatResult.ok,
-    ]
-
-    for code in return_codes:
-        if outcomes[code]:
-            return code
 
 
 def main():

@@ -27,6 +27,7 @@
 """docformatter test suite configuration file."""
 
 # Standard Library Imports
+import argparse
 import os
 import shutil
 import subprocess
@@ -100,3 +101,129 @@ def run_docformatter(arguments, temporary_file):
         stdin=subprocess.PIPE,
         env=environ,
     )
+
+
+@pytest.fixture(scope="function")
+def test_args(args):
+    """Create a set of arguments to use with tests.
+
+    To pass no arguments, just an empty file name:
+        @pytest.mark.parametrize("test_args", [[""]])
+
+    To pass an argument and empty file name:
+        @pytest.mark.parametrize("test_args", [["wrap-summaries", "79", ""]])
+    """
+    parser = argparse.ArgumentParser(
+        description="parser object for docformatter tests",
+        prog="docformatter",
+    )
+
+    changes = parser.add_mutually_exclusive_group()
+    changes.add_argument(
+        "-i",
+        "--in-place",
+        action="store_true",
+    )
+    changes.add_argument(
+        "-c",
+        "--check",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        nargs="*",
+    )
+    parser.add_argument(
+        "--wrap-summaries",
+        default=79,
+        type=int,
+        metavar="length",
+    )
+    parser.add_argument(
+        "--wrap-descriptions",
+        default=72,
+        type=int,
+        metavar="length",
+    )
+    parser.add_argument(
+        "--force-wrap",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--tab_width",
+        type=int,
+        dest="tab_width",
+        metavar="width",
+        default=1,
+    )
+    parser.add_argument(
+        "--blank",
+        dest="post_description_blank",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--pre-summary-newline",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--pre-summary-space",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--make-summary-multi-line",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--close-quotes-on-newline",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--range",
+        metavar="line",
+        dest="line_range",
+        default=None,
+        type=int,
+        nargs=2,
+    )
+    parser.add_argument(
+        "--docstring-length",
+        metavar="length",
+        dest="length_range",
+        default=None,
+        type=int,
+        nargs=2,
+    )
+    parser.add_argument(
+        "--non-strict",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--config",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="test version",
+    )
+    parser.add_argument(
+        "files",
+        nargs="+",
+    )
+
+    _test_args = parser.parse_args(args)
+
+    yield _test_args
