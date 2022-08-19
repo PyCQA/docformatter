@@ -46,10 +46,11 @@ import sysconfig
 import textwrap
 import tokenize
 from configparser import ConfigParser
-from typing import List, TextIO, Tuple, Union
+from typing import Dict, List, TextIO, Tuple, Union
 
 # Third Party Imports
-import untokenize
+import untokenize  # type: ignore
+from charset_normalizer import from_path
 
 try:
     # Third Party Imports
@@ -61,9 +62,7 @@ except ImportError:
 
 __version__ = "1.5.0"
 
-
-if sys.version_info.major == 3:
-    unicode = str
+unicode = str
 
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
@@ -107,7 +106,7 @@ class Configurator:
     parser = None
     """Parser object."""
 
-    flargs_dct = {}
+    flargs_dct: Dict[str, Union[bool, float, int, str]] = {}
     """Dictionary of configuration file arguments."""
 
     configuration_file_lst = [
@@ -361,10 +360,10 @@ class Formator:
 
     def __init__(
         self,
-            args: argparse.Namespace,
-            stderror: TextIO,
-            stdin: TextIO,
-            stdout: TextIO,
+        args: argparse.Namespace,
+        stderror: TextIO,
+        stdin: TextIO,
+        stdout: TextIO,
     ) -> None:
         """Initialize a Formattor instance.
 
@@ -388,6 +387,8 @@ class Formator:
         self.stderror: TextIO = stderror
         self.stdin: TextIO = stdin
         self.stdout: TextIO = stdout
+
+        self.encodor = Encodor()
 
     def do_format_standard_in(self, parser: argparse.ArgumentParser):
         """Print formatted text to standard out.
@@ -460,11 +461,12 @@ class Formator:
 
         Return
         ------
-        code: int
+        result_code: int
             One of the FormatResult codes.
         """
-        encoding = detect_encoding(filename)
-        with open_with_encoding(filename, encoding=encoding) as input_file:
+        self.encodor.do_detect_encoding(filename)
+
+        with self.encodor.do_open_with_encoding(filename) as input_file:
             source = input_file.read()
             formatted_source = self._do_format_code(source)
 
@@ -472,8 +474,9 @@ class Formator:
             if self.args.check:
                 return FormatResult.check_failed
             elif self.args.in_place:
-                with open_with_encoding(
-                    filename, mode="w", encoding=encoding
+                with self.encodor.do_open_with_encoding(
+                    filename,
+                    mode="w",
                 ) as output_file:
                     output_file.write(formatted_source)
             else:
@@ -500,7 +503,9 @@ class Formator:
             The text from the source file.
         """
         try:
-            original_newline = find_newline(source.splitlines(True))
+            original_newline = self.encodor.do_find_newline(
+                source.splitlines(True)
+            )
             code = self._format_code(source)
 
             return normalize_line_endings(
@@ -713,6 +718,78 @@ class Formator:
                 return f"{beginning}{summary_wrapped}{ending}"
 
 
+class Encodor:
+    """Encoding and decoding of files."""
+
+    CR = "\r"
+    LF = "\n"
+    CRLF = "\r\n"
+
+    def __init__(self):
+        """Initialize an Encodor instance."""
+        self.encoding = "latin-1"
+
+    def do_detect_encoding(self, filename: str) -> None:
+        """Return the detected file encoding.
+
+        Parameters
+        ----------
+        filename : str
+            The full path name of the file whose encoding is to be detected.
+        """
+        try:
+            self.encoding = from_path(filename).best().encoding
+
+            # Check for correctness of encoding.
+            with self.do_open_with_encoding(filename) as check_file:
+                check_file.read()
+        except (SyntaxError, LookupError, UnicodeDecodeError):
+            self.encoding = "latin-1"
+
+    def do_find_newline(self, source: str) -> Dict[int, int]:
+        """Return type of newline used in source.
+
+        Paramaters
+        ----------
+        source : list
+            A list of lines.
+
+        Returns
+        -------
+        counter : dict
+            A dict with the count of new line types found.
+        """
+        assert not isinstance(source, unicode)
+
+        counter = collections.defaultdict(int)
+        for line in source:
+            if line.endswith(self.CRLF):
+                counter[self.CRLF] += 1
+            elif line.endswith(self.CR):
+                counter[self.CR] += 1
+            elif line.endswith(self.LF):
+                counter[self.LF] += 1
+
+        return (sorted(counter, key=counter.get, reverse=True) or [self.LF])[0]
+
+    def do_open_with_encoding(self, filename: str, mode: str = "r"):
+        """Return opened file with a specific encoding.
+
+        Parameters
+        ----------
+        filename : str
+            The full path name of the file to open.
+        mode : str
+            The mode to open the file in.  Defaults to read-only.
+
+        Returns
+        -------
+        """
+        return io.open(
+            filename, mode=mode, encoding=self.encoding, newline=""
+        )  # Preserve line endings
+
+
 def has_correct_length(length_range, start, end):
     """Return True if docstring's length is in range."""
     if length_range is None:
@@ -730,6 +807,65 @@ def is_in_range(line_range, start, end):
     return any(
         line_range[0] <= line_no <= line_range[1]
         for line_no in range(start, end + 1)
+    )
+
+
+def is_probably_beginning_of_sentence(line):
+    """Return True if this line begins a new sentence."""
+    # Check heuristically for a parameter list.
+    for token in ["@", "-", r"\*"]:
+        if re.search(r"\s" + token + r"\s", line):
+            return True
+
+    stripped_line = line.strip()
+    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
+    is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
+
+    return is_beginning_of_sentence and not is_pydoc_ref
+
+
+def is_some_sort_of_code(text):
+    """Return True if text looks like code."""
+    return any(len(word) > 50 for word in text.split())
+
+
+def is_some_sort_of_list(text, strict):
+    """Return True if text looks like a list."""
+    split_lines = text.rstrip().splitlines()
+
+    # TODO: Find a better way of doing this.
+    # Very large number of lines but short columns probably means a list of
+    # items.
+    if (
+        len(split_lines)
+        / max([len(line.strip()) for line in split_lines] + [1])
+        > HEURISTIC_MIN_LIST_ASPECT_RATIO
+    ) and not strict:
+        return True
+
+    return any(
+        (
+            re.match(r"\s*$", line)
+            or
+            # "1. item"
+            re.match(r"\s*\d\.", line)
+            or
+            # "@parameter"
+            re.match(r"\s*[\-*:=@]", line)
+            or
+            # "parameter - description"
+            re.match(r".*\s+[\-*:=@]\s+", line)
+            or
+            # "parameter: description"
+            re.match(r"\s*\S+[\-*:=@]\s+", line)
+            or
+            # "parameter:\n    description"
+            re.match(r"\s*\S+:\s*$", line)
+            or
+            # "parameter -- description"
+            re.match(r"\s*\S+\s+--\s+", line)
+        )
+        for line in split_lines
     )
 
 
@@ -762,20 +898,6 @@ def _find_shortest_indentation(lines):
                 indentation = _indent
 
     return indentation or ""
-
-
-def is_probably_beginning_of_sentence(line):
-    """Return True if this line begins a new sentence."""
-    # Check heuristically for a parameter list.
-    for token in ["@", "-", r"\*"]:
-        if re.search(r"\s" + token + r"\s", line):
-            return True
-
-    stripped_line = line.strip()
-    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
-    is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
-
-    return is_beginning_of_sentence and not is_pydoc_ref
 
 
 def split_summary_and_description(contents):
@@ -850,69 +972,6 @@ def split_first_sentence(text):
         delimiter = ""
 
     return sentence, delimiter + rest
-
-
-def is_some_sort_of_list(text, strict):
-    """Return True if text looks like a list."""
-    split_lines = text.rstrip().splitlines()
-
-    # TODO: Find a better way of doing this.
-    # Very large number of lines but short columns probably means a list of
-    # items.
-    if (
-        len(split_lines)
-        / max([len(line.strip()) for line in split_lines] + [1])
-        > HEURISTIC_MIN_LIST_ASPECT_RATIO
-    ) and not strict:
-        return True
-
-    return any(
-        (
-            re.match(r"\s*$", line)
-            or
-            # "1. item"
-            re.match(r"\s*\d\.", line)
-            or
-            # "@parameter"
-            re.match(r"\s*[\-*:=@]", line)
-            or
-            # "parameter - description"
-            re.match(r".*\s+[\-*:=@]\s+", line)
-            or
-            # "parameter: description"
-            re.match(r"\s*\S+[\-*:=@]\s+", line)
-            or
-            # "parameter:\n    description"
-            re.match(r"\s*\S+:\s*$", line)
-            or
-            # "parameter -- description"
-            re.match(r"\s*\S+\s+--\s+", line)
-        )
-        for line in split_lines
-    )
-
-
-def is_some_sort_of_code(text):
-    """Return True if text looks like code."""
-    return any(len(word) > 50 for word in text.split())
-
-
-def find_newline(source):
-    """Return type of newline used in source.
-
-    Input is a list of lines.
-    """
-    assert not isinstance(source, unicode)
-
-    counter = collections.defaultdict(int)
-    for line in source:
-        if line.endswith(CRLF):
-            counter[CRLF] += 1
-        elif line.endswith(CR):
-            counter[CR] += 1
-        elif line.endswith(LF):
-            counter[LF] += 1
-    return (sorted(counter, key=counter.get, reverse=True) or [LF])[0]
 
 
 def normalize_line(line, newline):
@@ -1072,30 +1131,6 @@ def strip_leading_blank_lines(text):
     )
 
     return "\n".join(split[found:])
-
-
-def open_with_encoding(filename, encoding, mode="r"):
-    """Return opened file with a specific encoding."""
-    return io.open(
-        filename, mode=mode, encoding=encoding, newline=""
-    )  # Preserve line endings
-
-
-def detect_encoding(filename):
-    """Return file encoding."""
-    try:
-        with open(filename, "rb") as input_file:
-            # Standard Library Imports
-            from lib2to3.pgen2 import tokenize as lib2to3_tokenize
-
-            encoding = lib2to3_tokenize.detect_encoding(input_file.readline)[0]
-
-            # Check for correctness of encoding.
-            with open_with_encoding(filename, encoding) as check_file:
-                check_file.read()
-        return encoding
-    except (SyntaxError, LookupError, UnicodeDecodeError):
-        return "latin-1"
 
 
 def _main(argv, standard_out, standard_error, standard_in):
