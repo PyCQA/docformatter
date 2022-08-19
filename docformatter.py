@@ -410,7 +410,7 @@ class Formator:
         encoding = None
         source = self.stdin.read()
         if not isinstance(source, unicode):
-            encoding = self.stdin.encoding or _get_encoding()
+            encoding = self.stdin.encoding or self.encodor.system_encoding
             source = source.decode(encoding)
 
         formatted_source = self._do_format_code(source)
@@ -728,6 +728,9 @@ class Encodor:
     def __init__(self):
         """Initialize an Encodor instance."""
         self.encoding = "latin-1"
+        self.system_encoding = (
+            locale.getpreferredencoding() or sys.getdefaultencoding()
+        )
 
     def do_detect_encoding(self, filename: str) -> None:
         """Return the detected file encoding.
@@ -1151,11 +1154,6 @@ def _main(argv, standard_out, standard_error, standard_in):
         )
     else:
         return formator.do_format_files()
-
-
-def _get_encoding():
-    """Return preferred encoding."""
-    return locale.getpreferredencoding() or sys.getdefaultencoding()
 
 
 def find_py_files(sources, recursive, exclude=None):

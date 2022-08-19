@@ -58,9 +58,12 @@ Features
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
-See the the full documentation at `read-the-docs`_.
+See the the full documentation at `read-the-docs`_, especially the
+`requirements`_ section for a more detailed discussion of PEP 257 and other
+requirements.
 
 .. _read-the-docs: https://docformatter.readthedocs.io
+.. _requirements: https://docformatter.readthedocs.io/en/latest/requirements.html
 
 Installation
 ============
