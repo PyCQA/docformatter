@@ -182,6 +182,7 @@ deps =
 setenv =
     COVERAGE_FILE={toxinidir}/.coverage
 commands =
+    pip install -U pip
     pip install .[tomli]
     pytest -s -x -c ./pyproject.toml --cache-clear \
         --cov-config=pyproject.toml --cov=docformatter \
