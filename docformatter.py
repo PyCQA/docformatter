@@ -59,7 +59,7 @@ try:
 except ImportError:
     TOMLI_INSTALLED = False
 
-__version__ = "1.5.0-rc1"
+__version__ = "1.5.0"
 
 
 if sys.version_info.major == 3:
@@ -128,6 +128,7 @@ class Configurator:
             Any command line arguments passed during invocation.
         """
         self.args_lst = args
+        self.config_file = ""
         self.parser = argparse.ArgumentParser(
             description=__doc__,
             prog="docformatter",
@@ -143,7 +144,8 @@ class Configurator:
                     self.config_file = f"./{_configuration_file}"
                     break
 
-        self._do_read_configuration_file()
+        if os.path.isfile(self.config_file):
+            self._do_read_configuration_file()
 
     def do_parse_arguments(self) -> None:
         """Parse configuration file and command line arguments."""
@@ -308,11 +310,10 @@ class Configurator:
 
     def _do_read_configuration_file(self) -> None:
         """Read docformatter options from a configuration file."""
-        if os.path.isfile(self.config_file):
-            argfile = os.path.basename(self.config_file)
-            for f in self.configuration_file_lst:
-                if argfile == f:
-                    break
+        argfile = os.path.basename(self.config_file)
+        for f in self.configuration_file_lst:
+            if argfile == f:
+                break
 
         fullpath, ext = os.path.splitext(self.config_file)
         filename = os.path.basename(fullpath)

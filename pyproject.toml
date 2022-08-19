@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.4"
+version = "1.5.0"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -32,22 +32,33 @@ include = ["LICENSE"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-tomli = {version="1.2.3", optional=true}
+tomli = [
+    {version="<2.0.0", optional=true, python="<3.7"},
+    {version="^2.0.0", optional=true, python=">=3.7"},
+]
 untokenize = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
-pydocstyle = "^6.1.1"
-pylint = "^2.12.0"
-pycodestyle = "^2.8.0"
-coverage = {extras = ["toml"], version = "^6.2.0"}
-rstcheck = "<6.0.0"
-pytest = "<7.0.0"
-pytest-cov = "^3.0.0"
-mock = "^4.0.0"
-isort = "^5.7.0"
 black = [
     {version = "^22.0.0", python = ">=3.6.2"},
 ]
+coverage = {extras = ["toml"], version = "^6.2.0"}
+isort = "^5.7.0"
+mock = "^4.0.0"
+pycodestyle = "^2.8.0"
+pydocstyle = "^6.1.1"
+pylint = "^2.12.0"
+pytest = "<7.0.0"
+pytest-cov = "^3.0.0"
+rstcheck = "<6.0.0"
+Sphinx = "^5.0.0"
+twine = [
+    {version="<4.0.0", python = "<3.7"},
+    {version="^4.0.0", python = ">=3.7"},
+]
+
+[tool.poetry.extras]
+tomli = ["tomli"]
 
 [tool.poetry.scripts]
 docformatter = "docformatter:main"
@@ -158,19 +169,24 @@ legacy_tox_ini = """
 [tox]
 skipsdist = True
 isolated_build = True
-envlist = py{36,37,38,39,310,py36}, style
+envlist =
+    py{36,37,38,39,310,py36},
+    style
 
 [testenv:py{36,37,38,39,310,py36}]
 deps =
-    pytest
-    pytest-cov
     coverage
     mock
+    pytest
+    pytest-cov
+setenv =
+    COVERAGE_FILE={toxinidir}/.coverage
 commands =
     pip install .[tomli]
     pytest -s -x -c ./pyproject.toml --cache-clear \
         --cov-config=pyproject.toml --cov=docformatter \
         --cov-branch --cov-report=term tests/
+    coverage xml --rcfile=pyproject.toml
 
 [testenv:style]
 deps =

@@ -2,12 +2,12 @@ Author
 ------
 - Steven Myint (https://github.com/myint)
 
-Patches
--------
+Contributors
+------------
+- Kapshuna Alexander (https://github.com/kapsh)
 - Cheng Xi Bao (https://github.com/happlebao)
+- Peter Boothe (https://github.com/pboothe)
 - Andy Hayden (https://github.com/hayd)
 - Manuel Kaufmann (https://github.com/humitos)
-- Peter Boothe (https://github.com/pboothe)
-- Kapshuna Alexander (https://github.com/kapsh)
-- Serhiy Yevtushenko (https://github.com/serhiy-yevtushenko)
 - Doyle Rowland (https://github.com/weibullguy)
+- Serhiy Yevtushenko (https://github.com/serhiy-yevtushenko)

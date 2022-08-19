@@ -3,7 +3,7 @@
 # - Job 1:
 #     - Get new tag.
 #     - Update CHANGELOG.md
-#     - Update VERSION, pyproject.toml, and docs/conf.py with new version.
+#     - Update pyproject.toml and docs/source/conf.py with new version.
 #     - Set PR variables.
 #     - Cut PR to merge files and create release/* branch.
 name: Push Version Tag Workflow
@@ -56,13 +56,14 @@ jobs:
           stripGeneratorNotice: true
           verbose: true
 
-      - name: Update VERSION, pyproject.toml, and docs/conf.py
+      - name: Update pyproject.toml and docs/conf.py
         uses: vemel/nextversion@main
         with:
           path: ./pyproject.toml
           result: ${{ steps.newversion.outputs.new_version }}
           update: |
             ./pyproject.toml
+            ./docs/source/conf.py
 
       - name: Request release pull request
         uses: peter-evans/create-pull-request@v3
