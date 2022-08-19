@@ -108,10 +108,10 @@ def test_args(args):
     """Create a set of arguments to use with tests.
 
     To pass no arguments, just an empty file name:
-        @pytest.mark.parametrize("test_args", [[""]])
+        @pytest.mark.parametrize("args", [[""]])
 
-    To pass an argument and empty file name:
-        @pytest.mark.parametrize("test_args", [["wrap-summaries", "79", ""]])
+    To pass an argument AND empty file name:
+        @pytest.mark.parametrize("args", [["--wrap-summaries", "79", ""]])
     """
     parser = argparse.ArgumentParser(
         description="parser object for docformatter tests",
@@ -158,7 +158,7 @@ def test_args(args):
         default=False,
     )
     parser.add_argument(
-        "--tab_width",
+        "--tab-width",
         type=int,
         dest="tab_width",
         metavar="width",
@@ -224,6 +224,4 @@ def test_args(args):
         nargs="+",
     )
 
-    _test_args = parser.parse_args(args)
-
-    yield _test_args
+    yield parser.parse_args(args)

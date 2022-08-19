@@ -49,7 +49,6 @@ from configparser import ConfigParser
 from typing import List, TextIO, Tuple, Union
 
 # Third Party Imports
-import _io
 import untokenize
 
 try:
@@ -202,7 +201,7 @@ class Configurator:
             "result in a mess (default: %(default)s)",
         )
         self.parser.add_argument(
-            "--tab_width",
+            "--tab-width",
             type=int,
             dest="tab_width",
             metavar="width",
@@ -387,7 +386,7 @@ class Formator:
         """
         self.args = args
         self.stderror: TextIO = stderror
-        self.stdin: TextIOr = stdin
+        self.stdin: TextIO = stdin
         self.stdout: TextIO = stdout
 
     def do_format_standard_in(self, parser: argparse.ArgumentParser):
@@ -413,7 +412,7 @@ class Formator:
             encoding = self.stdin.encoding or _get_encoding()
             source = source.decode(encoding)
 
-        formatted_source = _format_code_with_args(source, args=self.args)
+        formatted_source = self._do_format_code(source)
 
         if encoding:
             formatted_source = formatted_source.encode(encoding)
@@ -583,8 +582,8 @@ class Formator:
                 previous_token_type = token_type
 
                 # If the current token is a newline, the previous token was a
-                # newline or a comment, and these two sequential newlines follow a
-                # function definition, ignore the blank line.
+                # newline or a comment, and these two sequential newlines
+                # follow a function definition, ignore the blank line.
                 if (
                     len(modified_tokens) <= 2
                     or token_type not in {tokenize.NL, tokenize.NEWLINE}

@@ -30,25 +30,37 @@
 # Standard Library Imports
 import itertools
 import random
+import sys
 
 # Third Party Imports
 import pytest
 
 # docformatter Package Imports
 import docformatter
+from docformatter import Formator
 
 # docformatter Local Imports
 from . import generate_random_docstring
 
+INDENTATION = "    "
+
 
 class TestFormatDocstring:
-    """Class for testing format_docstring() with no arguments."""
+    """Class for testing _do_format_docstring() with no arguments."""
 
     @pytest.mark.unit
-    def test_format_docstring(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring(self, test_args, args):
         """Return one-line docstring."""
-        assert '"""Hello."""' == docformatter.format_docstring(
-            "    ",
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '"""Hello."""' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """
 
@@ -58,10 +70,20 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_summary_that_ends_in_quote(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_summary_that_ends_in_quote(
+        self, test_args, args
+    ):
         """Return one-line docstring with period after quote."""
-        assert '''""""Hello"."""''' == docformatter.format_docstring(
-            "    ",
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '''""""Hello"."""''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """
 
@@ -71,15 +93,23 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_bad_indentation(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "44", ""]])
+    def test_format_docstring_with_bad_indentation(self, test_args, args):
         """Add spaces to indentation when too few."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Hello.
 
-    This should be indented but it is not. The
-    next line should be indented too. And
-    this too.
-    """''' == docformatter.format_docstring(
-            "    ",
+    This should be indented but it is not.
+    The next line should be indented too.
+    And this too.
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """Hello.
 
@@ -91,8 +121,16 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_too_much_indentation(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_too_much_indentation(self, test_args, args):
         """Remove spaces from indentation when too many."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Hello.
 
     This should be dedented.
@@ -100,8 +138,8 @@ Hello.
     1. This too.
     2. And this.
     3. And this.
-    """''' == docformatter.format_docstring(
-            "    ",
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """Hello.
 
@@ -116,14 +154,23 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_trailing_whitespace(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "52", ""]])
+    def test_format_docstring_with_trailing_whitespace(self, test_args, args):
         """Remove trailing white space."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Hello.
 
     This should be not have trailing whitespace. The
-    next line should not have trailing whitespace either.
-    """''' == docformatter.format_docstring(
-            "    ",
+    next line should not have trailing whitespace
+    either.
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """Hello.\t
 \t
@@ -135,15 +182,31 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_empty_docstring(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_empty_docstring(self, test_args, args):
         """Do nothing with empty docstring."""
-        assert '""""""' == docformatter.format_docstring("    ", '""""""')
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '""""""' == uut._do_format_docstring(INDENTATION, '""""""')
 
     @pytest.mark.unit
-    def test_format_docstring_with_no_period(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_no_period(self, test_args, args):
         """Add period to end of one-line and summary line."""
-        assert '"""Hello."""' == docformatter.format_docstring(
-            "    ",
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '"""Hello."""' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """
 
@@ -153,10 +216,18 @@ Hello
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_single_quotes(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_single_quotes(self, test_args, args):
         """Replace single triple quotes with triple double quotes."""
-        assert '"""Hello."""' == docformatter.format_docstring(
-            "    ",
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '"""Hello."""' == uut._do_format_docstring(
+            INDENTATION,
             """
 '''
 
@@ -166,15 +237,25 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_single_quotes_multi_line(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_single_quotes_multi_line(
+        self, test_args, args
+    ):
         """Replace single triple quotes with triple double quotes."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''
     """Return x factorial.
 
     This uses math.factorial.
     """
-'''.strip() == docformatter.format_docstring(
-            "    ",
+'''.strip() == uut._do_format_docstring(
+            INDENTATION,
             """
     '''
     Return x factorial.
@@ -185,7 +266,18 @@ Hello.
         )
 
     @pytest.mark.unit
-    def test_format_docstring_leave_underlined_summaries_alone(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_underlined_summaries_alone(
+        self, test_args, args
+    ):
+        """Leave underlined summary lines as is."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""
     Foo bar
     -------
@@ -193,51 +285,92 @@ Hello.
     This is more.
 
     """'''
-        assert docstring == docformatter.format_docstring("    ", docstring)
+        assert docstring == uut._do_format_docstring(INDENTATION, docstring)
 
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_numbered_lists(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_numbered_lists(
+        self, test_args, args
+    ):
         """Ignore lists beginning with numbers."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""Hello.
 
     1. This should be indented but it is not. The
     next line should be indented too. But
     this is okay.
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_parameter_lists(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_parameter_lists(
+        self, test_args, args
+    ):
         """Ignore lists beginning with <word> -."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""Hello.
 
     foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
     bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_colon_parameter_lists(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_colon_parameter_lists(
+        self, test_args, args
+    ):
         """Ignore lists beginning with <word>:"""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""Hello.
 
     foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
     bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_leave_list_alone(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_should_leave_list_alone(self, test_args, args):
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""
     one
     two
@@ -251,13 +384,14 @@ class TestFormatLists:
     ten
     eleven
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, strict=False
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
 
 class TestFormatWrap:
-    """Class for testing format_docstring() when requesting line wrapping."""
+    """Class for testing _do_format_docstring() with line wrapping."""
 
     @pytest.mark.unit
     def test_unwrap_summary(self):
@@ -267,8 +401,20 @@ class TestFormatWrap:
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_wrap(self):
-        """Wrap docstring."""
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_wrap(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap the docstring."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         # This function uses `random` so make sure each run of this test is
         # repeatable.
         random.seed(0)
@@ -278,12 +424,12 @@ class TestFormatWrap:
             range(min_line_length, 100), range(20)
         ):
             indentation = " " * num_indents
-            formatted_text = indentation + docformatter.format_docstring(
+            uut.args.wrap_summaries = max_length
+            formatted_text = indentation + uut._do_format_docstring(
                 indentation=indentation,
                 docstring=generate_random_docstring(
                     max_word_length=min_line_length // 2
                 ),
-                summary_wrap_length=max_length,
             )
             for line in formatted_text.split("\n"):
                 # It is not the formatter's fault if a word is too long to
@@ -292,18 +438,29 @@ class TestFormatWrap:
                     assert len(line) <= max_length
 
     @pytest.mark.unit
-    def test_format_docstring_with_weird_indentation_and_punctuation(self):
-        """"""
+    @pytest.mark.parametrize("args", [["--wrap-summaries", "79", ""]])
+    def test_format_docstring_with_weird_indentation_and_punctuation(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap and dedent docstring."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''
     """Creates and returns four was awakens to was created tracked ammonites
     was the fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
 
-    `four' falsified x falsified ammonites
-    to awakens to. `created' to ancestor was four to x dynamo to was
-    four ancestor to physicists().
+    `four' falsified x falsified ammonites to awakens to. `created' to
+    ancestor was four to x dynamo to was four ancestor to physicists().
     """
-        '''.strip() == docformatter.format_docstring(
-            "    ",
+        '''.strip() == uut._do_format_docstring(
+            INDENTATION,
             '''
             """Creates and returns four was awakens to was created tracked
                ammonites was the fifty, arithmetical four was pyrotechnic to
@@ -312,18 +469,29 @@ class TestFormatWrap:
                four ancestor to physicists().
             """
         '''.strip(),
-            summary_wrap_length=79,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_description_wrapping(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_with_description_wrapping(
+        self,
+        test_args,
+        args,
+    ):
         """Wrap description at 72 characters."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Hello.
 
     This should be indented but it is not. The next line should be
     indented too. But this is okay.
-    """''' == docformatter.format_docstring(
-            "    ",
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """Hello.
 
@@ -333,12 +501,23 @@ class TestFormatWrap:
 
     """
 '''.strip(),
-            description_wrap_length=72,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_multi_paragraph(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_multi_paragraph(
+        self,
+        test_args,
+        args,
+    ):
         """Ignore multiple paragraphs in elaborate description."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""Hello.
 
     This should be indented but it is not. The
@@ -349,44 +528,83 @@ class TestFormatWrap:
     next line should be indented too. But
     this is okay.
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_doctests(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_doctests(
+        self,
+        test_args,
+        args,
+    ):
         """Leave doctests alone."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""Hello.
 
     >>> 4
     4
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_ignore_doctests_in_summary(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_ignore_doctests_in_summary(
+        self,
+        test_args,
+        args,
+    ):
         """Leave doctests alone if they're in the summary."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         docstring = '''"""
     >>> 4
     4
 
     """'''
-        assert docstring == docformatter.format_docstring(
-            "    ", docstring, description_wrap_length=72
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_should_maintain_indentation_of_doctest(self):
+    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    def test_format_docstring_should_maintain_indentation_of_doctest(
+        self,
+        test_args,
+        args,
+    ):
         """Don't change indentation of doctest lines."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Foo bar bing bang.
 
         >>> tests = DocTestFinder().find(_TestClass)
         >>> runner = DocTestRunner(verbose=False)
         >>> tests.sort(key = lambda test: test.name)
-    """''' == docformatter.format_docstring(
-            "    ",
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             docstring='''"""Foo bar bing bang.
 
         >>> tests = DocTestFinder().find(_TestClass)
@@ -394,12 +612,35 @@ class TestFormatWrap:
         >>> tests.sort(key = lambda test: test.name)
 
     """''',
-            description_wrap_length=72,
         )
 
     @pytest.mark.unit
-    def test_force_wrap(self):
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "72",
+                "--wrap-summaries",
+                "50",
+                "--force-wrap",
+                "",
+            ]
+        ],
+    )
+    def test_force_wrap(
+        self,
+        test_args,
+        args,
+    ):
         """Force even lists to be wrapped."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert (
             (
                 '''\
@@ -408,42 +649,80 @@ class TestFormatWrap:
     convergence."""\
 '''
             )
-            == docformatter.format_docstring(
-                "    ",
+            == uut._do_format_docstring(
+                INDENTATION,
                 '''\
 """
 num_iterations is the number of updates - instead of a better definition of convergence.
 """\
 ''',
-                description_wrap_length=50,
-                summary_wrap_length=50,
-                force_wrap=True,
             )
         )
 
     @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-summaries",
+                "30",
+                "--tab-width",
+                "4",
+                "",
+            ]
+        ],
+    )
     def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(
         self,
+        test_args,
+        args,
     ):
         """"Should account for length of tab when wrapping.
 
         See PR #69.
         """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''
 \t\t"""Some summary x x x
 \t\tx."""
-'''.strip() == docformatter.format_docstring(
+'''.strip() == uut._do_format_docstring(
             "\t\t",
             '''
 \t\t"""Some summary x x x x."""
 '''.strip(),
-            summary_wrap_length=30,
-            tab_width=4,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_for_multi_line_summary_alone(self):
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-summaries",
+                "69",
+                "--close-quotes-on-newline",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_for_multi_line_summary_alone(
+        self,
+        test_args,
+        args,
+    ):
         """Place closing quotes on newline when wrapping one-liner."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert (
             (
                 '''\
@@ -452,33 +731,51 @@ num_iterations is the number of updates - instead of a better definition of conv
     """\
 '''
             )
-            == docformatter.format_docstring(
-                "    ",
+            == uut._do_format_docstring(
+                INDENTATION,
                 '''\
 """This one-line docstring will be multi-line because it's quite long."""\
 ''',
-                summary_wrap_length=69,
-                close_quotes_on_newline=True,
             )
         )
 
     @pytest.mark.unit
-    def test_format_docstring_for_one_line_summary_alone_but_too_long(self):
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-summaries",
+                "88",
+                "--close-quotes-on-newline",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_for_one_line_summary_alone_but_too_long(
+        self,
+        test_args,
+        args,
+    ):
         """"""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert (
             (
                 '''\
 """This one-line docstring will not be wrapped and quotes will be in-line."""\
 '''
             )
-            == docformatter.format_docstring(
-                "    ",
+            == uut._do_format_docstring(
+                INDENTATION,
                 '''\
 """This one-line docstring will not be wrapped and quotes will be 
 in-line."""\
 ''',
-                summary_wrap_length=88,
-                close_quotes_on_newline=True,
             )
         )
 
@@ -487,13 +784,25 @@ class TestFormatStyleOptions:
     """Class for testing format_docstring() when requesting style options."""
 
     @pytest.mark.unit
-    def test_format_docstring_with_no_post_description_blank(self):
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_no_post_description_blank(
+        self,
+        test_args,
+        args,
+    ):
         """Remove blank lines before closing triple quotes."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""Hello.
 
     Description.
-    """''' == docformatter.format_docstring(
-            "    ",
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """
 
@@ -504,18 +813,29 @@ Hello.
 
     """
 '''.strip(),
-            post_description_blank=False,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_with_pre_summary_newline(self):
+    @pytest.mark.parametrize("args", [["--pre-summary-newline", ""]])
+    def test_format_docstring_with_pre_summary_newline(
+        self,
+        test_args,
+        args,
+    ):
         """Remove blank line before summary."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert '''"""
     Hello.
 
     Description.
-    """''' == docformatter.format_docstring(
-            "    ",
+    """''' == uut._do_format_docstring(
+            INDENTATION,
             '''
 """
 
@@ -526,11 +846,23 @@ Hello.
 
     """
 '''.strip(),
-            pre_summary_newline=True,
         )
 
     @pytest.mark.unit
-    def test_format_docstring_make_summary_multi_line(self):
+    @pytest.mark.parametrize("args", [["--make-summary-multi-line", ""]])
+    def test_format_docstring_make_summary_multi_line(
+        self,
+        test_args,
+        args,
+    ):
+        """Place the one-line docstring between triple quotes."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert (
             (
                 '''\
@@ -539,24 +871,34 @@ Hello.
     """\
 '''
             )
-            == docformatter.format_docstring(
-                "    ",
+            == uut._do_format_docstring(
+                INDENTATION,
                 '''\
 """This one-line docstring will be multi-line"""\
 ''',
-                make_summary_multi_line=True,
             )
         )
 
     @pytest.mark.unit
-    def test_format_docstring_pre_summary_space(self):
-        """"""
+    @pytest.mark.parametrize("args", [["--pre-summary-space", ""]])
+    def test_format_docstring_pre_summary_space(
+        self,
+        test_args,
+        args,
+    ):
+        """Place a space between the opening quotes and the summary."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
         assert (
             '''""" This one-line docstring will have a leading space."""'''
-        ) == docformatter.format_docstring(
-            "    ",
+        ) == uut._do_format_docstring(
+            INDENTATION,
             '''\
 """This one-line docstring will have a leading space."""\
 ''',
-            pre_summary_space=True,
         )
