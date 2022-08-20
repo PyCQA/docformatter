@@ -70,23 +70,6 @@ HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 CR = "\r"
 LF = "\n"
 CRLF = "\r\n"
-STR_QUOTE_TYPES = (
-    '"""',
-    "'''",
-)
-RAW_QUOTE_TYPES = (
-    'r"""',
-    'R"""',
-    "r'''",
-    "R'''",
-)
-UCODE_QUOTE_TYPES = (
-    'u"""',
-    'U"""',
-    "u'''",
-    "U'''",
-)
-QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
@@ -352,6 +335,24 @@ class Configurator:
 class Formator:
     """Format docstrings."""
 
+    STR_QUOTE_TYPES = (
+        '"""',
+        "'''",
+    )
+    RAW_QUOTE_TYPES = (
+        'r"""',
+        'R"""',
+        "r'''",
+        "R'''",
+    )
+    UCODE_QUOTE_TYPES = (
+        'u"""',
+        'U"""',
+        "u'''",
+        "U'''",
+    )
+    QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
+
     parser = None
     """Parser object."""
 
@@ -557,7 +558,7 @@ class Formator:
             ) in tokenize.generate_tokens(sio.readline):
                 if (
                     token_type == tokenize.STRING
-                    and token_string.startswith(QUOTE_TYPES)
+                    and token_string.startswith(self.QUOTE_TYPES)
                     and (
                         previous_token_type == tokenize.INDENT
                         or only_comments_so_far
@@ -624,13 +625,13 @@ class Formator:
         docstring_formatted: str
             The docstring formatted according the various options.
         """
-        contents, open_quote = strip_docstring(docstring)
+        contents, open_quote = self._do_strip_docstring(docstring)
         open_quote = (
             f"{open_quote} " if self.args.pre_summary_space else open_quote
         )
 
         # Skip if there are nested triple double quotes
-        if contents.count(QUOTE_TYPES[0]):
+        if contents.count(self.QUOTE_TYPES[0]):
             return docstring
 
         # Do not modify things that start with doctests.
@@ -716,6 +717,45 @@ class Formator:
                 ).strip()
                 return f"{beginning}{summary_wrapped}{ending}"
 
+    def _do_strip_docstring(self, docstring: str) -> Tuple[str, str]:
+        """Return contents of docstring and opening quote type.
+
+        Strips the docstring of its triple quotes, trailing white space,
+        and line returns.  Determines type of docstring quote (either string,
+        raw, or unicode) and returns the opening quotes, including the type
+        identifier, with single quotes replaced by double quotes.
+
+        Parameters
+        ----------
+        docstring: str
+            The docstring, including the opening and closing triple quotes.
+
+        Returns
+        -------
+        (docstring, open_quote) : tuple
+            The docstring with the triple quotes removed.
+            The opening quote type with single quotes replaced by double
+            quotes.
+        """
+        docstring = docstring.strip()
+
+        for quote in self.QUOTE_TYPES:
+            if quote in self.RAW_QUOTE_TYPES + self.UCODE_QUOTE_TYPES and (
+                docstring.startswith(quote) and docstring.endswith(quote[1:])
+            ):
+                return docstring.split(quote, 1)[1].rsplit(quote[1:], 1)[
+                    0
+                ].strip(), quote.replace("'", '"')
+            elif docstring.startswith(quote) and docstring.endswith(quote):
+                return docstring.split(quote, 1)[1].rsplit(quote, 1)[
+                    0
+                ].strip(), quote.replace("'", '"')
+
+        raise ValueError(
+            "docformatter only handles triple-quoted (single or double) "
+            "strings"
+        )
+
 
 class Encodor:
     """Encoding and decoding of files."""
@@ -786,6 +826,8 @@ class Encodor:
 
         Returns
         -------
+        contents : TextIO
+            The contents of the file.
         """
         return io.open(
             filename, mode=mode, encoding=self.encoding, newline=""
@@ -991,44 +1033,6 @@ def normalize_line_endings(lines, newline):
     All lines will be modified to use the most common line ending.
     """
     return "".join([normalize_line(line, newline) for line in lines])
-
-
-def strip_docstring(docstring: str) -> Tuple[str, str]:
-    """Return contents of docstring and opening quote type.
-
-    Strips the docstring of its triple quotes, trailing white space,
-    and line returns.  Determines type of docstring quote (either string,
-    raw, or unicode) and returns the opening quotes, including the type
-    identifier, with single quotes replaced by double quotes.
-
-    Parameters
-    ----------
-    docstring: str
-        The docstring, including the opening and closing triple quotes.
-
-    Returns
-    -------
-    (docstring, open_quote) : tuple
-        The docstring with the triple quotes removed.
-        The opening quote type with single quotes replaced by double quotes.
-    """
-    docstring = docstring.strip()
-
-    for quote in QUOTE_TYPES:
-        if quote in RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES and (
-            docstring.startswith(quote) and docstring.endswith(quote[1:])
-        ):
-            return docstring.split(quote, 1)[1].rsplit(quote[1:], 1)[
-                0
-            ].strip(), quote.replace("'", '"')
-        elif docstring.startswith(quote) and docstring.endswith(quote):
-            return docstring.split(quote, 1)[1].rsplit(quote, 1)[
-                0
-            ].strip(), quote.replace("'", '"')
-
-    raise ValueError(
-        "docformatter only handles triple-quoted (single or double) strings"
-    )
 
 
 def unwrap_summary(summary):
