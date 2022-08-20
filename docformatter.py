@@ -180,8 +180,7 @@ class Configurator:
             type=int,
             metavar="length",
             help="wrap long summary lines at this length; "
-            "set to 0 to disable wrapping "
-            "(default: %(default)s)",
+            "set to 0 to disable wrapping (default: 79)",
         )
         self.parser.add_argument(
             "--wrap-descriptions",
@@ -190,14 +189,14 @@ class Configurator:
             metavar="length",
             help="wrap descriptions at this length; "
             "set to 0 to disable wrapping "
-            "(default: %(default)s)",
+            "(default: 72)",
         )
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
             default=bool(self.flargs_dct.get("force-wrap", False)),
             help="force descriptions to be wrapped even if it may "
-            "result in a mess (default: %(default)s)",
+            "result in a mess (default: False)",
         )
         self.parser.add_argument(
             "--tab-width",
@@ -206,28 +205,28 @@ class Configurator:
             metavar="width",
             default=int(self.flargs_dct.get("tab-width", 1)),
             help="tabs in indentation are this many characters when "
-            "wrapping lines (default: %(default)s)",
+            "wrapping lines (default: 1)",
         )
         self.parser.add_argument(
             "--blank",
             dest="post_description_blank",
             action="store_true",
             default=bool(self.flargs_dct.get("blank", False)),
-            help="add blank line after description (default: %(default)s)",
+            help="add blank line after description (default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-newline",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-newline", False)),
             help="add a newline before the summary of a multi-line docstring "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-space", False)),
             help="add a space after the opening triple quotes "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--make-summary-multi-line",
@@ -236,7 +235,7 @@ class Configurator:
                 self.flargs_dct.get("make-summary-multi-line", False)
             ),
             help="add a newline before and after the summary of a one-line "
-            "docstring (default: %(default)s)",
+            "docstring (default: False)",
         )
         self.parser.add_argument(
             "--close-quotes-on-newline",
@@ -246,7 +245,7 @@ class Configurator:
             ),
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--range",
@@ -256,7 +255,7 @@ class Configurator:
             type=int,
             nargs=2,
             help="apply docformatter to docstrings between these "
-            "lines; line numbers are indexed at 1 (default: %(default)s)",
+            "lines; line numbers are indexed at 1 (default: None)",
         )
         self.parser.add_argument(
             "--docstring-length",
@@ -266,7 +265,7 @@ class Configurator:
             type=int,
             nargs=2,
             help="apply docformatter to docstrings of given length range "
-            "(default: %(default)s)",
+            "(default: None)",
         )
         self.parser.add_argument(
             "--non-strict",
