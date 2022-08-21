@@ -752,9 +752,6 @@ def foo():\r
     foo. This is a docstring.\r
     """\r
 '''
-        assert docformatter.CRLF == docformatter.find_newline(
-            goes_in.splitlines(True)
-        )
         assert '''\
 def foo():\r
     """Hello foo.\r

@@ -46,10 +46,11 @@ import sysconfig
 import textwrap
 import tokenize
 from configparser import ConfigParser
-from typing import List, TextIO, Tuple, Union
+from typing import Dict, List, TextIO, Tuple, Union
 
 # Third Party Imports
-import untokenize
+import untokenize  # type: ignore
+from charset_normalizer import from_path
 
 try:
     # Third Party Imports
@@ -61,9 +62,7 @@ except ImportError:
 
 __version__ = "1.5.0"
 
-
-if sys.version_info.major == 3:
-    unicode = str
+unicode = str
 
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
@@ -71,23 +70,6 @@ HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 CR = "\r"
 LF = "\n"
 CRLF = "\r\n"
-STR_QUOTE_TYPES = (
-    '"""',
-    "'''",
-)
-RAW_QUOTE_TYPES = (
-    'r"""',
-    'R"""',
-    "r'''",
-    "R'''",
-)
-UCODE_QUOTE_TYPES = (
-    'u"""',
-    'U"""',
-    "u'''",
-    "U'''",
-)
-QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
 
 _PYTHON_LIBS = set(sysconfig.get_paths().values())
 
@@ -107,7 +89,7 @@ class Configurator:
     parser = None
     """Parser object."""
 
-    flargs_dct = {}
+    flargs_dct: Dict[str, Union[bool, float, int, str]] = {}
     """Dictionary of configuration file arguments."""
 
     configuration_file_lst = [
@@ -181,8 +163,7 @@ class Configurator:
             type=int,
             metavar="length",
             help="wrap long summary lines at this length; "
-            "set to 0 to disable wrapping "
-            "(default: %(default)s)",
+            "set to 0 to disable wrapping (default: 79)",
         )
         self.parser.add_argument(
             "--wrap-descriptions",
@@ -191,14 +172,14 @@ class Configurator:
             metavar="length",
             help="wrap descriptions at this length; "
             "set to 0 to disable wrapping "
-            "(default: %(default)s)",
+            "(default: 72)",
         )
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
             default=bool(self.flargs_dct.get("force-wrap", False)),
             help="force descriptions to be wrapped even if it may "
-            "result in a mess (default: %(default)s)",
+            "result in a mess (default: False)",
         )
         self.parser.add_argument(
             "--tab-width",
@@ -207,28 +188,28 @@ class Configurator:
             metavar="width",
             default=int(self.flargs_dct.get("tab-width", 1)),
             help="tabs in indentation are this many characters when "
-            "wrapping lines (default: %(default)s)",
+            "wrapping lines (default: 1)",
         )
         self.parser.add_argument(
             "--blank",
             dest="post_description_blank",
             action="store_true",
             default=bool(self.flargs_dct.get("blank", False)),
-            help="add blank line after description (default: %(default)s)",
+            help="add blank line after description (default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-newline",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-newline", False)),
             help="add a newline before the summary of a multi-line docstring "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
             default=bool(self.flargs_dct.get("pre-summary-space", False)),
             help="add a space after the opening triple quotes "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--make-summary-multi-line",
@@ -237,7 +218,7 @@ class Configurator:
                 self.flargs_dct.get("make-summary-multi-line", False)
             ),
             help="add a newline before and after the summary of a one-line "
-            "docstring (default: %(default)s)",
+            "docstring (default: False)",
         )
         self.parser.add_argument(
             "--close-quotes-on-newline",
@@ -247,7 +228,7 @@ class Configurator:
             ),
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
-            "(default: %(default)s)",
+            "(default: False)",
         )
         self.parser.add_argument(
             "--range",
@@ -257,7 +238,7 @@ class Configurator:
             type=int,
             nargs=2,
             help="apply docformatter to docstrings between these "
-            "lines; line numbers are indexed at 1 (default: %(default)s)",
+            "lines; line numbers are indexed at 1 (default: None)",
         )
         self.parser.add_argument(
             "--docstring-length",
@@ -267,7 +248,7 @@ class Configurator:
             type=int,
             nargs=2,
             help="apply docformatter to docstrings of given length range "
-            "(default: %(default)s)",
+            "(default: None)",
         )
         self.parser.add_argument(
             "--non-strict",
@@ -354,6 +335,24 @@ class Configurator:
 class Formator:
     """Format docstrings."""
 
+    STR_QUOTE_TYPES = (
+        '"""',
+        "'''",
+    )
+    RAW_QUOTE_TYPES = (
+        'r"""',
+        'R"""',
+        "r'''",
+        "R'''",
+    )
+    UCODE_QUOTE_TYPES = (
+        'u"""',
+        'U"""',
+        "u'''",
+        "U'''",
+    )
+    QUOTE_TYPES = STR_QUOTE_TYPES + RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES
+
     parser = None
     """Parser object."""
 
@@ -361,10 +360,10 @@ class Formator:
 
     def __init__(
         self,
-            args: argparse.Namespace,
-            stderror: TextIO,
-            stdin: TextIO,
-            stdout: TextIO,
+        args: argparse.Namespace,
+        stderror: TextIO,
+        stdin: TextIO,
+        stdout: TextIO,
     ) -> None:
         """Initialize a Formattor instance.
 
@@ -389,6 +388,8 @@ class Formator:
         self.stdin: TextIO = stdin
         self.stdout: TextIO = stdout
 
+        self.encodor = Encodor()
+
     def do_format_standard_in(self, parser: argparse.ArgumentParser):
         """Print formatted text to standard out.
 
@@ -409,7 +410,7 @@ class Formator:
         encoding = None
         source = self.stdin.read()
         if not isinstance(source, unicode):
-            encoding = self.stdin.encoding or _get_encoding()
+            encoding = self.stdin.encoding or self.encodor.system_encoding
             source = source.decode(encoding)
 
         formatted_source = self._do_format_code(source)
@@ -460,11 +461,12 @@ class Formator:
 
         Return
         ------
-        code: int
+        result_code: int
             One of the FormatResult codes.
         """
-        encoding = detect_encoding(filename)
-        with open_with_encoding(filename, encoding=encoding) as input_file:
+        self.encodor.do_detect_encoding(filename)
+
+        with self.encodor.do_open_with_encoding(filename) as input_file:
             source = input_file.read()
             formatted_source = self._do_format_code(source)
 
@@ -472,8 +474,9 @@ class Formator:
             if self.args.check:
                 return FormatResult.check_failed
             elif self.args.in_place:
-                with open_with_encoding(
-                    filename, mode="w", encoding=encoding
+                with self.encodor.do_open_with_encoding(
+                    filename,
+                    mode="w",
                 ) as output_file:
                     output_file.write(formatted_source)
             else:
@@ -500,7 +503,9 @@ class Formator:
             The text from the source file.
         """
         try:
-            original_newline = find_newline(source.splitlines(True))
+            original_newline = self.encodor.do_find_newline(
+                source.splitlines(True)
+            )
             code = self._format_code(source)
 
             return normalize_line_endings(
@@ -553,7 +558,7 @@ class Formator:
             ) in tokenize.generate_tokens(sio.readline):
                 if (
                     token_type == tokenize.STRING
-                    and token_string.startswith(QUOTE_TYPES)
+                    and token_string.startswith(self.QUOTE_TYPES)
                     and (
                         previous_token_type == tokenize.INDENT
                         or only_comments_so_far
@@ -620,13 +625,13 @@ class Formator:
         docstring_formatted: str
             The docstring formatted according the various options.
         """
-        contents, open_quote = strip_docstring(docstring)
+        contents, open_quote = self._do_strip_docstring(docstring)
         open_quote = (
             f"{open_quote} " if self.args.pre_summary_space else open_quote
         )
 
         # Skip if there are nested triple double quotes
-        if contents.count(QUOTE_TYPES[0]):
+        if contents.count(self.QUOTE_TYPES[0]):
             return docstring
 
         # Do not modify things that start with doctests.
@@ -712,6 +717,122 @@ class Formator:
                 ).strip()
                 return f"{beginning}{summary_wrapped}{ending}"
 
+    def _do_strip_docstring(self, docstring: str) -> Tuple[str, str]:
+        """Return contents of docstring and opening quote type.
+
+        Strips the docstring of its triple quotes, trailing white space,
+        and line returns.  Determines type of docstring quote (either string,
+        raw, or unicode) and returns the opening quotes, including the type
+        identifier, with single quotes replaced by double quotes.
+
+        Parameters
+        ----------
+        docstring: str
+            The docstring, including the opening and closing triple quotes.
+
+        Returns
+        -------
+        (docstring, open_quote) : tuple
+            The docstring with the triple quotes removed.
+            The opening quote type with single quotes replaced by double
+            quotes.
+        """
+        docstring = docstring.strip()
+
+        for quote in self.QUOTE_TYPES:
+            if quote in self.RAW_QUOTE_TYPES + self.UCODE_QUOTE_TYPES and (
+                docstring.startswith(quote) and docstring.endswith(quote[1:])
+            ):
+                return docstring.split(quote, 1)[1].rsplit(quote[1:], 1)[
+                    0
+                ].strip(), quote.replace("'", '"')
+            elif docstring.startswith(quote) and docstring.endswith(quote):
+                return docstring.split(quote, 1)[1].rsplit(quote, 1)[
+                    0
+                ].strip(), quote.replace("'", '"')
+
+        raise ValueError(
+            "docformatter only handles triple-quoted (single or double) "
+            "strings"
+        )
+
+
+class Encodor:
+    """Encoding and decoding of files."""
+
+    CR = "\r"
+    LF = "\n"
+    CRLF = "\r\n"
+
+    def __init__(self):
+        """Initialize an Encodor instance."""
+        self.encoding = "latin-1"
+        self.system_encoding = (
+            locale.getpreferredencoding() or sys.getdefaultencoding()
+        )
+
+    def do_detect_encoding(self, filename: str) -> None:
+        """Return the detected file encoding.
+
+        Parameters
+        ----------
+        filename : str
+            The full path name of the file whose encoding is to be detected.
+        """
+        try:
+            self.encoding = from_path(filename).best().encoding
+
+            # Check for correctness of encoding.
+            with self.do_open_with_encoding(filename) as check_file:
+                check_file.read()
+        except (SyntaxError, LookupError, UnicodeDecodeError):
+            self.encoding = "latin-1"
+
+    def do_find_newline(self, source: str) -> Dict[int, int]:
+        """Return type of newline used in source.
+
+        Paramaters
+        ----------
+        source : list
+            A list of lines.
+
+        Returns
+        -------
+        counter : dict
+            A dict with the count of new line types found.
+        """
+        assert not isinstance(source, unicode)
+
+        counter = collections.defaultdict(int)
+        for line in source:
+            if line.endswith(self.CRLF):
+                counter[self.CRLF] += 1
+            elif line.endswith(self.CR):
+                counter[self.CR] += 1
+            elif line.endswith(self.LF):
+                counter[self.LF] += 1
+
+        return (sorted(counter, key=counter.get, reverse=True) or [self.LF])[0]
+
+    def do_open_with_encoding(self, filename: str, mode: str = "r"):
+        """Return opened file with a specific encoding.
+
+        Parameters
+        ----------
+        filename : str
+            The full path name of the file to open.
+        mode : str
+            The mode to open the file in.  Defaults to read-only.
+
+        Returns
+        -------
+        contents : TextIO
+            The contents of the file.
+        """
+        return io.open(
+            filename, mode=mode, encoding=self.encoding, newline=""
+        )  # Preserve line endings
+
 
 def has_correct_length(length_range, start, end):
     """Return True if docstring's length is in range."""
@@ -730,6 +851,65 @@ def is_in_range(line_range, start, end):
     return any(
         line_range[0] <= line_no <= line_range[1]
         for line_no in range(start, end + 1)
+    )
+
+
+def is_probably_beginning_of_sentence(line):
+    """Return True if this line begins a new sentence."""
+    # Check heuristically for a parameter list.
+    for token in ["@", "-", r"\*"]:
+        if re.search(r"\s" + token + r"\s", line):
+            return True
+
+    stripped_line = line.strip()
+    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
+    is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
+
+    return is_beginning_of_sentence and not is_pydoc_ref
+
+
+def is_some_sort_of_code(text):
+    """Return True if text looks like code."""
+    return any(len(word) > 50 for word in text.split())
+
+
+def is_some_sort_of_list(text, strict):
+    """Return True if text looks like a list."""
+    split_lines = text.rstrip().splitlines()
+
+    # TODO: Find a better way of doing this.
+    # Very large number of lines but short columns probably means a list of
+    # items.
+    if (
+        len(split_lines)
+        / max([len(line.strip()) for line in split_lines] + [1])
+        > HEURISTIC_MIN_LIST_ASPECT_RATIO
+    ) and not strict:
+        return True
+
+    return any(
+        (
+            re.match(r"\s*$", line)
+            or
+            # "1. item"
+            re.match(r"\s*\d\.", line)
+            or
+            # "@parameter"
+            re.match(r"\s*[\-*:=@]", line)
+            or
+            # "parameter - description"
+            re.match(r".*\s+[\-*:=@]\s+", line)
+            or
+            # "parameter: description"
+            re.match(r"\s*\S+[\-*:=@]\s+", line)
+            or
+            # "parameter:\n    description"
+            re.match(r"\s*\S+:\s*$", line)
+            or
+            # "parameter -- description"
+            re.match(r"\s*\S+\s+--\s+", line)
+        )
+        for line in split_lines
     )
 
 
@@ -762,20 +942,6 @@ def _find_shortest_indentation(lines):
                 indentation = _indent
 
     return indentation or ""
-
-
-def is_probably_beginning_of_sentence(line):
-    """Return True if this line begins a new sentence."""
-    # Check heuristically for a parameter list.
-    for token in ["@", "-", r"\*"]:
-        if re.search(r"\s" + token + r"\s", line):
-            return True
-
-    stripped_line = line.strip()
-    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
-    is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
-
-    return is_beginning_of_sentence and not is_pydoc_ref
 
 
 def split_summary_and_description(contents):
@@ -852,69 +1018,6 @@ def split_first_sentence(text):
     return sentence, delimiter + rest
 
 
-def is_some_sort_of_list(text, strict):
-    """Return True if text looks like a list."""
-    split_lines = text.rstrip().splitlines()
-
-    # TODO: Find a better way of doing this.
-    # Very large number of lines but short columns probably means a list of
-    # items.
-    if (
-        len(split_lines)
-        / max([len(line.strip()) for line in split_lines] + [1])
-        > HEURISTIC_MIN_LIST_ASPECT_RATIO
-    ) and not strict:
-        return True
-
-    return any(
-        (
-            re.match(r"\s*$", line)
-            or
-            # "1. item"
-            re.match(r"\s*\d\.", line)
-            or
-            # "@parameter"
-            re.match(r"\s*[\-*:=@]", line)
-            or
-            # "parameter - description"
-            re.match(r".*\s+[\-*:=@]\s+", line)
-            or
-            # "parameter: description"
-            re.match(r"\s*\S+[\-*:=@]\s+", line)
-            or
-            # "parameter:\n    description"
-            re.match(r"\s*\S+:\s*$", line)
-            or
-            # "parameter -- description"
-            re.match(r"\s*\S+\s+--\s+", line)
-        )
-        for line in split_lines
-    )
-
-
-def is_some_sort_of_code(text):
-    """Return True if text looks like code."""
-    return any(len(word) > 50 for word in text.split())
-
-
-def find_newline(source):
-    """Return type of newline used in source.
-
-    Input is a list of lines.
-    """
-    assert not isinstance(source, unicode)
-
-    counter = collections.defaultdict(int)
-    for line in source:
-        if line.endswith(CRLF):
-            counter[CRLF] += 1
-        elif line.endswith(CR):
-            counter[CR] += 1
-        elif line.endswith(LF):
-            counter[LF] += 1
-    return (sorted(counter, key=counter.get, reverse=True) or [LF])[0]
-
-
 def normalize_line(line, newline):
     """Return line with fixed ending, if ending was present in line.
 
@@ -930,44 +1033,6 @@ def normalize_line_endings(lines, newline):
     All lines will be modified to use the most common line ending.
     """
     return "".join([normalize_line(line, newline) for line in lines])
-
-
-def strip_docstring(docstring: str) -> Tuple[str, str]:
-    """Return contents of docstring and opening quote type.
-
-    Strips the docstring of its triple quotes, trailing white space,
-    and line returns.  Determines type of docstring quote (either string,
-    raw, or unicode) and returns the opening quotes, including the type
-    identifier, with single quotes replaced by double quotes.
-
-    Parameters
-    ----------
-    docstring: str
-        The docstring, including the opening and closing triple quotes.
-
-    Returns
-    -------
-    (docstring, open_quote) : tuple
-        The docstring with the triple quotes removed.
-        The opening quote type with single quotes replaced by double quotes.
-    """
-    docstring = docstring.strip()
-
-    for quote in QUOTE_TYPES:
-        if quote in RAW_QUOTE_TYPES + UCODE_QUOTE_TYPES and (
-            docstring.startswith(quote) and docstring.endswith(quote[1:])
-        ):
-            return docstring.split(quote, 1)[1].rsplit(quote[1:], 1)[
-                0
-            ].strip(), quote.replace("'", '"')
-        elif docstring.startswith(quote) and docstring.endswith(quote):
-            return docstring.split(quote, 1)[1].rsplit(quote, 1)[
-                0
-            ].strip(), quote.replace("'", '"')
-
-    raise ValueError(
-        "docformatter only handles triple-quoted (single or double) strings"
-    )
 
 
 def unwrap_summary(summary):
@@ -1074,30 +1139,6 @@ def strip_leading_blank_lines(text):
     return "\n".join(split[found:])
 
 
-def open_with_encoding(filename, encoding, mode="r"):
-    """Return opened file with a specific encoding."""
-    return io.open(
-        filename, mode=mode, encoding=encoding, newline=""
-    )  # Preserve line endings
-
-
-def detect_encoding(filename):
-    """Return file encoding."""
-    try:
-        with open(filename, "rb") as input_file:
-            # Standard Library Imports
-            from lib2to3.pgen2 import tokenize as lib2to3_tokenize
-
-            encoding = lib2to3_tokenize.detect_encoding(input_file.readline)[0]
-
-            # Check for correctness of encoding.
-            with open_with_encoding(filename, encoding) as check_file:
-                check_file.read()
-        return encoding
-    except (SyntaxError, LookupError, UnicodeDecodeError):
-        return "latin-1"
-
-
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     configurator = Configurator(argv)
@@ -1116,11 +1157,6 @@ def _main(argv, standard_out, standard_error, standard_in):
         )
     else:
         return formator.do_format_files()
-
-
-def _get_encoding():
-    """Return preferred encoding."""
-    return locale.getpreferredencoding() or sys.getdefaultencoding()
 
 
 def find_py_files(sources, recursive, exclude=None):
