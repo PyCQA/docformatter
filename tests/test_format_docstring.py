@@ -677,7 +677,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         test_args,
         args,
     ):
-        """"Should account for length of tab when wrapping.
+        """Should account for length of tab when wrapping.
 
         See PR #69.
         """
@@ -902,3 +902,186 @@ Hello.
 """This one-line docstring will have a leading space."""\
 ''',
         )
+
+
+class TestStripDocstring:
+    """Class for testing _do_strip_docstring()."""
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring(
+        self,
+        test_args,
+        args,
+    ):
+        """Strip triple double quotes from docstring."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring, open_quote = uut._do_strip_docstring(
+            '''
+    """Hello.
+
+    """
+
+    '''
+        )
+        assert docstring == "Hello."
+        assert open_quote == '"""'
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_single_quotes(
+        self,
+        test_args,
+        args,
+    ):
+        """Strip triple single quotes from docstring."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring, open_quote = uut._do_strip_docstring(
+            """
+    '''Hello.
+
+    '''
+
+    """
+        )
+        assert docstring == "Hello."
+        assert open_quote == '"""'
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_empty_string(
+        self,
+        test_args,
+        args,
+    ):
+        """Return series of six double quotes when passed empty string."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring, open_quote = uut._do_strip_docstring('""""""')
+        assert docstring == ""
+        assert open_quote == '"""'
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_raw_string(
+        self,
+        test_args,
+        args,
+    ):
+        """Return docstring and raw open quote."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring, open_quote = uut._do_strip_docstring('r"""foo"""')
+        assert docstring == "foo"
+        assert open_quote == 'r"""'
+
+        docstring, open_quote = uut._do_strip_docstring("R'''foo'''")
+        assert docstring == "foo"
+        assert open_quote == 'R"""'
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_unicode_string(
+        self,
+        test_args,
+        args,
+    ):
+        """Return docstring and unicode open quote."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring, open_quote = uut._do_strip_docstring("u'''foo'''")
+        assert docstring == "foo"
+        assert open_quote == 'u"""'
+
+        docstring, open_quote = uut._do_strip_docstring('U"""foo"""')
+        assert docstring == "foo"
+        assert open_quote == 'U"""'
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_unknown(
+        self,
+        test_args,
+        args,
+    ):
+        """Raise ValueError with single quotes."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        with pytest.raises(ValueError):
+            uut._do_strip_docstring("foo")
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_single_quotes(
+        self,
+        test_args,
+        args,
+    ):
+        """Raise ValueError when strings begin with single single quotes.
+
+        See requirement PEP_257_1.  See issue #66 for example of docformatter
+        breaking code when encountering single quote.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        with pytest.raises(ValueError):
+            uut._do_strip_docstring("'hello\\''")
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_strip_docstring_with_double_quotes(
+        self,
+        test_args,
+        args,
+    ):
+        """Raise ValueError when strings begin with single double quotes.
+
+        See requirement PEP_257_1.  See issue #66 for example of docformatter
+        breaking code when encountering single quote.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        with pytest.raises(ValueError):
+            uut._do_strip_docstring('"hello\\""')
