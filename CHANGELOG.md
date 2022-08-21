@@ -1,19 +1,12 @@
 # Changelog
 
-## [v1.5.0](https://github.com/PyCQA/docformatter/tree/v1.5.0) (2022-08-11)
+## [v1.5.0](https://github.com/PyCQA/docformatter/tree/v1.5.0) (2022-08-19)
 
-[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.5.0-rc1...v1.5.0)
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.4...v1.5.0)
 
 **Merged pull requests:**
 
 - chore: add workflow actions [\#108](https://github.com/PyCQA/docformatter/pull/108) ([weibullguy](https://github.com/weibullguy))
-
-## [v1.5.0-rc1](https://github.com/PyCQA/docformatter/tree/v1.5.0-rc1) (2022-08-11)
-
-[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.4...v1.5.0-rc1)
-
-**Merged pull requests:**
-
 - feat: adjust for tab when wrapping [\#105](https://github.com/PyCQA/docformatter/pull/105) ([weibullguy](https://github.com/weibullguy))
 - feat: add option to place closing quotes on newline [\#104](https://github.com/PyCQA/docformatter/pull/104) ([weibullguy](https://github.com/weibullguy))
 - test: move remaining tests to tests/ directory [\#102](https://github.com/PyCQA/docformatter/pull/102) ([weibullguy](https://github.com/weibullguy))
