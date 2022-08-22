@@ -25,7 +25,8 @@ options listed using the same name as command line argument.  For example:
       wrap-summaries = 82
       blank = true
 
-In ``setup.cfg``, add a ``[docformatter]`` section.
+In ``setup.cfg``, add a ``[docformatter]``, ``[tool.docformatter]``, or
+``[tool:docformatter]`` section.
 
 .. code-block:: yaml
 
