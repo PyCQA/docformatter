@@ -50,7 +50,7 @@ from typing import Dict, List, TextIO, Tuple, Union
 
 # Third Party Imports
 import untokenize  # type: ignore
-from charset_normalizer import from_path
+from charset_normalizer import from_path  # pylint: disable=import-error
 
 try:
     # Third Party Imports
@@ -171,8 +171,7 @@ class Configurator:
             type=int,
             metavar="length",
             help="wrap descriptions at this length; "
-            "set to 0 to disable wrapping "
-            "(default: 72)",
+            "set to 0 to disable wrapping (default: 72)",
         )
         self.parser.add_argument(
             "--force-wrap",
@@ -258,13 +257,19 @@ class Configurator:
             "issue #67) (default: False)",
         )
         self.parser.add_argument(
-            "--config", help="path to file containing docformatter options"
+            "--config",
+            default=self.config_file,
+            help="path to file containing docformatter options",
         )
         self.parser.add_argument(
-            "--version", action="version", version=f"%(prog)s {__version__}"
+            "--version",
+            action="version",
+            version=f"%(prog)s {__version__}",
         )
         self.parser.add_argument(
-            "files", nargs="+", help="files to format or '-' for standard in"
+            "files",
+            nargs="+",
+            help="files to format or '-' for standard in",
         )
 
         self.args = self.parser.parse_args(self.args_lst[1:])
@@ -324,7 +329,11 @@ class Configurator:
         config = ConfigParser()
         config.read(self.config_file)
 
-        for _section in ["tool:docformatter", "docformatter"]:
+        for _section in [
+            "tool.docformatter",
+            "tool:docformatter",
+            "docformatter",
+        ]:
             if _section in config.sections():
                 self.flargs_dct = {
                     k: v if isinstance(v, list) else str(v)
@@ -834,81 +843,6 @@ class Encodor:
         )  # Preserve line endings
 
 
-class Encodor:
-    """Encoding and decoding of files."""
-
-    CR = "\r"
-    LF = "\n"
-    CRLF = "\r\n"
-
-    def __init__(self):
-        """Initialize an Encodor instance."""
-        self.encoding = "latin-1"
-        self.system_encoding = (
-            locale.getpreferredencoding() or sys.getdefaultencoding()
-        )
-
-    def do_detect_encoding(self, filename: str) -> None:
-        """Return the detected file encoding.
-
-        Parameters
-        ----------
-        filename : str
-            The full path name of the file whose encoding is to be detected.
-        """
-        try:
-            self.encoding = from_path(filename).best().encoding
-
-            # Check for correctness of encoding.
-            with self.do_open_with_encoding(filename) as check_file:
-                check_file.read()
-        except (SyntaxError, LookupError, UnicodeDecodeError):
-            self.encoding = "latin-1"
-
-    def do_find_newline(self, source: str) -> Dict[int, int]:
-        """Return type of newline used in source.
-
-        Paramaters
-        ----------
-        source : list
-            A list of lines.
-
-        Returns
-        -------
-        counter : dict
-            A dict with the count of new line types found.
-        """
-        assert not isinstance(source, unicode)
-
-        counter = collections.defaultdict(int)
-        for line in source:
-            if line.endswith(self.CRLF):
-                counter[self.CRLF] += 1
-            elif line.endswith(self.CR):
-                counter[self.CR] += 1
-            elif line.endswith(self.LF):
-                counter[self.LF] += 1
-
-        return (sorted(counter, key=counter.get, reverse=True) or [self.LF])[0]
-
-    def do_open_with_encoding(self, filename: str, mode: str = "r"):
-        """Return opened file with a specific encoding.
-
-        Parameters
-        ----------
-        filename : str
-            The full path name of the file to open.
-        mode : str
-            The mode to open the file in.  Defaults to read-only.
-
-        Returns
-        -------
-        """
-        return io.open(
-            filename, mode=mode, encoding=self.encoding, newline=""
-        )  # Preserve line endings
-
-
 def has_correct_length(length_range, start, end):
     """Return True if docstring's length is in range."""
     if length_range is None:
@@ -943,12 +877,97 @@ def is_probably_beginning_of_sentence(line):
     return is_beginning_of_sentence and not is_pydoc_ref
 
 
-def is_some_sort_of_code(text):
+def is_some_sort_of_code(text: str) -> bool:
     """Return True if text looks like code."""
-    return any(len(word) > 50 for word in text.split())
+    return any(
+        len(word) > 50
+        and not re.match(r"<{0,1}(http:|https:|ftp:|sftp:)", word)
+        for word in text.split()
+    )
 
 
-def is_some_sort_of_list(text, strict):
+def do_preserve_links(
+    text: str,
+    indentation: str,
+    wrap_length: int,
+) -> List[str]:
+    """Rebuild links in docstring.
+
+    Parameters
+    ----------
+    text : str
+        The docstring description.
+    indentation : str
+        The indentation (number of spaces or tabs) to place in front of each
+        line.
+    wrap_length : int
+        The column to wrap each line at.
+
+    Returns
+    -------
+    lines : list
+        A list containing each line of the description with any links put
+        back together.
+    """
+    lines = textwrap.wrap(
+        textwrap.dedent(text),
+        width=wrap_length,
+        initial_indent=indentation,
+        subsequent_indent=indentation,
+    )
+
+    url = next(
+        (
+            line
+            for line in lines
+            if re.search(r"<?(http://|https://|ftp://|sftp://)", line)
+        ),
+        "",
+    )
+
+    if url != "":
+        url_idx = lines.index(url)
+
+        # Is this an in-line link (i.e., enclosed in <>)?  We want to keep
+        # the '<' and '>' part of the link.
+        if re.search(r"<", url):
+            lines[url_idx] = f"{indentation}" + url.split(sep="<")[0].strip()
+            url = f"{indentation}<" + url.split(sep="<")[1]
+            url = url + lines[url_idx + 1].strip()
+            lines[url_idx + 1] = url
+        # Is this a link target definition (i.e., .. a link: https://)?  We
+        # want to keep the .. a link: on the same line as the url.
+        elif re.search(r"(\.\. )", url):
+            url = url + lines[url_idx + 1].strip()
+            lines[url_idx] = url
+            lines.pop(url_idx + 1)
+        # Is this a simple link (i.e., just a link in the text) that should
+        # be unwrapped?  We want to break the url out from the rest of the
+        # text.
+        elif len(lines[url_idx]) >= wrap_length:
+            lines[url_idx] = (
+                f"{indentation}" + url.strip().split(sep=" ")[0].strip()
+            )
+            url = f"{indentation}" + url.strip().split(sep=" ")[1].strip()
+            url = url + lines[url_idx + 1].strip().split(sep=" ")[0].strip()
+            lines.append(
+                indentation
+                + " ".join(lines[url_idx + 1].strip().split(sep=" ")[1:])
+            )
+            lines[url_idx + 1] = url
+
+        with contextlib.suppress(IndexError):
+            if lines[url_idx + 2].strip() in [".", "?", "!", ";"] or re.search(
+                r">", lines[url_idx + 2]
+            ):
+                url = url + lines[url_idx + 2].strip()
+                lines[url_idx + 1] = url
+                lines.pop(url_idx + 2)
+
+    return lines
+
+
+def is_some_sort_of_list(text, strict) -> bool:
     """Return True if text looks like a list."""
     split_lines = text.rstrip().splitlines()
 
@@ -1161,21 +1180,13 @@ def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     # Ignore possibly complicated cases.
     if wrap_length <= 0 or (
         not force_wrap
-        and (is_some_sort_of_list(text, strict) or is_some_sort_of_code(text))
+        and (is_some_sort_of_code(text) or is_some_sort_of_list(text, strict))
     ):
         return text
 
-    return (
-        indentation
-        + "\n".join(
-            textwrap.wrap(
-                textwrap.dedent(text),
-                width=wrap_length,
-                initial_indent=indentation,
-                subsequent_indent=indentation,
-            )
-        ).strip()
-    )
+    text = do_preserve_links(text, indentation, wrap_length)
+
+    return indentation + "\n".join(text).strip()
 
 
 def remove_section_header(text):
