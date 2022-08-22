@@ -662,15 +662,7 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [
-            [
-                "--wrap-summaries",
-                "30",
-                "--tab-width",
-                "4",
-                "",
-            ]
-        ],
+        [["--wrap-summaries", "30", "--tab-width", "4", ""]],
     )
     def test_format_docstring_with_summary_only_and_wrap_and_tab_indentation(
         self,
@@ -701,14 +693,7 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [
-            [
-                "--wrap-summaries",
-                "69",
-                "--close-quotes-on-newline",
-                "",
-            ]
-        ],
+        [["--wrap-summaries", "69", "--close-quotes-on-newline", ""]],
     )
     def test_format_docstring_for_multi_line_summary_alone(
         self,
@@ -742,14 +727,7 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [
-            [
-                "--wrap-summaries",
-                "88",
-                "--close-quotes-on-newline",
-                "",
-            ]
-        ],
+        [["--wrap-summaries", "88", "--close-quotes-on-newline", ""]],
     )
     def test_format_docstring_for_one_line_summary_alone_but_too_long(
         self,
@@ -773,10 +751,163 @@ num_iterations is the number of updates - instead of a better definition of conv
             == uut._do_format_docstring(
                 INDENTATION,
                 '''\
-"""This one-line docstring will not be wrapped and quotes will be 
-in-line."""\
+"""This one-line docstring will not be wrapped and quotes will be in-line."""\
 ''',
             )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_inline_links(
+        self,
+        test_args,
+        args,
+    ):
+        """Preserve links instead of wrapping them.
+
+        See issue #75. See requirement docformatter_10.1.3.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""This is a docstring with a link.
+
+    Here is an elaborate description containing a link.
+    `Area Under the Receiver Operating Characteristic Curve (ROC AUC)
+        <https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Further_interpretations>`_.
+    """\
+'''
+
+        assert '''\
+"""This is a docstring with a link.
+
+    Here is an elaborate description containing a link. `Area Under the
+    Receiver Operating Characteristic Curve (ROC AUC)
+    <https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Further_interpretations>`_.
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_target_links(
+        self,
+        test_args,
+        args,
+    ):
+        """Preserve links instead of wrapping them.
+
+        See issue #75. See requirement docformatter_10.1.3.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""This is another docstring with `a link`_.
+
+    .. a link: http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
+    """\
+'''
+
+        assert '''\
+"""This is another docstring with `a link`_.
+
+    .. a link: http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_sinmple_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Preserve links instead of wrapping them.
+
+        See issue #75. See requirement docformatter_10.1.3.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""This is another docstring with a link.
+
+    See http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html for additional information.
+    """\
+'''
+
+        assert '''\
+"""This is another docstring with a link.
+
+    See
+    http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html
+    for additional information.
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_short_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Short links will remain untouched.
+
+        See issue #75. See requirement docformatter_10.1.3.
+        """
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""This is yanf with a short link.
+
+    See http://www.reliaqual.com for examples.
+    """\
+'''
+
+        assert '''\
+"""This is yanf with a short link.
+
+    See http://www.reliaqual.com for examples.
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
         )
 
 
@@ -1051,8 +1182,8 @@ class TestStripDocstring:
     ):
         """Raise ValueError when strings begin with single single quotes.
 
-        See requirement PEP_257_1.  See issue #66 for example of docformatter
-        breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of
+        docformatter breaking code when encountering single quote.
         """
         uut = Formator(
             test_args,
@@ -1073,8 +1204,8 @@ class TestStripDocstring:
     ):
         """Raise ValueError when strings begin with single double quotes.
 
-        See requirement PEP_257_1.  See issue #66 for example of docformatter
-        breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of
+        docformatter breaking code when encountering single quote.
         """
         uut = Formator(
             test_args,

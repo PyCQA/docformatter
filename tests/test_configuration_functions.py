@@ -51,45 +51,61 @@ class TestConfigurator:
     @pytest.mark.unit
     def test_initialize_configurator_with_default(self):
         """Return a Configurator() instance using default pyproject.toml."""
-        unit_under_test = Configurator([])
+        argb = [
+            "/path/to/docformatter",
+            "",
+        ]
 
-        assert unit_under_test.config_file == "./pyproject.toml"
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args_lst == argb
+        assert uut.config_file == "./pyproject.toml"
 
     @pytest.mark.unit
     def test_initialize_configurator_with_pyproject_toml(self):
         """Return a Configurator() instance loaded from a pyproject.toml."""
         argb = [
+            "/path/to/docformatter",
+            "-c",
             "--config",
             "./tests/_data/pyproject.toml",
+            "",
         ]
 
-        unit_under_test = Configurator(argb)
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
 
-        assert unit_under_test.args is None
-        assert unit_under_test.flargs_dct == {
-            "recursive": "True",
-            "wrap-summaries": "82",
-        }
-        assert unit_under_test.configuration_file_lst == [
+        assert uut.args.check
+        assert not uut.args.in_place
+        assert uut.args_lst == argb
+        assert uut.config_file == "./tests/_data/pyproject.toml"
+        assert uut.configuration_file_lst == [
             "pyproject.toml",
             "setup.cfg",
             "tox.ini",
         ]
-        assert unit_under_test.args_lst == argb
-        assert unit_under_test.config_file == "./tests/_data/pyproject.toml"
+        assert uut.flargs_dct == {
+            "recursive": "True",
+            "wrap-summaries": "82",
+        }
 
     @pytest.mark.unit
     def test_initialize_configurator_with_setup_cfg(self):
         """Return docformatter configuration loaded from a setup.cfg file."""
         argb = [
+            "/path/to/docformatter",
+            "-c",
             "--config",
             "./tests/_data/setup.cfg",
+            "",
         ]
 
-        unit_under_test = Configurator(argb)
-        unit_under_test.do_parse_arguments()
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
 
-        assert unit_under_test.flargs_dct == {
+        assert uut.config_file == "./tests/_data/setup.cfg"
+        assert uut.flargs_dct == {
             "blank": "False",
             "wrap-summaries": "79",
             "wrap-descriptions": "72",
@@ -99,14 +115,18 @@ class TestConfigurator:
     def test_initialize_configurator_with_tox_ini(self):
         """Return docformatter configuration loaded from a tox.ini file."""
         argb = [
+            "/path/to/docformatter",
+            "-c",
             "--config",
             "./tests/_data/tox.ini",
+            "",
         ]
 
-        unit_under_test = Configurator(argb)
-        unit_under_test.do_parse_arguments()
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
 
-        assert unit_under_test.flargs_dct == {
+        assert uut.config_file == "./tests/_data/tox.ini"
+        assert uut.flargs_dct == {
             "blank": "False",
             "wrap-summaries": "79",
             "wrap-descriptions": "72",
@@ -116,46 +136,177 @@ class TestConfigurator:
     def test_unsupported_config_file(self):
         """Return empty configuration dict when file is unsupported."""
         argb = [
+            "/path/to/docformatter",
+            "-c",
             "--config",
             "./tests/conf.py",
+            "",
         ]
 
-        unit_under_test = Configurator(argb)
-        unit_under_test.do_parse_arguments()
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
 
-        assert unit_under_test.flargs_dct == {}
+        assert uut.config_file == "./tests/conf.py"
+        assert uut.flargs_dct == {}
 
     @pytest.mark.unit
     def test_cli_override_config_file(self):
         """Command line arguments override configuration file options."""
         argb = [
+            "/path/to/docformatter",
+            "-c",
             "--config",
             "./tests/_data/tox.ini",
             "--make-summary-multi-line",
             "--blank",
             "--wrap-summaries",
             "88",
+            "",
         ]
 
-        unit_under_test = Configurator(argb)
-        unit_under_test.do_parse_arguments()
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
 
-        assert unit_under_test.flargs_dct == {
+        assert uut.config_file == "./tests/_data/tox.ini"
+        assert uut.flargs_dct == {
             "blank": "False",
             "wrap-descriptions": "72",
             "wrap-summaries": "79",
         }
-        assert not unit_under_test.args.in_place
-        assert not unit_under_test.args.check
-        assert not unit_under_test.args.recursive
-        assert unit_under_test.args.exclude is None
-        assert unit_under_test.args.wrap_summaries == 88
-        assert unit_under_test.args.wrap_descriptions == 72
-        assert unit_under_test.args.post_description_blank
-        assert not unit_under_test.args.pre_summary_newline
-        assert not unit_under_test.args.pre_summary_space
-        assert unit_under_test.args.make_summary_multi_line
-        assert not unit_under_test.args.force_wrap
-        assert unit_under_test.args.line_range is None
-        assert unit_under_test.args.length_range is None
-        assert not unit_under_test.args.non_strict
+        assert not uut.args.in_place
+        assert uut.args.check
+        assert not uut.args.recursive
+        assert uut.args.exclude is None
+        assert uut.args.wrap_summaries == 88
+        assert uut.args.wrap_descriptions == 72
+        assert uut.args.post_description_blank
+        assert not uut.args.pre_summary_newline
+        assert not uut.args.pre_summary_space
+        assert uut.args.make_summary_multi_line
+        assert not uut.args.force_wrap
+        assert uut.args.line_range is None
+        assert uut.args.length_range is None
+        assert not uut.args.non_strict
+
+    @pytest.mark.unit
+    def test_only_format_in_line_range(self, capsys):
+        """Only format docstrings in line range."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--range",
+            "1",
+            "3",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.line_range == [1, 3]
+
+    @pytest.mark.unit
+    def test_low_line_range_is_zero(self, capsys):
+        """Raise parser error if the first value for the range is zero."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--range",
+            "0",
+            "10",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        with pytest.raises(SystemExit):
+            uut.do_parse_arguments()
+
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "--range must be positive numbers" in err
+
+    @pytest.mark.unit
+    def test_low_line_range_greater_than_high_line_range(self, capsys):
+        """Raise parser error if the first value for the range is greater than
+        the second."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--range",
+            "10",
+            "1",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        with pytest.raises(SystemExit):
+            uut.do_parse_arguments()
+
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert (
+            "First value of --range should be less than or equal to the second"
+            in err
+        )
+
+    @pytest.mark.unit
+    def test_only_format_in_length_range(self, capsys):
+        """Only format docstrings in length range."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--docstring-length",
+            "25",
+            "55",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.length_range == [25, 55]
+
+    @pytest.mark.unit
+    def test_low_length_range_is_zero(self, capsys):
+        """Raise parser error if the first value for the length range is
+        zero."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--docstring-length",
+            "0",
+            "10",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        with pytest.raises(SystemExit):
+            uut.do_parse_arguments()
+
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "--docstring-length must be positive numbers" in err
+
+    @pytest.mark.unit
+    def test_low_length_range_greater_than_high_length_range(self, capsys):
+        """Raise parser error if the first value for the range is greater than
+        the second."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--docstring-length",
+            "55",
+            "25",
+            "",
+        ]
+
+        uut = Configurator(argb)
+        with pytest.raises(SystemExit):
+            uut.do_parse_arguments()
+
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert (
+            "First value of --docstring-length should be less than or equal "
+            "to the second" in err
+        )
