@@ -15,7 +15,7 @@ If no configuration file is explicitly passed, ``docformatter`` will search
 the current directory for the supported files and use the first one found.
 The order of precedence is ``pyproject.toml``, ``setup.cfg``, then ``tox.ini``.
 
-In ``pyproject.toml`` or ``tox.ini``, add a section ``[tool.docformatter]`` with
+In ``pyproject.toml``, add a section ``[tool.docformatter]`` with
 options listed using the same name as command line argument.  For example:
 
 .. code-block:: yaml
@@ -25,7 +25,7 @@ options listed using the same name as command line argument.  For example:
       wrap-summaries = 82
       blank = true
 
-In ``setup.cfg``, add a ``[docformatter]`` section.
+In ``setup.cfg`` or ``tox.ini``, add a ``[docformatter]`` section.
 
 .. code-block:: yaml
 

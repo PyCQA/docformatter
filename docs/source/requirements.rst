@@ -194,6 +194,7 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.1.1', ' Shall not wrap lists or syntax directive statements', ' Derived', ' Shall', ' Yes'
     ' docformatter_10.1.1.1', ' Should allow wrapping of lists and syntax directive statements.', ' Stakeholder', ' Should', ' Yes [*PR #5*, *PR #93*]'
     ' docformatter_10.1.2', ' Should allow/disallow wrapping of one-line docstrings.', ' Derived', ' Should', ' No'
+    ' docformatter_10.1.3', ' Shall not wrap links that exceed the wrap length.', Derived', ' Shall', ' Yes [*PR #114*]'
     ' docformatter_10.2', ' Should format docstrings using NumPy style.', ' Style', ' Should', ' No'
     ' docformatter_10.3', ' Should format docstrings using Google style.', ' Style', ' Should', ' No'
     ' docformatter_10.4', ' Should format docstrings using Sphinx style.',' Style', ' Should', ' No'

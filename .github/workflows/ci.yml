@@ -11,35 +11,63 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
+        python-version:
+          - "pypy-3.6-v7.3.3"
+          - "3.10"
+          - "3.9"
+          - "3.8"
+          - "3.7"
+          - "3.6"
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install -U pip
-        python -m pip install .[tomli]
-        python -m pip install --quiet coverage coveralls pytest pytest-cov mock tox
-    - name: Run tests with tox
-      run: |
-        tox -e py
-    - name: Create Coveralls report
-      uses: miurahr/coveralls-python-action@patch-pyprject-toml
-      with:
-        parallel: true
+      - name: Setup Python for tox
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install tox
+        run: python -m pip install tox
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python ${{ matrix.python-version }} for test
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup test suite
+        run: tox -vv --notest
+      - name: Run tests with tox
+        run: tox -e py --skip-pkg-install
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-data
+          path: ".tox/.coverage.*"
 
   upload_coveralls:
     name: Upload Results to Coveralls
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install tox
+        run: python -m pip install tox
+      - name: Setup coverage
+        run: tox -e coverage --notest
+      - name: Download coverage data
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-data
+          path: .tox
+      - name: Combine coverage reports
+        run: tox -e coverage
       - name: Upload coverage report to Coveralls
         uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
-          parallel-finished: true
+          base-path: .tox

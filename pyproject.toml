@@ -54,6 +54,7 @@ pylint = "^2.12.0"
 pytest = "<7.0.0"
 pytest-cov = "^3.0.0"
 rstcheck = "<6.0.0"
+tox = "^3.25.0"
 Sphinx = "^5.0.0"
 twine = [
     {version="<4.0.0", python = "<3.7"},
@@ -170,30 +171,57 @@ line_length = 79
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-skipsdist = True
-isolated_build = True
 envlist =
-    py{36,37,38,39,310,py36},
-    style
-
-[testenv:py{36,37,38,39,310,py36}]
-deps =
+    py36
+    py37
+    py38
+    py39
+    py310
+    pypy3
     coverage
+    style
+isolated_build = true
+skip_missing_interpreters = true
+skipsdist = true
+
+[testenv]
+description = run the test suite using pytest under {basepython}
+deps =
+    charset_normalizer
+    coverage[toml]
     mock
     pytest
     pytest-cov
+    tomli
+    untokenize
 setenv =
-    COVERAGE_FILE={toxinidir}/.coverage
+    COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
-    pip install -U pip
-    pip install .[tomli]
-    pytest -s -x -c ./pyproject.toml --cache-clear \
-        --cov-config=pyproject.toml --cov=docformatter \
-        --cov-branch --cov-report=term tests/
-    coverage xml --rcfile=pyproject.toml
+    pytest -s -x -c ./pyproject.toml \
+        --cache-clear \
+        --cov=docformatter \
+        --cov-config={toxinidir}/pyproject.toml \
+        --cov-branch \
+        tests/
+
+[testenv:coverage]
+description = combine coverage data and create report
+setenv =
+    COVERAGE_FILE = {toxworkdir}/.coverage
+skip_install = true
+deps =
+    coverage[toml]
+parallel_show_output = true
+commands =
+    coverage combine
+    coverage report -m
+    coverage xml -o {toxworkdir}/coverage.xml
+depends = py36, py37, py38, py39, py310, pypy3
 
 [testenv:style]
+description = run autoformatters and style checkers
 deps =
+    charset_normalizer
     docformatter
     pycodestyle
     pydocstyle

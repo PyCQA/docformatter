@@ -16,3 +16,4 @@ htmlcov/
 poetry.lock
 .idea/
 .vscode/
+.tox/
