@@ -187,10 +187,13 @@ skipsdist = true
 [testenv]
 description = run the test suite using pytest under {basepython}
 deps =
+    charset_normalizer
     coverage[toml]
     mock
     pytest
     pytest-cov
+    tomli
+    untokenize
 setenv =
     COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
