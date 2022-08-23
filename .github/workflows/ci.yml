@@ -61,7 +61,7 @@ jobs:
       - name: Setup coverage
         run: tox -e coverage --notest
       - name: Download coverage data
-        uses: actions/download-artifacts@v3
+        uses: actions/download-artifact@v3
         with:
           name: coverage-data
           path: .tox
