@@ -71,3 +71,4 @@ jobs:
         uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
           base-path: .tox
+          debug: true
