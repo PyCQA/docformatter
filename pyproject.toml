@@ -171,14 +171,20 @@ line_length = 79
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-skipsdist = True
-isolated_build = True
 envlist =
-    py{36,37,38,39,310,py36},
-    coverage,
+    py36
+    py37
+    py38
+    py39
+    py310
+    pypy3
+    coverage
     style
+isolated_build = true
+skip_missing_interpreters = true
+skipsdist = true
 
-[testenv:py{36,37,38,39,310,py36}]
+[testenv]
 description = run the test suite using pytest under {basepython}
 deps =
     coverage[toml]
@@ -188,8 +194,6 @@ deps =
 setenv =
     COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
-    pip install -U pip
-    pip install .[tomli]
     pytest -s -x -c ./pyproject.toml \
         --cache-clear \
         --cov=docformatter \
@@ -209,11 +213,12 @@ commands =
     coverage combine
     coverage report -m
     coverage xml -o {toxworkdir}/coverage.xml
-depends = py36, py37, py38, py39, py310, pypy36
+depends = py36, py37, py38, py39, py310, pypy3
 
 [testenv:style]
 description = run autoformatters and style checkers
 deps =
+    charset_normalizer
     docformatter
     pycodestyle
     pydocstyle
