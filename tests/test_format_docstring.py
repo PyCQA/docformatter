@@ -839,7 +839,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         "args",
         [["--wrap-descriptions", "72", ""]],
     )
-    def test_format_docstring_with_sinmple_link(
+    def test_format_docstring_with_simple_link(
         self,
         test_args,
         args,
@@ -908,6 +908,35 @@ num_iterations is the number of updates - instead of a better definition of conv
     """\
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_class_attributes(self, test_args, args):
+        """Wrap long class attribute docstrings."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be
+    reformatted nicely by docformatter."""
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
+'''
         )
 
 
