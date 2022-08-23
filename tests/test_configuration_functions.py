@@ -4,7 +4,7 @@
 #       tests.test_configuration_functions.py is part of the docformatter
 #       project
 #
-# Copyright (C) 2012-2019 Steven Myint
+# Copyright (C) 2012-2022 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,13 +25,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for testing functions used to control docformatter configuration.
-
-Configuration functions are:
-
-    - find_config_file()
-    - read_configuration_file()
-"""
+"""Module for testing docformatter's Configurator class."""
 
 # Standard Library Imports
 import io
@@ -41,7 +35,6 @@ import sys
 import pytest
 
 # docformatter Package Imports
-import docformatter
 from docformatter import Configurator
 
 
@@ -227,8 +220,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_low_line_range_greater_than_high_line_range(self, capsys):
-        """Raise parser error if the first value for the range is greater than
-        the second."""
+        """Raise parser error if first value for range > than second."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -268,8 +260,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_low_length_range_is_zero(self, capsys):
-        """Raise parser error if the first value for the length range is
-        zero."""
+        """Raise parser error if the first value for the length range = 0."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -289,8 +280,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_low_length_range_greater_than_high_length_range(self, capsys):
-        """Raise parser error if the first value for the range is greater than
-        the second."""
+        """Raise parser error if first value for range > second value."""
         argb = [
             "/path/to/docformatter",
             "-c",
