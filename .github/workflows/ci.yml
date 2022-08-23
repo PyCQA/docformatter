@@ -29,12 +29,7 @@ jobs:
     - name: Run tests with tox
       run: |
         tox -e py
-    - name: Create Coveralls report
-      uses: miurahr/coveralls-python-action@patch-pyprject-toml
-      with:
-        base-path: .tox
-        flag-name: ${{ matrix.python-version }}
-        parallel: true
+        tox -e coverage
 
   upload_coveralls:
     name: Upload Results to Coveralls
@@ -45,4 +40,3 @@ jobs:
         uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
           base-path: .tox
-          parallel-finished: true
