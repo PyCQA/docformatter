@@ -553,7 +553,6 @@ class Formator:
         modified_tokens = []
 
         sio = io.StringIO(source)
-        previous_token_string = ""
         previous_token_type = None
         only_comments_so_far = True
 
@@ -570,6 +569,7 @@ class Formator:
                     and token_string.startswith(self.QUOTE_TYPES)
                     and (
                         previous_token_type == tokenize.INDENT
+                        or previous_token_type == tokenize.NEWLINE
                         or only_comments_so_far
                     )
                     and is_in_range(self.args.line_range, start[0], end[0])
@@ -577,9 +577,7 @@ class Formator:
                         self.args.length_range, start[0], end[0]
                     )
                 ):
-                    indentation = (
-                        "" if only_comments_so_far else previous_token_string
-                    )
+                    indentation = " " * (len(line) - len(line.lstrip()))
                     token_string = self._do_format_docstring(
                         indentation,
                         token_string,
@@ -592,7 +590,6 @@ class Formator:
                 ]:
                     only_comments_so_far = False
 
-                previous_token_string = token_string
                 previous_token_type = token_type
 
                 # If the current token is a newline, the previous token was a
@@ -1139,13 +1136,15 @@ def normalize_summary(summary):
     # remove trailing whitespace
     summary = summary.rstrip()
 
-    # Add period at end of sentence
+    # Add period at end of sentence and capitalize the first word of the
+    # summary.
     if (
         summary
         and (summary[-1].isalnum() or summary[-1] in ['"', "'"])
         and (not summary.startswith("#"))
     ):
         summary += "."
+        summary = summary[0].upper() + summary[1:]
 
     return summary
 

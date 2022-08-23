@@ -184,6 +184,15 @@ isolated_build = true
 skip_missing_interpreters = true
 skipsdist = true
 
+[gh-actions]
+python =
+    3.6: py36
+    3.7: py37
+    3.8: py38
+    3.9: py39
+    3.10: py310
+    pypy-3.6: pypy3
+
 [testenv]
 description = run the test suite using pytest under {basepython}
 deps =

@@ -189,6 +189,23 @@ class TestNormalizers:
         summary = "# This is a title"
         assert summary == docformatter.normalize_summary(summary)
 
+    @pytest.mark.unit
+    def test_normalize_summary_capitalize_first_letter(self):
+        """Capitalize the first letter of the summary.
+
+        See issue #76. See requirement docformatter_4.5.1.
+        """
+        assert (
+            "This is a summary that needs to be capped."
+            == docformatter.normalize_summary(
+                "this is a summary that needs to be capped"
+            )
+        )
+
+        assert "Don't lower case I'm." == docformatter.normalize_summary(
+            "don't lower case I'm"
+        )
+
 
 class TestSplitters:
     """Class for testing the string splitting function.

@@ -841,6 +841,33 @@ def crash_rocket(location):    # pragma: no cover
         )
         assert docstring == uut._do_format_code(docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_class_docstring(self, test_args, args):
+        """Format class docstring."""
+        uut = Formator(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring.
+
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+'''
+        assert docstring == uut._do_format_code('''\
+class TestClass:
+    """This is a class docstring.
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+''')
+
 
 class TestFormatCodeRanges:
     """Class for testing _format_code() with the line_range or length_range

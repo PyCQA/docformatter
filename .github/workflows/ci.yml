@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install tox
-        run: python -m pip install tox
+        run: python -m pip install tox tox-gh-actions
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -39,35 +39,21 @@ jobs:
         run: tox -vv --notest
       - name: Run tests with tox
         run: tox -e py --skip-pkg-install
-      - name: Upload coverage data
-        uses: actions/upload-artifact@v3
+      - name: Create Coveralls coverage report
+        uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
-          name: coverage-data
-          path: ".tox/.coverage.*"
+          base-path: .tox
+          debug: true
+          parallel: true
 
   upload_coveralls:
     name: Upload Results to Coveralls
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install tox
-        run: python -m pip install tox
-      - name: Setup coverage
-        run: tox -e coverage --notest
-      - name: Download coverage data
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage-data
-          path: .tox
-      - name: Combine coverage reports
-        run: tox -e coverage
       - name: Upload coverage report to Coveralls
         uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
           base-path: .tox
+          debug: true
+          parallel-finished: true
