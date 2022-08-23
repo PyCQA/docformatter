@@ -175,25 +175,44 @@ skipsdist = True
 isolated_build = True
 envlist =
     py{36,37,38,39,310,py36},
+    coverage,
     style
 
 [testenv:py{36,37,38,39,310,py36}]
+description = run the test suite using pytest under {basepython}
 deps =
-    coverage
+    coverage[toml]
     mock
     pytest
     pytest-cov
 setenv =
-    COVERAGE_FILE={toxinidir}/.coverage
+    COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
     pip install -U pip
     pip install .[tomli]
-    pytest -s -x -c ./pyproject.toml --cache-clear \
-        --cov-config=pyproject.toml --cov=docformatter \
-        --cov-branch --cov-report=term tests/
-    coverage xml --rcfile=pyproject.toml
+    pytest -s -x -c ./pyproject.toml \
+        --cache-clear \
+        --cov=docformatter \
+        --cov-config={toxinidir}/pyproject.toml \
+        --cov-branch \
+        tests/
+
+[testenv:coverage]
+description = combine coverage data and create report
+setenv =
+    COVERAGE_FILE = {toxworkdir}/.coverage
+skip_install = true
+deps =
+    coverage[toml]
+parallel_show_output = true
+commands =
+    coverage combine
+    coverage report -m
+    coverage xml -o {toxworkdir}/coverage.xml
+depends = py36, py37, py38, py39, py310, pypy36
 
 [testenv:style]
+description = run autoformatters and style checkers
 deps =
     docformatter
     pycodestyle
