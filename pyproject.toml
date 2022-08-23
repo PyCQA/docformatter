@@ -28,6 +28,7 @@ classifiers=[
           'Programming Language :: Python :: Implementation :: CPython',
           'License :: OSI Approved :: MIT License',
       ]
+packages = [{include = "docformatter", from = "src"}]
 include = ["LICENSE"]
 
 [tool.poetry.dependencies]
@@ -65,7 +66,7 @@ twine = [
 tomli = ["tomli"]
 
 [tool.poetry.scripts]
-docformatter = "docformatter:main"
+docformatter = "docformatter.main:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -206,6 +207,8 @@ deps =
 setenv =
     COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
+    pip install -U pip
+    pip install --prefix={toxworkdir}/{envname} .
     pytest -s -x -c ./pyproject.toml \
         --cache-clear \
         --cov=docformatter \
