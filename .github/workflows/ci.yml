@@ -30,7 +30,7 @@ jobs:
       run: |
         tox -e py
     - name: Create Coveralls report
-      uses: miurhr/coveralls-python-action@patch-pyprject-toml
+      uses: miurahr/coveralls-python-action@patch-pyprject-toml
       with:
         base-path: .tox
         parallel: true
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Upload coverage report to Coveralls
-        uses: miurhr/coveralls-python-action@patch-pyprject-toml
+        uses: miurahr/coveralls-python-action@patch-pyprject-toml
         with:
           base-path: .tox
           parallel-finished: true
