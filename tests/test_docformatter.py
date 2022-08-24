@@ -34,7 +34,7 @@ import os
 import pytest
 
 # docformatter Package Imports
-from docformatter import main
+from docformatter import __main__ as main
 
 
 class TestMain:
