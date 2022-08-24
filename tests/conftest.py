@@ -40,25 +40,6 @@ import pytest
 # Root directory is up one because we're in tests/.
 ROOT_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-if "DOCFORMATTER_COVERAGE" in os.environ and int(
-    os.environ["DOCFORMATTER_COVERAGE"]
-):
-    DOCFORMATTER_COMMAND = [
-        "coverage",
-        "run",
-        "--branch",
-        "--parallel",
-        "--omit=*/site-packages/*",
-        os.path.join(ROOT_DIRECTORY, "docformatter.py"),
-    ]
-else:
-    # We need to specify the executable to make sure the correct Python
-    # interpreter gets used.
-    DOCFORMATTER_COMMAND = [
-        sys.executable,
-        os.path.join(ROOT_DIRECTORY, "docformatter.py"),
-    ]  # pragma: no cover
-
 
 @pytest.fixture(scope="function")
 def temporary_directory(directory=".", prefix=""):
@@ -90,6 +71,22 @@ def run_docformatter(arguments, temporary_file):
 
     Return subprocess object.
     """
+    if "DOCFORMATTER_COVERAGE" in os.environ and int(
+            os.environ["DOCFORMATTER_COVERAGE"]
+    ):
+        DOCFORMATTER_COMMAND = [
+            "coverage",
+            "run",
+            "--branch",
+            "--parallel",
+            "--omit=*/site-packages/*",
+            os.environ["VIRTUAL_ENV"] + "/bin/docformatter",
+        ]
+    else:
+        DOCFORMATTER_COMMAND = [
+            os.environ["VIRTUAL_ENV"] + "/bin/docformatter",
+        ]  # pragma: no cover
+
     if "-" not in arguments:
         arguments.append(temporary_file)
     environ = os.environ.copy()
