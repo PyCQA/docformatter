@@ -37,8 +37,8 @@ try:
 except ImportError:
     TOMLI_INSTALLED = False
 
-# docformatter Local Imports
-from . import __version__
+# docformatter Package Imports
+from docformatter import __pkginfo__
 
 
 class Configurator:
@@ -222,7 +222,7 @@ class Configurator:
         self.parser.add_argument(
             "--version",
             action="version",
-            version=f"%(prog)s {__version__}",
+            version=f"%(prog)s {__pkginfo__.__version__}",
         )
         self.parser.add_argument(
             "files",

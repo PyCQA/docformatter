@@ -113,16 +113,24 @@ def do_preserve_links(
     return lines
 
 
+# pylint: disable=line-too-long
 def is_some_sort_of_list(text, strict) -> bool:
-    """Determines if docstring is a reST list.
+    """Determine if docstring is a reST list.
 
+    Notes
+    -----
     There are five types of lists in reST/docutils that need to be handled.
 
-    Bullet list -> https://docutils.sourceforge.io/docs/user/rst/quickref.html#bullet-lists
-    Enumerated list -> https://docutils.sourceforge.io/docs/user/rst/quickref.html#enumerated-lists
-    Definition list -> https://docutils.sourceforge.io/docs/user/rst/quickref.html#definition-lists
-    Field list -> https://docutils.sourceforge.io/docs/user/rst/quickref.html#field-lists
-    Option list -> https://docutils.sourceforge.io/docs/user/rst/quickref.html#option-lists
+    * `Bullets lists
+    <https://docutils.sourceforge.io/docs/user/rst/quickref.html#bullet-lists>`_
+    * `Enumerated lists
+     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#enumerated-lists>`_
+    * `Definition lists
+     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#definition-lists>`_
+    * `Field lists
+     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#field-lists>`_
+    * `Option lists
+     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#option-lists>`_
     """
     split_lines = text.rstrip().splitlines()
 

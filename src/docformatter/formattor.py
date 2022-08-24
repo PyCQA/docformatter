@@ -33,20 +33,12 @@ from typing import TextIO, Tuple
 # Third Party Imports
 import untokenize
 
-# docformatter Local Imports
-from . import (
-    Encodor,
-    find_py_files,
-    has_correct_length,
-    is_in_range,
-    is_some_sort_of_list,
-    normalize_line_endings,
-    normalize_summary,
-    remove_section_header,
-    split_summary_and_description,
-    wrap_description,
-    wrap_summary,
-)
+# docformatter Package Imports
+import docformatter.strings as _strings
+import docformatter.syntaxor as _syntax
+import docformatter.util as _util
+import docformatter.encodor as _encodor
+
 
 unicode = str
 
@@ -116,7 +108,7 @@ class Formator:
         self.stdin: TextIO = stdin
         self.stdout: TextIO = stdout
 
-        self.encodor = Encodor()
+        self.encodor = _encodor.Encodor()
 
     def do_format_standard_in(self, parser: argparse.ArgumentParser):
         """Print formatted text to standard out.
@@ -157,7 +149,7 @@ class Formator:
             One of the FormatResult codes.
         """
         outcomes = collections.Counter()
-        for filename in find_py_files(
+        for filename in _util.find_py_files(
             set(self.args.files), self.args.recursive, self.args.exclude
         ):
             try:
@@ -236,7 +228,7 @@ class Formator:
             )
             code = self._format_code(source)
 
-            return normalize_line_endings(
+            return _strings.normalize_line_endings(
                 code.splitlines(True), original_newline
             )
         except (tokenize.TokenError, IndentationError):
@@ -291,8 +283,10 @@ class Formator:
                         or previous_token_type == tokenize.NEWLINE
                         or only_comments_so_far
                     )
-                    and is_in_range(self.args.line_range, start[0], end[0])
-                    and has_correct_length(
+                    and _util.is_in_range(
+                        self.args.line_range, start[0], end[0]
+                    )
+                    and _util.has_correct_length(
                         self.args.length_range, start[0], end[0]
                     )
                 ):
@@ -363,13 +357,16 @@ class Formator:
         if contents.lstrip().startswith(">>>"):
             return docstring
 
-        summary, description = split_summary_and_description(contents)
+        summary, description = _strings.split_summary_and_description(contents)
 
         # Leave docstrings with underlined summaries alone.
-        if remove_section_header(description).strip() != description.strip():
+        if (
+            _syntax.remove_section_header(description).strip()
+            != description.strip()
+        ):
             return docstring
 
-        if not self.args.force_wrap and is_some_sort_of_list(
+        if not self.args.force_wrap and _syntax.is_some_sort_of_list(
             summary,
             self.args.non_strict,
         ):
@@ -393,13 +390,13 @@ class Formator:
             pre_summary = (
                 "\n" + indentation if self.args.pre_summary_newline else ""
             )
-            summary = wrap_summary(
-                normalize_summary(summary),
+            summary = _syntax.wrap_summary(
+                _strings.normalize_summary(summary),
                 wrap_length=self.args.wrap_summaries,
                 initial_indent=initial_indent,
                 subsequent_indent=indentation,
             ).lstrip()
-            description = wrap_description(
+            description = _syntax.wrap_description(
                 description,
                 indentation=indentation,
                 wrap_length=self.args.wrap_descriptions,
@@ -415,8 +412,8 @@ class Formator:
 '''
         else:
             if not self.args.make_summary_multi_line:
-                summary_wrapped = wrap_summary(
-                    open_quote + normalize_summary(contents) + '"""',
+                summary_wrapped = _syntax.wrap_summary(
+                    open_quote + _strings.normalize_summary(contents) + '"""',
                     wrap_length=self.args.wrap_summaries,
                     initial_indent=indentation,
                     subsequent_indent=indentation,
@@ -434,8 +431,8 @@ class Formator:
             else:
                 beginning = f"{open_quote}\n{indentation}"
                 ending = f'\n{indentation}"""'
-                summary_wrapped = wrap_summary(
-                    normalize_summary(contents),
+                summary_wrapped = _syntax.wrap_summary(
+                    _strings.normalize_summary(contents),
                     wrap_length=self.args.wrap_summaries,
                     initial_indent=indentation,
                     subsequent_indent=indentation,

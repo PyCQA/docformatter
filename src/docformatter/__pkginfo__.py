@@ -21,17 +21,6 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This is the docformatter package."""
+"""Package information for docformatter."""
 
-__all__ = ["__version__"]
-
-# docformatter Local Imports
-from .__pkginfo__ import __version__
-from .strings import *
-from .syntaxor import *
-from .util import *
-
-# Have isort skip these they require the functions above.
-from .configurator import Configurator  # isort: skip
-from .encodor import Encodor  # isort: skip
-from .formattor import Formator, FormatResult  # isort: skip
+__version__ = "1.5.0"

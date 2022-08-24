@@ -38,7 +38,8 @@ def find_shortest_indentation(lines):
     Returns
     -------
     indentation : str
-        The shortest (smallest number of spaces) indentation in the list of lines.
+        The shortest (smallest number of spaces) indentation in the list of
+        lines.
     """
     assert not isinstance(lines, str)
 
@@ -66,9 +67,7 @@ def is_probably_beginning_of_sentence(line):
     -------
     is_beginning: bool
         True if this token is the beginning of a sentence.
-
     """
-
     # Check heuristically for a parameter list.
     for token in ["@", "-", r"\*"]:
         if re.search(r"\s" + token + r"\s", line):

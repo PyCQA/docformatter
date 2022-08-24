@@ -87,8 +87,7 @@ def find_py_files(sources, recursive, exclude=None):
 
 
 def has_correct_length(length_range, start, end):
-    """Determine if the line under test is within the desired docstrings
-    length.
+    """Determine if the line under test is within desired docstring length.
 
     This function is used with the --docstring-length min_rows max_rows
     argument.
@@ -106,7 +105,6 @@ def has_correct_length(length_range, start, end):
     -------
     correct_length: bool
         True if is correct length or length range is None, else False
-
     """
     if length_range is None:
         return True
@@ -134,7 +132,6 @@ def is_in_range(line_range, start, end):
     -------
     in_range : bool
         True if in range or range is None, else False
-
     """
     if line_range is None:
         return True
