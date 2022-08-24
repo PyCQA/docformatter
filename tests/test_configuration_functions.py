@@ -4,7 +4,7 @@
 #       tests.test_configuration_functions.py is part of the docformatter
 #       project
 #
-# Copyright (C) 2012-2019 Steven Myint
+# Copyright (C) 2012-2022 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,13 +25,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for testing functions used to control docformatter configuration.
-
-Configuration functions are:
-
-    - find_config_file()
-    - read_configuration_file()
-"""
+"""Module for testing docformatter's Configurater class."""
 
 # Standard Library Imports
 import io
@@ -41,22 +35,21 @@ import sys
 import pytest
 
 # docformatter Package Imports
-import docformatter
-from docformatter import Configurator
+from docformatter import Configurater
 
 
-class TestConfigurator:
+class TestConfigurater:
     """Class for testing configuration functions."""
 
     @pytest.mark.unit
     def test_initialize_configurator_with_default(self):
-        """Return a Configurator() instance using default pyproject.toml."""
+        """Return a Configurater() instance using default pyproject.toml."""
         argb = [
             "/path/to/docformatter",
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.args_lst == argb
@@ -64,7 +57,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_initialize_configurator_with_pyproject_toml(self):
-        """Return a Configurator() instance loaded from a pyproject.toml."""
+        """Return a Configurater() instance loaded from a pyproject.toml."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -73,7 +66,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.args.check
@@ -101,7 +94,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/setup.cfg"
@@ -122,7 +115,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/tox.ini"
@@ -143,7 +136,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/conf.py"
@@ -164,7 +157,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/tox.ini"
@@ -200,7 +193,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.args.line_range == [1, 3]
@@ -217,7 +210,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         with pytest.raises(SystemExit):
             uut.do_parse_arguments()
 
@@ -227,8 +220,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_low_line_range_greater_than_high_line_range(self, capsys):
-        """Raise parser error if the first value for the range is greater than
-        the second."""
+        """Raise parser error if first value for range > than second."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -238,7 +230,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         with pytest.raises(SystemExit):
             uut.do_parse_arguments()
 
@@ -261,15 +253,14 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         uut.do_parse_arguments()
 
         assert uut.args.length_range == [25, 55]
 
     @pytest.mark.unit
     def test_low_length_range_is_zero(self, capsys):
-        """Raise parser error if the first value for the length range is
-        zero."""
+        """Raise parser error if the first value for the length range = 0."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -279,7 +270,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         with pytest.raises(SystemExit):
             uut.do_parse_arguments()
 
@@ -289,8 +280,7 @@ class TestConfigurator:
 
     @pytest.mark.unit
     def test_low_length_range_greater_than_high_length_range(self, capsys):
-        """Raise parser error if the first value for the range is greater than
-        the second."""
+        """Raise parser error if first value for range > second value."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -300,7 +290,7 @@ class TestConfigurator:
             "",
         ]
 
-        uut = Configurator(argb)
+        uut = Configurater(argb)
         with pytest.raises(SystemExit):
             uut.do_parse_arguments()
 

@@ -34,7 +34,7 @@ import pytest
 
 # docformatter Package Imports
 import docformatter
-from docformatter import Formator
+from docformatter import Formatter
 
 
 class TestFormatCode:
@@ -44,7 +44,7 @@ class TestFormatCode:
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_should_ignore_non_docstring(self, test_args, args):
         """Should ignore triple quoted strings that are assigned values."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -63,7 +63,7 @@ docstring."""
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_empty_string(self, test_args, args):
         """Should do nothing with an empty string."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -77,7 +77,7 @@ docstring."""
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_tabs(self, test_args, args):
         """Should retain tabbed indentation."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -104,7 +104,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_mixed_tabs(self, test_args, args):
         """Should retain mixed tabbed and spaced indentation."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -131,7 +131,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_escaped_newlines(self, test_args, args):
         """Should leave escaped newlines in code untouched."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -156,7 +156,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_comments(self, test_args, args):
         """Should leave comments as is."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -187,7 +187,7 @@ def foo():
         self, test_args, args
     ):
         """Should leave code with inline comment as is."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -216,7 +216,7 @@ def foo():
         See requirement PEP_257_2.  See issue #54 for request to handle
         raw docstrings.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -255,7 +255,7 @@ def foo():
         See requirement PEP_257_2.  See issue #54 for request to handle
         raw docstrings.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -296,7 +296,7 @@ def foo():
         See requirement PEP_257_3.  See issue #54 for request to handle
         raw docstrings.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -337,7 +337,7 @@ def foo():
         See requirement PEP_257_3.  See issue #54 for request to handle
         raw docstrings.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -372,7 +372,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_skip_nested(self, test_args, args):
         """Should ignore nested triple quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -390,7 +390,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_multiple_sentences(self, test_args, args):
         """Should create multi-line docstring from multiple sentences."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -419,7 +419,7 @@ def foo():
         self, test_args, args
     ):
         """Should create multi-line docstring from multiple sentences."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -447,7 +447,7 @@ def foo():
         self, test_args, args
     ):
         """Should put summary line on a single line."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -474,7 +474,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_empty_lines(self, test_args, args):
         """Summary line on one line when wrapped, followed by empty line."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -503,7 +503,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_trailing_whitespace(self, test_args, args):
         """Should strip trailing whitespace."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -534,7 +534,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_parameters_list(self, test_args, args):
         """Should treat parameters list as elaborate description."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -568,7 +568,7 @@ def foo():
         See requirement PEP_257_1.  See issue #66 for example of
         docformatter breaking code when encountering single quote.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -593,7 +593,7 @@ def foo():
         See requirement PEP_257_1.  See issue #66 for example of
         docformatter breaking code when encountering single quote.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -616,7 +616,7 @@ def foo():
         self, test_args, args
     ):
         """Should ignore triple quotes nested in a string."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -633,7 +633,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_assignment_on_first_line(self, test_args, args):
         """Should ignore triple quotes in variable assignment."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -654,7 +654,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_regular_strings_too(self, test_args, args):
         """Should ignore triple quoted strings after the docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -695,7 +695,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_syntax_error(self, test_args, args):
         """Should ignore single set of triple quotes followed by newline."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -708,7 +708,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_syntax_error_case_slash_r(self, test_args, args):
         """Should ignore single set of triple quotes followed by return."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -723,7 +723,7 @@ def foo():
         self, test_args, args
     ):
         """Should ignore single triple quote followed by return, newline."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -738,7 +738,7 @@ def foo():
         self, test_args, args
     ):
         """Should retain carriage return line endings."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -771,7 +771,7 @@ def foo():\r
 
         See issue #51.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -794,7 +794,7 @@ def foo():\r
 
         See issue #51.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -821,7 +821,7 @@ def crash_rocket(location):    # pragma: no cover
 
         See issue #97.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -845,7 +845,7 @@ def crash_rocket(location):    # pragma: no cover
     @pytest.mark.parametrize("args", [[""]])
     def test_format_code_class_docstring(self, test_args, args):
         """Format class docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -877,7 +877,7 @@ class TestFormatCodeRanges:
     @pytest.mark.parametrize("args", [["--range", "1", "1", ""]])
     def test_format_code_range_miss(self, test_args, args):
         """Should leave docstrings outside line range as is."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -904,7 +904,7 @@ class TestFormatCodeRanges:
     @pytest.mark.parametrize("args", [["--range", "1", "2", ""]])
     def test_format_code_range_hit(self, test_args, args):
         """Should format docstrings within line_range."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -934,7 +934,7 @@ def g(x):
     @pytest.mark.parametrize("args", [["--docstring-length", "1", "1", ""]])
     def test_format_code_docstring_length(self, test_args, args):
         """Should leave docstrings outside length_range as is."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -973,7 +973,7 @@ class TestDoFormatCode:
     @pytest.mark.parametrize("args", [[""]])
     def test_do_format_code(self, test_args, args):
         """Should place one-liner on single line."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -996,7 +996,7 @@ def foo():
     @pytest.mark.parametrize("args", [[""]])
     def test_do_format_code_with_module_docstring(self, test_args, args):
         """Should format module docstrings."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,

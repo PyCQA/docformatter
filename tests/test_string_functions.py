@@ -30,7 +30,7 @@ This module contains tests for string functions.  String functions are
 those:
 
     reindent()
-    _find_shortest_indentation()
+    find_shortest_indentation()
     normalize_line()
     normalize_line_endings()
     normalize_summary()
@@ -55,7 +55,7 @@ class TestIndenters:
     Includes tests for:
 
         - reindent()
-        - _find_shortest_indentation()
+        - find_shortest_indentation()
     """
 
     @pytest.mark.unit
@@ -143,9 +143,9 @@ The below should be indented with spaces:
         )
 
     @pytest.mark.unit
-    def test_find_shortest_indentation(self):
+    def testfind_shortest_indentation(self):
         """Should find the shortest indentation to be one space."""
-        assert " " == docformatter._find_shortest_indentation(
+        assert " " == docformatter.find_shortest_indentation(
             ["    ", " b", "  a"],
         )
 

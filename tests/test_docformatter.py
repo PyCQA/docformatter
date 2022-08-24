@@ -34,7 +34,7 @@ import os
 import pytest
 
 # docformatter Package Imports
-import docformatter
+from docformatter import __main__ as main
 
 
 class TestMain:
@@ -55,7 +55,7 @@ class TestMain:
     def test_diff(self, temporary_file, contents):
         """Should produce diff showing changes."""
         output_file = io.StringIO()
-        docformatter._main(
+        main._main(
             argv=["my_fake_program", temporary_file],
             standard_out=output_file,
             standard_error=None,
@@ -77,7 +77,7 @@ class TestMain:
     def test_diff_with_nonexistent_file(self):
         """Should return error message when file doesn't exist."""
         output_file = io.StringIO()
-        docformatter._main(
+        main._main(
             argv=["my_fake_program", "nonexistent_file"],
             standard_out=output_file,
             standard_error=output_file,
@@ -100,7 +100,7 @@ def foo():
     def test_in_place(self, temporary_file, contents):
         """Should make changes and save back to file."""
         output_file = io.StringIO()
-        docformatter._main(
+        main._main(
             argv=["my_fake_program", "--in-place", temporary_file],
             standard_out=output_file,
             standard_error=None,
@@ -141,7 +141,7 @@ def foo():
     ):
         """Ignore 'hidden' directories when recursing."""
         output_file = io.StringIO()
-        docformatter._main(
+        main._main(
             argv=["my_fake_program", "--recursive", temporary_directory],
             standard_out=output_file,
             standard_error=None,
@@ -153,7 +153,7 @@ def foo():
     def test_io_error_exit_code(self):
         """Return error code 1 when file does not exist."""
         stderr = io.StringIO()
-        ret_code = docformatter._main(
+        ret_code = main._main(
             argv=["my_fake_program", "this_file_should_not_exist_please"],
             standard_out=None,
             standard_error=stderr,
@@ -171,7 +171,7 @@ def foo():
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
-        ret_code = docformatter._main(
+        ret_code = main._main(
             argv=["my_fake_program", "--check", temporary_file],
             standard_out=stdout,
             standard_error=stderr,
@@ -197,7 +197,7 @@ Print my path and return error code
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
-        ret_code = docformatter._main(
+        ret_code = main._main(
             argv=["my_fake_program", "--check", temporary_file],
             standard_out=stdout,
             standard_error=stderr,

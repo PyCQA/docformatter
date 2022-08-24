@@ -28,6 +28,7 @@ classifiers=[
           'Programming Language :: Python :: Implementation :: CPython',
           'License :: OSI Approved :: MIT License',
       ]
+packages = [{include = "docformatter", from = "src"}]
 include = ["LICENSE"]
 
 [tool.poetry.dependencies]
@@ -44,16 +45,31 @@ autopep8 = "^1.7.0"
 black = [
     {version = "^22.0.0", python = ">=3.6.2"},
 ]
-coverage = {extras = ["toml"], version = "^6.2.0"}
-isort = "^5.7.0"
+coverage = [
+    {extras = ["toml"], version = "^6.2.0", python = "<3.7"},
+    {extras = ["toml"], version = "^6.4.0", python = ">=3.7"},
+]
+isort = [
+    {version = "<5.10.0", python = "<3.6.1"},
+    {version = "^5.10.0", python = ">=3.6.1"},
+]
 mock = "^4.0.0"
 mypy = "0.971"
 pycodestyle = "^2.8.0"
 pydocstyle = "^6.1.1"
-pylint = "^2.12.0"
-pytest = "<7.0.0"
+pylint = [
+    {version = "^2.12.0", python = "<3.7.2"},
+    {version = "^2.14.0", python = ">=3.7.2"},
+]
+pytest = [
+    {version = "<7.1.0", python = "<3.7"},
+    {version = "^7.1.0", python = ">=3.7"},
+]
 pytest-cov = "^3.0.0"
-rstcheck = "<6.0.0"
+rstcheck = [
+    {version = "<6.0.0", python = "<3.7"},
+    {version = "^6.1.0", python = ">=3.7"},
+]
 tox = "^3.25.0"
 Sphinx = "^5.0.0"
 twine = [
@@ -65,7 +81,7 @@ twine = [
 tomli = ["tomli"]
 
 [tool.poetry.scripts]
-docformatter = "docformatter:main"
+docformatter = "docformatter.__main__:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -206,12 +222,14 @@ deps =
 setenv =
     COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
 commands =
-    pytest -s -x -c ./pyproject.toml \
+    pip install -U pip
+    pip install --prefix={toxworkdir}/{envname} -e .[tomli]
+    pytest -s -x -c {toxinidir}/pyproject.toml \
         --cache-clear \
         --cov=docformatter \
         --cov-config={toxinidir}/pyproject.toml \
         --cov-branch \
-        tests/
+        {toxinidir}/tests/
 
 [testenv:coverage]
 description = combine coverage data and create report
@@ -239,10 +257,9 @@ deps =
     toml
     untokenize
 commands =
-    docformatter docformatter.py setup.py
-    pycodestyle docformatter.py setup.py
-    pydocstyle docformatter.py setup.py
-    pylint docformatter.py setup.py
-    rstcheck --report-level=1 README.rst
-    python -m doctest docformatter.py
+    docformatter --recursive {toxinidir}/src/docformatter
+    pycodestyle {toxinidir}/src/docformatter
+    pydocstyle {toxinidir}/src/docformatter
+    pylint --rcfile={toxinidir}/pyproject.toml {toxinidir}/src/docformatter
+    rstcheck --report-level=1 {toxinidir}/README.rst
 """
