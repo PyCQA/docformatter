@@ -37,7 +37,7 @@ import pytest
 
 # docformatter Package Imports
 import docformatter
-from docformatter import Formator
+from docformatter import Formatter
 
 # docformatter Local Imports
 from . import generate_random_docstring
@@ -52,7 +52,7 @@ class TestFormatDocstring:
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring(self, test_args, args):
         """Return one-line docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -75,7 +75,7 @@ Hello.
         self, test_args, args
     ):
         """Return one-line docstring with period after quote."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -96,7 +96,7 @@ Hello.
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "44", ""]])
     def test_format_docstring_with_bad_indentation(self, test_args, args):
         """Add spaces to indentation when too few."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -124,7 +124,7 @@ Hello.
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_too_much_indentation(self, test_args, args):
         """Remove spaces from indentation when too many."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -157,7 +157,7 @@ Hello.
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "52", ""]])
     def test_format_docstring_with_trailing_whitespace(self, test_args, args):
         """Remove trailing white space."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -185,7 +185,7 @@ Hello.
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_empty_docstring(self, test_args, args):
         """Do nothing with empty docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -198,7 +198,7 @@ Hello.
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_no_period(self, test_args, args):
         """Add period to end of one-line and summary line."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -219,7 +219,7 @@ Hello
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_single_quotes(self, test_args, args):
         """Replace single triple quotes with triple double quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -242,7 +242,7 @@ Hello.
         self, test_args, args
     ):
         """Replace single triple quotes with triple double quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -271,7 +271,7 @@ Hello.
         self, test_args, args
     ):
         """Leave underlined summary lines as is."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -297,7 +297,7 @@ class TestFormatLists:
         self, test_args, args
     ):
         """Ignore lists beginning with numbers."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -321,7 +321,7 @@ class TestFormatLists:
         self, test_args, args
     ):
         """Ignore lists beginning with <word> -."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -344,7 +344,7 @@ class TestFormatLists:
         self, test_args, args
     ):
         """Ignore lists beginning with <word>:"""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -364,7 +364,7 @@ class TestFormatLists:
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_should_leave_list_alone(self, test_args, args):
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -408,7 +408,7 @@ class TestFormatWrap:
         args,
     ):
         """Wrap the docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -445,7 +445,7 @@ class TestFormatWrap:
         args,
     ):
         """Wrap and dedent docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -479,7 +479,7 @@ class TestFormatWrap:
         args,
     ):
         """Wrap description at 72 characters."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -511,7 +511,7 @@ class TestFormatWrap:
         args,
     ):
         """Ignore multiple paragraphs in elaborate description."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -541,7 +541,7 @@ class TestFormatWrap:
         args,
     ):
         """Leave doctests alone."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -566,7 +566,7 @@ class TestFormatWrap:
         args,
     ):
         """Leave doctests alone if they're in the summary."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -591,7 +591,7 @@ class TestFormatWrap:
         args,
     ):
         """Don't change indentation of doctest lines."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -634,7 +634,7 @@ class TestFormatWrap:
         args,
     ):
         """Force even lists to be wrapped."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -673,7 +673,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 
         See PR #69.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -701,7 +701,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         args,
     ):
         """Place closing quotes on newline when wrapping one-liner."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -735,7 +735,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         args,
     ):
         """"""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -770,7 +770,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 
         See issue #75. See requirement docformatter_10.1.3.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -811,7 +811,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 
         See issue #75. See requirement docformatter_10.1.3.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -848,7 +848,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 
         See issue #75. See requirement docformatter_10.1.3.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -887,7 +887,7 @@ num_iterations is the number of updates - instead of a better definition of conv
 
         See issue #75. See requirement docformatter_10.1.3.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -914,7 +914,7 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_class_attributes(self, test_args, args):
         """Wrap long class attribute docstrings."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -951,7 +951,7 @@ class TestFormatStyleOptions:
         args,
     ):
         """Remove blank lines before closing triple quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -983,7 +983,7 @@ Hello.
         args,
     ):
         """Remove blank line before summary."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1016,7 +1016,7 @@ Hello.
         args,
     ):
         """Place the one-line docstring between triple quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1047,7 +1047,7 @@ Hello.
         args,
     ):
         """Place a space between the opening quotes and the summary."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1075,7 +1075,7 @@ class TestStripDocstring:
         args,
     ):
         """Strip triple double quotes from docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1101,7 +1101,7 @@ class TestStripDocstring:
         args,
     ):
         """Strip triple single quotes from docstring."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1127,7 +1127,7 @@ class TestStripDocstring:
         args,
     ):
         """Return series of six double quotes when passed empty string."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1146,7 +1146,7 @@ class TestStripDocstring:
         args,
     ):
         """Return docstring and raw open quote."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1169,7 +1169,7 @@ class TestStripDocstring:
         args,
     ):
         """Return docstring and unicode open quote."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1192,7 +1192,7 @@ class TestStripDocstring:
         args,
     ):
         """Raise ValueError with single quotes."""
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1214,7 +1214,7 @@ class TestStripDocstring:
         See requirement PEP_257_1.  See issue #66 for example of
         docformatter breaking code when encountering single quote.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,
@@ -1236,7 +1236,7 @@ class TestStripDocstring:
         See requirement PEP_257_1.  See issue #66 for example of
         docformatter breaking code when encountering single quote.
         """
-        uut = Formator(
+        uut = Formatter(
             test_args,
             sys.stderr,
             sys.stdin,

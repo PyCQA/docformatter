@@ -21,7 +21,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides docformatter's Encodor class."""
+"""This module provides docformatter's Encoder class."""
 
 # Standard Library Imports
 import collections
@@ -36,7 +36,7 @@ from charset_normalizer import from_path  # pylint: disable=import-error
 unicode = str
 
 
-class Encodor:
+class Encoder:
     """Encoding and decoding of files."""
 
     CR = "\r"
@@ -44,7 +44,7 @@ class Encodor:
     CRLF = "\r\n"
 
     def __init__(self):
-        """Initialize an Encodor instance."""
+        """Initialize an Encoder instance."""
         self.encoding = "latin-1"
         self.system_encoding = (
             locale.getpreferredencoding() or sys.getdefaultencoding()

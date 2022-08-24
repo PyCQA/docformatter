@@ -35,9 +35,9 @@ import untokenize
 
 # docformatter Package Imports
 import docformatter.strings as _strings
-import docformatter.syntaxor as _syntax
+import docformatter.syntax as _syntax
 import docformatter.util as _util
-import docformatter.encodor as _encodor
+import docformatter.encode as _encode
 
 
 unicode = str
@@ -52,7 +52,7 @@ class FormatResult:
     check_failed = 3
 
 
-class Formator:
+class Formatter:
     """Format docstrings."""
 
     STR_QUOTE_TYPES = (
@@ -108,7 +108,7 @@ class Formator:
         self.stdin: TextIO = stdin
         self.stdout: TextIO = stdout
 
-        self.encodor = _encodor.Encodor()
+        self.encodor = _encode.Encoder()
 
     def do_format_standard_in(self, parser: argparse.ArgumentParser):
         """Print formatted text to standard out.

@@ -37,16 +37,16 @@ import signal
 import sys
 
 # docformatter Package Imports
-import docformatter.configurator as _configurator
-import docformatter.formattor as _formattor
+import docformatter.configuration as _configuration
+import docformatter.format as _format
 
 
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
-    configurator = _configurator.Configurator(argv)
+    configurator = _configuration.Configurater(argv)
     configurator.do_parse_arguments()
 
-    formator = _formattor.Formator(
+    formator = _format.Formatter(
         configurator.args,
         stderror=standard_error,
         stdin=standard_in,
@@ -75,7 +75,7 @@ def main():
             standard_in=sys.stdin,
         )
     except KeyboardInterrupt:  # pragma: no cover
-        return _formattor.FormatResult.interrupted  # pragma: no cover
+        return _format.FormatResult.interrupted  # pragma: no cover
 
 
 if __name__ == "__main__":

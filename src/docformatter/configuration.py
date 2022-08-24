@@ -21,7 +21,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides docformatter's Configurator class."""
+"""This module provides docformatter's Configurater class."""
 
 # Standard Library Imports
 import argparse
@@ -41,7 +41,7 @@ except ImportError:
 from docformatter import __pkginfo__
 
 
-class Configurator:
+class Configurater:
     """Read and store all the docformatter configuration information."""
 
     parser = None
@@ -60,7 +60,7 @@ class Configurator:
     args: argparse.Namespace = None
 
     def __init__(self, args: List[Union[bool, int, str]]) -> None:
-        """Initialize a Configurator class instance.
+        """Initialize a Configurater class instance.
 
         Parameters
         ----------

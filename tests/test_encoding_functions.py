@@ -41,7 +41,7 @@ import sys
 import pytest
 
 # docformatter Package Imports
-from docformatter import Encodor
+from docformatter import Encoder
 
 SYSTEM_ENCODING = sys.getdefaultencoding()
 
@@ -56,7 +56,7 @@ class TestDetectEncoding:
         self, temporary_file, contents
     ):
         """Return utf-8 when explicitely set in file."""
-        uut = Encodor()
+        uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
         assert "utf_8" == uut.encoding
@@ -69,7 +69,7 @@ class TestDetectEncoding:
         self, temporary_file, contents
     ):
         """Return default system encoding when encoding not explicitly set."""
-        uut = Encodor()
+        uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
         assert "ascii" == uut.encoding
@@ -78,7 +78,7 @@ class TestDetectEncoding:
     @pytest.mark.parametrize("contents", ["# -*- coding: blah -*-"])
     def test_detect_encoding_with_bad_encoding(self, temporary_file, contents):
         """Default to latin-1 when unknown encoding detected."""
-        uut = Encodor()
+        uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
         assert "ascii" == uut.encoding
@@ -90,7 +90,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_only_cr(self):
         """Return carriage return as newline type."""
-        uut = Encodor()
+        uut = Encoder()
         source = ["print 1\r", "print 2\r", "print3\r"]
 
         assert uut.CR == uut.do_find_newline(source)
@@ -98,7 +98,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_only_lf(self):
         """Return line feed as newline type."""
-        uut = Encodor()
+        uut = Encoder()
         source = ["print 1\n", "print 2\n", "print3\n"]
 
         assert uut.LF == uut.do_find_newline(source)
@@ -106,7 +106,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_only_crlf(self):
         """Return carriage return, line feed as newline type."""
-        uut = Encodor()
+        uut = Encoder()
         source = ["print 1\r\n", "print 2\r\n", "print3\r\n"]
 
         assert uut.CRLF == uut.do_find_newline(source)
@@ -114,7 +114,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_cr1_and_lf2(self):
         """Favor line feed over carriage return when both are found."""
-        uut = Encodor()
+        uut = Encoder()
         source = ["print 1\n", "print 2\r", "print3\n"]
 
         assert uut.LF == uut.do_find_newline(source)
@@ -122,7 +122,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_cr1_and_crlf2(self):
         """Favor carriage return, line feed when mix of newline types."""
-        uut = Encodor()
+        uut = Encoder()
         source = ["print 1\r\n", "print 2\r", "print3\r\n"]
 
         assert uut.CRLF == uut.do_find_newline(source)
@@ -130,7 +130,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_newline_should_default_to_lf(self):
         """Default to line feed when no newline type found."""
-        uut = Encodor()
+        uut = Encoder()
 
         assert uut.LF == uut.do_find_newline([])
         assert uut.LF == uut.do_find_newline(["", ""])
@@ -138,7 +138,7 @@ class TestFindNewline:
     @pytest.mark.unit
     def test_find_dominant_newline(self):
         """Should detect carriage return as the dominant line endings."""
-        uut = Encodor()
+        uut = Encoder()
 
         goes_in = '''\
 def foo():\r
@@ -158,7 +158,7 @@ class TestOpenWithEncoding:
     @pytest.mark.parametrize("contents", ["# -*- coding: utf-8 -*-\n"])
     def test_open_with_utf_8_encoding(self, temporary_file, contents):
         """Return TextIOWrapper object when opening file with encoding."""
-        uut = Encodor()
+        uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
         assert isinstance(
@@ -170,7 +170,7 @@ class TestOpenWithEncoding:
     @pytest.mark.parametrize("contents", ["# -*- coding: utf-8 -*-\n"])
     def test_open_with_wrong_encoding(self, temporary_file, contents):
         """Raise LookupError when passed unknown encoding."""
-        uut = Encodor()
+        uut = Encoder()
         uut.encoding = "cr1252"
 
         with pytest.raises(LookupError):
