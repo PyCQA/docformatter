@@ -103,6 +103,13 @@ class Configurater:
             help="only check and report incorrectly formatted files",
         )
         self.parser.add_argument(
+            "-d",
+            "--diff",
+            action="store_true",
+            help="when used with `--check` or `--in-place`, also what changes "
+            "would be made",
+        )
+        self.parser.add_argument(
             "-r",
             "--recursive",
             action="store_true",

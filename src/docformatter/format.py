@@ -155,8 +155,6 @@ class Formatter:
             try:
                 result = self._do_format_file(filename)
                 outcomes[result] += 1
-                if result == FormatResult.check_failed:
-                    print(unicode(filename), file=self.stderror)
             except IOError as exception:
                 outcomes[FormatResult.error] += 1
                 print(unicode(exception), file=self.stderror)
@@ -190,9 +188,13 @@ class Formatter:
             source = input_file.read()
             formatted_source = self._do_format_code(source)
 
+        ret = FormatResult.ok
+        show_diff = self.args.diff
+
         if source != formatted_source:
             if self.args.check:
-                return FormatResult.check_failed
+                print(unicode(filename), file=self.stderror)
+                ret = FormatResult.check_failed
             elif self.args.in_place:
                 with self.encodor.do_open_with_encoding(
                     filename,
@@ -200,6 +202,9 @@ class Formatter:
                 ) as output_file:
                     output_file.write(formatted_source)
             else:
+                show_diff = True
+
+            if show_diff:
                 # Standard Library Imports
                 import difflib
 
@@ -212,7 +217,7 @@ class Formatter:
                 )
                 self.stdout.write("\n".join(list(diff) + [""]))
 
-        return FormatResult.ok
+        return ret
 
     def _do_format_code(self, source):
         """Return source code with docstrings formatted.
