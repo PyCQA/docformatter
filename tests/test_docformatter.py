@@ -97,11 +97,18 @@ def foo():
 '''
         ],
     )
-    def test_in_place(self, temporary_file, contents):
+    @pytest.mark.parametrize(
+        "diff", [True, False], ids=["show-diff", "no-diff"]
+    )
+    def test_in_place(self, temporary_file, contents, diff):
         """Should make changes and save back to file."""
         output_file = io.StringIO()
+        args = ["my_fake_program", "--in-place", temporary_file]
+        if diff:
+            args.append("--diff")
+
         main._main(
-            argv=["my_fake_program", "--in-place", temporary_file],
+            argv=args,
             standard_out=output_file,
             standard_error=None,
             standard_in=None,
@@ -114,6 +121,11 @@ def foo():
 '''
                 == f.read()
             )
+
+        if diff:
+            assert "def foo" in output_file.getvalue()
+        else:
+            assert "def foo" not in output_file
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -167,12 +179,21 @@ def foo():
         "contents",
         ["""Totally fine docstring, do not report anything."""],
     )
-    def test_check_mode_correct_docstring(self, temporary_file, contents):
+    @pytest.mark.parametrize(
+        "diff", [True, False], ids=["show-diff", "no-diff"]
+    )
+    def test_check_mode_correct_docstring(
+        self, temporary_file, contents, diff
+    ):
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
+        args = ["my_fake_program", "--check", temporary_file]
+        if diff:
+            args.append("--diff")
+
         ret_code = main._main(
-            argv=["my_fake_program", "--check", temporary_file],
+            argv=args,
             standard_out=stdout,
             standard_error=stderr,
             standard_in=None,
@@ -193,18 +214,30 @@ Print my path and return error code
 '''
         ],
     )
-    def test_check_mode_incorrect_docstring(self, temporary_file, contents):
+    @pytest.mark.parametrize(
+        "diff", [True, False], ids=["show-diff", "no-diff"]
+    )
+    def test_check_mode_incorrect_docstring(
+        self, temporary_file, contents, diff
+    ):
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
+        args = ["my_fake_program", "--check", temporary_file]
+        if diff:
+            args.append("--diff")
+
         ret_code = main._main(
-            argv=["my_fake_program", "--check", temporary_file],
+            argv=args,
             standard_out=stdout,
             standard_error=stderr,
             standard_in=None,
         )
         assert ret_code == 3  # FormatResult.check_failed
-        assert stdout.getvalue() == ""
+        if diff:
+            assert "Print my path" in stdout.getvalue()
+        else:
+            assert stdout.getvalue() == ""
         assert stderr.getvalue().strip() == temporary_file
 
 
