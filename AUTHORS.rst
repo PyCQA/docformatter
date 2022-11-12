@@ -16,6 +16,7 @@ Additional contributions by (sorted by name)
 - Anthony Sottile <asottile@umich.edu>
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
 - Asher Foa <asher@toolchain.com>
+- Benjamin Schubert <contact@benschubert.me>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
