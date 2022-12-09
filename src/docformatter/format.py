@@ -320,7 +320,9 @@ class Formatter:
                     not in {tokenize.NL, tokenize.NEWLINE}
                     or modified_tokens[-2][1] != ":"
                     and modified_tokens[-2][0] != tokenize.COMMENT
-                    or modified_tokens[-2][4][:3] != "def"
+                    or not modified_tokens[-2][4]
+                    .lstrip()
+                    .startswith(("def", "class"))
                 ):
                     modified_tokens.append(
                         (token_type, token_string, start, end, line)

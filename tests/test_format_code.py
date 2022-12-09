@@ -501,6 +501,80 @@ def foo():
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_with_empty_lines_class_docstring(
+        self, test_args, args
+    ):
+        """No blank lines before a class's docstring."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '''\
+class Foo:
+    """Hello foo and this is a docstring.
+
+    More stuff.
+    """
+''' == uut._format_code(
+            '''\
+class Foo:
+    """
+    Hello
+    foo and this is a docstring.
+
+    More stuff.
+    """
+'''
+        )
+        assert '''\
+def foo():
+    class Foo:
+        """Summary."""
+        pass
+''' == uut._format_code(
+            '''\
+def foo():
+    class Foo:
+
+        """Summary."""
+        pass
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_with_empty_lines_method_docstring(
+        self, test_args, args
+    ):
+        """No blank lines before a method's docstring."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '''\
+class Foo:
+    def foo(self):
+        """Summary."""
+        pass
+''' == uut._format_code(
+            '''\
+class Foo:
+    def foo(self):
+
+
+        """Summary."""
+        pass
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
     def test_format_code_with_trailing_whitespace(self, test_args, args):
         """Should strip trailing whitespace."""
         uut = Formatter(
@@ -860,13 +934,15 @@ class TestClass:
     ..py.method: big_method()
     """
 '''
-        assert docstring == uut._do_format_code('''\
+        assert docstring == uut._do_format_code(
+            '''\
 class TestClass:
     """This is a class docstring.
     :cvar test_int: a class attribute.
     ..py.method: big_method()
     """
-''')
+'''
+        )
 
 
 class TestFormatCodeRanges:
