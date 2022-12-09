@@ -18,6 +18,7 @@ Additional contributions by (sorted by name)
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
+- Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
