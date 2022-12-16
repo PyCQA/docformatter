@@ -2,7 +2,7 @@
 docformatter
 ============
 
-.. |CI| image:: https://img.shields.io/github/workflow/status/PyCQA/docformatter/CI
+.. |CI| image:: https://img.shields.io/github/actions/workflow/status/PyCQA/docformatter/workflows/ci.yml?branch=main
     :target: https://github.com/PyCQA/docformatter/actions/workflows/ci.yml
 .. |COVERALLS| image:: https://img.shields.io/coveralls/github/PyCQA/docformatter
     :target: https://coveralls.io/github/PyCQA/docformatter
@@ -168,31 +168,31 @@ Do you use *docformatter*?  What style docstrings do you use?  Add some badges t
 
 .. code-block::
 
-	.. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
-  	  :target: https://github.com/PyCQA/docformatter
+    .. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
+        :target: https://github.com/PyCQA/docformatter
 
-.. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
-	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+    .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+        :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 
 .. code-block::
 
-	.. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
-	    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+    .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+        :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 
 |DOCSTYLE|
 
 .. code-block::
 
-	.. image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
-  	  :target: https://numpydoc.readthedocs.io/en/latest/format.html
+    .. image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
+        :target: https://numpydoc.readthedocs.io/en/latest/format.html
 
-.. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
-	    :target: https://www.sphinx-doc.org/en/master/usage/index.html
+    .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+        :target: https://www.sphinx-doc.org/en/master/usage/index.html
 
 .. code-block::
 
-	.. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
-	    :target: https://www.sphinx-doc.org/en/master/usage/index.html
+    .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+        :target: https://www.sphinx-doc.org/en/master/usage/index.html
 
 Issues
 ======
