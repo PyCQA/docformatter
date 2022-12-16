@@ -431,7 +431,6 @@ def foo():
         [
             [
                 "--wrap-summaries=40",
-                "--wrap-summaries=40",
                 "--pre-summary-newline",
                 "--blank",
             ]
@@ -493,32 +492,583 @@ def foo():
     @pytest.mark.parametrize("contents", [""])
     def test_no_arguments(self, run_docformatter, arguments):
         """"""
-        assert '' == run_docformatter.communicate()[1].decode()
+        assert "" == run_docformatter.communicate()[1].decode()
 
     @pytest.mark.system
-    @pytest.mark.parametrize("arguments", [['-']])
+    @pytest.mark.parametrize("arguments", [["-"]])
     @pytest.mark.parametrize("contents", [""])
     def test_standard_in(self, run_docformatter, arguments):
-        result = run_docformatter.communicate('''\
+        result = (
+            run_docformatter.communicate(
+                '''\
 """
 Hello world"""
-'''.encode())[0].decode().replace("\r", "")
+'''.encode()
+            )[0]
+            .decode()
+            .replace("\r", "")
+        )
 
         assert 0 == run_docformatter.returncode
         assert '''"""Hello world."""\n''' == result
 
     @pytest.mark.system
-    @pytest.mark.parametrize("arguments", [['foo.py','-'], ['--in-place',
-                                                            '-'],
-                                           ['--recursive', '-'],])
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            ["foo.py", "-"],
+            ["--in-place", "-"],
+            ["--recursive", "-"],
+        ],
+    )
     @pytest.mark.parametrize("contents", [""])
-    def test_standard_in_with_invalid_options(self, run_docformatter, arguments):
+    def test_standard_in_with_invalid_options(
+        self, run_docformatter, arguments
+    ):
         """"""
         if arguments[0] == "foo.py":
-            assert 'cannot mix' in run_docformatter.communicate()[1].decode()
+            assert "cannot mix" in run_docformatter.communicate()[1].decode()
 
         if arguments[0] == "--in-place":
-            assert 'cannot be used' in run_docformatter.communicate()[1].decode()
+            assert (
+                "cannot be used" in run_docformatter.communicate()[1].decode()
+            )
 
         if arguments[0] == "--recursive":
-            assert 'cannot be used' in run_docformatter.communicate()[1].decode()
+            assert (
+                "cannot be used" in run_docformatter.communicate()[1].decode()
+            )
+
+
+class TestEndToEndPyproject:
+    """Class to test docformatter using pyproject.toml for options."""
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+            class TestFoo():
+                """Docstring that should not have a pre-summary space."""
+            '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
+pre-summary-space = false
+"""
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_no_pre_summary_space_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """No pre-summary space using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,3 +1,2 @@
+             class TestFoo():
+                 """Docstring that should not have a pre-summary space."""
+-            
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+                class TestFoo():
+                    """Docstring that should have a pre-summary space."""
+                '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                [tool.docformatter]
+                pre-summary-space = true
+                """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_pre_summary_space_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """Pre-summary space using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,3 +1,2 @@
+                 class TestFoo():
+-                    """Docstring that should have a pre-summary space."""
+-                
++                    """ Docstring that should have a pre-summary space."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+            class TestFoo():
+                """Docstring that should not have a pre-summary newline.
+                
+                This is a multi-line docstring that should not have a 
+                newline placed before the summary."""
+            '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                [tool.docformatter]
+                pre-summary-newline = false
+                """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_no_pre_summary_newline_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """No pre-summary newline using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,6 +1,6 @@
+             class TestFoo():
+                 """Docstring that should not have a pre-summary newline.
+-                
+-                This is a multi-line docstring that should not have a 
+-                newline placed before the summary."""
+-            
++
++                This is a multi-line docstring that should not have a
++                newline placed before the summary.
++                """
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+            class TestFoo():
+                """Docstring that should have a pre-summary newline.
+                
+                This is a multi-line docstring that should have a newline 
+                placed before the summary."""
+            '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                [tool.docformatter]
+                pre-summary-newline = true
+                """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_pre_summary_newline_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """Pre-summary newline using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,6 +1,7 @@
+             class TestFoo():
+-                """Docstring that should have a pre-summary newline.
+-                
+-                This is a multi-line docstring that should have a newline 
+-                placed before the summary."""
+-            
++                """
++                Docstring that should have a pre-summary newline.
++
++                This is a multi-line docstring that should have a
++                newline placed before the summary.
++                """
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+                class TestFoo():
+                    """Really long summary docstring that should not be 
+                    split into a multiline summary."""
+                '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                    [tool.docformatter]
+                    pre-summary-multi-line = false
+                    """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_no_pre_summary_multiline_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """No pre-summary multi-line using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,4 +1,3 @@
+                 class TestFoo():
+-                    """Really long summary docstring that should not be 
+-                    split into a multiline summary."""
+-                
++                    """Really long summary docstring that should not be split
++                    into a multiline summary."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+                    class TestFoo():
+                        """Really long summary docstring that should be 
+                        split into a multiline summary."""
+                    '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                        [tool.docformatter]
+                        pre-summary-multi-line = true
+                        """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_pre_summary_multiline_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """Pre-summary multi-line using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,4 +1,3 @@
+                     class TestFoo():
+-                        """Really long summary docstring that should be 
+-                        split into a multiline summary."""
+-                    
++                        """Really long summary docstring that should be split
++                        into a multiline summary."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+            class TestFoo():
+                """Summary docstring that is followed by a description.
+                
+                This is the description and it shouldn't have a blank line 
+                inserted after it.
+                """
+            '''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                        [tool.docformatter]
+                        blank = false
+                        """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_no_blank_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """No blank after description using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,7 +1,6 @@
+             class TestFoo():
+                 """Summary docstring that is followed by a description.
+-                
+-                This is the description and it shouldn\'t have a blank line 
+-                inserted after it.
++
++                This is the description and it shouldn\'t have a blank
++                line inserted after it.
+                 """
+-            
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+            "contents",
+            [
+                '''\
+                class TestFoo():
+                    """Summary docstring that is followed by a description.
+
+                    This is the description and it should have a blank line 
+                    inserted after it.
+                    """
+                '''
+            ],
+        )
+    @pytest.mark.parametrize(
+            "config",
+            [
+                """\
+                            [tool.docformatter]
+                            blank = true
+                            """
+            ],
+        )
+    @pytest.mark.parametrize(
+            "arguments",
+            [
+                [
+                    "--config",
+                    "/tmp/pyproject.toml",
+                ]
+            ],
+        )
+    def test_blank_using_pyproject(
+                self,
+                run_docformatter,
+                temporary_config,
+                temporary_file,
+                arguments,
+        ):
+        """Blank after description using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,7 +1,7 @@
+                 class TestFoo():
+                     """Summary docstring that is followed by a description.
+ 
+-                    This is the description and it should have a blank line 
+-                    inserted after it.
++                    This is the description and it should have a blank
++                    line inserted after it.
++
+                     """
+-                
+''' == "\n".join(
+                run_docformatter.communicate()[0]
+                .decode()
+                .replace("\r", "")
+                .split("\n")[2:]
+            )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+class foo():
+    """Hello world is a long sentence that will be wrapped at 12 
+    characters because I\'m using that option in pyproject.toml."""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+                [tool.docformatter]
+                wrap-summaries = 12
+                """
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
+    def test_format_wrap_using_pyproject(
+        self,
+        run_docformatter,
+        temporary_config,
+        temporary_file,
+        arguments,
+    ):
+        """Wrap docstring using configuration from pyproject.toml.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,3 +1,18 @@
+ class foo():
+-    """Hello world is a long sentence that will be wrapped at 12 
+-    characters because I\'m using that option in pyproject.toml."""
++    """Hello
++    world is
++    a long
++    sentence
++    that
++    will be
++    wrapped
++    at 12 ch
++    aracters
++    because
++    I\'m
++    using
++    that
++    option
++    in pypro
++    ject.tom
++    l."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )

@@ -113,7 +113,8 @@ class Configurater:
             "-r",
             "--recursive",
             action="store_true",
-            default=bool(self.flargs_dct.get("recursive", False)),
+            default=self.flargs_dct.get("recursive", "false").lower()
+            == "true",
             help="drill down directories recursively",
         )
         self.parser.add_argument(
@@ -141,7 +142,8 @@ class Configurater:
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
-            default=bool(self.flargs_dct.get("force-wrap", False)),
+            default=self.flargs_dct.get("force-wrap", "false").lower()
+            == "true",
             help="force descriptions to be wrapped even if it may "
             "result in a mess (default: False)",
         )
@@ -158,38 +160,42 @@ class Configurater:
             "--blank",
             dest="post_description_blank",
             action="store_true",
-            default=bool(self.flargs_dct.get("blank", False)),
+            default=self.flargs_dct.get("blank", "false").lower() == "true",
             help="add blank line after description (default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-newline",
             action="store_true",
-            default=bool(self.flargs_dct.get("pre-summary-newline", False)),
+            default=self.flargs_dct.get("pre-summary-newline", "false").lower()
+            == "true",
             help="add a newline before the summary of a multi-line docstring "
             "(default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
-            default=bool(self.flargs_dct.get("pre-summary-space", False)),
+            default=self.flargs_dct.get("pre-summary-space", "false").lower()
+            == "true",
             help="add a space after the opening triple quotes "
             "(default: False)",
         )
         self.parser.add_argument(
             "--make-summary-multi-line",
             action="store_true",
-            default=bool(
-                self.flargs_dct.get("make-summary-multi-line", False)
-            ),
+            default=self.flargs_dct.get(
+                "make-summary-multi-line", "false"
+            ).lower()
+            == "true",
             help="add a newline before and after the summary of a one-line "
             "docstring (default: False)",
         )
         self.parser.add_argument(
             "--close-quotes-on-newline",
             action="store_true",
-            default=bool(
-                self.flargs_dct.get("close-quotes-on-newline", False)
-            ),
+            default=self.flargs_dct.get(
+                "close-quotes-on-newline", "false"
+            ).lower()
+            == "true",
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
             "(default: False)",
@@ -217,7 +223,8 @@ class Configurater:
         self.parser.add_argument(
             "--non-strict",
             action="store_true",
-            default=bool(self.flargs_dct.get("non-strict", False)),
+            default=self.flargs_dct.get("non-strict", "false").lower()
+            == "true",
             help="don't strictly follow reST syntax to identify lists (see "
             "issue #67) (default: False)",
         )
@@ -238,7 +245,6 @@ class Configurater:
         )
 
         self.args = self.parser.parse_args(self.args_lst[1:])
-
         if self.args.line_range:
             if self.args.line_range[0] <= 0:
                 self.parser.error("--range must be positive numbers")
