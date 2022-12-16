@@ -64,6 +64,17 @@ def temporary_file(contents, file_directory=".", file_prefix=""):
     finally:
         os.remove(f.name)
 
+@pytest.fixture(scope="function")
+def temporary_config(config, file_directory="/tmp",
+                     file_name="pyproject.toml"):
+    """Write contents to temporary configuration and yield it."""
+    f = open(f"{file_directory}/{file_name}", "wb")
+    try:
+        f.write(config.encode())
+        f.close()
+        yield f.name
+    finally:
+        os.remove(f.name)
 
 @pytest.fixture(scope="function")
 def run_docformatter(arguments, temporary_file):
