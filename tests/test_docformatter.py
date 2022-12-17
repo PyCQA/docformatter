@@ -474,7 +474,12 @@ def foo():
             ["--range", "3", "1", os.devnull],
         ],
     )
-    def test_invalid_range(self, run_docformatter, arguments):
+    def test_invalid_range(
+        self,
+        run_docformatter,
+        arguments,
+        contents,
+    ):
         """"""
         if arguments[1] == "0":
             assert (
@@ -490,14 +495,24 @@ def foo():
     @pytest.mark.system
     @pytest.mark.parametrize("arguments", [[]])
     @pytest.mark.parametrize("contents", [""])
-    def test_no_arguments(self, run_docformatter, arguments):
+    def test_no_arguments(
+        self,
+        run_docformatter,
+        arguments,
+        contents,
+    ):
         """"""
         assert "" == run_docformatter.communicate()[1].decode()
 
     @pytest.mark.system
     @pytest.mark.parametrize("arguments", [["-"]])
     @pytest.mark.parametrize("contents", [""])
-    def test_standard_in(self, run_docformatter, arguments):
+    def test_standard_in(
+        self,
+        run_docformatter,
+        arguments,
+        contents,
+    ):
         result = (
             run_docformatter.communicate(
                 '''\
@@ -523,7 +538,10 @@ Hello world"""
     )
     @pytest.mark.parametrize("contents", [""])
     def test_standard_in_with_invalid_options(
-        self, run_docformatter, arguments
+        self,
+        run_docformatter,
+        arguments,
+        contents,
     ):
         """"""
         if arguments[0] == "foo.py":
@@ -574,9 +592,11 @@ pre-summary-space = false
     def test_no_pre_summary_space_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """No pre-summary space using configuration from pyproject.toml.
 
@@ -625,9 +645,11 @@ pre-summary-space = false
     def test_pre_summary_space_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """Pre-summary space using configuration from pyproject.toml.
 
@@ -680,9 +702,11 @@ pre-summary-space = false
     def test_no_pre_summary_newline_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """No pre-summary newline using configuration from pyproject.toml.
 
@@ -741,9 +765,11 @@ pre-summary-space = false
     def test_pre_summary_newline_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """Pre-summary newline using configuration from pyproject.toml.
 
@@ -802,9 +828,11 @@ pre-summary-space = false
     def test_no_pre_summary_multiline_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """No pre-summary multi-line using configuration from pyproject.toml.
 
@@ -857,9 +885,11 @@ pre-summary-space = false
     def test_pre_summary_multiline_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """Pre-summary multi-line using configuration from pyproject.toml.
 
@@ -915,9 +945,11 @@ pre-summary-space = false
     def test_no_blank_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """No blank after description using configuration from pyproject.toml.
 
@@ -944,9 +976,9 @@ pre-summary-space = false
 
     @pytest.mark.system
     @pytest.mark.parametrize(
-            "contents",
-            [
-                '''\
+        "contents",
+        [
+            '''\
                 class TestFoo():
                     """Summary docstring that is followed by a description.
 
@@ -954,33 +986,35 @@ pre-summary-space = false
                     inserted after it.
                     """
                 '''
-            ],
-        )
+        ],
+    )
     @pytest.mark.parametrize(
-            "config",
-            [
-                """\
+        "config",
+        [
+            """\
                             [tool.docformatter]
                             blank = true
                             """
-            ],
-        )
+        ],
+    )
     @pytest.mark.parametrize(
-            "arguments",
+        "arguments",
+        [
             [
-                [
-                    "--config",
-                    "/tmp/pyproject.toml",
-                ]
-            ],
-        )
+                "--config",
+                "/tmp/pyproject.toml",
+            ]
+        ],
+    )
     def test_blank_using_pyproject(
-                self,
-                run_docformatter,
-                temporary_config,
-                temporary_file,
-                arguments,
-        ):
+        self,
+        run_docformatter,
+        temporary_pyproject_toml,
+        temporary_file,
+        arguments,
+        contents,
+        config,
+    ):
         """Blank after description using configuration from pyproject.toml.
 
         See issue #119.
@@ -998,11 +1032,11 @@ pre-summary-space = false
                      """
 -                
 ''' == "\n".join(
-                run_docformatter.communicate()[0]
-                .decode()
-                .replace("\r", "")
-                .split("\n")[2:]
-            )
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -1036,9 +1070,11 @@ class foo():
     def test_format_wrap_using_pyproject(
         self,
         run_docformatter,
-        temporary_config,
+        temporary_pyproject_toml,
         temporary_file,
         arguments,
+        contents,
+        config,
     ):
         """Wrap docstring using configuration from pyproject.toml.
 
@@ -1066,6 +1102,218 @@ class foo():
 +    in pypro
 +    ject.tom
 +    l."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+
+class TestEndToEndSetupcfg:
+    """Class to test docformatter using setup.cfg for options."""
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+class TestFoo():
+    """ Docstring that should not have a pre-summary space."""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+pre-summary-space = false
+"""
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/setup.cfg",
+            ]
+        ],
+    )
+    def test_no_pre_summary_space_using_setup_cfg(
+        self,
+        run_docformatter,
+        temporary_setup_cfg,
+        temporary_file,
+        arguments,
+        contents,
+        config,
+    ):
+        """No pre-summary space using configuration from setup.cfg.
+
+        See issue #119.
+        """
+        assert '''\
+@@ -1,2 +1,2 @@
+ class TestFoo():
+-    """ Docstring that should not have a pre-summary space."""
++    """Docstring that should not have a pre-summary space."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+class TestFoo():
+    """ Docstring that should not have a pre-summary space."""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+in-place = true
+check = false
+diff = false
+"""
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/setup.cfg",
+            ]
+        ],
+    )
+    def test_in_place_using_setup_cfg(self,
+        run_docformatter,
+        temporary_setup_cfg,
+        temporary_file,
+        arguments,
+        contents,
+        config,):
+        """Make changes in-place if set in setup.cfg.
+
+        See issue #122.
+        """
+        assert '' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+        with open(temporary_file, "r") as f:
+            assert f.read() == '''\
+class TestFoo():
+    """Docstring that should not have a pre-summary space."""
+'''
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+class TestFoo():
+    """ Docstring that should not have a pre-summary space."""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+in-place = true
+check = true
+diff = false
+"""
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/setup.cfg",
+            ]
+        ],
+    )
+    def test_check_using_setup_cfg(self,
+        run_docformatter,
+        temporary_setup_cfg,
+        temporary_file,
+        arguments,
+        contents,
+        config,):
+        """Just check for changes if set in setup.cfg.
+
+        See issue #122.
+        """
+        _results = run_docformatter.communicate()
+        assert '' == "\n".join(
+            _results[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+        assert temporary_file == _results[1].decode().rstrip("\n")
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+class TestFoo():
+    """ Docstring that should not have a pre-summary space."""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+check = true
+diff = true
+"""
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--config",
+                "/tmp/setup.cfg",
+            ]
+        ],
+    )
+    def test_check_with_diff_using_setup_cfg(self,
+        run_docformatter,
+        temporary_setup_cfg,
+        temporary_file,
+        arguments,
+        contents,
+        config,):
+        """Check for changes and print diff if set in setup.cfg.
+
+        See issue #122.
+        """
+        assert '''\
+@@ -1,2 +1,2 @@
+ class TestFoo():
+-    """ Docstring that should not have a pre-summary space."""
++    """Docstring that should not have a pre-summary space."""
 ''' == "\n".join(
             run_docformatter.communicate()[0]
             .decode()

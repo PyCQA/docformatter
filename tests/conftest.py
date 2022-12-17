@@ -65,10 +65,20 @@ def temporary_file(contents, file_directory=".", file_prefix=""):
         os.remove(f.name)
 
 @pytest.fixture(scope="function")
-def temporary_config(config, file_directory="/tmp",
-                     file_name="pyproject.toml"):
+def temporary_pyproject_toml(config, config_file_directory="/tmp",):
     """Write contents to temporary configuration and yield it."""
-    f = open(f"{file_directory}/{file_name}", "wb")
+    f = open(f"{config_file_directory}/pyproject.toml", "wb")
+    try:
+        f.write(config.encode())
+        f.close()
+        yield f.name
+    finally:
+        os.remove(f.name)
+
+@pytest.fixture(scope="function")
+def temporary_setup_cfg(config, config_file_directory="/tmp",):
+    """Write contents to temporary configuration and yield it."""
+    f = open(f"{config_file_directory}/setup.cfg", "wb")
     try:
         f.write(config.encode())
         f.close()
