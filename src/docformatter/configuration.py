@@ -124,7 +124,8 @@ class Configurater:
             "-e",
             "--exclude",
             nargs="*",
-            help="exclude directories and files by names",
+            default=self.flargs_dct.get("exclude", None),
+            help="in recursive mode, exclude directories and files by names",
         )
         self.parser.add_argument(
             "--wrap-summaries",
