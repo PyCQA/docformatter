@@ -1196,28 +1196,33 @@ diff = false
             ]
         ],
     )
-    def test_in_place_using_setup_cfg(self,
+    def test_in_place_using_setup_cfg(
+        self,
         run_docformatter,
         temporary_setup_cfg,
         temporary_file,
         arguments,
         contents,
-        config,):
+        config,
+    ):
         """Make changes in-place if set in setup.cfg.
 
         See issue #122.
         """
-        assert '' == "\n".join(
+        assert "" == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
             .replace("\r", "")
             .split("\n")[2:]
         )
         with open(temporary_file, "r") as f:
-            assert f.read() == '''\
+            assert (
+                f.read()
+                == '''\
 class TestFoo():
     """Docstring that should not have a pre-summary space."""
 '''
+            )
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -1249,23 +1254,22 @@ diff = false
             ]
         ],
     )
-    def test_check_using_setup_cfg(self,
+    def test_check_using_setup_cfg(
+        self,
         run_docformatter,
         temporary_setup_cfg,
         temporary_file,
         arguments,
         contents,
-        config,):
+        config,
+    ):
         """Just check for changes if set in setup.cfg.
 
         See issue #122.
         """
         _results = run_docformatter.communicate()
-        assert '' == "\n".join(
-            _results[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+        assert "" == "\n".join(
+            _results[0].decode().replace("\r", "").split("\n")[2:]
         )
         assert temporary_file == _results[1].decode().rstrip("\n")
 
@@ -1298,13 +1302,15 @@ diff = true
             ]
         ],
     )
-    def test_check_with_diff_using_setup_cfg(self,
+    def test_check_with_diff_using_setup_cfg(
+        self,
         run_docformatter,
         temporary_setup_cfg,
         temporary_file,
         arguments,
         contents,
-        config,):
+        config,
+    ):
         """Check for changes and print diff if set in setup.cfg.
 
         See issue #122.
