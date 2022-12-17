@@ -300,3 +300,83 @@ class TestConfigurater:
             "First value of --docstring-length should be less than or equal "
             "to the second" in err
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
+check = true
+diff = true
+recursive = true
+exclude = ["src/", "tests/"]
+"""
+        ],
+    )
+    def test_exclude_from_pyproject_toml(self,temporary_pyproject_toml,config,):
+        """Read exclude list from pyproject.toml.
+
+        See issue #120.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/pyproject.toml",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.check
+        assert not uut.args.in_place
+        assert uut.args_lst == argb
+        assert uut.config_file == "/tmp/pyproject.toml"
+        assert uut.flargs_dct == {
+            "recursive": "True",
+            "check": "True",
+            "diff": "True",
+            "exclude": ["src/", "tests/"]
+        }
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+check = true
+diff = true
+recursive = true
+exclude = ["src/", "tests/"]
+"""
+        ],
+    )
+    def test_exclude_from_setup_cfg(self,temporary_setup_cfg,config,):
+        """Read exclude list from setup.cfg.
+
+        See issue #120.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/setup.cfg",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.check
+        assert not uut.args.in_place
+        assert uut.args_lst == argb
+        assert uut.config_file == "/tmp/setup.cfg"
+        assert uut.flargs_dct == {
+            "recursive": "true",
+            "check": "true",
+            "diff": "true",
+            "exclude": '["src/", "tests/"]'
+        }

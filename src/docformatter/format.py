@@ -192,9 +192,9 @@ class Formatter:
         show_diff = self.args.diff
 
         if source != formatted_source:
+            ret = FormatResult.check_failed
             if self.args.check:
                 print(unicode(filename), file=self.stderror)
-                ret = FormatResult.check_failed
             elif self.args.in_place:
                 with self.encodor.do_open_with_encoding(
                     filename,

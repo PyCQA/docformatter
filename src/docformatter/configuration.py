@@ -94,18 +94,21 @@ class Configurater:
             "-i",
             "--in-place",
             action="store_true",
+            default=self.flargs_dct.get("in-place", "false").lower() == "true",
             help="make changes to files instead of printing diffs",
         )
         changes.add_argument(
             "-c",
             "--check",
             action="store_true",
+            default=self.flargs_dct.get("check", "false").lower() == "true",
             help="only check and report incorrectly formatted files",
         )
         self.parser.add_argument(
             "-d",
             "--diff",
             action="store_true",
+            default=self.flargs_dct.get("diff", "false").lower() == "true",
             help="when used with `--check` or `--in-place`, also what changes "
             "would be made",
         )
@@ -121,7 +124,8 @@ class Configurater:
             "-e",
             "--exclude",
             nargs="*",
-            help="exclude directories and files by names",
+            default=self.flargs_dct.get("exclude", None),
+            help="in recursive mode, exclude directories and files by names",
         )
         self.parser.add_argument(
             "--wrap-summaries",

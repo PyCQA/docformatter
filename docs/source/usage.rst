@@ -39,7 +39,7 @@ help output provides a summary of these options:
       -i, --in-place        make changes to files instead of printing diffs
       -c, --check           only check and report incorrectly formatted files
       -r, --recursive       drill down directories recursively
-      -e, --exclude         exclude directories and files by names
+      -e, --exclude         in recursive mode, exclude directories and files by names
 
       --wrap-summaries length
                             wrap long summary lines at this length; set
@@ -93,7 +93,7 @@ Possible exit codes from ``docformatter``:
 
 - **1** - if any error encountered
 - **2** - if it was interrupted
-- **3** - if any file needs to be formatted (in ``--check`` mode)
+- **3** - if any file needs to be formatted (in ``--check`` or ``--in-place`` mode)
 
 Use as a PyCharm File Watcher
 -----------------------------

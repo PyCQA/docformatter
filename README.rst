@@ -2,7 +2,7 @@
 docformatter
 ============
 
-.. |CI| image:: https://img.shields.io/github/actions/workflow/status/PyCQA/docformatter/workflows/ci.yml?branch=main
+.. |CI| image:: https://img.shields.io/github/actions/workflow/status/PyCQA/docformatter/ci.yml?branch=master
     :target: https://github.com/PyCQA/docformatter/actions/workflows/ci.yml
 .. |COVERALLS| image:: https://img.shields.io/coveralls/github/PyCQA/docformatter
     :target: https://coveralls.io/github/PyCQA/docformatter
