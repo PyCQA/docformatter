@@ -944,6 +944,53 @@ class TestClass:
 '''
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_strip_blank_line_after_method_docstring(
+        self,
+        test_args,
+        args,
+    ):
+        """Strip any newlines after a method docstring.
+
+        See issue #130 and requirement PEP_257_4.4.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring."""
+
+    def test_method(self):
+        """This is a method docstring.
+
+        With a long description followed by two blank lines.
+        """
+        pass
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+
+    """This is a class docstring."""
+
+    def test_method(self):
+
+        """This is a method docstring.
+
+        With a long description followed by two blank lines.
+        """
+
+
+        pass
+'''
+)
+
 
 class TestFormatCodeRanges:
     """Class for testing _format_code() with the line_range or length_range

@@ -23,9 +23,11 @@
 # SOFTWARE.
 """This module provides docformatter's Formattor class."""
 
+
 # Standard Library Imports
 import argparse
 import collections
+import contextlib
 import io
 import tokenize
 from typing import TextIO, Tuple
@@ -34,11 +36,10 @@ from typing import TextIO, Tuple
 import untokenize
 
 # docformatter Package Imports
+import docformatter.encode as _encode
 import docformatter.strings as _strings
 import docformatter.syntax as _syntax
 import docformatter.util as _util
-import docformatter.encode as _encode
-
 
 unicode = str
 
@@ -327,6 +328,9 @@ class Formatter:
                     modified_tokens.append(
                         (token_type, token_string, start, end, line)
                     )
+                    modified_tokens = self._do_remove_blank_lines_after_method(
+                        modified_tokens
+                    )
 
             return untokenize.untokenize(modified_tokens)
         except tokenize.TokenError:
@@ -445,6 +449,29 @@ class Formatter:
                     subsequent_indent=indentation,
                 ).strip()
                 return f"{beginning}{summary_wrapped}{ending}"
+
+    def _do_remove_blank_lines_after_method(self, modified_tokens):
+        """Remove blank lines after method docstring.
+
+        Parameters
+        ----------
+        modified_tokens: list
+            The list of tokens created from the docstring.
+
+        Returns
+        -------
+        modified_tokens: list
+            The list of tokens with any blank lines following a method
+            docstring removed.
+        """
+        with contextlib.suppress(IndexError):
+            if (
+                modified_tokens[-1][4] == "\n"
+                and modified_tokens[-2][4].strip() == '"""'
+                and modified_tokens[-5][4].lstrip().startswith("def")
+            ):
+                modified_tokens.pop(-1)
+        return modified_tokens
 
     def _do_strip_docstring(self, docstring: str) -> Tuple[str, str]:
         """Return contents of docstring and opening quote type.
