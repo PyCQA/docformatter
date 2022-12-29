@@ -62,6 +62,10 @@ def do_preserve_links(
         subsequent_indent=indentation,
     )
 
+    # There is nothing to do if the input wasn't wrapped.
+    if len(lines) < 2:
+        return lines
+
     url = next(
         (
             line
@@ -81,6 +85,7 @@ def do_preserve_links(
             url = f"{indentation}<" + url.split(sep="<")[1]
             url = url + lines[url_idx + 1].strip()
             lines[url_idx + 1] = url
+
         # Is this a link target definition (i.e., .. a link: https://)?  We
         # want to keep the .. a link: on the same line as the url.
         elif re.search(r"(\.\. )", url):
