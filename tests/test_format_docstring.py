@@ -802,6 +802,43 @@ num_iterations is the number of updates - instead of a better definition of conv
         "args",
         [["--wrap-descriptions", "72", ""]],
     )
+    def test_format_docstring_with_short_inline_link(
+            self,
+            test_args,
+            args,
+    ):
+        """Short in-line links will remain untouched.
+
+        See issue #140. See requirement docformatter_10.1.3.1.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""This is yanf with a short link.
+
+    See `the link <https://www.link.com`_ for more details.
+    """\
+'''
+
+        assert '''\
+"""This is yanf with a short link.
+
+    See `the link <https://www.link.com`_ for more details.
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
     def test_format_docstring_with_target_links(
         self,
         test_args,
