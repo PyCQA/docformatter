@@ -313,7 +313,8 @@ class Formatter:
 
                 # If the current token is a newline, the previous token was a
                 # newline or a comment, and these two sequential newlines
-                # follow a function definition, ignore the blank line.
+                # follow a function or method definition, ignore the blank
+                # line before the docstring.
                 if (
                     len(modified_tokens) <= 2
                     or token_type not in {tokenize.NL, tokenize.NEWLINE}
@@ -321,14 +322,15 @@ class Formatter:
                     not in {tokenize.NL, tokenize.NEWLINE}
                     or modified_tokens[-2][1] != ":"
                     and modified_tokens[-2][0] != tokenize.COMMENT
-                    or not modified_tokens[-2][4]
-                    .lstrip()
-                    .startswith(("def", "class"))
+                    or not modified_tokens[-2][4].lstrip().startswith(("def"))
                 ):
                     modified_tokens.append(
                         (token_type, token_string, start, end, line)
                     )
                     modified_tokens = self._do_remove_blank_lines_after_method(
+                        modified_tokens
+                    )
+                    modified_tokens = self._do_remove_blank_lines_before_class(
                         modified_tokens
                     )
 
@@ -450,7 +452,8 @@ class Formatter:
                 ).strip()
                 return f"{beginning}{summary_wrapped}{ending}"
 
-    def _do_remove_blank_lines_after_method(self, modified_tokens):
+    @staticmethod
+    def _do_remove_blank_lines_after_method(modified_tokens):
         """Remove blank lines after method docstring.
 
         Parameters
@@ -467,10 +470,36 @@ class Formatter:
         with contextlib.suppress(IndexError):
             if (
                 modified_tokens[-1][4] == "\n"
-                and modified_tokens[-2][4].strip() == '"""'
+                and modified_tokens[-2][4].lstrip().startswith('"""')
                 and modified_tokens[-5][4].lstrip().startswith("def")
             ):
                 modified_tokens.pop(-1)
+        return modified_tokens
+
+    @staticmethod
+    def _do_remove_blank_lines_before_class(modified_tokens):
+        """Remove blank lines before class docstring.
+
+        If there is no class docstring, leave any blank lines as is.
+
+        Parameters
+        ----------
+        modified_tokens: list
+            The list of tokens created from the docstring.
+
+        Returns
+        -------
+        modified_tokens: list
+            The list of tokens with any blank lines following a method
+            docstring removed.
+        """
+        with contextlib.suppress(IndexError):
+            if (
+                modified_tokens[-3][4] == "\n"
+                and modified_tokens[-2][4].lstrip().startswith('"""')
+                and modified_tokens[-6][4].lstrip().startswith("class")
+            ):
+                modified_tokens.pop(-3)
         return modified_tokens
 
     def _do_strip_docstring(self, docstring: str) -> Tuple[str, str]:
