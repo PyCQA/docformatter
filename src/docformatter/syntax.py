@@ -62,6 +62,10 @@ def do_preserve_links(
         subsequent_indent=indentation,
     )
 
+    # There is nothing to do if the input wasn't wrapped.
+    if len(lines) < 2:
+        return lines
+
     url = next(
         (
             line
@@ -77,16 +81,23 @@ def do_preserve_links(
         # Is this an in-line link (i.e., enclosed in <>)?  We want to keep
         # the '<' and '>' part of the link.
         if re.search(r"<", url):
-            lines[url_idx] = f"{indentation}" + url.split(sep="<")[0].strip()
+            if len(url.split(sep="<")[0].strip()) > 0:
+                lines[url_idx] = (
+                    f"{indentation}" + url.split(sep="<")[0].strip()
+                )
+
             url = f"{indentation}<" + url.split(sep="<")[1]
-            url = url + lines[url_idx + 1].strip()
-            lines[url_idx + 1] = url
+            if len(url.split(sep=">")) < 2:
+                url = url + lines[url_idx + 1].strip()
+                lines[url_idx + 1] = url
+
         # Is this a link target definition (i.e., .. a link: https://)?  We
         # want to keep the .. a link: on the same line as the url.
         elif re.search(r"(\.\. )", url):
             url = url + lines[url_idx + 1].strip()
             lines[url_idx] = url
             lines.pop(url_idx + 1)
+
         # Is this a simple link (i.e., just a link in the text) that should
         # be unwrapped?  We want to break the url out from the rest of the
         # text.
