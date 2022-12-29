@@ -946,6 +946,70 @@ class TestClass:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_class_docstring_remove_blank_line(
+        self, test_args, args
+    ):
+        """Remove blank line before class docstring.
+
+        See issue #139.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring.
+
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+
+    """This is a class docstring.
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_class_docstring_keep_blank_line(
+        self, test_args, args
+    ):
+        """Keep blank line after class definition if there is no docstring.
+
+        See issue #139.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = """\
+class TestClass:
+
+    variable = 1
+"""
+        assert docstring == uut._do_format_code(
+            """\
+class TestClass:
+
+    variable = 1
+"""
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
     def test_format_code_strip_blank_line_after_method_docstring(
         self,
         test_args,
@@ -989,7 +1053,7 @@ class TestClass:
 
         pass
 '''
-)
+        )
 
 
 class TestFormatCodeRanges:
