@@ -836,6 +836,45 @@ num_iterations is the number of updates - instead of a better definition of conv
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
+            "args",
+            [["--wrap-descriptions", "72", ""]],
+        )
+    def test_format_docstring_with_inline_link_retain_spaces(
+                self,
+                test_args,
+                args,
+    ):
+        """In-line links shouldn't remove blank spaces between words.
+
+        See issue #140.
+        """
+        uut = Formatter(
+                test_args,
+                sys.stderr,
+                sys.stdin,
+                sys.stdout,
+        )
+
+        docstring = '''\
+"""This is a docstring with a link that causes a wrap.
+
+    See `the link <https://www.link.com/a/long/link/that/causes/line/break>`_ for more details.
+    """\
+'''
+
+        assert '''\
+"""This is a docstring with a link that causes a wrap.
+
+    See `the link
+    <https://www.link.com/a/long/link/that/causes/line/break>`_ for more
+    details.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
         "args",
         [["--wrap-descriptions", "72", ""]],
     )
