@@ -438,6 +438,43 @@ class TestFormatWrap:
                     assert len(line) <= max_length
 
     @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args", [["--wrap-descriptions", "120", "--wrap-summaries", "120", ""]]
+    )
+    def test_format_docstring_with_multi_paragraph_description(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap each paragraph in the long description seperately.
+
+        See issue #127.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '''\
+"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it
+    is not.
+
+    It doesn\'t wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """''' == uut._do_format_docstring(
+            INDENTATION,
+            '''"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it is not.
+
+    It doesn't wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """'''.strip(),
+        )
+
+    @pytest.mark.unit
     @pytest.mark.parametrize("args", [["--wrap-summaries", "79", ""]])
     def test_format_docstring_with_weird_indentation_and_punctuation(
         self,
@@ -803,9 +840,9 @@ num_iterations is the number of updates - instead of a better definition of conv
         [["--wrap-descriptions", "72", ""]],
     )
     def test_format_docstring_with_short_inline_link(
-            self,
-            test_args,
-            args,
+        self,
+        test_args,
+        args,
     ):
         """Short in-line links will remain untouched.
 
@@ -836,23 +873,23 @@ num_iterations is the number of updates - instead of a better definition of conv
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
-            "args",
-            [["--wrap-descriptions", "72", ""]],
-        )
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
     def test_format_docstring_with_inline_link_retain_spaces(
-                self,
-                test_args,
-                args,
+        self,
+        test_args,
+        args,
     ):
         """In-line links shouldn't remove blank spaces between words.
 
         See issue #140.
         """
         uut = Formatter(
-                test_args,
-                sys.stderr,
-                sys.stdin,
-                sys.stdout,
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
         )
 
         docstring = '''\
@@ -870,8 +907,8 @@ num_iterations is the number of updates - instead of a better definition of conv
     details.
     """\
 ''' == uut._do_format_docstring(
-                INDENTATION, docstring.strip()
-            )
+            INDENTATION, docstring.strip()
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(

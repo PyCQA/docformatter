@@ -736,12 +736,12 @@ pre-summary-space = false
         "contents",
         [
             '''\
-            class TestFoo():
-                """Docstring that should have a pre-summary newline.
-                
-                This is a multi-line docstring that should have a newline 
-                placed before the summary."""
-            '''
+class TestFoo():
+    """Docstring that should have a pre-summary newline.
+
+    This is a multi-line docstring that should have a newline 
+    placed before the summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -776,19 +776,17 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,7 @@
-             class TestFoo():
--                """Docstring that should have a pre-summary newline.
--                
--                This is a multi-line docstring that should have a newline 
--                placed before the summary."""
--            
-+                """
-+                Docstring that should have a pre-summary newline.
-+
-+                This is a multi-line docstring that should have a
-+                newline placed before the summary.
-+                """
+@@ -1,5 +1,7 @@
+ class TestFoo():
+-    """Docstring that should have a pre-summary newline.
++    """
++    Docstring that should have a pre-summary newline.
+ 
+-    This is a multi-line docstring that should have a newline 
+-    placed before the summary."""
++    This is a multi-line docstring that should have a newline placed
++    before the summary.
++    """
 ''' == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
@@ -915,13 +913,13 @@ pre-summary-space = false
         "contents",
         [
             '''\
-            class TestFoo():
-                """Summary docstring that is followed by a description.
-                
-                This is the description and it shouldn't have a blank line 
-                inserted after it.
-                """
-            '''
+class TestFoo():
+    """Summary docstring that is followed by a description.
+
+    This is the description and it shouldn't have a blank line 
+    inserted after it.
+    """
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -956,17 +954,15 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,7 +1,6 @@
-             class TestFoo():
-                 """Summary docstring that is followed by a description.
--                
--                This is the description and it shouldn\'t have a blank line 
--                inserted after it.
-+
-+                This is the description and it shouldn\'t have a blank
-+                line inserted after it.
-                 """
--            
+@@ -1,6 +1,6 @@
+ class TestFoo():
+     """Summary docstring that is followed by a description.
+ 
+-    This is the description and it shouldn\'t have a blank line 
+-    inserted after it.
++    This is the description and it shouldn\'t have a blank line inserted
++    after it.
+     """
 ''' == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
@@ -979,22 +975,22 @@ pre-summary-space = false
         "contents",
         [
             '''\
-                class TestFoo():
-                    """Summary docstring that is followed by a description.
+class TestFoo():
+    """Summary docstring that is followed by a description.
 
-                    This is the description and it should have a blank line 
-                    inserted after it.
-                    """
-                '''
+    This is the description and it should have a blank line 
+    inserted after it.
+    """
+'''
         ],
     )
     @pytest.mark.parametrize(
         "config",
         [
             """\
-                            [tool.docformatter]
-                            blank = true
-                            """
+            [tool.docformatter]
+            blank = true
+            """
         ],
     )
     @pytest.mark.parametrize(
@@ -1020,17 +1016,16 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,7 +1,7 @@
-                 class TestFoo():
-                     """Summary docstring that is followed by a description.
+@@ -1,6 +1,7 @@
+ class TestFoo():
+     """Summary docstring that is followed by a description.
  
--                    This is the description and it should have a blank line 
--                    inserted after it.
-+                    This is the description and it should have a blank
-+                    line inserted after it.
+-    This is the description and it should have a blank line 
+-    inserted after it.
++    This is the description and it should have a blank line inserted
++    after it.
 +
-                     """
--                
+     """
 ''' == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
