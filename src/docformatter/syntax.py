@@ -32,6 +32,52 @@ from typing import List
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
+def description_to_list(
+    text: str, indentation: str, wrap_length: int
+) -> List[str]:
+    """Convert the description to a list of wrap length lines.
+
+    Parameters
+    ----------
+    text : str
+        The docstring description.
+    indentation : str
+        The indentation (number of spaces or tabs) to place in front of each
+        line.
+    wrap_length : int
+        The column to wrap each line at.
+
+    Returns
+    -------
+    lines : list
+        A list containing each line of the description with any links put
+        back together.
+    """
+    # This is a description containing only one paragraph.
+    if len(re.findall(r"\n\n", text)) <= 0:
+        return textwrap.wrap(
+            textwrap.dedent(text),
+            width=wrap_length,
+            initial_indent=indentation,
+            subsequent_indent=indentation,
+        )
+
+    # This is a description containing multiple paragraphs.
+    lines = []
+    for _line in text.splitlines():
+        _text = textwrap.wrap(
+            textwrap.dedent(_line),
+            width=wrap_length,
+            initial_indent=indentation,
+            subsequent_indent=indentation,
+        )
+        if _text:
+            lines.extend(_text)
+        else:
+            lines.append("")
+    return lines
+
+
 def do_preserve_links(
     text: str,
     indentation: str,
@@ -55,12 +101,7 @@ def do_preserve_links(
         A list containing each line of the description with any links put
         back together.
     """
-    lines = textwrap.wrap(
-        textwrap.dedent(text),
-        width=wrap_length,
-        initial_indent=indentation,
-        subsequent_indent=indentation,
-    )
+    lines = description_to_list(text, indentation, wrap_length)
 
     # There is nothing to do if the input wasn't wrapped.
     if len(lines) < 2:
@@ -157,8 +198,8 @@ def is_some_sort_of_list(text, strict) -> bool:
 
     return any(
         (
-            re.match(r"\s*$", line)
-            or
+            # re.match(r"\s*$", line)
+            # or
             # "1. item"
             re.match(r"\s*\d\.", line)
             or
