@@ -43,7 +43,7 @@ Bug Fixes
 - Add pyproject.toml support for config \(Issue \#10\) [\#77](https://github.com/PyCQA/docformatter/pull/77) ([weibullguy](https://github.com/weibullguy))
 - Bugfix --wrap-summaries 0 now fully disables summary wrapping [\#74](https://github.com/PyCQA/docformatter/pull/74) ([howeaj](https://github.com/howeaj))
 - Better document --docstring-length option and add it to the readme [\#72](https://github.com/PyCQA/docformatter/pull/72) ([AntoineD](https://github.com/AntoineD))
-- Removed the empty line between function definiton and docstring \#51 [\#53](https://github.com/PyCQA/docformatter/pull/53) ([dabauxi](https://github.com/dabauxi))
+- Removed the empty line between function definition and docstring \#51 [\#53](https://github.com/PyCQA/docformatter/pull/53) ([dabauxi](https://github.com/dabauxi))
 - Pre-Summary Space Option [\#46](https://github.com/PyCQA/docformatter/pull/46) ([alecmerdler](https://github.com/alecmerdler))
 
 ## [v1.4](https://github.com/PyCQA/docformatter/tree/v1.4) (2020-12-27)

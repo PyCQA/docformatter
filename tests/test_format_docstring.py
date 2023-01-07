@@ -446,7 +446,7 @@ class TestFormatWrap:
         test_args,
         args,
     ):
-        """Wrap each paragraph in the long description seperately.
+        """Wrap each paragraph in the long description separately.
 
         See issue #127.
         """

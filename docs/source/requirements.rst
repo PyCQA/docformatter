@@ -210,7 +210,7 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_11.8',' Should read docstrings from stdin and report results to stdout.', ' Stakeholder', ' Should', ' Yes [*PR #8*]'
 
 Requirement ID's that begin with PEP_257 are taken from PEP 257.  Those
-prefaced with docformatter are un-releated to PEP 257.
+prefaced with docformatter are un-related to PEP 257.
 
 Test Suite
 ----------

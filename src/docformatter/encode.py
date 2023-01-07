@@ -70,7 +70,7 @@ class Encoder:
     def do_find_newline(self, source: str) -> Dict[int, int]:
         """Return type of newline used in source.
 
-        Paramaters
+        Parameters
         ----------
         source : list
             A list of lines.
