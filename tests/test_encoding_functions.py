@@ -55,7 +55,7 @@ class TestDetectEncoding:
     def test_detect_encoding_with_explicit_utf_8(
         self, temporary_file, contents
     ):
-        """Return utf-8 when explicitely set in file."""
+        """Return utf-8 when explicitly set in file."""
         uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
