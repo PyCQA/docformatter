@@ -80,6 +80,14 @@ Or, if you want to use pyproject.toml to configure docformatter::
 
     $ pip install --upgrade docformatter[tomli]
 
+Or, if you want to use a release candidate (or any other tag)::
+
+    $ pip install git+https://github.com/PyCQA/docformatter.git@<RC_TAG>
+
+Where <RC_TAG> is the release candidate tag you'd like to install.  Release
+candidate tags will have the format v1.6.0-rc.1  Release candidates will also be
+made available as a Github Release.
+
 Example
 =======
 

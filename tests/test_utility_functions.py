@@ -45,7 +45,7 @@ import docformatter
 
 
 class TestFindPyFiles:
-    """Class for testing the find_py_files() Function."""
+    """Class for testing the find_py_files() function."""
 
     @pytest.mark.unit
     def test_is_hidden(self):
