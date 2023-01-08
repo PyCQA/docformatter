@@ -15,8 +15,12 @@ docformatter
     :target: https://pycqa.github.io/isort/
 .. |SELF| image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
     :target: https://github.com/PyCQA/docformatter
-.. |DOCSTYLE| image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
+.. |SPHINXSTYLE| image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+    :target: https://www.sphinx-doc.org/en/master/usage/index.html
+.. |NUMPSTYLE| image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
     :target: https://numpydoc.readthedocs.io/en/latest/format.html
+.. |GOOGSTYLE| image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+    :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 
 .. |VERSION| image:: https://img.shields.io/pypi/v/docformatter
 .. |LICENSE| image:: https://img.shields.io/pypi/l/docformatter
@@ -27,7 +31,7 @@ docformatter
 +----------------+----------------------------------------------------------+
 | **Code**       + |BLACK| |ISORT|                                          +
 +----------------+----------------------------------------------------------+
-| **Docstrings** + |SELF| |DOCSTYLE|                                        +
+| **Docstrings** + |SELF| |NUMPSTYLE|                                        +
 +----------------+----------------------------------------------------------+
 | **GitHub**     + |CI| |CONTRIBUTORS| |COMMIT|                             +
 +----------------+----------------------------------------------------------+
@@ -171,28 +175,26 @@ Do you use *docformatter*?  What style docstrings do you use?  Add some badges t
     .. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
         :target: https://github.com/PyCQA/docformatter
 
-    .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
-        :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+|SPHINXSTYLE|
 
 .. code-block::
 
-    .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
-        :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
+    .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+        :target: https://www.sphinx-doc.org/en/master/usage/index.html
 
-|DOCSTYLE|
+|NUMPSTYLE|
 
 .. code-block::
 
     .. image:: https://img.shields.io/badge/%20style-numpy-459db9.svg
         :target: https://numpydoc.readthedocs.io/en/latest/format.html
 
-    .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
-        :target: https://www.sphinx-doc.org/en/master/usage/index.html
+|GOOGSTYLE|
 
 .. code-block::
 
-    .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
-        :target: https://www.sphinx-doc.org/en/master/usage/index.html
+    .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
+        :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 
 Issues
 ======

@@ -107,14 +107,7 @@ def do_preserve_links(
     if len(lines) < 2:
         return lines
 
-    url = next(
-        (
-            line
-            for line in lines
-            if re.search(r"<?(http://|https://|ftp://|sftp://)", line)
-        ),
-        "",
-    )
+    url = is_some_sort_of_link(lines)
 
     if url != "":
         url_idx = lines.index(url)
@@ -163,6 +156,77 @@ def do_preserve_links(
                 lines.pop(url_idx + 2)
 
     return lines
+
+
+def is_some_sort_of_link(lines: List[str]) -> str:
+    """Determine if docstring line contains a link.
+
+    URL patterns based on table at
+    <https://en.wikipedia.org/wiki/List_of_URI_schemes>
+
+    Parameters
+    ----------
+    lines: str
+        the list of docstring lines to check for a link pattern.
+
+    Returns
+    -------
+    url: str
+        the line with the url pattern.
+    """
+    url_patterns = (
+        "("
+        "afp://|"
+        "apt:|"
+        "bitcoin:|"
+        "chrome://|"
+        "cvs://|"
+        "dav://|"
+        "dns:|"
+        "file://|"
+        "finger://|"
+        "fish://|"
+        "ftp://|"
+        "ftps://|"
+        "git://|"
+        "http://|"
+        "https://|"
+        "imap://|"
+        "ipp://|"
+        "ipps://|"
+        "irc://|"
+        "irc6://|"
+        "ircs://|"
+        "jar:|"
+        "ldap://|"
+        "ldaps://|"
+        "mailto:|"
+        "news:|"
+        "nfs://|"
+        "nntp://|"
+        "pop://|"
+        "rsync://|"
+        "s3://|"
+        "sftp://|"
+        "shttp://|"
+        "sip:|"
+        "sips:|"
+        "smb://|"
+        "sms:|"
+        "snmp://|"
+        "ssh://|"
+        "svn://|"
+        "telnet://|"
+        "vnc://|"
+        "xmpp:|"
+        "xri://"
+        ")"
+    )
+
+    return next(
+        (line for line in lines if re.search(rf"<?{url_patterns}", line)),
+        "",
+    )
 
 
 # pylint: disable=line-too-long
