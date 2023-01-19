@@ -24,16 +24,65 @@
 """This module provides docformatter's Syntaxor class."""
 
 # Standard Library Imports
-import contextlib
 import re
 import textwrap
-from typing import List
+from typing import Iterable, List, Tuple, Union
 
+# URL_PATTERNS based on table at
+# <https://en.wikipedia.org/wiki/List_of_URI_schemes>
+URL_PATTERNS = (
+    "afp|"
+    "apt|"
+    "bitcoin|"
+    "chrome|"
+    "cvs|"
+    "dav|"
+    "dns|"
+    "file|"
+    "finger|"
+    "fish|"
+    "ftp|"
+    "ftps|"
+    "git|"
+    "http|"
+    "https|"
+    "imap|"
+    "ipp|"
+    "ipps|"
+    "irc|"
+    "irc6|"
+    "ircs|"
+    "jar|"
+    "ldap|"
+    "ldaps|"
+    "mailto|"
+    "news|"
+    "nfs|"
+    "nntp|"
+    "pop|"
+    "rsync|"
+    "s3|"
+    "sftp|"
+    "shttp|"
+    "sip|"
+    "sips|"
+    "smb|"
+    "sms|"
+    "snmp|"
+    "ssh|"
+    "svn|"
+    "telnet|"
+    "vnc|"
+    "xmpp|"
+    "xri"
+)
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
 def description_to_list(
-    text: str, indentation: str, wrap_length: int
+    text: str,
+    indentation: str,
+    wrap_length: int,
 ) -> List[str]:
     """Convert the description to a list of wrap length lines.
 
@@ -75,15 +124,57 @@ def description_to_list(
             lines.extend(_text)
         else:
             lines.append("")
+
     return lines
 
 
-def do_preserve_links(
+def do_find_links(text: str) -> List[Tuple[int, int]]:
+    r"""Determine if docstring contains any links.
+
+    The regex used to find URL links:
+        (`[\w :]+|\.\. _?[\w :]+)? is used to find in-line links that should
+        remain on a single line even if it exceeds the wrap length.
+            ` matches the character `
+            \.\. matches the pattern ..
+            ? matches the previous pattern between zero and one times
+            _? matches the character _ between zero and one times
+        [\w :]+ is used to match the name of the link that is displayed in
+        the resulting document.
+            \w : matches a single character, spaces, and colons between one
+            and unlimited times
+        <? matches the character < between zero and one times
+        ({URL_PATTERNS}):\/\/
+            matches one of the strings in the variable URL_PATTERNS,
+            followed by a colon and two forward slashes
+        (\S*)
+            \S matches any non-whitespace character between zero and unlimited
+            times
+        >?
+            matches the character > between zero and one times
+
+    Parameters
+    ----------
+    text: str
+        the docstring description to check for a link patterns.
+
+    Returns
+    -------
+    url_index: list
+        an list of tuples with each tuple containing the starting and ending
+        position of each URL found in the passed description.
+    """
+    _url_iter = re.finditer(
+        rf"(`[\w :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", text
+    )
+    return [(_url.start(0), _url.end(0)) for _url in _url_iter]
+
+
+def do_split_description(
     text: str,
     indentation: str,
     wrap_length: int,
-) -> List[str]:
-    """Rebuild links in docstring.
+) -> Union[List[str], Iterable]:
+    """Split the description into a list of lines.
 
     Parameters
     ----------
@@ -101,132 +192,34 @@ def do_preserve_links(
         A list containing each line of the description with any links put
         back together.
     """
-    lines = description_to_list(text, indentation, wrap_length)
-
-    # There is nothing to do if the input wasn't wrapped.
-    if len(lines) < 2:
-        return lines
-
-    url = is_some_sort_of_link(lines)
-
-    if url != "":
-        url_idx = lines.index(url)
-
-        # Is this an in-line link (i.e., enclosed in <>)?  We want to keep
-        # the '<' and '>' part of the link.
-        if re.search(r"<", url):
-            if len(url.split(sep="<")[0].strip()) > 0:
-                lines[url_idx] = (
-                    f"{indentation}" + url.split(sep="<")[0].strip()
-                )
-
-            url = f"{indentation}<" + url.split(sep="<")[1]
-            if len(url.split(sep=">")) < 2:
-                url = url + lines[url_idx + 1].strip()
-                lines[url_idx + 1] = url
-
-        # Is this a link target definition (i.e., .. a link: https://)?  We
-        # want to keep the .. a link: on the same line as the url.
-        elif re.search(r"(\.\. )", url):
-            url = url + lines[url_idx + 1].strip()
-            lines[url_idx] = url
-            lines.pop(url_idx + 1)
-
-        # Is this a simple link (i.e., just a link in the text) that should
-        # be unwrapped?  We want to break the url out from the rest of the
-        # text.
-        elif len(lines[url_idx]) >= wrap_length:
-            lines[url_idx] = (
-                f"{indentation}" + url.strip().split(sep=" ")[0].strip()
-            )
-            url = f"{indentation}" + url.strip().split(sep=" ")[1].strip()
-            url = url + lines[url_idx + 1].strip().split(sep=" ")[0].strip()
-            lines.append(
-                indentation
-                + " ".join(lines[url_idx + 1].strip().split(sep=" ")[1:])
-            )
-            lines[url_idx + 1] = url
-
-        with contextlib.suppress(IndexError):
-            if lines[url_idx + 2].strip() in [".", "?", "!", ";"] or re.search(
-                r">", lines[url_idx + 2]
+    # Check if the description contains any URLs.
+    _url_idx = do_find_links(text)
+    if _url_idx:
+        _lines = []
+        _text_idx = 0
+        for _idx in _url_idx:
+            # If the text including the URL is longer than the wrap length,
+            # we need to split the description before the URL, wrap the pre-URL
+            # text, and add the URL as a separate line.
+            if len(text[_text_idx: _idx[1]]) > (
+                wrap_length - len(indentation)
             ):
-                url = url + lines[url_idx + 2].strip()
-                lines[url_idx + 1] = url
-                lines.pop(url_idx + 2)
+                # Wrap everything in the description before the first URL.
+                _lines.extend(
+                    description_to_list(
+                        text[_text_idx: _idx[0]], indentation, wrap_length
+                    )
+                )
+                # Add the URL.
+                _lines.append(f"{indentation}{text[_idx[0]:_idx[1]].strip()}")
+                _text_idx = _idx[1]
 
-    return lines
+        # Finally, add everything after the last URL.
+        _lines.append(f"{indentation}{text[_text_idx:].strip()}")
 
-
-def is_some_sort_of_link(lines: List[str]) -> str:
-    """Determine if docstring line contains a link.
-
-    URL patterns based on table at
-    <https://en.wikipedia.org/wiki/List_of_URI_schemes>
-
-    Parameters
-    ----------
-    lines: str
-        the list of docstring lines to check for a link pattern.
-
-    Returns
-    -------
-    url: str
-        the line with the url pattern.
-    """
-    url_patterns = (
-        "("
-        "afp://|"
-        "apt:|"
-        "bitcoin:|"
-        "chrome://|"
-        "cvs://|"
-        "dav://|"
-        "dns:|"
-        "file://|"
-        "finger://|"
-        "fish://|"
-        "ftp://|"
-        "ftps://|"
-        "git://|"
-        "http://|"
-        "https://|"
-        "imap://|"
-        "ipp://|"
-        "ipps://|"
-        "irc://|"
-        "irc6://|"
-        "ircs://|"
-        "jar:|"
-        "ldap://|"
-        "ldaps://|"
-        "mailto:|"
-        "news:|"
-        "nfs://|"
-        "nntp://|"
-        "pop://|"
-        "rsync://|"
-        "s3://|"
-        "sftp://|"
-        "shttp://|"
-        "sip:|"
-        "sips:|"
-        "smb://|"
-        "sms:|"
-        "snmp://|"
-        "ssh://|"
-        "svn://|"
-        "telnet://|"
-        "vnc://|"
-        "xmpp:|"
-        "xri://"
-        ")"
-    )
-
-    return next(
-        (line for line in lines if re.search(rf"<?{url_patterns}", line)),
-        "",
-    )
+        return _lines
+    else:
+        return description_to_list(text, indentation, wrap_length)
 
 
 # pylint: disable=line-too-long
@@ -262,8 +255,6 @@ def is_some_sort_of_list(text, strict) -> bool:
 
     return any(
         (
-            # re.match(r"\s*$", line)
-            # or
             # "1. item"
             re.match(r"\s*\d\.", line)
             or
@@ -290,7 +281,9 @@ def is_some_sort_of_code(text: str) -> bool:
     """Return True if text looks like code."""
     return any(
         len(word) > 50
-        and not re.match(r"<{0,1}(http:|https:|ftp:|sftp:)", word)
+        and not re.match(
+            rf"(`[\w :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", word
+        )
         for word in text.split()
     )
 
@@ -385,6 +378,6 @@ def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     ):
         return text
 
-    text = do_preserve_links(text, indentation, wrap_length)
+    lines = do_split_description(text, indentation, wrap_length)
 
-    return indentation + "\n".join(text).strip()
+    return indentation + "\n".join(lines).strip()
