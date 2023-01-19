@@ -28,8 +28,8 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-# URL_PATTERNS based on table at
-# <https://en.wikipedia.org/wiki/List_of_URI_schemes>
+# These are the URL pattern to look for when finding links and is based on the
+# table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
 URL_PATTERNS = (
     "afp|"
     "apt|"
@@ -76,6 +76,24 @@ URL_PATTERNS = (
     "xmpp|"
     "xri"
 )
+
+# This is the regex used to find URL links:
+#
+# (`[\w.:]+|\.\._?[\w:]+)? is used to find in-line links that should remain
+# on a single line even if it exceeds the wrap length.
+#   `[\w.:]+ matches the character ` followed by any number of letters,
+#   periods, spaces, or colons.
+#   \.\._?[\w:]+ matches the pattern .. followed by zero or one underscore,
+#   then any number of letters, periods, spaces, or colons.
+#   ? matches the previous pattern between zero or one times.
+# <?({URL_PATTERNS}):(//)?(\S*)>? is used to find the actual link.
+#   < ? matches the character < between zero and one times.
+#   ({URL_PATTERNS}):(//)? matches one of the strings in the variable
+#   URL_PATTERNS, followed by a colon and two forward slashes zero or one time.
+#   (\S*) matches any non-whitespace character between zero and unlimited
+#   times.
+#   >? matches the character > between zero and one times.
+URL_REGEX = rf"(`[\w. :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):(//)?(\S*)>?"
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
@@ -131,27 +149,6 @@ def description_to_list(
 def do_find_links(text: str) -> List[Tuple[int, int]]:
     r"""Determine if docstring contains any links.
 
-    The regex used to find URL links:
-        (`[\w :]+|\.\. _?[\w :]+)? is used to find in-line links that should
-        remain on a single line even if it exceeds the wrap length.
-            ` matches the character `
-            \.\. matches the pattern ..
-            ? matches the previous pattern between zero and one times
-            _? matches the character _ between zero and one times
-        [\w :]+ is used to match the name of the link that is displayed in
-        the resulting document.
-            \w : matches a single character, spaces, and colons between one
-            and unlimited times
-        <? matches the character < between zero and one times
-        ({URL_PATTERNS}):\/\/
-            matches one of the strings in the variable URL_PATTERNS,
-            followed by a colon and two forward slashes
-        (\S*)
-            \S matches any non-whitespace character between zero and unlimited
-            times
-        >?
-            matches the character > between zero and one times
-
     Parameters
     ----------
     text: str
@@ -160,12 +157,10 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
     Returns
     -------
     url_index: list
-        an list of tuples with each tuple containing the starting and ending
+        a list of tuples with each tuple containing the starting and ending
         position of each URL found in the passed description.
     """
-    _url_iter = re.finditer(
-        rf"(`[\w. :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", text
-    )
+    _url_iter = re.finditer(URL_REGEX, text)
     return [(_url.start(0), _url.end(0)) for _url in _url_iter]
 
 
@@ -201,13 +196,13 @@ def do_split_description(
             # If the text including the URL is longer than the wrap length,
             # we need to split the description before the URL, wrap the pre-URL
             # text, and add the URL as a separate line.
-            if len(text[_text_idx: _idx[1]]) > (
+            if len(text[_text_idx : _idx[1]]) > (
                 wrap_length - len(indentation)
             ):
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx: _idx[0]], indentation, wrap_length
+                        text[_text_idx : _idx[0]], indentation, wrap_length
                     )
                 )
                 # Add the URL.
@@ -280,10 +275,7 @@ def is_some_sort_of_list(text, strict) -> bool:
 def is_some_sort_of_code(text: str) -> bool:
     """Return True if text looks like code."""
     return any(
-        len(word) > 50
-        and not re.match(
-            rf"(`[\w :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", word
-        )
+        len(word) > 50 and not re.match(URL_REGEX, word)
         for word in text.split()
     )
 
