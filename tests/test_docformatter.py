@@ -299,7 +299,7 @@ def foo():
         contents,
         arguments,
     ):
-        """"""
+        """Wrap summary at --wrap-summaries number of columns."""
         assert '''\
 @@ -1,4 +1,3 @@
  def foo():
@@ -331,13 +331,14 @@ def foo():
     @pytest.mark.parametrize(
         "arguments", [["--wrap-summaries=0", "--wrap-description=0"]]
     )
-    def test_end_to_end_with_no_wrapping(
+    def test_end_to_end_with_no_wrapping_long_sentences(
         self,
         run_docformatter,
         temporary_file,
         contents,
         arguments,
     ):
+        """Long sentences remain long with wrapping turned off."""
         assert "" == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
@@ -363,14 +364,14 @@ def foo():
     @pytest.mark.parametrize(
         "arguments", [["--wrap-summaries=0", "--wrap-description=0"]]
     )
-    def test_end_to_end_with_no_wrapping_2(
+    def test_end_to_end_with_no_wrapping_short_sentences(
         self,
         run_docformatter,
         temporary_file,
         arguments,
         contents,
     ):
-        """"""
+        """Short sentences remain short with wrapping turned off."""
         assert "" == "\n".join(
             run_docformatter.communicate()[0]
             .decode()
@@ -397,13 +398,104 @@ def foo():
         arguments,
         contents,
     ):
-        """"""
+        """Add period to end of summary even with wrapping off."""
         assert '''\
 @@ -1,3 +1,3 @@
  def foo():
      """Wrapping is off, but it will still add
 -    the trailing period  """
 +    the trailing period."""
+''' == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+def foo():
+    """Description from issue #145 that was being improperly wrapped.
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--wrap-summaries=72",
+                "--wrap-descriptions=78",
+            ]
+        ],
+    )
+    def test_end_to_end_keep_rest_link_one_line(
+        self,
+        run_docformatter,
+        temporary_file,
+        arguments,
+        contents,
+    ):
+        """Keep reST in-line URL link on one line.
+
+        See issue #145. See requirement docformatter_10.1.3.1.
+        """
+        assert "" == "\n".join(
+            run_docformatter.communicate()[0]
+            .decode()
+            .replace("\r", "")
+            .split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+def foo():
+    """Description from issue #150 that was being improperly wrapped.
+
+    The text file can be retrieved via the Chrome plugin `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing"""
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [
+            [
+                "--wrap-summaries=72",
+                "--wrap-descriptions=78",
+            ]
+        ],
+    )
+    def test_end_to_end_keep_in_line_link_one_line(
+        self,
+        run_docformatter,
+        temporary_file,
+        arguments,
+        contents,
+    ):
+        """Keep in-line URL link on one line.
+
+        See issue #150. See requirement docformatter_10.1.3.1.
+        """
+        assert '''\
+@@ -1,4 +1,7 @@
+ def foo():
+     """Description from issue #150 that was being improperly wrapped.
+ 
+-    The text file can be retrieved via the Chrome plugin `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing"""
++    The text file can be retrieved via the Chrome plugin
++    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>`
++    while browsing
++    """
 ''' == "\n".join(
             run_docformatter.communicate()[0]
             .decode()

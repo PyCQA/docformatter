@@ -902,9 +902,9 @@ num_iterations is the number of updates - instead of a better definition of conv
         assert '''\
 """This is a docstring with a link that causes a wrap.
 
-    See `the link
-    <https://www.link.com/a/long/link/that/causes/line/break>`_ for more
-    details.
+    See
+    `the link <https://www.link.com/a/long/link/that/causes/line/break>`_
+    for more details.
     """\
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()

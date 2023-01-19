@@ -223,426 +223,158 @@ class TestIsProbablySentence:
         )
 
 
-class TestIsSomeSortOfLink:
-    """Class for testing the is_some_sort_of_link() function."""
+class TestDoFindLinks:
+    """Class for testing the do_find_links() function."""
 
     @pytest.mark.unit
-    def test_is_some_sort_of_file_system_link(self):
+    def test_do_find_file_system_link(self):
         """Identify afp://, nfs://, smb:// as a link."""
-        lines = [
-            "This is an Apple Filing Protocol URL pattern:",
-            "afp://[<user@]<host>[:<port>][/[<path>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "afp://[<user@]<host>[:<port>][/[<path>]]"
-        )
-        lines = [
-            "This is an Network File System URL pattern:",
-            "nfs://server<:port>/<path>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "nfs://server<:port>/<path>"
-        )
-        lines = [
-            "This is an Samba URL pattern:",
-            "smb://[<user>@]<host>[:<port>][/[<path>]][?<param1>=<value1>[;<param2>=<value2>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "smb://[<user>@]<host>[:<port>][/[<path>]][?<param1>=<value1>[;<param2>=<value2>]]"
-        )
+        text = "This is an Apple Filing Protocol URL pattern: afp://[<user@]<host>[:<port>][/[<path>]]"
+        assert docformatter.do_find_links(text) == [(46, 86)]
+        text = "This is an Network File System URL pattern: nfs://server<:port>/<path>"
+        assert docformatter.do_find_links(text) == [(44, 70)]
+        text = "This is an Samba URL pattern: smb://[<user>@]<host>[:<port>][/[<path>]][?<param1>=<value1>[;<param2>=<value2>]]"
+        assert docformatter.do_find_links(text) == [(30, 111)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_miscellaneous_link(self):
+    def test_do_find_miscellaneous_link(self):
         """Identify apt:, bitcoin:, chrome://, and jar: as a link."""
-        lines = ["This is an apt URL pattern:", "apt:docformatter"]
-        assert docformatter.is_some_sort_of_link(lines) == "apt:docformatter"
-        lines = [
-            "This is a bitcoin URL pattern:",
-            "bitcoin:<address>[?[amount=<size>][&][label=<label>][&]["
-            "message=<message>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "bitcoin:<address>[?[amount=<size>][&][label=<label>][&]["
-            "message=<message>]]"
+        text = "This is an apt URL pattern: apt:docformatter"
+        assert docformatter.do_find_links(text) == [(28, 44)]
+        text = "This is a bitcoin URL pattern: bitcoin:<address>[?[amount=<size>][&][label=<label>][&][message=<message>]]"
+        assert docformatter.do_find_links(text) == [(31, 106)]
+        text = (
+            "This is a chrome URL pattern: chrome://<package>/<section>/<path>"
         )
-        lines = [
-            "This is a chrome URL pattern:",
-            "chrome://<package>/<section>/<path>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "chrome://<package>/<section>/<path>"
-        )
-        lines = [
-            "This is a Java compressed archive URL pattern:",
-            "jar:<url>!/[<entry>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines) == "jar:<url>!/[<entry>]"
-        )
+        assert docformatter.do_find_links(text) == [(30, 65)]
+        text = "This is a Java compressed archive URL pattern: jar:<url>!/[<entry>]"
+        assert docformatter.do_find_links(text) == [(47, 67)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_version_control_link(self):
+    def test_do_find_version_control_link(self):
         """Identify cvs://, git://, or svn:// as a link."""
-        lines = [
-            "This is a Concurrent Versions System URL pattern:",
-            "cvs://<method:logindetails>@<repository>/<modulepath>;[date=date "
-            "to retrieve | tag=tag to retrieve]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "cvs://<method:logindetails>@<repository>/<modulepath>;["
-            "date=date to retrieve | tag=tag to retrieve]"
-        )
-        lines = [
-            "This is a Git URL pattern:",
-            "git://github.com/PyCQA/docformatter.git",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "git://github.com/PyCQA/docformatter.git"
-        )
-        lines = [
-            "This is a Subversion URL pattern:",
-            "svn://<logindetails>@<repository><:port>/<modulepath>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "svn://<logindetails>@<repository><:port>/<modulepath>"
-        )
+        text = "This is a Concurrent Versions System URL pattern: cvs://<method:logindetails>@<repository>/<modulepath>;[date=date to retrieve | tag=tag to retrieve]"
+        assert docformatter.do_find_links(text) == [(50, 114)]
+        text = "This is a Git URL pattern: git://github.com/PyCQA/docformatter.git"
+        assert docformatter.do_find_links(text) == [(27, 66)]
+        text = "This is a Subversion URL pattern: svn://<logindetails>@<repository><:port>/<modulepath>"
+        assert docformatter.do_find_links(text) == [(34, 87)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_domain_name_system_link(self):
+    def test_do_find_domain_name_system_link(self):
         """Identify dns: as a link."""
-        lines = [
-            "This is a Domain Name System URL pattern:",
-            "dns:example?TYPE=A;CLASS=IN",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "dns:example?TYPE=A;CLASS=IN"
-        )
+        text = "This is a Domain Name System URL pattern: dns:example?TYPE=A;CLASS=IN"
+        assert docformatter.do_find_links(text) == [(42, 69)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_file_transfer_protocol_link(self):
+    def test_do_find_file_transfer_protocol_link(self):
         """Identify file://, ftp://, ftps://, and sftp:// as a link."""
-        lines = [
-            "This is a URL pattern for addressing a file:",
-            "file://[host]/path",
-        ]
-        assert docformatter.is_some_sort_of_link(lines) == "file://[host]/path"
-        lines = [
-            "This is a File Transfer Protocol URL pattern:",
-            "ftp://[user[:password]@]host[:port]/url-path",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ftp://[user[:password]@]host[:port]/url-path"
+        text = (
+            "This is a URL pattern for addressing a file: file://[host]/path"
         )
-        lines = [
-            "This is a Secure File Transfer Protocol URL pattern:",
-            "ftps://[user[:password]@]host[:port]/url-path",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ftps://[user[:password]@]host[:port]/url-path"
-        )
-        lines = [
-            "This is a SSH File Transfer Protocol URL pattern:",
-            "sftp://[<user>[;fingerprint=<host-key fingerprint>]@]<host>["
-            ":<port>]/<path>/<file>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "sftp://[<user>[;fingerprint=<host-key fingerprint>]@]<host>["
-            ":<port>]/<path>/<file>"
-        )
+        assert docformatter.do_find_links(text) == [(39, 44), (45, 63)]
+        text = "This is a File Transfer Protocol URL pattern: ftp://[user[:password]@]host[:port]/url-path"
+        assert docformatter.do_find_links(text) == [(46, 90)]
+        text = "This is a Secure File Transfer Protocol URL pattern: ftps://[user[:password]@]host[:port]/url-path"
+        assert docformatter.do_find_links(text) == [(53, 98)]
+        text = "This is a SSH File Transfer Protocol URL pattern: sftp://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>]/<path>/<file>"
+        assert docformatter.do_find_links(text) == [(50, 87)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_network_command_link(self):
+    def test_do_find_network_command_link(self):
         """Identify finger://, rsync://, telnet://, and vnc:// as a link."""
-        lines = [
-            "This is a finger protocol URL pattern:",
-            "finger://host[:port][/<request>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "finger://host[:port][/<request>]"
-        )
-        lines = [
-            "This is a remote synchronization URL pattern:",
-            "rsync://<host>[:<port>]/<path>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "rsync://<host>[:<port>]/<path>"
-        )
-        lines = [
-            "This is a telnet URL pattern:",
-            "telnet://<user>:<password>@<host>[:<port>/]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "telnet://<user>:<password>@<host>[:<port>/]"
-        )
-        lines = [
-            "This is a Virtual Network Computing URL pattern:",
-            "vnc://[<host>[:<port>]][?<params>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "vnc://[<host>[:<port>]][?<params>]"
-        )
-        lines = [
-            "This is an eXtensible Resource Identifier URL pattern:",
-            "xri://<authority>[/[<path>]][?<query>][#fragment]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "xri://<authority>[/[<path>]][?<query>][#fragment]"
-        )
+        text = "This is a finger protocol URL pattern: finger://host[:port][/<request>]"
+        assert docformatter.do_find_links(text) == [(39, 71)]
+        text = "This is a remote synchronization URL pattern: rsync://<host>[:<port>]/<path>"
+        assert docformatter.do_find_links(text) == [(46, 76)]
+        text = "This is a telnet URL pattern: telnet://<user>:<password>@<host>[:<port>/]"
+        assert docformatter.do_find_links(text) == [(30, 73)]
+        text = "This is a Virtual Network Computing URL pattern: vnc://[<host>[:<port>]][?<params>]"
+        assert docformatter.do_find_links(text) == [(49, 83)]
+        text = "This is an eXtensible Resource Identifier URL pattern: xri://<authority>[/[<path>]][?<query>][#fragment]"
+        assert docformatter.do_find_links(text) == [(55, 104)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_remote_shell_link(self):
+    def test_do_find_remote_shell_link(self):
         """Identify fish:// and ssh:// as a link."""
-        lines = [
-            "This is a fish URL pattern:",
-            "fish://[<username>[:<password>]@]<hostname>[:<port>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "fish://[<username>[:<password>]@]<hostname>[:<port>]"
-        )
-        lines = [
-            "This is a Secure Shell URL pattern:",
-            "ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>["
-            ":<port>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>["
-            ":<port>]"
-        )
+        text = "This is a fish URL pattern: fish://[<username>[:<password>]@]<hostname>[:<port>]"
+        assert docformatter.do_find_links(text) == [(28, 80)]
+        text = "This is a Secure Shell URL pattern: ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>]"
+        assert docformatter.do_find_links(text) == [(36, 72)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_internet_transfer_protocol_link(self):
+    def test_do_find_internet_transfer_protocol_link(self):
         """Identify dav:, http://, https://, and shttp:// as a link."""
-        lines = [
-            "This is a WebDAV Transfer Protocol URL pattern:",
-            "dav://example.com/directory/subdirectory",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "dav://example.com/directory/subdirectory"
-        )
-        lines = [
-            "This is a Hypertext Transfer Protocol URL pattern:",
-            "http://github.com/PyCQA/docformatter",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "http://github.com/PyCQA/docformatter"
-        )
-        lines = [
-            "This is a Secure Hypertext Transfer Protocol URL pattern:",
-            "https://github.com/PyCQA/docformatter",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "https://github.com/PyCQA/docformatter"
-        )
-        lines = [
-            "This is an obsolete Secure Hypertext Transfer Protocol URL "
-            "pattern:",
-            "shttp://github.com/PyCQA/docformatter",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "shttp://github.com/PyCQA/docformatter"
-        )
+        text = "This is a WebDAV Transfer Protocol URL pattern: dav://example.com/directory/subdirectory"
+        assert docformatter.do_find_links(text) == [(48, 88)]
+        text = "This is a Hypertext Transfer Protocol URL pattern: http://github.com/PyCQA/docformatter"
+        assert docformatter.do_find_links(text) == [(51, 87)]
+        text = "This is a Secure Hypertext Transfer Protocol URL pattern: https://github.com/PyCQA/docformatter"
+        assert docformatter.do_find_links(text) == [(58, 95)]
+        text = "This is an obsolete Secure Hypertext Transfer Protocol URL pattern: shttp://github.com/PyCQA/docformatter"
+        assert docformatter.do_find_links(text) == [(68, 105)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_mail_link(self):
+    def test_do_find_mail_link(self):
         """Identify imap://, mailto:, and pop:// as a link."""
-        lines = [
-            "This is a Internet Message Access Protocol URL pattern:",
-            "imap://[<user>[;AUTH=<type>]@]<host>[:<port>]/<command>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "imap://[<user>[;AUTH=<type>]@]<host>[:<port>]/<command>"
-        )
-        lines = [
-            "This is a Simple Mail Transfer Protocol URL pattern:",
-            "mailto:<address>[?<header1>=<value1>[&<header2>=<value2>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "mailto:<address>[?<header1>=<value1>[&<header2>=<value2>]]"
-        )
-        lines = [
-            "This is a Post Office Protocol URL pattern:",
-            "pop://[<user>[;AUTH=<auth>]@]<host>[:<port>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "pop://[<user>[;AUTH=<auth>]@]<host>[:<port>]"
-        )
+        text = "This is a Internet Message Access Protocol URL pattern: imap://[<user>[;AUTH=<type>]@]<host>[:<port>]/<command>"
+        assert docformatter.do_find_links(text) == [(56, 111)]
+        text = "This is a Simple Mail Transfer Protocol URL pattern: mailto:<address>[?<header1>=<value1>[&<header2>=<value2>]]"
+        assert docformatter.do_find_links(text) == [(53, 111)]
+        text = "This is a Post Office Protocol URL pattern: pop://[<user>[;AUTH=<auth>]@]<host>[:<port>]"
+        assert docformatter.do_find_links(text) == [(44, 88)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_printer_link(self):
+    def test_do_find_printer_link(self):
         """Identify ipp:// and ipps:// as a link."""
-        lines = [
-            "This is a Internet Printing Protocol URL pattern:",
-            "ipp://printer.example.com/ipp/print",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ipp://printer.example.com/ipp/print"
-        )
-        lines = [
-            "This is a Secure Internet Printing Protocol URL pattern:",
-            "ipps://printer2.example.com:443/ipp/print",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ipps://printer2.example.com:443/ipp/print"
-        )
+        text = "This is a Internet Printing Protocol URL pattern: ipp://printer.example.com/ipp/print"
+        assert docformatter.do_find_links(text) == [(50, 85)]
+        text = "This is a Secure Internet Printing Protocol URL pattern: ipps://printer2.example.com:443/ipp/print"
+        assert docformatter.do_find_links(text) == [(57, 98)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_messaging_link(self):
+    def test_do_find_messaging_link(self):
         """Identify irc://, irc6://, ircs://, sms://, and xmpp:// as a link."""
-        lines = [
-            "This is a Internet Relay Chat URL pattern:",
-            "irc://<host>[:<port>]/[<channel>[?<password>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "irc://<host>[:<port>]/[<channel>[?<password>]]"
-        )
-        lines = [
-            "This is a Internet Relay Chat v6 URL pattern:",
-            "irc6://<host>[:<port>]/[<channel>[?<password>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "irc6://<host>[:<port>]/[<channel>[?<password>]]"
-        )
-        lines = [
-            "This is a Secure Internet Relay Chat URL pattern:",
-            "ircs://<host>[:<port>]/[<channel>[?<password>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ircs://<host>[:<port>]/[<channel>[?<password>]]"
-        )
-        lines = [
-            "This is a Short Message Service URL pattern:",
-            "sms:+15558675309?body=hello%20there",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "sms:+15558675309?body=hello%20there"
-        )
-        lines = [
-            "This is a Extensible Messaging and Presence Protocol URL "
-            "pattern:",
-            "xmpp:[<user>]@<host>[:<port>]/[<resource>][?<query>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "xmpp:[<user>]@<host>[:<port>]/[<resource>][?<query>]"
-        )
+        text = "This is a Internet Relay Chat URL pattern: irc://<host>[:<port>]/[<channel>[?<password>]]"
+        assert docformatter.do_find_links(text) == [(43, 89)]
+        text = "This is a Internet Relay Chat v6 URL pattern: irc6://<host>[:<port>]/[<channel>[?<password>]]"
+        assert docformatter.do_find_links(text) == [(46, 93)]
+        text = "This is a Secure Internet Relay Chat URL pattern: ircs://<host>[:<port>]/[<channel>[?<password>]]"
+        assert docformatter.do_find_links(text) == [(50, 97)]
+        text = "This is a Short Message Service URL pattern: sms:+15558675309?body=hello%20there"
+        assert docformatter.do_find_links(text) == [(45, 80)]
+        text = "This is a Extensible Messaging and Presence Protocol URL pattern: xmpp:[<user>]@<host>[:<port>]/[<resource>][?<query>]"
+        assert docformatter.do_find_links(text) == [(66, 118)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_directory_access_link(self):
+    def test_do_find_directory_access_link(self):
         """Identify ldap://, ldaps://, and s3:// as a link."""
-        lines = [
-            "This is a Lightweight Directory Access Protocol URL pattern:",
-            "ldap://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?["
-            "<filter>][?<extensions>]]]]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ldap://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?["
-            "<filter>][?<extensions>]]]]]"
+        text = "This is a Lightweight Directory Access Protocol URL pattern: ldap://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?[<filter>][?<extensions>]]]]]"
+        assert docformatter.do_find_links(text) == [(61, 91)]
+        text = "This is a Secure Lightweight Directory Access Protocol URL pattern: ldaps://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?[<filter>][?<extensions>]]]]]"
+        assert docformatter.do_find_links(text) == [(68, 99)]
+        text = (
+            "This is an Amazon S3 bucket URL pattern: s3://mybucket/puppy.jpg"
         )
-        lines = [
-            "This is a Secure Lightweight Directory Access Protocol URL "
-            "pattern:",
-            "ldaps://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?["
-            "<filter>][?<extensions>]]]]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "ldaps://[<host>[:<port>]][/<dn> [?[<attributes>][?["
-            "<scope>][?[<filter>][?<extensions>]]]]]"
-        )
-        lines = [
-            "This is an Amazon S3 bucket URL pattern:",
-            "s3://mybucket/puppy.jpg",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "s3://mybucket/puppy.jpg"
-        )
+        assert docformatter.do_find_links(text) == [(41, 64)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_news_link(self):
+    def test_do_find_news_link(self):
         """Identify news: and nntp:// as a link."""
-        lines = [
-            "This is a Usenet newsgroup URL pattern:",
-            "news:<newsgroupname>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines) == "news:<newsgroupname>"
-        )
-        lines = [
-            "This is a Network News Transfer Protocol URL pattern:",
-            "nntp://<host>:<port>/<newsgroup-name>/<article-number>",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "nntp://<host>:<port>/<newsgroup-name>/<article-number>"
-        )
+        text = "This is a Usenet newsgroup URL pattern: news:<newsgroupname>"
+        assert docformatter.do_find_links(text) == [(40, 60)]
+        text = "This is a Network News Transfer Protocol URL pattern: nntp://<host>:<port>/<newsgroup-name>/<article-number>"
+        assert docformatter.do_find_links(text) == [(54, 108)]
 
     @pytest.mark.unit
-    def test_is_some_sort_of_initiation_link(self):
+    def test_do_find_initiation_link(self):
         """Identify sip:, sips:, and snmp:// as a link."""
-        lines = [
-            "This is a Session Initiation Protocol URL pattern:",
-            "sip:<user>[:<password>]@<host>[:<port>][;<uri-parameters>]["
-            "?<headers>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "sip:<user>[:<password>]@<host>[:<port>][;<uri-parameters>]["
-            "?<headers>]"
-        )
-        lines = [
-            "This is a Secure Session Initiation Protocol URL pattern:",
-            "sips:<user>[:<password>]@<host>[:<port>][;<uri-parameters>]["
-            "?<headers>]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "sips:<user>[:<password>]@<host>[:<port>][;<uri-parameters>]["
-            "?<headers>]"
-        )
-        lines = [
-            "This is a Simple Network Management Protocol URL pattern:",
-            "snmp://[user@]host[:port][/[<context>[;<contextEngineID>]]["
-            "/<oid>]]",
-        ]
-        assert (
-            docformatter.is_some_sort_of_link(lines)
-            == "snmp://[user@]host[:port][/[<context>[;<contextEngineID>]]["
-            "/<oid>]]"
-        )
+        text = "This is a Session Initiation Protocol URL pattern: sip:<user>[:<password>]@<host>[:<port>][;<uri-parameters>][?<headers>]"
+        assert docformatter.do_find_links(text) == [(51, 121)]
+        text = "This is a Secure Session Initiation Protocol URL pattern: sips:<user>[:<password>]@<host>[:<port>][;<uri-parameters>][?<headers>]"
+        assert docformatter.do_find_links(text) == [(58, 129)]
+        text = "This is a Simple Network Management Protocol URL pattern: snmp://[user@]host[:port][/[<context>[;<contextEngineID>]][/<oid>]]"
+        assert docformatter.do_find_links(text) == [(58, 125)]
 
 
 class TestIsSomeSortOfList:
