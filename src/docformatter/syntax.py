@@ -164,7 +164,7 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
         position of each URL found in the passed description.
     """
     _url_iter = re.finditer(
-        rf"(`[\w :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", text
+        rf"(`[\w. :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):/?(\S*)>?", text
     )
     return [(_url.start(0), _url.end(0)) for _url in _url_iter]
 
