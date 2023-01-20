@@ -1,19 +1,12 @@
 # This workflow runs when a pull request is closed.
 #
-# - Job 1:
-#     - Gets list of PR labels.
-#     - Get release version from VERSION.
-#     - IF 'release' label:
-#         - Cut release.
-#     - IF release is cut:
-#         - Build artifacts.
-#         - Upload to Test PyPi if build succeeds. (Future)
-#         - Test install from Test PyPi. (Future)
-#         - Upload to PyPi if test install succeeds. (Future)
-# - Job 2 (needs job 1):
-#     - Close old milestone.
-#     - Create new minor version milestone.
-#     - Create new major version milestone.
+# - Gets list of PR labels.
+# - IF 'release' label:
+#   - Get release version using Poetry.
+#   - Get next semantic version.
+#   - Close old milestones.
+#   - Create new minor version milestone.
+#   - Create new major version milestone.
 name: Do Release Workflow
 
 on:
@@ -24,12 +17,12 @@ on:
       - closed
 
 jobs:
-  cut-release:
-    name: Cut New Release
+  create_new_milestone:
+    name: Create New Milestone
+    needs: cut-release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -42,103 +35,33 @@ jobs:
         if: contains(steps.prlabels.outputs.labels, ' release ')
         run: |
           pip install poetry
-          echo "::set-output name=rel_version::$(echo $(poetry version | cut -d' ' -f2))"
-          echo "cut_release=1" >> $GITHUB_ENV
-
-      - name: Cut the release
-        id: cutrelease
-        if: ${{ env.cut_release == 1 }}
-        uses: release-drafter/release-drafter@master
-        with:
-          name: "v${{ steps.relversion.outputs.rel_version }}"
-          tag: "v${{ steps.relversion.outputs.rel_version }}"
-          version: "${{ steps.relversion.outputs.rel_version }}"
-          prerelease: false
-          publish: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print release info
-        run: |
-          echo ${{ steps.cutrelease.outputs.id }}
-          echo ${{ steps.cutrelease.outputs.name }}
-          echo ${{ steps.cutrelease.outputs.tag_name }}
-          echo ${{ steps.cutrelease.outputs.html_url }}
-          echo ${{ steps.cutrelease.outputs.upload_url }}
-
-      - name: Build release
-        if: startsWith(steps.cutrelease.outputs.tag_name, 'v')
-        id: build
-        run: |
-          pip install -U pip poetry twine
-          poetry build && twine check dist/* && echo "build_ok=1" >> $GITHUB_ENV
-
-#      - name: Publish to Test PyPi
-#        if: ${{ env.build_ok == 1 }}
-#        uses: pypa/gh-action-pypi-publish@release/v1
-#        with:
-#          user: __token__
-#          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-#          repository_url: https://test.pypi.org/legacy/
-
-#      - name: Test install from Test PyPI
-#        if: ${{ env.build_ok == 1 }}
-#        run: |
-#          sudo apt-get update
-#          pip install \
-#          --index-url https://test.pypi.org/simple/ \
-#          --extra-index-url https://pypi.org/simple \
-#          docformatter==${{ steps.relversion.outputs.rel_version }} && echo "install_ok=1" >> $GITHUB_ENV
-
-#      - name: Publish to PyPi
-#        if: ${{ env.install_ok == 1 }}
-#        uses: pypa/gh-action-pypi-publish@release/v1
-#        with:
-#          user: __token__
-#          password: ${{ secrets.PYPI_API_TOKEN }}
-
-      - name: Upload wheel to Release
-        id: upload-wheel
-        if: ${{ env.build_ok == 1 }}
-        uses: shogo82148/actions-upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.cutrelease.outputs.upload_url }}
-
-  create_new_milestone:
-    name: Create New Milestone
-    needs: cut-release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2.2.0
-        with:
-          fetch-depth: 0
-
-      - name: Get new version
-        id: newversion
-        run: |
-          pip install poetry
-          echo "::set-output name=version::$(echo $(poetry version | cut -d' ' -f2))"
+          echo "version=$(echo $(poetry version | cut -d' ' -f2))" >> $GITHUB_OUTPUT
+          echo "do_milestones=1" >> $GITHUB_ENV
 
       - name: Get next semantic version
         id: nextversion
+        if: ${{ env.do_milestones == 1 }}
         uses: WyriHaximus/github-action-next-semvers@v1.1.0
         with:
-          version: ${{ steps.newversion.outputs.version }}
+          version: ${{ steps.relversion.outputs.version }}
 
       - name: Close old milestone
+        if: ${{ env.do_milestones == 1 }}
         uses: WyriHaximus/github-action-close-milestone@master
         with:
-          number: ${{ steps.newversion.outputs.version }}
+          number: ${{ steps.relversion.outputs.version }}
 
       - name: Create new minor release milestone
-        uses: WyriHaximus/github-action-create-milestone@master
+        if: ${{ env.do_milestones == 1 }}
+        uses: WyriHaximus/github-action-create-milestone@v1.2.0
         with:
           title: "${{ steps.nextversion.outputs.v_minor }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new major release milestone
-        uses: WyriHaximus/github-action-create-milestone@master
+        if: ${{ env.do_milestones == 1 }}
+        uses: WyriHaximus/github-action-create-milestone@v1.2.0
         with:
           title: "${{ steps.nextversion.outputs.v_major }}"
         env:

@@ -2,16 +2,22 @@
 #
 # - Job 1:
 #     - Get new tag.
-#     - Update CHANGELOG.md
-#     - Update pyproject.toml and docs/source/conf.py with new version.
-#     - Set PR variables.
-#     - Cut PR to merge files and create release/* branch.
+#     - Build new release.
+#     - If release candidate tag:
+#         - Cut PR to merge files and create release/* branch.
+#         - Generate GitHub (pre-)release if build succeeds.
+#         - Upload wheel to GitHub (pre-)release if build succeeds.
+#     - If release tag:
+#         - Update CHANGELOG.md
+#         - Upload wheel to Test PyPi if build succeeds. (Future)
+#         - Test install from Test PyPi. (Future)
+#         - Upload wheel to PyPi if test install succeeds. (Future)
 name: Push Version Tag Workflow
 
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+.rc[0-9]+'
 
 jobs:
   request-release:
@@ -19,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: master
@@ -28,12 +34,60 @@ jobs:
         id: newversion
         run: |
           new_tag=${GITHUB_REF/refs\/tags\//}
-          echo "::set-output name=new_version::$(echo $new_tag)"
+          echo "new_tag=$(echo $new_tag)" >> $GITHUB_OUTPUT
+          echo "new_version=$(echo $new_tag | sed 's/.rc[0-9]*//')" >> $GITHUB_OUTPUT
           echo "New tag is: $new_tag"
+          echo "New version is: $new_version"
           echo "GitHub ref: ${{ github.ref }}"
+
+      - name: Build release
+        id: build
+        run: |
+          pip install -U pip poetry twine
+          poetry build && twine check dist/* && echo "build_ok=1" >> $GITHUB_ENV
+
+      - name: Open release pull request
+        uses: peter-evans/create-pull-request@v3
+        if: contains( steps.newversion.output.new_tag, 'rc' )
+        with:
+          commit-message: "release: ${{ steps.newversion.outputs.new_version }}"
+          title: "release: ${{ steps.newversion.outputs.new_version }}"
+          body: "Please cut release ${{ steps.newversion.outputs.new_version }}"
+          branch: "release/${{ steps.newversion.outputs.new_version }}"
+          base: master
+          labels: release
+
+      - name: Cut the pre-release
+        id: cutprerelease
+        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+        uses: release-drafter/release-drafter@v5
+        with:
+          name: "v${{ steps.relversion.outputs.new_tag }}"
+          tag: "v${{ steps.relversion.outputs.new_tag }}"
+          version: "${{ steps.relversion.outputs.new_tag }}"
+          prerelease: true
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print release candidate info
+        run: |
+          echo ${{ steps.cutprerelease.outputs.id }}
+          echo ${{ steps.cutprerelease.outputs.name }}
+          echo ${{ steps.cutprerelease.outputs.tag_name }}
+          echo ${{ steps.cutprerelease.outputs.html_url }}
+          echo ${{ steps.cutprerelease.outputs.upload_url }}
+
+      - name: Upload wheel to GitHub release
+        id: upload-wheel
+        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.cutprerelease.outputs.upload_url }}
 
       - name: Generate release changelog
         uses: heinrichreimer/github-changelog-generator-action@master
+        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: "v1.3.1"
@@ -41,9 +95,9 @@ jobs:
           breakingLabel: "Breaking Changes"
           breakingLabels: "V: major"
           enhancementLabel: "New Features"
-          enhancementLabels: "V: minor"
+          enhancementLabels: "P: enhancement"
           bugsLabel: "Bug Fixes"
-          bugLabels: "V: patch"
+          bugLabels: "P: bug"
           excludeLabels: "release"
           issues: false
           issuesWoLabels: false
@@ -56,21 +110,26 @@ jobs:
           stripGeneratorNotice: true
           verbose: true
 
-      - name: Update pyproject.toml and docs/conf.py
-        uses: vemel/nextversion@main
-        with:
-          path: ./pyproject.toml
-          result: ${{ steps.newversion.outputs.new_version }}
-          update: |
-            ./pyproject.toml
-            ./docs/source/conf.py
+#      - name: Publish to Test PyPi
+#        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+#          repository_url: https://test.pypi.org/legacy/
 
-      - name: Request release pull request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          commit-message: "release: ${{ steps.newversion.outputs.new_version }}"
-          title: "release: ${{ steps.newversion.outputs.new_version }}"
-          body: "Please cut release ${{ steps.newversion.outputs.new_version }}"
-          branch: "release/${{ steps.newversion.outputs.new_version }}"
-          base: master
-          labels: release
+#      - name: Test install from Test PyPI
+#        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+#        run: |
+#          sudo apt-get update
+#          pip install \
+#          --index-url https://test.pypi.org/simple/ \
+#          --extra-index-url https://pypi.org/simple \
+#          docformatter==${{ steps.newversion.outputs.new_version }} && echo "install_ok=1" >> $GITHUB_ENV
+
+#      - name: Publish to PyPi
+#        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.install_ok == 1 }}
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPI_API_TOKEN }}
