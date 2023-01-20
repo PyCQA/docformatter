@@ -36,7 +36,7 @@ jobs:
           new_tag=${GITHUB_REF/refs\/tags\//}
           new_version=$(echo $new_tag | sed 's/.rc[0-9]*//')"
           echo "new_tag=$(echo $new_tag)" >> $GITHUB_OUTPUT
-          echo "new_version=$(echo $new_version) >> $GITHUB_OUTPUT
+          echo "new_version=$(echo $new_version)" >> $GITHUB_OUTPUT
           echo "New tag is: $new_tag"
           echo "New version is: $new_version"
           echo "GitHub ref: ${{ github.ref }}"
