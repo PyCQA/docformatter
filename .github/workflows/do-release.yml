@@ -19,7 +19,6 @@ on:
 jobs:
   create_new_milestone:
     name: Create New Milestone
-    needs: cut-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
