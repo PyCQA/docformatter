@@ -49,7 +49,7 @@ jobs:
 
       - name: Open release pull request
         uses: peter-evans/create-pull-request@v3
-        if: contains( steps.newversion.output.new_tag, 'rc' )
+        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) }}
         with:
           commit-message: "release: ${{ steps.newversion.outputs.new_version }}"
           title: "release: ${{ steps.newversion.outputs.new_version }}"
@@ -63,9 +63,9 @@ jobs:
         if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
         uses: release-drafter/release-drafter@v5
         with:
-          name: "v${{ steps.relversion.outputs.new_tag }}"
-          tag: "v${{ steps.relversion.outputs.new_tag }}"
-          version: "${{ steps.relversion.outputs.new_tag }}"
+          name: "v${{ steps.newversion.outputs.new_tag }}"
+          tag: "v${{ steps.newversion.outputs.new_tag }}"
+          version: "${{ steps.newversion.outputs.new_tag }}"
           prerelease: true
           publish: true
         env:
