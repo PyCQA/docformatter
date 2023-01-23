@@ -23,7 +23,9 @@
 # SOFTWARE.
 """This module provides docformatter's Syntaxor class."""
 
+
 # Standard Library Imports
+import contextlib
 import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
@@ -90,10 +92,10 @@ URL_PATTERNS = (
 #   < ? matches the character < between zero and one times.
 #   ({URL_PATTERNS}):(//)? matches one of the strings in the variable
 #   URL_PATTERNS, followed by a colon and two forward slashes zero or one time.
-#   (\S*) matches any non-whitespace character between zero and unlimited
-#   times.
+#   ([a-zA-Z0-9\.\/-`]*) matches the list of characters between zero and
+#   unlimited times.
 #   >? matches the character > between zero and one times.
-URL_REGEX = rf"(`[\w. :]+|\.\. _?[\w :]+)?<?({URL_PATTERNS}):(//)?(\S*)>?"
+URL_REGEX = rf"(`[\w. :]+|\.\. _?[\w :]+|')?<?({URL_PATTERNS}):(//)?(\S*)>?"
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
@@ -164,6 +166,40 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
     return [(_url.start(0), _url.end(0)) for _url in _url_iter]
 
 
+def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
+    """Check if the identified URL is something other than a complete link.
+
+    Is the identified link simply:
+        1. The URL scheme pattern such as 's3://' or 'file://' or 'dns:'.
+        2. The beginning of a URL link that has been wrapped by the user.
+
+    Arguments
+    ---------
+    text: str
+        The description text containing the link.
+    index: tuple
+        The index in the text of the starting and ending position of the
+        identified link.
+
+    Returns
+    -------
+    _do_skip: bool
+        Whether to skip this link and simply treat it as a standard text word.
+    """
+    _do_skip = False
+
+    _do_skip = _do_skip or (
+        text[index[1] - 3: index[1]] == "//'"
+        or text[index[1] - 2: index[1]] == ":'"
+    )
+    with contextlib.suppress(IndexError):
+        _do_skip = _do_skip or (
+            text[index[0]] == "<" and text[index[1]] != ">"
+        )
+
+    return _do_skip
+
+
 def do_split_description(
     text: str,
     indentation: str,
@@ -193,16 +229,20 @@ def do_split_description(
         _lines = []
         _text_idx = 0
         for _idx in _url_idx:
+            # Skip URL if it is simply a quoted pattern.
+            if do_skip_link(text, _idx):
+                continue
+
             # If the text including the URL is longer than the wrap length,
             # we need to split the description before the URL, wrap the pre-URL
             # text, and add the URL as a separate line.
-            if len(text[_text_idx : _idx[1]]) > (
+            if len(text[_text_idx: _idx[1]]) > (
                 wrap_length - len(indentation)
             ):
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx : _idx[0]], indentation, wrap_length
+                        text[_text_idx: _idx[0]], indentation, wrap_length
                     )
                 )
                 # Add the URL.
