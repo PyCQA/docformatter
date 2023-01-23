@@ -377,6 +377,37 @@ class TestDoFindLinks:
         assert docformatter.do_find_links(text) == [(58, 125)]
 
 
+class TestDoSkipLink:
+    """Class for testing the do_skip_links() function."""
+
+    @pytest.mark.unit
+    def test_do_skip_only_link_pattern(self):
+        """Don't treat things like 's3://' or 'file://' as links.
+
+        See issue #150.
+        """
+        text = (
+            "Directories are implicitly created.  The accepted URL can start "
+            "with 's3://' to refer to files on s3.  Local files can be "
+            "prefixed with 'file://' (but it is not needed!)"
+        )
+        assert docformatter.do_skip_link(text, (70, 76))
+        assert docformatter.do_skip_link(text, (137, 145))
+
+    @pytest.mark.unit
+    def test_do_skip_already_wrapped_link(self):
+        """Skip links that were already wrapped by the user.
+
+        See issue #150.
+        """
+        text = (
+            "The text file can be retrieved via the Chrome plugin `Get "
+            "Cookies.txt <https://chrome.google.com/webstore/detail/get-"
+            "cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."
+        )
+        assert docformatter.do_skip_link(text, (70, 117))
+
+
 class TestIsSomeSortOfList:
     """Class for testing the is_some_sort_of_list() function."""
 
