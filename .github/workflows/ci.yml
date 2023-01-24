@@ -56,4 +56,5 @@ jobs:
         with:
           base-path: .tox
           debug: true
+          parallel: true
           parallel-finished: true
