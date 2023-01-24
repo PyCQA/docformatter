@@ -317,4 +317,8 @@ prioritization scheme:
 
 Integration of a bug fix will result in a patch version bump (i.e., 1.5.0 ->
 1.5.1).  Integration of one or more enhancements will result in a minor
-version bump (i.e., 1.5.0 -> 1.6.0).
+version bump (i.e., 1.5.0 -> 1.6.0).  One or more release candidates will be
+provided for each minor or major version bump.  These will be indicated by
+appending `-rcX` to the version number, where the X is the release candidate
+number beginning with 1.  Release candidates will not be uploaded to PyPi,
+but will be made available via GitHub Releases.

@@ -153,12 +153,12 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
 
     Parameters
     ----------
-    text: str
+    text : str
         the docstring description to check for a link patterns.
 
     Returns
     -------
-    url_index: list
+    url_index : list
         a list of tuples with each tuple containing the starting and ending
         position of each URL found in the passed description.
     """
@@ -175,15 +175,15 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
 
     Arguments
     ---------
-    text: str
+    text : str
         The description text containing the link.
-    index: tuple
+    index : tuple
         The index in the text of the starting and ending position of the
         identified link.
 
     Returns
     -------
-    _do_skip: bool
+    _do_skip : bool
         Whether to skip this link and simply treat it as a standard text word.
     """
     _do_skip = False
@@ -290,6 +290,9 @@ def is_some_sort_of_list(text, strict) -> bool:
 
     return any(
         (
+            # Admonitions (remove when adding support for reST directives)
+            re.match(r"(\.\. )", line)
+            or
             # "1. item"
             re.match(r"\s*\d\.", line)
             or
