@@ -81,21 +81,44 @@ URL_PATTERNS = (
 
 # This is the regex used to find URL links:
 #
-# (`[\w.:]+|\.\._?[\w:]+)? is used to find in-line links that should remain
-# on a single line even if it exceeds the wrap length.
-#   `[\w.:]+ matches the character ` followed by any number of letters,
-#   periods, spaces, or colons.
-#   \.\._?[\w:]+ matches the pattern .. followed by zero or one underscore,
-#   then any number of letters, periods, spaces, or colons.
+# (`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')? is used to find in-line links that
+# should remain on a single line even if it exceeds the wrap length.
+#   `{{2}} is used to find two back-tick characters.
+#   This finds patterns like: ``http://www.example.com``
+#
+#   `\w[\w. :\n]* matches the back-tick character immediately followed by one
+#   letter, then followed by any number of letters, periods, spaces, colons,
+#   or newlines.
+#   This finds patterns like: `Link text <https://domain.invalid/>`_
+#
+#   \.\. _?[\w. :]+ matches the pattern .. followed one space, then by zero or
+#   one underscore, then any number of letters, periods, spaces, or colons.
+#   This finds patterns like: .. _a link: https://domain.invalid/
+#
+#   ' matches a single quote.
+#   This finds patterns like: 'http://www.example.com'
+#
 #   ? matches the previous pattern between zero or one times.
+#
 # <?({URL_PATTERNS}):(//)?(\S*)>? is used to find the actual link.
-#   < ? matches the character < between zero and one times.
-#   ({URL_PATTERNS}):(//)? matches one of the strings in the variable
-#   URL_PATTERNS, followed by a colon and two forward slashes zero or one time.
-#   ([a-zA-Z0-9\.\/-`]*) matches the list of characters between zero and
-#   unlimited times.
+#   <? matches the character < between zero and one times.
+#   ({URL_PATTERNS}) matches one of the strings in the variable
+#   URL_PATTERNS
+#   : matches a colon.
+#   (//)? matches two forward slashes zero or one time.
+#   (\S*) matches any non-whitespace character between zero and infinity times.
 #   >? matches the character > between zero and one times.
-URL_REGEX = rf"(`[\w. :]+|\.\. _?[\w :]+|')?<?({URL_PATTERNS}):(//)?(\S*)>?"
+URL_REGEX = rf"(`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')?<?({URL_PATTERNS}):(\
+//)?(\S*)>?"
+
+# This is the regex used to ignore found hyperlinks when they don't actually
+# contain a domain, but only the URL pattern. This will ignore URLs like
+# ``http://`` or 'ftp:` that should be treated simply as a word.
+#
+# ({URL_PATTERNS}) matches one of the URL patterns.
+# :(/){{0,2}} matches a colon followed by up to two forward slashes.
+# (``|') matches a double back-tick or single quote.
+URL_SKIP_REGEX = rf"({URL_PATTERNS}):(/){{0,2}}(``|')"
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
@@ -148,6 +171,39 @@ def description_to_list(
     return lines
 
 
+def do_clean_url(url: str, indentation: str) -> str:
+    r"""Strip newlines and multiple whitespace from URL string.
+
+    This function deals with situations such as:
+
+    `Get\n
+        Cookies.txt <https://chrome.google.com/webstore/detail/get-
+
+    by returning:
+
+    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-
+
+    Parameters
+    ----------
+    url : str
+        The URL that was found by the do_find_links() function and needs to be
+        processed.
+    indentation : str
+        The indentation pattern used.
+
+    Returns
+    -------
+    url : str
+        The URL with internal newlines removed and excess whitespace removed.
+    """
+    _lines = url.splitlines()
+    for _idx, _line in enumerate(_lines):
+        if _line[:4] == indentation:
+            _lines[_idx] = f" {_line.strip()}"
+
+    return f'{indentation}{"".join(list(_lines))}'
+
+
 def do_find_links(text: str) -> List[Tuple[int, int]]:
     r"""Determine if docstring contains any links.
 
@@ -186,12 +242,8 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
     _do_skip : bool
         Whether to skip this link and simply treat it as a standard text word.
     """
-    _do_skip = False
+    _do_skip = re.search(URL_SKIP_REGEX, text[index[0] : index[1]]) is not None
 
-    _do_skip = _do_skip or (
-        text[index[1] - 3: index[1]] == "//'"
-        or text[index[1] - 2: index[1]] == ":'"
-    )
     with contextlib.suppress(IndexError):
         _do_skip = _do_skip or (
             text[index[0]] == "<" and text[index[1]] != ">"
@@ -236,17 +288,20 @@ def do_split_description(
             # If the text including the URL is longer than the wrap length,
             # we need to split the description before the URL, wrap the pre-URL
             # text, and add the URL as a separate line.
-            if len(text[_text_idx: _idx[1]]) > (
+            if len(text[_text_idx : _idx[1]]) > (
                 wrap_length - len(indentation)
             ):
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx: _idx[0]], indentation, wrap_length
+                        text[_text_idx : _idx[0]], indentation, wrap_length
                     )
                 )
+
                 # Add the URL.
-                _lines.append(f"{indentation}{text[_idx[0]:_idx[1]].strip()}")
+                _lines.append(
+                    f"{do_clean_url(text[_idx[0] : _idx[1]], indentation)}"
+                )
                 _text_idx = _idx[1]
 
         # Finally, add everything after the last URL.
@@ -258,7 +313,7 @@ def do_split_description(
 
 
 # pylint: disable=line-too-long
-def is_some_sort_of_list(text, strict) -> bool:
+def is_some_sort_of_list(text: str, strict: bool) -> bool:
     """Determine if docstring is a reST list.
 
     Notes

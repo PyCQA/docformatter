@@ -494,9 +494,10 @@ def foo():
      """Description from issue #150 that was being improperly wrapped.
  
 -    The text file can be retrieved via the Chrome plugin `Get 
-+    The text file can be retrieved via the Chrome plugin `Get
-     Cookies.txt <https://chrome.google.com/webstore/detail/get-
+-    Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
++    The text file can be retrieved via the Chrome plugin
++    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-
 +    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing.
 +    """
 ''' == "\n".join(
