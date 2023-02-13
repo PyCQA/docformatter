@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.6.0-rc2"
+version = "1.6.0-rc3"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -229,7 +229,6 @@ depends = py37, py38, py39, py310, pypy3
 description = run autoformatters and style checkers
 deps =
     charset_normalizer
-    docformatter
     pycodestyle
     pydocstyle
     pylint
@@ -237,6 +236,7 @@ deps =
     toml
     untokenize
 commands =
+    pip install .
     docformatter --recursive {toxinidir}/src/docformatter
     pycodestyle --ignore=E203,W503,W504 {toxinidir}/src/docformatter
     pydocstyle {toxinidir}/src/docformatter
