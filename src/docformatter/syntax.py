@@ -30,8 +30,9 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-# These are the URL pattern to look for when finding links and is based on the
-# table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
+REST_REGEX = r"\.{2} [\w-]+:{1,2}?[\w ]*?"
+"""The regular expression to use for finding reST directives."""
+
 URL_PATTERNS = (
     "afp|"
     "apt|"
@@ -78,6 +79,11 @@ URL_PATTERNS = (
     "xmpp|"
     "xri"
 )
+"""The URL patterns to look for when finding links.
+
+Based on the table at
+<https://en.wikipedia.org/wiki/List_of_URI_schemes>
+"""
 
 # This is the regex used to find URL links:
 #
@@ -111,14 +117,17 @@ URL_PATTERNS = (
 URL_REGEX = rf"(`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')?<?({URL_PATTERNS}):(\
 //)?(\S*)>?"
 
-# This is the regex used to ignore found hyperlinks when they don't actually
-# contain a domain, but only the URL pattern. This will ignore URLs like
-# ``http://`` or 'ftp:` that should be treated simply as a word.
-#
-# ({URL_PATTERNS}) matches one of the URL patterns.
-# :(/){{0,2}} matches a colon followed by up to two forward slashes.
-# (``|') matches a double back-tick or single quote.
 URL_SKIP_REGEX = rf"({URL_PATTERNS}):(/){{0,2}}(``|')"
+"""The regex used to ignore found hyperlinks.
+
+URLs that don't actually contain a domain, but only the URL pattern should
+be treated like simple text. This will ignore URLs like ``http://`` or 'ftp:`.
+
+({URL_PATTERNS}) matches one of the URL patterns.
+:(/){{0,2}} matches a colon followed by up to two forward slashes.
+(``|') matches a double back-tick or single quote.
+"""
+
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
@@ -204,6 +213,33 @@ def do_clean_url(url: str, indentation: str) -> str:
     return f'{indentation}{"".join(list(_lines))}'
 
 
+def do_find_directives(text: str) -> bool:
+    """Determine if docstring contains any reST directives.
+
+    .. todo::
+
+        Currently this function only returns True/False to indicate whether a
+        reST directive was found.  Should return a list of tuples containing
+        the start and end position of each reST directive found similar to the
+        function do_find_links().
+
+    Parameters
+    ----------
+    text : str
+        The docstring text to test.
+
+    Returns
+    -------
+    is_directive : bool
+        Whether the docstring is a reST directive.
+    """
+    _rest_iter = re.finditer(REST_REGEX, text)
+    if not [(rest.start(0), rest.end(0)) for rest in _rest_iter]:
+        return False
+    else:
+        return True
+
+
 def do_find_links(text: str) -> List[Tuple[int, int]]:
     r"""Determine if docstring contains any links.
 
@@ -242,7 +278,7 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
     _do_skip : bool
         Whether to skip this link and simply treat it as a standard text word.
     """
-    _do_skip = re.search(URL_SKIP_REGEX, text[index[0] : index[1]]) is not None
+    _do_skip = re.search(URL_SKIP_REGEX, text[index[0]: index[1]]) is not None
 
     with contextlib.suppress(IndexError):
         _do_skip = _do_skip or (
@@ -288,13 +324,13 @@ def do_split_description(
             # If the text including the URL is longer than the wrap length,
             # we need to split the description before the URL, wrap the pre-URL
             # text, and add the URL as a separate line.
-            if len(text[_text_idx : _idx[1]]) > (
+            if len(text[_text_idx: _idx[1]]) > (
                 wrap_length - len(indentation)
             ):
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx : _idx[0]], indentation, wrap_length
+                        text[_text_idx: _idx[0]], indentation, wrap_length
                     )
                 )
 
@@ -345,9 +381,6 @@ def is_some_sort_of_list(text: str, strict: bool) -> bool:
 
     return any(
         (
-            # Admonitions (remove when adding support for reST directives)
-            re.match(r"(\.\. )", line)
-            or
             # "1. item"
             re.match(r"\s*\d\.", line)
             or
@@ -464,7 +497,11 @@ def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     # Ignore possibly complicated cases.
     if wrap_length <= 0 or (
         not force_wrap
-        and (is_some_sort_of_code(text) or is_some_sort_of_list(text, strict))
+        and (
+            is_some_sort_of_code(text)
+            or do_find_directives(text)
+            or is_some_sort_of_list(text, strict)
+        )
     ):
         return text
 
