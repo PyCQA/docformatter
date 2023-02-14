@@ -379,9 +379,12 @@ class Formatter:
         ):
             return docstring
 
-        if not self.args.force_wrap and _syntax.is_some_sort_of_list(
-            summary,
-            self.args.non_strict,
+        if not self.args.force_wrap and (
+            _syntax.is_some_sort_of_list(
+                summary,
+                self.args.non_strict,
+            )
+            or _syntax.do_find_directives(summary)
         ):
             # Something is probably not right with the splitting.
             return docstring

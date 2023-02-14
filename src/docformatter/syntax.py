@@ -150,7 +150,7 @@ def description_to_list(
 
     Returns
     -------
-    lines : list
+    _lines : list
         A list containing each line of the description with any links put
         back together.
     """
@@ -162,22 +162,23 @@ def description_to_list(
             initial_indent=indentation,
             subsequent_indent=indentation,
         )
-
+    print("TEXT:", text.splitlines())
     # This is a description containing multiple paragraphs.
-    lines = []
+    _lines = []
     for _line in text.splitlines():
         _text = textwrap.wrap(
             textwrap.dedent(_line),
             width=wrap_length,
             initial_indent=indentation,
             subsequent_indent=indentation,
+            drop_whitespace=False,
         )
         if _text:
-            lines.extend(_text)
+            _lines.extend(_text)
         else:
-            lines.append("")
+            _lines.append("")
 
-    return lines
+    return _lines
 
 
 def do_clean_url(url: str, indentation: str) -> str:
