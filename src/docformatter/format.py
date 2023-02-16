@@ -370,6 +370,12 @@ class Formatter:
         if contents.lstrip().startswith(">>>"):
             return docstring
 
+        # Do not modify docstring if the only thing it contains is a link.
+        _links = _syntax.do_find_links(contents)
+        with contextlib.suppress(IndexError):
+            if _links[0][0] == 0 and _links[0][1] == len(contents):
+                return docstring
+
         summary, description = _strings.split_summary_and_description(contents)
 
         # Leave docstrings with underlined summaries alone.

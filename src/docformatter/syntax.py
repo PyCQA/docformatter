@@ -162,7 +162,7 @@ def description_to_list(
             initial_indent=indentation,
             subsequent_indent=indentation,
         )
-    print("TEXT:", text.splitlines())
+
     # This is a description containing multiple paragraphs.
     _lines = []
     for _line in text.splitlines():
