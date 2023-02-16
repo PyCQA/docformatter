@@ -287,6 +287,49 @@ Hello.
     """'''
         assert docstring == uut._do_format_docstring(INDENTATION, docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_directive_alone(self, test_args, args):
+        """Leave docstrings that have a reST directive in the summary alone."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''
+    """.. code-block:: shell-session
+
+    ► apm --version
+    apm  2.6.2
+    npm  6.14.13
+    node 12.14.1 x64
+    atom 1.58.0
+    python 2.7.16
+    git 2.33.0
+    """'''
+        assert docstring == uut._do_format_docstring(INDENTATION, docstring)
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_link_only_docstring_alone(
+        self, test_args, args
+    ):
+        """Leave docstrings that consist of only a link alone."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''"""
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """'''
+        assert docstring == uut._do_format_docstring(INDENTATION, docstring)
+
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
@@ -460,7 +503,7 @@ class TestFormatWrap:
         assert '''\
 """My awesome function.
 
-    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it 
     is not.
 
     It doesn\'t wrap because of this line and the blank line in between! Delete them and it will wrap.
