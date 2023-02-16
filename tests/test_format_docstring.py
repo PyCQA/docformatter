@@ -1034,6 +1034,45 @@ num_iterations is the number of updates - instead of a better definition of conv
         "args",
         [["--wrap-descriptions", "72", ""]],
     )
+    def test_format_docstring_keep_inline_link_together(
+        self,
+        test_args,
+        args,
+    ):
+        """Keep in-line links together with the display text.
+
+        See issue #157.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+    """Get the Python type of a Click parameter.
+
+    See the list of `custom types provided by Click
+    <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """\
+    '''
+
+        assert '''\
+"""Get the Python type of a Click parameter.
+
+    See the list of
+    `custom types provided by Click <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
     def test_format_docstring_with_short_link(
         self,
         test_args,

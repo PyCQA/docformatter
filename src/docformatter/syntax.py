@@ -208,7 +208,7 @@ def do_clean_url(url: str, indentation: str) -> str:
     """
     _lines = url.splitlines()
     for _idx, _line in enumerate(_lines):
-        if _line[:4] == indentation:
+        if len(indentation) > 0 and _line[: len(indentation)] == indentation:
             _lines[_idx] = f" {_line.strip()}"
 
     return f'{indentation}{"".join(list(_lines))}'
@@ -279,7 +279,7 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
     _do_skip : bool
         Whether to skip this link and simply treat it as a standard text word.
     """
-    _do_skip = re.search(URL_SKIP_REGEX, text[index[0]: index[1]]) is not None
+    _do_skip = re.search(URL_SKIP_REGEX, text[index[0] : index[1]]) is not None
 
     with contextlib.suppress(IndexError):
         _do_skip = _do_skip or (
@@ -325,13 +325,13 @@ def do_split_description(
             # If the text including the URL is longer than the wrap length,
             # we need to split the description before the URL, wrap the pre-URL
             # text, and add the URL as a separate line.
-            if len(text[_text_idx: _idx[1]]) > (
+            if len(text[_text_idx : _idx[1]]) > (
                 wrap_length - len(indentation)
             ):
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx: _idx[0]], indentation, wrap_length
+                        text[_text_idx : _idx[0]], indentation, wrap_length
                     )
                 )
 
