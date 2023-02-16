@@ -503,7 +503,7 @@ class TestFormatWrap:
         assert '''\
 """My awesome function.
 
-    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it 
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it
     is not.
 
     It doesn\'t wrap because of this line and the blank line in between! Delete them and it will wrap.
@@ -583,14 +583,17 @@ class TestFormatWrap:
 '''.strip(),
         )
 
-    @pytest.mark.unit
+    @pytest.mark.xfail
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
     def test_format_docstring_should_ignore_multi_paragraph(
         self,
         test_args,
         args,
     ):
-        """Ignore multiple paragraphs in elaborate description."""
+        """Ignore multiple paragraphs in elaborate description.
+
+        Multiple description paragraphs is supported since v1.5.0.
+        """
         uut = Formatter(
             test_args,
             sys.stderr,
@@ -1032,7 +1035,7 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "72", ""]],
+        [["--wrap-descriptions", "88", ""]],
     )
     def test_format_docstring_keep_inline_link_together(
         self,

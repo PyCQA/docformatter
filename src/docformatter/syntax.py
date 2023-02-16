@@ -165,16 +165,16 @@ def description_to_list(
 
     # This is a description containing multiple paragraphs.
     _lines = []
-    for _line in text.splitlines():
+    for _line in text.split("\n\n"):
         _text = textwrap.wrap(
             textwrap.dedent(_line),
             width=wrap_length,
             initial_indent=indentation,
             subsequent_indent=indentation,
-            drop_whitespace=False,
         )
         if _text:
             _lines.extend(_text)
+            _lines.append("")
         else:
             _lines.append("")
 
