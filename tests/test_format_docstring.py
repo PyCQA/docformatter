@@ -904,18 +904,55 @@ num_iterations is the number of updates - instead of a better definition of conv
         docstring = '''\
 """This is yanf with a short link.
 
-    See `the link <https://www.link.com`_ for more details.
+    See `the link <https://www.link.com>`_ for more details.
     """\
 '''
 
         assert '''\
 """This is yanf with a short link.
 
-    See `the link <https://www.link.com`_ for more details.
+    See `the link <https://www.link.com>`_ for more details.
     """\
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_short_inline_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Should move long in-line links to line by themselves."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+    """Helpful docstring.
+
+    A larger description that starts here.  https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """\
+'''
+
+        assert '''\
+"""Helpful docstring.
+
+    A larger description that starts here.
+    https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -993,6 +1030,24 @@ num_iterations is the number of updates - instead of a better definition of conv
             INDENTATION, docstring.strip()
         )
 
+        docstring = '''\
+"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """\
+'''
+        assert '''\
+"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """\
+''' == uut._do_format_docstring(
+                    INDENTATION, docstring.strip()
+                )
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",

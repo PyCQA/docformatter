@@ -3,7 +3,7 @@
 #
 #       tests.test_string_functions.py is part of the docformatter project
 #
-# Copyright (C) 2012-2019 Steven Myint
+# Copyright (C) 2012-2023 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -273,7 +273,7 @@ class TestSplitters:
         """"""
         assert (
             "This is the first",
-            "- one\n- two"
+            "- one\n- two",
         ) == docformatter.split_summary_and_description(
             "This is the first\n- one\n- two"
         )
@@ -439,6 +439,23 @@ Try this and this and this and this and this and this and this at
             assert (text, "") == docformatter.split_summary_and_description(
                 text
             )
+
+    @pytest.mark.unit
+    def test_split_summary_and_description_with_url(self):
+        """Retain URL on second line with summary."""
+        text = '''\
+"""Sequence of package managers as defined by `XKCD #1654: Universal Install Script
+<https://xkcd.com/1654/>`_.
+
+See the corresponding :issue:`implementation rationale in issue #10 <10>`.
+"""\
+'''
+        assert (
+            '"""Sequence of package managers as defined by `XKCD #1654: Universal Install Script\n'
+            "<https://xkcd.com/1654/>`_.",
+            "\nSee the corresponding :issue:`implementation rationale in issue #10 <10>`."
+            '\n"""',
+        ) == docformatter.split_summary_and_description(text)
 
 
 class TestStrippers:
