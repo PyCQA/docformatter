@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2012-2022 Steven Myint
+# Copyright (C) 2012-2023 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -92,9 +92,9 @@ Based on the table at
 #   `{{2}} is used to find two back-tick characters.
 #   This finds patterns like: ``http://www.example.com``
 #
-#   `\w[\w. :\n]* matches the back-tick character immediately followed by one
+#   `\w[\w. :#\n]* matches the back-tick character immediately followed by one
 #   letter, then followed by any number of letters, periods, spaces, colons,
-#   or newlines.
+#   hash marks or newlines.
 #   This finds patterns like: `Link text <https://domain.invalid/>`_
 #
 #   \.\. _?[\w. :]+ matches the pattern .. followed one space, then by zero or
