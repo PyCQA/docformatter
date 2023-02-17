@@ -23,4 +23,4 @@
 # SOFTWARE.
 """Package information for docformatter."""
 
-__version__ = "1.6.0-rc4"
+__version__ = "1.6.0-rc5"

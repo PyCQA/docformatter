@@ -273,7 +273,7 @@ class TestSplitters:
         """"""
         assert (
             "This is the first",
-            "- one\n- two",
+            "- one\n- two"
         ) == docformatter.split_summary_and_description(
             "This is the first\n- one\n- two"
         )
@@ -377,7 +377,7 @@ class TestSplitters:
         )
 
     @pytest.mark.unit
-    def test_split_summary_and_description_with_late__punctuation(self):
+    def test_split_summary_and_description_with_punctuation(self):
         """"""
         assert (
             (
@@ -402,7 +402,7 @@ Try this and this and this and this and this and this and this at
         )
 
     @pytest.mark.unit
-    def test_split_summary_and_description_without__punctuation(self):
+    def test_split_summary_and_description_without_punctuation(self):
         """"""
         assert (
             (

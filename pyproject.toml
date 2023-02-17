@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.5.1"
+version = "1.6.0-rc5"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -226,7 +226,7 @@ commands =
     coverage combine
     coverage report -m
     coverage xml -o {toxworkdir}/coverage.xml
-depends = py37, py38, py39, py310, pypy3
+depends = py37, py38, py39, py310, py311, pypy3
 
 [testenv:style]
 description = run autoformatters and style checkers
@@ -239,6 +239,7 @@ deps =
     toml
     untokenize
 commands =
+    pip install -U pip
     pip install .
     docformatter --recursive {toxinidir}/src/docformatter
     pycodestyle --ignore=E203,W503,W504 {toxinidir}/src/docformatter

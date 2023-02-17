@@ -30,7 +30,7 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-REST_REGEX = r"\.{2} [\w-]+:{1,2}?[\w ]*?"
+REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?[\w ]*?"
 """The regular expression to use for finding reST directives."""
 
 URL_PATTERNS = (
@@ -114,7 +114,7 @@ Based on the table at
 #   (//)? matches two forward slashes zero or one time.
 #   (\S*) matches any non-whitespace character between zero and infinity times.
 #   >? matches the character > between zero and one times.
-URL_REGEX = rf"(`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')?<?({URL_PATTERNS}):(\
+URL_REGEX = rf"(`{{2}}|`\w[\w. :#\n]*|\.\. _?[\w. :]+|')?<?({URL_PATTERNS}):(\
 //)?(\S*)>?"
 
 URL_SKIP_REGEX = rf"({URL_PATTERNS}):(/){{0,2}}(``|')"
@@ -135,6 +135,7 @@ def description_to_list(
     text: str,
     indentation: str,
     wrap_length: int,
+    contains_links: bool,
 ) -> List[str]:
     """Convert the description to a list of wrap length lines.
 
@@ -147,6 +148,8 @@ def description_to_list(
         line.
     wrap_length : int
         The column to wrap each line at.
+    contains_links : bool
+        The description contains links.
 
     Returns
     -------
@@ -174,7 +177,8 @@ def description_to_list(
         )
         if _text:
             _lines.extend(_text)
-            _lines.append("")
+            if not contains_links:
+                _lines.append("")
         else:
             _lines.append("")
 
@@ -208,7 +212,7 @@ def do_clean_url(url: str, indentation: str) -> str:
     """
     _lines = url.splitlines()
     for _idx, _line in enumerate(_lines):
-        if len(indentation) > 0 and _line[: len(indentation)] == indentation:
+        if indentation != "" and _line[: len(indentation)] == indentation:
             _lines[_idx] = f" {_line.strip()}"
 
     return f'{indentation}{"".join(list(_lines))}'
@@ -235,10 +239,7 @@ def do_find_directives(text: str) -> bool:
         Whether the docstring is a reST directive.
     """
     _rest_iter = re.finditer(REST_REGEX, text)
-    if not [(rest.start(0), rest.end(0)) for rest in _rest_iter]:
-        return False
-    else:
-        return True
+    return bool([(rest.start(0), rest.end(0)) for rest in _rest_iter])
 
 
 def do_find_links(text: str) -> List[Tuple[int, int]]:
@@ -314,6 +315,7 @@ def do_split_description(
     """
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
+
     if _url_idx:
         _lines = []
         _text_idx = 0
@@ -331,7 +333,10 @@ def do_split_description(
                 # Wrap everything in the description before the first URL.
                 _lines.extend(
                     description_to_list(
-                        text[_text_idx : _idx[0]], indentation, wrap_length
+                        text[_text_idx : _idx[0]],
+                        indentation,
+                        wrap_length,
+                        True,
                     )
                 )
 
@@ -346,7 +351,12 @@ def do_split_description(
 
         return _lines
     else:
-        return description_to_list(text, indentation, wrap_length)
+        return description_to_list(
+            text,
+            indentation,
+            wrap_length,
+            False,
+        )
 
 
 # pylint: disable=line-too-long
