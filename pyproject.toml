@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.6.0-rc4"
+version = "1.5.1"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -22,6 +22,7 @@ classifiers=[
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
           'Programming Language :: Python :: Implementation',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Programming Language :: Python :: Implementation :: CPython',
@@ -135,7 +136,7 @@ output = 'coverage.xml'
 
 [tool.black]
 line-length = 79
-target-version = ['py37', 'py38', 'py39', 'py310']
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -174,6 +175,7 @@ envlist =
     py38
     py39
     py310
+    py311
     pypy3
     coverage
     style
@@ -187,6 +189,7 @@ python =
     3.8: py38
     3.9: py39
     3.10: py310
+    3.11: py311
     pypy-3.8: pypy3
 
 [testenv]
