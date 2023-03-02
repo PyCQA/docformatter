@@ -1410,7 +1410,8 @@ Hello.
         test_args,
         args,
     ):
-        """Place a space between the opening quotes and the summary."""
+        """Place a space between the opening quotes and the summary only if
+        the content starts with a quote."""
         uut = Formatter(
             test_args,
             sys.stderr,
