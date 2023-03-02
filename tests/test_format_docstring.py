@@ -1403,6 +1403,38 @@ Hello.
 ''',
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [["--black", ""]])
+    def test_format_docstring_black(
+        self,
+        test_args,
+        args,
+    ):
+        """Place a space between the opening quotes and the summary."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            '''"""This one-line docstring will not have a leading space."""'''
+        ) == uut._do_format_docstring(
+            INDENTATION,
+            '''\
+"""   This one-line docstring will not have a leading space."""\
+''',
+        )
+        assert (
+                   '''""" "This" quote starting one-line docstring will have a leading space."""'''
+               ) == uut._do_format_docstring(
+            INDENTATION,
+            '''\
+"""   "This" quote starting one-line docstring will have a leading space."""\
+''',
+        )
+
 
 class TestStripDocstring:
     """Class for testing _do_strip_docstring()."""

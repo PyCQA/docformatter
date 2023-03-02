@@ -234,7 +234,8 @@ with *convention* requirements.
 
 ``docformatter`` currently provides these arguments for *style* requirements.
 ::
-
+    --black [boolean, default False]
+        Formats docstrings to be compatible with black.
     --blank [boolean, default False]
         Boolean to indicate whether to add a blank line after the
         elaborate description.
@@ -299,8 +300,6 @@ The following are new *style* arguments needed to accommodate the various style 
 
     --syntax [string, default "sphinx"]
         One of sphinx, numpy, or google
-    --black [boolean, default False]
-        Formats docstrings to be compatible with black.
 
 Issue and Version Management
 ----------------------------

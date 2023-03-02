@@ -127,22 +127,51 @@ class Configurater:
             default=self.flargs_dct.get("exclude", None),
             help="in recursive mode, exclude directories and files by names",
         )
-        self.parser.add_argument(
-            "--wrap-summaries",
-            default=int(self.flargs_dct.get("wrap-summaries", 79)),
-            type=int,
-            metavar="length",
-            help="wrap long summary lines at this length; "
-            "set to 0 to disable wrapping (default: 79)",
+        black_group = self.parser.add_mutually_exclusive_group()
+        black_group.add_argument(
+            "--pre-summary-space",
+            action="store_true",
+            default=self.flargs_dct.get("pre-summary-space", "false").lower()
+            == "true",
+            help="add a space after the opening triple quotes "
+                 "(default: False)",
         )
-        self.parser.add_argument(
-            "--wrap-descriptions",
-            default=int(self.flargs_dct.get("wrap-descriptions", 72)),
-            type=int,
-            metavar="length",
-            help="wrap descriptions at this length; "
-            "set to 0 to disable wrapping (default: 72)",
+        black_group.add_argument(
+            "--black",
+            action="store_true",
+            default=self.flargs_dct.get("black", "false").lower()
+            == "true",
+            help="make formatting compatible with standard black options "
+                 "(default: False)",
         )
+        args = self.parser.parse_known_args()[0]
+        if args.black:
+            self.parser.add_argument(
+                "--black-line-length",
+                default=int(self.flargs_dct.get("black-line-length", 88)),
+                type=int,
+                metavar="length",
+                help="wrap all lines at this length; "
+                     "(default: 88)",
+            )
+
+        else:
+            self.parser.add_argument(
+                "--wrap-summaries",
+                default=int(self.flargs_dct.get("wrap-summaries", 79)),
+                type=int,
+                metavar="length",
+                help="wrap long summary lines at this length; "
+                "set to 0 to disable wrapping (default: 79)",
+            )
+            self.parser.add_argument(
+                "--wrap-descriptions",
+                default=int(self.flargs_dct.get("wrap-descriptions", 72)),
+                type=int,
+                metavar="length",
+                help="wrap descriptions at this length; "
+                "set to 0 to disable wrapping (default: 72)",
+            )
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
@@ -173,14 +202,6 @@ class Configurater:
             default=self.flargs_dct.get("pre-summary-newline", "false").lower()
             == "true",
             help="add a newline before the summary of a multi-line docstring "
-            "(default: False)",
-        )
-        self.parser.add_argument(
-            "--pre-summary-space",
-            action="store_true",
-            default=self.flargs_dct.get("pre-summary-space", "false").lower()
-            == "true",
-            help="add a space after the opening triple quotes "
             "(default: False)",
         )
         self.parser.add_argument(
@@ -268,6 +289,10 @@ class Configurater:
                     "First value of --docstring-length should be less "
                     "than or equal to the second"
                 )
+
+        if self.args.black:
+            self.args.wrap_summaries = self.args.black_line_length
+            self.args.wrap_descriptions = self.args.black_line_length
 
     def _do_read_configuration_file(self) -> None:
         """Read docformatter options from a configuration file."""

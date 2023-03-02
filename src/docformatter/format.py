@@ -345,9 +345,12 @@ class Formatter:
             The docstring formatted according the various options.
         """
         contents, open_quote = self._do_strip_docstring(docstring)
-        open_quote = (
-            f"{open_quote} " if self.args.pre_summary_space else open_quote
-        )
+
+        if self.args.black:
+            if contents.startswith('"'):
+                open_quote = f"{open_quote} "
+        elif self.args.pre_summary_space:
+            open_quote = f"{open_quote} "
 
         # Skip if there are nested triple double quotes
         if contents.count(self.QUOTE_TYPES[0]):

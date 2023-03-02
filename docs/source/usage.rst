@@ -22,7 +22,7 @@ help output provides a summary of these options:
 .. code-block:: console
 
     usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
-                        [--wrap-descriptions length] [--blank]
+                        [--wrap-descriptions length] [--blank] [--black]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range start_line end_line]
                         [--docstring-length min_length max_length]
@@ -60,6 +60,11 @@ help output provides a summary of these options:
                             add a space between the opening triple quotes and
                             the first word in a one-line or summary line of a
                             multi-line docstring
+                            (default: False)
+      --black
+                            make formatting consistent with black, setting wrap-summaries
+                            and wrap-descriptions to a default 88 if not specified and only
+                            adding a pre-summary-space when docstring starts with '"'
                             (default: False)
       --make-summary-multi-line
                             add a newline before and after a one-line docstring
