@@ -22,7 +22,9 @@ help output provides a summary of these options:
 .. code-block:: console
 
     usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
-                        [--wrap-descriptions length] [--blank] [--black]
+                        [--wrap-descriptions length] [--blank]
+                        [--black] [--black-line-length length]
+                        [--pre-summary-space]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range start_line end_line]
                         [--docstring-length min_length max_length]
@@ -66,6 +68,10 @@ help output provides a summary of these options:
                             and wrap-descriptions to a default 88 if not specified and only
                             adding a pre-summary-space when docstring starts with '"'
                             (default: False)
+      --black-line-length length
+                            set line length for wrap-summaries and wrap-descriptions,
+                            only used if --black is set
+                            (default: 88)
       --make-summary-multi-line
                             add a newline before and after a one-line docstring
                             (default: False)

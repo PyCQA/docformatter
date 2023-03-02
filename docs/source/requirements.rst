@@ -236,6 +236,8 @@ with *convention* requirements.
 ::
     --black [boolean, default False]
         Formats docstrings to be compatible with black.
+    --black-line-length [integer, default 88]
+        Line length to use when running in black compatibility mode.
     --blank [boolean, default False]
         Boolean to indicate whether to add a blank line after the
         elaborate description.
