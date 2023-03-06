@@ -145,33 +145,32 @@ class Configurater:
                  "(default: False)",
         )
         args = self.parser.parse_known_args()[0]
-        if args.black:
-            self.parser.add_argument(
-                "--black-line-length",
-                default=int(self.flargs_dct.get("black-line-length", 88)),
-                type=int,
-                metavar="length",
-                help="wrap all lines at this length; "
-                     "(default: 88)",
-            )
 
+        # Default black line length is 88 so use this when not specified
+        # otherwise use PEP-8 defaults
+        if args.black:
+            _default_wrap_summaries = 88
+            _default_wrap_descriptions = 88
         else:
-            self.parser.add_argument(
-                "--wrap-summaries",
-                default=int(self.flargs_dct.get("wrap-summaries", 79)),
-                type=int,
-                metavar="length",
-                help="wrap long summary lines at this length; "
-                "set to 0 to disable wrapping (default: 79)",
-            )
-            self.parser.add_argument(
-                "--wrap-descriptions",
-                default=int(self.flargs_dct.get("wrap-descriptions", 72)),
-                type=int,
-                metavar="length",
-                help="wrap descriptions at this length; "
-                "set to 0 to disable wrapping (default: 72)",
-            )
+            _default_wrap_summaries = 79
+            _default_wrap_descriptions = 72
+
+        self.parser.add_argument(
+            "--wrap-summaries",
+            default=int(self.flargs_dct.get("wrap-summaries", _default_wrap_summaries)),
+            type=int,
+            metavar="length",
+            help="wrap long summary lines at this length; "
+            "set to 0 to disable wrapping (default: 79)",
+        )
+        self.parser.add_argument(
+            "--wrap-descriptions",
+            default=int(self.flargs_dct.get("wrap-descriptions", _default_wrap_descriptions)),
+            type=int,
+            metavar="length",
+            help="wrap descriptions at this length; "
+            "set to 0 to disable wrapping (default: 72)",
+        )
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
@@ -289,10 +288,6 @@ class Configurater:
                     "First value of --docstring-length should be less "
                     "than or equal to the second"
                 )
-
-        if self.args.black:
-            self.args.wrap_summaries = self.args.black_line_length
-            self.args.wrap_descriptions = self.args.black_line_length
 
     def _do_read_configuration_file(self) -> None:
         """Read docformatter options from a configuration file."""
