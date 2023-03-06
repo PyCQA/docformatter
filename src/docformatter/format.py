@@ -314,11 +314,12 @@ class Formatter:
                     (token_type, token_string, start, end, line)
                 )
 
+            max_blank_lines = 1 if self.args.black else 0
             modified_tokens = self._do_remove_blank_lines_after_definitions(
-                modified_tokens
+                modified_tokens, max_blank_lines
             )
             modified_tokens = self._do_remove_blank_lines_after_docstring(
-                modified_tokens
+                modified_tokens, max_blank_lines
             )
 
             return untokenize.untokenize(modified_tokens)
@@ -511,7 +512,7 @@ class Formatter:
 '''
 
     @staticmethod
-    def _do_remove_blank_lines_after_definitions(modified_tokens):
+    def _do_remove_blank_lines_after_definitions(modified_tokens, max_blank_lines: int = 0):
         """Remove blank lines between definitions and docstrings.
 
         Blank lines between class, method, function, and variable
@@ -521,6 +522,8 @@ class Formatter:
         ----------
         modified_tokens: list
             The list of tokens created from the docstring.
+        max_blank_lines: int
+            The maximum number of blank lines to leave after the docstring.
 
         Returns
         -------
@@ -534,7 +537,7 @@ class Formatter:
                 j = 1
                 while modified_tokens[_idx - j][
                     4
-                ] == "\n" and not modified_tokens[_idx - j - 1][
+                ] == "\n" and not modified_tokens[_idx - j - 1 - max_blank_lines][
                     4
                 ].strip().endswith(
                     '"""'
@@ -546,7 +549,7 @@ class Formatter:
                 # definitions and docstring.
                 j = 2
                 while modified_tokens[_idx - j][4] == "\n" and modified_tokens[
-                    _idx - j - 2
+                    _idx - j - 2 - max_blank_lines
                 ][4].strip().startswith(("def", "class")):
                     modified_tokens.pop(_idx - j)
                     j += 1
