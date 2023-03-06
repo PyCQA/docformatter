@@ -1134,8 +1134,8 @@ CONST = 123
             test_args,
             args,
     ):
-        """Test no new lines are stripped running in black mode after method but
-        other blank lines are stripped
+        """Test blank lines are stripped running in black mode after method
+         leaving at most one blank line and other blank lines are stripped
         """
         uut = Formatter(
             test_args,
@@ -1150,7 +1150,14 @@ class TestClass:
 
     class_attribute = 1
 
-    def test_method(self):
+    def test_method_1(self):
+        """This is a method docstring.
+
+        With no blank line after it.
+        """
+        pass
+
+    def test_method_2(self):
         """This is a method docstring.
 
         With a long description followed by multiple blank lines.
@@ -1166,7 +1173,14 @@ class TestClass:
 
     class_attribute = 1
 
-    def test_method(self):
+    def test_method_1(self):
+        """This is a method docstring.
+
+        With no line after it.
+        """
+        pass
+
+    def test_method_2(self):
 
         """This is a method docstring.
 
