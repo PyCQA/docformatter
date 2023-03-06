@@ -234,6 +234,7 @@ with *convention* requirements.
 
 ``docformatter`` currently provides these arguments for *style* requirements.
 ::
+
     --black [boolean, default False]
         Formats docstrings to be compatible with black.
     --blank [boolean, default False]
