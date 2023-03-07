@@ -135,7 +135,6 @@ def description_to_list(
     text: str,
     indentation: str,
     wrap_length: int,
-    contains_links: bool,
 ) -> List[str]:
     """Convert the description to a list of wrap length lines.
 
@@ -148,8 +147,6 @@ def description_to_list(
         line.
     wrap_length : int
         The column to wrap each line at.
-    contains_links : bool
-        The description contains links.
 
     Returns
     -------
@@ -177,8 +174,7 @@ def description_to_list(
         )
         if _text:
             _lines.extend(_text)
-            if not contains_links:
-                _lines.append("")
+            _lines.append("")
         else:
             _lines.append("")
 
@@ -315,7 +311,6 @@ def do_split_description(
     """
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
-
     if _url_idx:
         _lines = []
         _text_idx = 0
@@ -336,7 +331,6 @@ def do_split_description(
                         text[_text_idx : _idx[0]],
                         indentation,
                         wrap_length,
-                        True,
                     )
                 )
 
@@ -347,7 +341,8 @@ def do_split_description(
                 _text_idx = _idx[1]
 
         # Finally, add everything after the last URL.
-        _lines.append(f"{indentation}{text[_text_idx:].strip()}")
+        _stripped_text = text[_text_idx + 1 :].strip(" ").replace("\n\n", "\n")
+        _lines.append(f"{indentation}{_stripped_text}")
 
         return _lines
     else:
@@ -355,7 +350,6 @@ def do_split_description(
             text,
             indentation,
             wrap_length,
-            False,
         )
 
 

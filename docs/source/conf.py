@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'docformatter'
-copyright = '2022, Steven Myint'
+copyright = '2022-2023, Steven Myint'
 author = 'Steven Myint'
-release = '1.6.0-rc5'
+release = '1.6.0-rc6'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

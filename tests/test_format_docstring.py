@@ -1129,6 +1129,58 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
+        [["--wrap-descriptions", "88", ""]],
+    )
+    def test_format_docstring_keep_inline_link_together_two_paragraphs(
+            self,
+            test_args,
+            args,
+    ):
+        """Keep in-line links together with the display text.
+
+        If there is another paragraph following the in-line link, don't strip
+        the newline in between.
+
+        See issue #157.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+"""\
+'''
+
+        assert '''\
+"""Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+    
+    This allow user\'s config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
         [["--wrap-descriptions", "72", ""]],
     )
     def test_format_docstring_with_short_link(
