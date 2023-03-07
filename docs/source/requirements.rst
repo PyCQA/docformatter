@@ -232,14 +232,6 @@ with *convention* requirements.
         the opening quotes in a multi-line docstring.  See requirement
         PEP_257_5.2.
 
-The following are new arguments that are needed to implement **should** or
-**may** *convention* requirements:
-::
-
-    --wrap-one-line [boolean, default False]
-        Boolean to indicate whether to wrap one-line docstrings.  Provides
-        option for requirement PEP_257_4.1.
-
 ``docformatter`` currently provides these arguments for *style* requirements.
 ::
 
@@ -270,14 +262,6 @@ The following are new arguments that are needed to implement **should** or
         Wrap long one-line docstrings and summary lines in multi-line
         docstrings at this length.
 
-The following are new *style* arguments needed to accommodate the various style options:
-::
-
-    --syntax [string, default "sphinx"]
-        One of sphinx, numpy, or google
-    --black [boolean, default False]
-        Formats docstrings to be compatible with black.
-
 ``docformatter`` currently provides these arguments for *stakeholder* requirements.
 ::
 
@@ -298,6 +282,25 @@ The following are new *style* arguments needed to accommodate the various style 
         Only format docstrings that are between [start, end] rows in the file.
     --recursive
         Drill down directories recursively.
+
+Arguments Needed for Future Releases
+------------------------------------
+
+The following are new arguments that are needed to implement **should** or
+**may** *convention* requirements:
+::
+
+    --wrap-one-line [boolean, default False]
+        Boolean to indicate whether to wrap one-line docstrings.  Provides
+        option for requirement PEP_257_4.1.
+
+The following are new *style* arguments needed to accommodate the various style options:
+::
+
+    --syntax [string, default "sphinx"]
+        One of sphinx, numpy, or google
+    --black [boolean, default False]
+        Formats docstrings to be compatible with black.
 
 Issue and Version Management
 ----------------------------
