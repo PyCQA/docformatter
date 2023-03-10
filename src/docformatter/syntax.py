@@ -30,7 +30,7 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?[\w ]*?"
+REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?"
 """The regular expression to use for finding reST directives."""
 
 URL_PATTERNS = (
@@ -174,9 +174,7 @@ def description_to_list(
         )
         if _text:
             _lines.extend(_text)
-            _lines.append("")
-        else:
-            _lines.append("")
+        _lines.append("")
 
     return _lines
 
@@ -311,46 +309,50 @@ def do_split_description(
     """
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
-    if _url_idx:
-        _lines = []
-        _text_idx = 0
-        for _idx in _url_idx:
-            # Skip URL if it is simply a quoted pattern.
-            if do_skip_link(text, _idx):
-                continue
-
-            # If the text including the URL is longer than the wrap length,
-            # we need to split the description before the URL, wrap the pre-URL
-            # text, and add the URL as a separate line.
-            if len(text[_text_idx : _idx[1]]) > (
-                wrap_length - len(indentation)
-            ):
-                # Wrap everything in the description before the first URL.
-                _lines.extend(
-                    description_to_list(
-                        text[_text_idx : _idx[0]],
-                        indentation,
-                        wrap_length,
-                    )
-                )
-
-                # Add the URL.
-                _lines.append(
-                    f"{do_clean_url(text[_idx[0] : _idx[1]], indentation)}"
-                )
-                _text_idx = _idx[1]
-
-        # Finally, add everything after the last URL.
-        _stripped_text = text[_text_idx + 1 :].strip(" ").replace("\n\n", "\n")
-        _lines.append(f"{indentation}{_stripped_text}")
-
-        return _lines
-    else:
+    if not _url_idx:
         return description_to_list(
             text,
             indentation,
             wrap_length,
         )
+    _lines = []
+    _text_idx = 0
+    for _idx in _url_idx:
+        # Skip URL if it is simply a quoted pattern.
+        if do_skip_link(text, _idx):
+            continue
+
+        # If the text including the URL is longer than the wrap length,
+        # we need to split the description before the URL, wrap the pre-URL
+        # text, and add the URL as a separate line.
+        if len(text[_text_idx : _idx[1]]) > (
+            wrap_length - len(indentation)
+        ):
+            # Wrap everything in the description before the first URL.
+            _lines.extend(
+                description_to_list(
+                    text[_text_idx : _idx[0]],
+                    indentation,
+                    wrap_length,
+                )
+            )
+
+            # Add the URL.
+            _lines.append(
+                f"{do_clean_url(text[_idx[0] : _idx[1]], indentation)}"
+            )
+
+            _text_idx = _idx[1]
+
+    # Finally, add everything after the last URL.
+    with contextlib.suppress(IndexError):
+        _stripped_text = (
+            text[_text_idx + 1 :].strip(indentation)
+            if text[_text_idx] == "\n"
+            else text[_text_idx:].strip()
+        )
+        _lines.append(f"{indentation}{_stripped_text}")
+    return _lines
 
 
 # pylint: disable=line-too-long
