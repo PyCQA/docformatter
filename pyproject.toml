@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.6.0-rc6"
+version = "1.6.0-rc7"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
