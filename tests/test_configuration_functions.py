@@ -175,6 +175,7 @@ class TestConfigurater:
         assert uut.args.post_description_blank
         assert not uut.args.pre_summary_newline
         assert not uut.args.pre_summary_space
+        assert not uut.args.black
         assert uut.args.make_summary_multi_line
         assert not uut.args.force_wrap
         assert uut.args.line_range is None
@@ -300,6 +301,21 @@ class TestConfigurater:
             "First value of --docstring-length should be less than or equal "
             "to the second" in err
         )
+
+    @pytest.mark.unit
+    def test_black_line_length_defaults(self, capsys):
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--black",
+            "",
+        ]
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+        assert uut.args.black
+        assert not uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 88
+        assert uut.args.wrap_descriptions == 88
 
     @pytest.mark.unit
     @pytest.mark.parametrize(

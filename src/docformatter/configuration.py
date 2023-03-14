@@ -144,7 +144,7 @@ class Configurater:
             help="make formatting compatible with standard black options "
                  "(default: False)",
         )
-        args = self.parser.parse_known_args()[0]
+        args = self.parser.parse_known_args(self.args_lst[1:])[0]
 
         # Default black line length is 88 so use this when not specified
         # otherwise use PEP-8 defaults
