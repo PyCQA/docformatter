@@ -304,6 +304,7 @@ class TestConfigurater:
 
     @pytest.mark.unit
     def test_black_line_length_defaults(self, capsys):
+        """Black line length defaults to 88."""
         argb = [
             "/path/to/docformatter",
             "-c",
@@ -316,6 +317,40 @@ class TestConfigurater:
         assert not uut.args.pre_summary_space
         assert uut.args.wrap_summaries == 88
         assert uut.args.wrap_descriptions == 88
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+            "config",
+            [
+                """\
+    [tool.docformatter]
+    black = true
+    wrap_summaries = 80
+    """
+            ],
+        )
+    def test_black_from_pyproject(self, temporary_pyproject_toml, config, ):
+        """Test black setting via pyproject.toml."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/pyproject.toml",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.black
+        assert not uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 80
+        assert uut.args.wrap_descriptions == 88
+        assert uut.flargs_dct == {
+            "black": "True",
+            "wrap_summaries": "80",
+        }
+
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
