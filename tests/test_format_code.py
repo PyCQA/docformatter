@@ -1176,7 +1176,7 @@ class TestClass:
     def test_method_1(self):
         """This is a method docstring.
 
-        With no line after it.
+        With no blank line after it.
         """
         pass
 

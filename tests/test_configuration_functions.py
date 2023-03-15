@@ -27,10 +27,6 @@
 # SOFTWARE.
 """Module for testing docformatter's Configurater class."""
 
-# Standard Library Imports
-import io
-import sys
-
 # Third Party Imports
 import pytest
 
@@ -198,7 +194,7 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.args.line_range == [1, 3]
-
+    #
     @pytest.mark.unit
     def test_low_line_range_is_zero(self, capsys):
         """Raise parser error if the first value for the range is zero."""
@@ -303,12 +299,22 @@ class TestConfigurater:
         )
 
     @pytest.mark.unit
-    def test_black_line_length_defaults(self, capsys):
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
+"""
+        ],
+    )
+    def test_black_line_length_defaults(self, temporary_pyproject_toml, config, ):
         """Black line length defaults to 88."""
         argb = [
             "/path/to/docformatter",
             "-c",
             "--black",
+            "--config",
+            "/tmp/pyproject.toml",
             "",
         ]
         uut = Configurater(argb)
@@ -323,9 +329,9 @@ class TestConfigurater:
             "config",
             [
                 """\
-    [tool.docformatter]
-    black = true
-    wrap_summaries = 80
+[tool.docformatter]
+black = true
+wrap-summaries = 80
     """
             ],
         )
@@ -348,7 +354,7 @@ class TestConfigurater:
         assert uut.args.wrap_descriptions == 88
         assert uut.flargs_dct == {
             "black": "True",
-            "wrap_summaries": "80",
+            "wrap-summaries": "80",
         }
 
 

@@ -73,7 +73,6 @@ class Configurater:
             description=__doc__,
             prog="docformatter",
         )
-
         try:
             self.config_file = self.args_lst[
                 self.args_lst.index("--config") + 1
@@ -145,7 +144,6 @@ class Configurater:
                  "(default: False)",
         )
         args = self.parser.parse_known_args(self.args_lst[1:])[0]
-
         # Default black line length is 88 so use this when not specified
         # otherwise use PEP-8 defaults
         if args.black:
@@ -157,7 +155,8 @@ class Configurater:
 
         self.parser.add_argument(
             "--wrap-summaries",
-            default=int(self.flargs_dct.get("wrap-summaries", _default_wrap_summaries)),
+            default=int(self.flargs_dct.get("wrap-summaries",
+                                            _default_wrap_summaries)),
             type=int,
             metavar="length",
             help="wrap long summary lines at this length; "
@@ -165,7 +164,8 @@ class Configurater:
         )
         self.parser.add_argument(
             "--wrap-descriptions",
-            default=int(self.flargs_dct.get("wrap-descriptions", _default_wrap_descriptions)),
+            default=int(self.flargs_dct.get("wrap-descriptions",
+                                            _default_wrap_descriptions)),
             type=int,
             metavar="length",
             help="wrap descriptions at this length; "
