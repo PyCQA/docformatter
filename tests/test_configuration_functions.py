@@ -194,7 +194,7 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.args.line_range == [1, 3]
-    #
+
     @pytest.mark.unit
     def test_low_line_range_is_zero(self, capsys):
         """Raise parser error if the first value for the range is zero."""
@@ -357,6 +357,41 @@ wrap-summaries = 80
             "wrap-summaries": "80",
         }
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+black = True
+wrap-descriptions = 80
+"""
+        ],
+    )
+    def test_black_from_setup_cfg(self, temporary_setup_cfg, config, ):
+        """Read black config from setup.cfg.
+
+        See issue #120.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/setup.cfg",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.black
+        assert not uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 88
+        assert uut.args.wrap_descriptions == 80
+        assert uut.flargs_dct == {
+            "black": "True",
+            "wrap-descriptions": "80",
+        }
 
     @pytest.mark.unit
     @pytest.mark.parametrize(

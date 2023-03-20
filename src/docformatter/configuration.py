@@ -73,6 +73,7 @@ class Configurater:
             description=__doc__,
             prog="docformatter",
         )
+
         try:
             self.config_file = self.args_lst[
                 self.args_lst.index("--config") + 1
@@ -144,6 +145,7 @@ class Configurater:
                  "(default: False)",
         )
         args = self.parser.parse_known_args(self.args_lst[1:])[0]
+
         # Default black line length is 88 so use this when not specified
         # otherwise use PEP-8 defaults
         if args.black:
