@@ -24,7 +24,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for testing the format_docstring() function."""
+"""Module for testing the Formatter class."""
 
 
 # Standard Library Imports
@@ -330,6 +330,41 @@ Hello.
     """'''
         assert docstring == uut._do_format_docstring(INDENTATION, docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_blank_line_after_variable_def(self,
+                                                                  test_args,
+                                                                  args,):
+        """Leave blank lines after any variable beginning with 'def'.
+
+        See issue #156.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '\
+class AcceptHeader(ExtendedSchemaNode): \
+    # ok to use name in this case because target key in the mapping must \
+    # be that specific value but cannot have a field named with this format \
+    name = "Accept" \
+    schema_type = String \
+    missing = drop \
+    default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers \
+\
+\
+class AcceptLanguageHeader(ExtendedSchemaNode): \
+    # ok to use name in this case because target key in the mapping must \
+    # be that specific value but cannot have a field named with this format \
+    name = "Accept-Language" \
+    schema_type = String \
+    missing = drop \
+    default = AcceptLanguage.EN_CA \
+    # FIXME: oneOf validator for supported languages (?)'
+        assert docstring == uut._do_format_code(docstring)
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
