@@ -287,6 +287,49 @@ Hello.
     """'''
         assert docstring == uut._do_format_docstring(INDENTATION, docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_directive_alone(self, test_args, args):
+        """Leave docstrings that have a reST directive in the summary alone."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''
+    """.. code-block:: shell-session
+
+    ► apm --version
+    apm  2.6.2
+    npm  6.14.13
+    node 12.14.1 x64
+    atom 1.58.0
+    python 2.7.16
+    git 2.33.0
+    """'''
+        assert docstring == uut._do_format_docstring(INDENTATION, docstring)
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_leave_link_only_docstring_alone(
+        self, test_args, args
+    ):
+        """Leave docstrings that consist of only a link alone."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''"""
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """'''
+        assert docstring == uut._do_format_docstring(INDENTATION, docstring)
+
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
@@ -540,14 +583,17 @@ class TestFormatWrap:
 '''.strip(),
         )
 
-    @pytest.mark.unit
+    @pytest.mark.xfail
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
     def test_format_docstring_should_ignore_multi_paragraph(
         self,
         test_args,
         args,
     ):
-        """Ignore multiple paragraphs in elaborate description."""
+        """Ignore multiple paragraphs in elaborate description.
+
+        Multiple description paragraphs is supported since v1.5.0.
+        """
         uut = Formatter(
             test_args,
             sys.stderr,
@@ -858,18 +904,55 @@ num_iterations is the number of updates - instead of a better definition of conv
         docstring = '''\
 """This is yanf with a short link.
 
-    See `the link <https://www.link.com`_ for more details.
+    See `the link <https://www.link.com>`_ for more details.
     """\
 '''
 
         assert '''\
 """This is yanf with a short link.
 
-    See `the link <https://www.link.com`_ for more details.
+    See `the link <https://www.link.com>`_ for more details.
     """\
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_short_inline_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Should move long in-line links to line by themselves."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+    """Helpful docstring.
+
+    A larger description that starts here.  https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """\
+'''
+
+        assert '''\
+"""Helpful docstring.
+
+    A larger description that starts here.
+    https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -947,6 +1030,24 @@ num_iterations is the number of updates - instead of a better definition of conv
             INDENTATION, docstring.strip()
         )
 
+        docstring = '''\
+"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """\
+'''
+        assert '''\
+"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """\
+''' == uut._do_format_docstring(
+                    INDENTATION, docstring.strip()
+                )
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
@@ -985,6 +1086,97 @@ num_iterations is the number of updates - instead of a better definition of conv
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "88", ""]],
+    )
+    def test_format_docstring_keep_inline_link_together(
+        self,
+        test_args,
+        args,
+    ):
+        """Keep in-line links together with the display text.
+
+        See issue #157.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+    """Get the Python type of a Click parameter.
+
+    See the list of `custom types provided by Click
+    <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """\
+    '''
+
+        assert '''\
+"""Get the Python type of a Click parameter.
+
+    See the list of
+    `custom types provided by Click <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [["--wrap-descriptions", "88", ""]],
+    )
+    def test_format_docstring_keep_inline_link_together_two_paragraphs(
+            self,
+            test_args,
+            args,
+    ):
+        """Keep in-line links together with the display text.
+
+        If there is another paragraph following the in-line link, don't strip
+        the newline in between.
+
+        See issue #157.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+"""\
+'''
+
+        assert '''\
+"""Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+    
+    This allow user\'s config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """\
+''' == uut._do_format_docstring(
+                INDENTATION, docstring.strip()
+            )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(

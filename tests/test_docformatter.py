@@ -462,7 +462,9 @@ def foo():
 def foo():
     """Description from issue #150 that was being improperly wrapped.
 
-    The text file can be retrieved via the Chrome plugin `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing"""
+    The text file can be retrieved via the Chrome plugin `Get 
+    Cookies.txt <https://chrome.google.com/webstore/detail/get-
+    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
 '''
         ],
     )
@@ -475,26 +477,28 @@ def foo():
             ]
         ],
     )
-    def test_end_to_end_keep_in_line_link_one_line(
+    def test_ignore_already_wrapped_link(
         self,
         run_docformatter,
         temporary_file,
         arguments,
         contents,
     ):
-        """Keep in-line URL link on one line.
+        """Ignore a URL link that was wrapped by the user.
 
-        See issue #150. See requirement docformatter_10.1.3.1.
+        See issue #150.
         """
         assert '''\
-@@ -1,4 +1,7 @@
+@@ -1,6 +1,7 @@
  def foo():
      """Description from issue #150 that was being improperly wrapped.
  
--    The text file can be retrieved via the Chrome plugin `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing"""
+-    The text file can be retrieved via the Chrome plugin `Get 
+-    Cookies.txt <https://chrome.google.com/webstore/detail/get-
+-    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
 +    The text file can be retrieved via the Chrome plugin
-+    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>`
-+    while browsing
++    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-
++    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing.
 +    """
 ''' == "\n".join(
             run_docformatter.communicate()[0]

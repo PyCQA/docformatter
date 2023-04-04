@@ -70,11 +70,11 @@ def is_probably_beginning_of_sentence(line):
     """
     # Check heuristically for a parameter list.
     for token in ["@", "-", r"\*"]:
-        if re.search(r"\s" + token + r"\s", line):
+        if re.search(rf"\s{token}\s", line):
             return True
 
     stripped_line = line.strip()
-    is_beginning_of_sentence = re.match(r'[^\w"\'`\(\)]', stripped_line)
+    is_beginning_of_sentence = re.match(r"^[-@\)]", stripped_line)
     is_pydoc_ref = re.match(r"^:\w+:", stripped_line)
 
     return is_beginning_of_sentence and not is_pydoc_ref
@@ -97,9 +97,9 @@ def normalize_line_endings(lines, newline):
     return "".join([normalize_line(line, newline) for line in lines])
 
 
-def normalize_summary(summary):
+def normalize_summary(summary: str) -> str:
     """Return normalized docstring summary."""
-    # remove trailing whitespace
+    # Remove trailing whitespace
     summary = summary.rstrip()
 
     # Add period at end of sentence and capitalize the first word of the
@@ -162,16 +162,11 @@ def split_summary_and_description(contents):
     split_lines = contents.rstrip().splitlines()
 
     for index in range(1, len(split_lines)):
-        found = False
-
-        # Empty line separation would indicate the rest is the description or,
+        # Empty line separation would indicate the rest is the description or
         # symbol on second line probably is a description with a list.
         if not split_lines[index].strip() or is_probably_beginning_of_sentence(
             split_lines[index]
         ):
-            found = True
-
-        if found:
             return (
                 "\n".join(split_lines[:index]).strip(),
                 "\n".join(split_lines[index:]).rstrip(),

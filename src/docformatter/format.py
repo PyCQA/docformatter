@@ -370,6 +370,12 @@ class Formatter:
         if contents.lstrip().startswith(">>>"):
             return docstring
 
+        # Do not modify docstring if the only thing it contains is a link.
+        _links = _syntax.do_find_links(contents)
+        with contextlib.suppress(IndexError):
+            if _links[0][0] == 0 and _links[0][1] == len(contents):
+                return docstring
+
         summary, description = _strings.split_summary_and_description(contents)
 
         # Leave docstrings with underlined summaries alone.
@@ -379,9 +385,12 @@ class Formatter:
         ):
             return docstring
 
-        if not self.args.force_wrap and _syntax.is_some_sort_of_list(
-            summary,
-            self.args.non_strict,
+        if not self.args.force_wrap and (
+            _syntax.is_some_sort_of_list(
+                summary,
+                self.args.non_strict,
+            )
+            or _syntax.do_find_directives(summary)
         ):
             # Something is probably not right with the splitting.
             return docstring
@@ -393,64 +402,123 @@ class Formatter:
         self.args.wrap_descriptions -= tab_compensation
 
         if description:
-            # Compensate for triple quotes by temporarily prepending 3 spaces.
-            # This temporary prepending is undone below.
-            initial_indent = (
-                indentation
-                if self.args.pre_summary_newline
-                else 3 * " " + indentation
-            )
-            pre_summary = (
-                "\n" + indentation if self.args.pre_summary_newline else ""
-            )
-            summary = _syntax.wrap_summary(
-                _strings.normalize_summary(summary),
-                wrap_length=self.args.wrap_summaries,
-                initial_indent=initial_indent,
-                subsequent_indent=indentation,
-            ).lstrip()
-            description = _syntax.wrap_description(
+            return self._do_format_multiline_docstring(
+                indentation,
+                summary,
                 description,
-                indentation=indentation,
-                wrap_length=self.args.wrap_descriptions,
-                force_wrap=self.args.force_wrap,
-                strict=self.args.non_strict,
+                open_quote,
             )
-            post_description = "\n" if self.args.post_description_blank else ""
-            return f'''\
+
+        return self._do_format_oneline_docstring(
+            indentation,
+            contents,
+            open_quote,
+        )
+
+    def _do_format_oneline_docstring(
+        self,
+        indentation: str,
+        contents: str,
+        open_quote: str,
+    ) -> str:
+        """Format one line docstrings.
+
+        Parameters
+        ----------
+        indentation : str
+            The indentation to use for each line.
+        contents : str
+            The contents of the original docstring.
+        open_quote : str
+            The type of quote used by the original docstring.  Selected from
+            QUOTE_TYPES.
+
+        Returns
+        -------
+        formatted_docstring : str
+            The formatted docstring.
+        """
+        if self.args.make_summary_multi_line:
+            beginning = f"{open_quote}\n{indentation}"
+            ending = f'\n{indentation}"""'
+            summary_wrapped = _syntax.wrap_summary(
+                _strings.normalize_summary(contents),
+                wrap_length=self.args.wrap_summaries,
+                initial_indent=indentation,
+                subsequent_indent=indentation,
+            ).strip()
+            return f"{beginning}{summary_wrapped}{ending}"
+        else:
+            summary_wrapped = _syntax.wrap_summary(
+                open_quote + _strings.normalize_summary(contents) + '"""',
+                wrap_length=self.args.wrap_summaries,
+                initial_indent=indentation,
+                subsequent_indent=indentation,
+            ).strip()
+            if self.args.close_quotes_on_newline and "\n" in summary_wrapped:
+                summary_wrapped = (
+                    f"{summary_wrapped[:-3]}"
+                    f"\n{indentation}"
+                    f"{summary_wrapped[-3:]}"
+                )
+            return summary_wrapped
+
+    def _do_format_multiline_docstring(
+        self,
+        indentation: str,
+        summary: str,
+        description: str,
+        open_quote: str,
+    ) -> str:
+        """Format multiline docstrings.
+
+        Parameters
+        ----------
+        indentation : str
+            The indentation to use for each line.
+        summary : str
+            The summary from the original docstring.
+        description : str
+            The long description from the original docstring.
+        open_quote : str
+            The type of quote used by the original docstring.  Selected from
+            QUOTE_TYPES.
+
+        Returns
+        -------
+        formatted_docstring : str
+            The formatted docstring.
+        """
+        # Compensate for triple quotes by temporarily prepending 3 spaces.
+        # This temporary prepending is undone below.
+        initial_indent = (
+            indentation
+            if self.args.pre_summary_newline
+            else 3 * " " + indentation
+        )
+        pre_summary = (
+            "\n" + indentation if self.args.pre_summary_newline else ""
+        )
+        summary = _syntax.wrap_summary(
+            _strings.normalize_summary(summary),
+            wrap_length=self.args.wrap_summaries,
+            initial_indent=initial_indent,
+            subsequent_indent=indentation,
+        ).lstrip()
+        description = _syntax.wrap_description(
+            description,
+            indentation=indentation,
+            wrap_length=self.args.wrap_descriptions,
+            force_wrap=self.args.force_wrap,
+            strict=self.args.non_strict,
+        )
+        post_description = "\n" if self.args.post_description_blank else ""
+        return f'''\
 {open_quote}{pre_summary}{summary}
 
 {description}{post_description}
 {indentation}"""\
 '''
-        else:
-            if not self.args.make_summary_multi_line:
-                summary_wrapped = _syntax.wrap_summary(
-                    open_quote + _strings.normalize_summary(contents) + '"""',
-                    wrap_length=self.args.wrap_summaries,
-                    initial_indent=indentation,
-                    subsequent_indent=indentation,
-                ).strip()
-                if (
-                    self.args.close_quotes_on_newline
-                    and "\n" in summary_wrapped
-                ):
-                    summary_wrapped = (
-                        f"{summary_wrapped[:-3]}"
-                        f"\n{indentation}"
-                        f"{summary_wrapped[-3:]}"
-                    )
-                return summary_wrapped
-            else:
-                beginning = f"{open_quote}\n{indentation}"
-                ending = f'\n{indentation}"""'
-                summary_wrapped = _syntax.wrap_summary(
-                    _strings.normalize_summary(contents),
-                    wrap_length=self.args.wrap_summaries,
-                    initial_indent=indentation,
-                    subsequent_indent=indentation,
-                ).strip()
-                return f"{beginning}{summary_wrapped}{ending}"
 
     @staticmethod
     def _do_remove_blank_lines_after_method(modified_tokens):
