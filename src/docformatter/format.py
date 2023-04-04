@@ -229,13 +229,13 @@ class Formatter:
             The text from the source file.
         """
         try:
-            original_newline = self.encodor.do_find_newline(
+            _original_newline = self.encodor.do_find_newline(
                 source.splitlines(True)
             )
-            code = self._format_code(source)
+            _code = self._format_code(source)
 
             return _strings.normalize_line_endings(
-                code.splitlines(True), original_newline
+                _code.splitlines(True), _original_newline
             )
         except (tokenize.TokenError, IndentationError):
             return source
@@ -322,7 +322,7 @@ class Formatter:
                     not in {tokenize.NL, tokenize.NEWLINE}
                     or modified_tokens[-2][1] != ":"
                     and modified_tokens[-2][0] != tokenize.COMMENT
-                    or not modified_tokens[-2][4].lstrip().startswith(("def"))
+                    or not modified_tokens[-2][4].lstrip().startswith("def ")
                 ):
                     modified_tokens.append(
                         (token_type, token_string, start, end, line)
