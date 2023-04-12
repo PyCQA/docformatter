@@ -1055,6 +1055,78 @@ class TestClass:
 '''
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_strip_blank_line_after_class_variable(
+        self,
+        test_args,
+        args,
+    ):
+        """Strip any newlines between a class variable defintion and docstring.
+
+        See issue #.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring."""
+
+    test_var = 0
+    """This is a class variable docstring."""
+
+    test_var2 = 1
+    """This is a second class variable docstring."""
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+
+    """This is a class docstring."""
+
+    test_var = 0
+
+    """This is a class variable docstring."""
+
+    test_var2 = 1
+
+
+    """This is a second class variable docstring."""
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_strip_blank_line_after_module_variable(
+        self,
+        test_args,
+        args,
+    ):
+        """Strip newlines between module variable defintiion and docstring."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+CONST = 123
+"""docstring for CONST."""
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+CONST = 123
+
+"""docstring for CONST."""
+'''
+        )
+
 
 class TestFormatCodeRanges:
     """Class for testing _format_code() with the line_range or length_range
@@ -1190,7 +1262,7 @@ def foo():
             sys.stdout,
         )
 
-        assert '''\
+        docstring = '''\
 #!/usr/env/bin python
 """This is a module docstring.
 
@@ -1202,7 +1274,8 @@ def foo():
 this
 is
 not."""
-''' == uut._do_format_code(
+'''
+        assert docstring == uut._do_format_code(
             '''\
 #!/usr/env/bin python
 """This is
@@ -1219,3 +1292,72 @@ is
 not."""
 '''
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_do_format_code_keep_newline_for_stub_functions(
+        self, test_args, args
+    ):
+        """Should keep newline after docstring in stub functions.
+
+        See issue #156 and issue #173.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class Foo:
+
+    @abstractmethod
+    def bar(self):
+        """This is a description."""
+
+    @abstractmethod
+    def baz(self):
+        """This is a second description."""
+
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class Foo:
+
+    @abstractmethod
+    def bar(self):
+
+        """This is a description."""
+
+    @abstractmethod
+    def baz(self):
+
+        """This is a second description."""
+
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_do_format_code_keep_newlines_outside_docstring(
+        self, test_args, args
+    ):
+        """Should keep newlines in code following docstring."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def new_function():
+    """Description of function."""
+    found = next(
+        (index for index, line in enumerate(split) if line.strip()), 0
+    )
+
+    return "\n".join(split[found:])
+'''
+        assert docstring == uut._do_format_code(docstring)
