@@ -325,9 +325,7 @@ def do_split_description(
         # If the text including the URL is longer than the wrap length,
         # we need to split the description before the URL, wrap the pre-URL
         # text, and add the URL as a separate line.
-        if len(text[_text_idx : _idx[1]]) > (
-            wrap_length - len(indentation)
-        ):
+        if len(text[_text_idx : _idx[1]]) > (wrap_length - len(indentation)):
             # Wrap everything in the description before the first URL.
             _lines.extend(
                 description_to_list(

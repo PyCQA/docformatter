@@ -118,9 +118,10 @@ with the following ``.pre-commit-config.yaml`` configuration:
 .. code-block:: yaml
 
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.5.0
+    rev: v1.6.1
     hooks:
       - id: docformatter
+        additional_dependencies: [tomli]
         args: [--in-place --config ./pyproject.toml]
 
 You will need to install ``pre-commit`` and run ``pre-commit install``.
@@ -130,6 +131,9 @@ will fail if ``docformatter`` processes a change.  The ``--in-place`` option
 fails because pre-commit does a diff check and fails if it detects a hook
 changed a file.  The ``--check`` option fails because ``docformatter`` returns
 a non-zero exit code.
+
+The ``additional_dependencies: [tomli]`` is only required if you are using
+``pyproject.toml`` for ``docformatter``'s configuration.
 
 Use with GitHub Actions
 -----------------------

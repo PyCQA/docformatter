@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2012-2022 Steven Myint
+# Copyright (C) 2012-2023 Steven Myint
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -28,7 +28,7 @@ import collections
 import io
 import locale
 import sys
-from typing import Dict
+from typing import Dict, List
 
 # Third Party Imports
 from charset_normalizer import from_path  # pylint: disable=import-error
@@ -67,7 +67,7 @@ class Encoder:
         except (SyntaxError, LookupError, UnicodeDecodeError):
             self.encoding = "latin-1"
 
-    def do_find_newline(self, source: str) -> Dict[int, int]:
+    def do_find_newline(self, source: List[str]) -> Dict[int, int]:
         """Return type of newline used in source.
 
         Parameters

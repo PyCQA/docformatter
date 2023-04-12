@@ -40,21 +40,3 @@ jobs:
         run: tox -vv --notest
       - name: Run tests with tox
         run: tox -e py --skip-pkg-install
-      - name: Create Coveralls coverage report
-        uses: miurahr/coveralls-python-action@patch-pyprject-toml
-        with:
-          base-path: .tox
-          debug: true
-          parallel: true
-
-  upload_coveralls:
-    name: Upload Results to Coveralls
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload coverage report to Coveralls
-        uses: miurahr/coveralls-python-action@patch-pyprject-toml
-        with:
-          base-path: .tox
-          debug: true
-          parallel-finished: true
