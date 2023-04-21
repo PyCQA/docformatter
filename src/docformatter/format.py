@@ -569,17 +569,31 @@ class Formatter:
         # statement as long as it's not a stub function.
         for _idx, _token in enumerate(modified_tokens):
             with contextlib.suppress(IndexError):
+                _is_definition = (
+                    _token[4].lstrip().startswith(("class ", "def ", "@"))
+                )
+                _is_docstring = (
+                    modified_tokens[_idx - 2][4].strip().endswith('"""')
+                )
+                _after_definition = (
+                    modified_tokens[_idx - 6][4]
+                    .lstrip()
+                    .startswith(("class", "def", "@"))
+                )
+                _after_docstring = modified_tokens[_idx - 5][
+                    4
+                ].strip().endswith('"""') or modified_tokens[_idx - 5][
+                    4
+                ].strip().startswith(
+                    '"""'
+                )
+
                 if (
                     _token[0] == 1
-                    and not _token[4]
-                    .lstrip()
-                    .startswith(("class ", "def ", "@"))
-                    and not modified_tokens[_idx - 2][4]
-                    .strip()
-                    .endswith('"""')
-                    and modified_tokens[_idx - 6][4]
-                    .lstrip()
-                    .startswith(("class ", "def ", "@"))
+                    and not _is_definition
+                    and not _is_docstring
+                    and _after_definition
+                    and _after_docstring
                 ):
                     j = 1
                     while modified_tokens[_idx - j][4] == "\n":

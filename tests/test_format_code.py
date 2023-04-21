@@ -1064,7 +1064,7 @@ class TestClass:
     ):
         """Strip any newlines between a class variable defintion and docstring.
 
-        See issue #.
+        See requirement .
         """
         uut = Formatter(
             test_args,
@@ -1126,6 +1126,36 @@ CONST = 123
 """docstring for CONST."""
 '''
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_do_not_touch_function_no_docstring(
+        self,
+        test_args,
+        args,
+    ):
+        """Do not remove newlines in functions with no docstring.
+
+        See issue #156.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def test_wps3_process_step_io_data_or_href():
+    """Validates that \'data\' literal values and \'href\' file references are both
+    handled as input for workflow steps corresponding to a WPS-3 process."""
+
+    def mock_wps_request(method, url, *_, **kwargs):
+        nonlocal test_reached_parse_inputs
+
+        method = method.upper()
+'''
+        assert docstring == uut._do_format_code(docstring)
 
 
 class TestFormatCodeRanges:
