@@ -208,6 +208,14 @@ commands =
     pip install -U pip
     pip install --prefix={toxworkdir}/{envname} -e .[tomli]
     pytest -s -x -c {toxinidir}/pyproject.toml \
+        -m unit \
+        --cache-clear \
+        --cov=docformatter \
+        --cov-config={toxinidir}/pyproject.toml \
+        --cov-branch \
+        {toxinidir}/tests/
+    pytest -s -x -c {toxinidir}/pyproject.toml \
+        -m system \
         --cache-clear \
         --cov=docformatter \
         --cov-config={toxinidir}/pyproject.toml \
