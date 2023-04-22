@@ -29,6 +29,7 @@ import argparse
 import collections
 import contextlib
 import io
+import re
 import tokenize
 from typing import TextIO, Tuple
 
@@ -587,11 +588,15 @@ class Formatter:
                 ].strip().startswith(
                     '"""'
                 )
+                _comment_follows = re.search(
+                    r"\"\"\" *#", modified_tokens[_idx - 4][4]
+                )
 
                 if (
                     _token[0] == 1
                     and not _is_definition
                     and not _is_docstring
+                    and not _comment_follows
                     and _after_definition
                     and _after_docstring
                 ):
