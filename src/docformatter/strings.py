@@ -164,8 +164,9 @@ def split_summary_and_description(contents):
     for index in range(1, len(split_lines)):
         # Empty line separation would indicate the rest is the description or
         # symbol on second line probably is a description with a list.
-        if not split_lines[index].strip() or is_probably_beginning_of_sentence(
-            split_lines[index]
+        if not split_lines[index].strip() or (
+            index + 1 < len(split_lines)
+            and is_probably_beginning_of_sentence(split_lines[index + 1])
         ):
             return (
                 "\n".join(split_lines[:index]).strip(),
