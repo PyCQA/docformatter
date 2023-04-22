@@ -302,8 +302,8 @@ class TestSplitters:
     def test_split_summary_and_description_with_list_on_other_line(self):
         """"""
         assert (
-            "Test\n    test",
-            "    @blah",
+            "Test",
+            "    test\n    @blah",
         ) == docformatter.split_summary_and_description(
             """\
     Test

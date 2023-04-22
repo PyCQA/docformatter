@@ -332,9 +332,11 @@ Hello.
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_blank_line_after_variable_def(self,
-                                                                  test_args,
-                                                                  args,):
+    def test_format_docstring_leave_blank_line_after_variable_def(
+        self,
+        test_args,
+        args,
+    ):
         """Leave blank lines after any variable beginning with 'def'.
 
         See issue #156.
@@ -368,9 +370,11 @@ class AcceptLanguageHeader(ExtendedSchemaNode): \
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_blank_line_after_comment(self,
-                                                                  test_args,
-                                                                  args,):
+    def test_format_docstring_leave_blank_line_after_comment(
+        self,
+        test_args,
+        args,
+    ):
         """Leave blank lines after docstring followed by a comment.
 
         See issue #176.
@@ -1029,8 +1033,8 @@ num_iterations is the number of updates - instead of a better definition of conv
     A larger description that ends here.
     """\
 ''' == uut._do_format_docstring(
-                INDENTATION, docstring.strip()
-            )
+            INDENTATION, docstring.strip()
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -1124,8 +1128,9 @@ num_iterations is the number of updates - instead of a better definition of conv
     .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
     """\
 ''' == uut._do_format_docstring(
-                    INDENTATION, docstring.strip()
-                )
+            INDENTATION, docstring.strip()
+        )
+
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
@@ -1201,8 +1206,8 @@ num_iterations is the number of updates - instead of a better definition of conv
     `custom types provided by Click <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
     """\
 ''' == uut._do_format_docstring(
-                INDENTATION, docstring.strip()
-            )
+            INDENTATION, docstring.strip()
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -1210,14 +1215,14 @@ num_iterations is the number of updates - instead of a better definition of conv
         [["--wrap-descriptions", "88", ""]],
     )
     def test_format_docstring_keep_inline_link_together_two_paragraphs(
-            self,
-            test_args,
-            args,
+        self,
+        test_args,
+        args,
     ):
         """Keep in-line links together with the display text.
 
-        If there is another paragraph following the in-line link, don't strip
-        the newline in between.
+        If there is another paragraph following the in-line link, don't
+        strip the newline in between.
 
         See issue #157.
         """
@@ -1253,8 +1258,8 @@ num_iterations is the number of updates - instead of a better definition of conv
     precedence over any values from the config file.
     """\
 ''' == uut._do_format_docstring(
-                INDENTATION, docstring.strip()
-            )
+            INDENTATION, docstring.strip()
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -1321,6 +1326,29 @@ class TestClass:
     """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
 '''
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_no_blank_in_summary_with_symbol(
+        self, test_args, args
+    ):
+        """Wrap long class attribute docstrings.
+
+        See issue #79.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
+    -v."""
+'''
+        assert docstring == uut._do_format_code(docstring)
 
 
 class TestFormatStyleOptions:
