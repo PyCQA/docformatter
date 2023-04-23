@@ -175,6 +175,9 @@ def description_to_list(
         if _text:
             _lines.extend(_text)
         _lines.append("")
+        with contextlib.suppress(IndexError):
+            if _lines[-2] == _lines[-1] == "":
+                _lines.pop(-1)
 
     return _lines
 
@@ -334,6 +337,9 @@ def do_split_description(
                     wrap_length,
                 )
             )
+
+            if _lines[-1] == "":
+                _lines.pop(-1)
 
             # Add the URL.
             _lines.append(
