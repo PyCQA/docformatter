@@ -206,6 +206,29 @@ class TestNormalizers:
             "don't lower case I'm"
         )
 
+    @pytest.mark.unit
+    def test_normalize_summary_capitalize_first_letter_with_period(self):
+        """Capitalize the first letter of the summary even when ends in period.
+
+        See issue #184. See requirement docformatter_4.5.1.
+        """
+        assert (
+            "This is a summary that needs to be capped."
+            == docformatter.normalize_summary(
+                "this is a summary that needs to be capped."
+            )
+        )
+
+    @pytest.mark.unit
+    def test_normalize_summary_dont_capitalize_first_letter_if_variable(self):
+        """Capitalize the first word unless it looks like a variable."""
+        assert (
+            "num_iterations should not be capitalized in this summary."
+            == docformatter.normalize_summary(
+                "num_iterations should not be capitalized in this summary"
+            )
+        )
+
 
 class TestSplitters:
     """Class for testing the string splitting function.
