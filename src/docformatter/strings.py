@@ -23,6 +23,8 @@
 # SOFTWARE.
 """This module provides docformatter string functions."""
 
+
+import contextlib
 # Standard Library Imports
 import re
 
@@ -110,7 +112,13 @@ def normalize_summary(summary: str) -> str:
         and (not summary.startswith("#"))
     ):
         summary += "."
-        summary = summary[0].upper() + summary[1:]
+
+    with contextlib.suppress(IndexError):
+        # Look for underscores in the first word, this would typically
+        # indicate the first word is a variable name or some other
+        # non-standard English word.
+        if "_" not in summary.split(" ", 1)[0]:
+            summary = summary[0].upper() + summary[1:]
 
     return summary
 
