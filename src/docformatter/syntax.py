@@ -338,8 +338,9 @@ def do_split_description(
                 )
             )
 
-            if _lines[-1] == "":
-                _lines.pop(-1)
+            with contextlib.suppress(IndexError):
+                if _lines[-1] == "":
+                    _lines.pop(-1)
 
             # Add the URL.
             _lines.append(
