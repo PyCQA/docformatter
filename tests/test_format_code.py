@@ -853,9 +853,9 @@ def foo():\r
         )
 
         assert (
-            '\n\n\ndef my_func():\n"""Summary of my function."""\npass'
+            'def my_func():\n"""Summary of my function."""\npass'
             == uut._do_format_code(
-                '\n\n\ndef my_func():\n\n"""Summary of my function."""\npass'
+                'def my_func():\n\n"""Summary of my function."""\npass'
             )
         )
 
@@ -1107,7 +1107,7 @@ class TestClass:
         test_args,
         args,
     ):
-        """Strip newlines between module variable defintiion and docstring."""
+        """Strip newlines between module variable definition and docstring."""
         uut = Formatter(
             test_args,
             sys.stderr,
@@ -1157,6 +1157,34 @@ def test_wps3_process_step_io_data_or_href():
 '''
         assert docstring == uut._do_format_code(docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_keep_newline_after_shebang(
+        self,
+        test_args,
+        args,
+    ):
+        """Do not remove newlines following the shebang.
+
+        See issue #187.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+#!/usr/bin/env python
+
+"""a.py."""
+'''
+        assert docstring == uut._do_format_code('''\
+#!/usr/bin/env python
+
+"""a.py"""
+''')
 
 class TestFormatCodeRanges:
     """Class for testing _format_code() with the line_range or length_range
