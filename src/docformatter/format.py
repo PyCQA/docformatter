@@ -528,14 +528,20 @@ class Formatter:
         """
         for _idx, _token in enumerate(modified_tokens):
             if _token[0] == 3:
-                # Remove newline between variable definition and docstring.
                 j = 1
-                while modified_tokens[_idx - j][
-                    4
-                ] == "\n" and not modified_tokens[_idx - j - 1][
-                    4
-                ].strip().endswith(
-                    '"""'
+
+                # Remove newline between variable definition and docstring
+                # unless is separating docstring from:
+                #     * A previous docstring.
+                #     * The file's shebang.
+                while (
+                    modified_tokens[_idx - j][4] == "\n"
+                    and not (
+                        modified_tokens[_idx - j - 1][4]
+                        .strip()
+                        .endswith('"""')
+                    )
+                    and not modified_tokens[_idx - j - 1][4].startswith("#!/")
                 ):
                     modified_tokens.pop(_idx - j)
                     j += 1

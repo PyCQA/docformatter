@@ -104,8 +104,7 @@ def normalize_summary(summary: str) -> str:
     # Remove trailing whitespace
     summary = summary.rstrip()
 
-    # Add period at end of sentence and capitalize the first word of the
-    # summary.
+    # Add period at end of sentence.
     if (
         summary
         and (summary[-1].isalnum() or summary[-1] in ['"', "'"])
@@ -114,10 +113,11 @@ def normalize_summary(summary: str) -> str:
         summary += "."
 
     with contextlib.suppress(IndexError):
-        # Look for underscores in the first word, this would typically
-        # indicate the first word is a variable name or some other
-        # non-standard English word.
-        if "_" not in summary.split(" ", 1)[0]:
+        # Look for underscores, periods in the first word, this would typically
+        # indicate the first word is a variable name, file name, or some other
+        # non-standard English word.  If none of these exist capitalize the
+        # first word of the summary.
+        if all(char not in summary.split(" ", 1)[0] for char in ["_", "."]):
             summary = summary[0].upper() + summary[1:]
 
     return summary
