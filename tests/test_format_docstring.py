@@ -1301,6 +1301,43 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
+        [["--wrap-descriptions", "72", ""]],
+    )
+    def test_format_docstring_with_only_link_in_description(
+        self,
+        test_args,
+        args,
+    ):
+        """No index error when only link in long description.
+
+        See issue #189.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+    """This method doesn't do anything.
+
+    https://example.com/this-is-just-a-long-url/designed-to-trigger/the-wrapping-of-the-description
+    """
+'''
+
+        assert '''\
+"""This method doesn\'t do anything.
+
+    https://example.com/this-is-just-a-long-url/designed-to-trigger/the-wrapping-of-the-description
+    """\
+''' == uut._do_format_docstring(
+            INDENTATION, docstring.strip()
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
         [["--wrap-descriptions", "88", "--wrap-summaries", "88", ""]],
     )
     def test_format_docstring_link_only_one_newline_after_link(
