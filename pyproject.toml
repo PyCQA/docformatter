@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.6.3"
+version = "1.6.4"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -220,6 +220,7 @@ commands =
         --cov=docformatter \
         --cov-config={toxinidir}/pyproject.toml \
         --cov-branch \
+        --cov-append \
         {toxinidir}/tests/
 
 [testenv:coverage]
