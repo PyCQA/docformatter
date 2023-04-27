@@ -41,10 +41,79 @@ import docformatter.configuration as _configuration
 import docformatter.format as _format
 
 
+def _help():
+    """Print docformatter's help."""
+    print(
+        """\
+usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]] [--black]
+                    [--wrap-summaries length] [--wrap-descriptions length]
+                    [--force-wrap] [--tab-width width] [--blank]
+                    [--pre-summary-newline] [--pre-summary-space]
+                    [--make-summary-multi-line] [--close-quotes-on-newline]
+                    [--range line line] [--docstring-length length length]
+                    [--non-strict] [--config CONFIG] [--version]
+                    files [files ...]
+
+positional arguments:
+  files                 files to format or '-' for standard in
+
+options:
+  -h, --help            show this help message and exit
+  -i, --in-place        make changes to files instead of printing diffs
+  -c, --check           only check and report incorrectly formatted files
+  -d, --diff            when used with `--check` or `--in-place`, also what
+                        changes would be made
+  -r, --recursive       drill down directories recursively
+  -e [EXCLUDE ...], --exclude [EXCLUDE ...]
+                        in recursive mode, exclude directories and files by
+                        names
+  --black               make formatting compatible with standard black options
+                        (default: False)
+  --wrap-summaries length
+                        wrap long summary lines at this length; set to 0 to
+                        disable wrapping (default: 79, 88 with --black option)
+  --wrap-descriptions length
+                        wrap descriptions at this length; set to 0 to disable
+                        wrapping (default: 72, 88 with --black option)
+  --force-wrap          force descriptions to be wrapped even if it may result
+                        in a mess (default: False)
+  --tab-width width     tabs in indentation are this many characters when
+                        wrapping lines (default: 1)
+  --blank               add blank line after description (default: False)
+  --pre-summary-newline
+                        add a newline before the summary of a multi-line
+                        docstring (default: False)
+  --pre-summary-space   add a space after the opening triple quotes
+                        (default: False)
+  --make-summary-multi-line
+                        add a newline before and after the summary of a
+                        one-line docstring (default: False)
+  --close-quotes-on-newline
+                        place closing triple quotes on a new-line when a
+                        one-line docstring wraps to two or more lines
+                        (default: False)
+  --range line line     apply docformatter to docstrings between these lines;
+                        line numbers are indexed at 1 (default: None)
+  --docstring-length length length
+                        apply docformatter to docstrings of given length range
+                        (default: None)
+  --non-strict          don't strictly follow reST syntax to identify lists
+                        (see issue #67) (default: False)
+  --config CONFIG       path to file containing docformatter options
+  --version             show program's version number and exit
+"""
+    )
+
+
 def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     configurator = _configuration.Configurater(argv)
-    configurator.do_parse_arguments()
+
+    if "--help" in configurator.args_lst:
+        _help()
+        sys.exit()
+    else:
+        configurator.do_parse_arguments()
 
     formator = _format.Formatter(
         configurator.args,
