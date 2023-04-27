@@ -1438,6 +1438,63 @@ def function2():
 '''
         assert docstring == uut._do_format_code(docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [["--black", ""]])
+    def test_format_docstring_black(
+        self,
+        test_args,
+        args,
+    ):
+        """Format with black options when --black specified.
+
+        Add a space between the opening quotes and the summary if
+        content starts with a quote.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            '''"""This one-line docstring will not have a leading space."""'''
+        ) == uut._do_format_docstring(
+            INDENTATION,
+            '''\
+"""   This one-line docstring will not have a leading space."""\
+''',
+        )
+        assert (
+            '''""" "This" quote starting one-line docstring will have a leading space."""'''
+        ) == uut._do_format_docstring(
+            INDENTATION,
+            '''\
+""""This" quote starting one-line docstring will have a leading space."""\
+''',
+        )
+        assert (
+            (
+                '''\
+""" "This" quote starting one-line docstring will have a leading space.
+
+    This long description will be wrapped at 88 characters because we
+    passed the --black option and 88 characters is the default wrap
+    length.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+""""This" quote starting one-line docstring will have a leading space.
+
+This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
+"""\
+''',
+            )
+        )
+
 
 class TestFormatStyleOptions:
     """Class for testing format_docstring() when requesting style options."""
