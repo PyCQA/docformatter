@@ -583,9 +583,7 @@ def _do_remove_blank_lines_after_definitions(
             while (
                 modified_tokens[_idx - j][4] == "\n"
                 and not (
-                    modified_tokens[_idx - j - 1][4]
-                    .strip()
-                    .endswith('"""')
+                    modified_tokens[_idx - j - 1][4].strip().endswith('"""')
                 )
                 and not modified_tokens[_idx - j - 1][4].startswith("#!/")
             ):
@@ -639,13 +637,9 @@ def _do_remove_blank_lines_after_docstring(modified_tokens):
                 .lstrip()
                 .startswith(("class", "def", "@"))
             )
-            _after_docstring = modified_tokens[_idx - 5][
-                4
-            ].strip().endswith('"""') or modified_tokens[_idx - 5][
-                4
-            ].strip().startswith(
+            _after_docstring = modified_tokens[_idx - 5][4].strip().endswith(
                 '"""'
-            )
+            ) or modified_tokens[_idx - 5][4].strip().startswith('"""')
             _comment_follows = re.search(
                 r"\"\"\" *#", modified_tokens[_idx - 4][4]
             )

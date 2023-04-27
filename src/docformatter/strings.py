@@ -24,8 +24,8 @@
 """This module provides docformatter string functions."""
 
 
-import contextlib
 # Standard Library Imports
+import contextlib
 import re
 
 
