@@ -128,6 +128,15 @@ class Configurater:
             help="in recursive mode, exclude directories and files by names",
         )
         self.parser.add_argument(
+            "-n",
+            "--non-cap",
+            action="store",
+            nargs="*",
+            default=self.flargs_dct.get("non-cap", None),
+            help="list of words not to capitalize when they appear as the "
+            "first word in the summary",
+        )
+        self.parser.add_argument(
             "--wrap-summaries",
             default=int(self.flargs_dct.get("wrap-summaries", 79)),
             type=int,
