@@ -24,9 +24,10 @@
 """This module provides docformatter string functions."""
 
 
-import contextlib
 # Standard Library Imports
+import contextlib
 import re
+from typing import List
 
 
 def find_shortest_indentation(lines):
@@ -99,8 +100,28 @@ def normalize_line_endings(lines, newline):
     return "".join([normalize_line(line, newline) for line in lines])
 
 
-def normalize_summary(summary: str) -> str:
-    """Return normalized docstring summary."""
+def normalize_summary(summary: str, noncap: List[str] = None) -> str:
+    """Return normalized docstring summary.
+
+    A normalized docstring summary will have the first word capitalized and
+    a period at the end.
+
+    Parameters
+    ----------
+    summary : str
+        The summary string.
+    noncap : list
+        A user-provided list of words not to capitalize when they appear as
+        the first word in the summary.
+
+    Returns
+    -------
+    summary : str
+        The normalized summary string.
+    """
+    if noncap is None:
+        noncap = []
+
     # Remove trailing whitespace
     summary = summary.rstrip()
 
@@ -115,9 +136,13 @@ def normalize_summary(summary: str) -> str:
     with contextlib.suppress(IndexError):
         # Look for underscores, periods in the first word, this would typically
         # indicate the first word is a variable name, file name, or some other
-        # non-standard English word.  If none of these exist capitalize the
+        # non-standard English word.  The search the list of user-defined
+        # words not to capitalize.  If none of these exist capitalize the
         # first word of the summary.
-        if all(char not in summary.split(" ", 1)[0] for char in ["_", "."]):
+        if (
+            all(char not in summary.split(" ", 1)[0] for char in ["_", "."])
+            and summary.split(" ", 1)[0] not in noncap
+        ):
             summary = summary[0].upper() + summary[1:]
 
     return summary
