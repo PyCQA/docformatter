@@ -216,6 +216,28 @@ Hello
         )
 
     @pytest.mark.unit
+    @pytest.mark.parametrize("args", [["--non-cap", "eBay", 'iPad', "-c", ""]])
+    def test_format_docstring_with_non_cap_words(self, test_args, args):
+        """Capitalize words not found in the non_cap list.
+
+        See issue #193.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert '"""eBay kinda suss."""' == uut._do_format_docstring(
+            INDENTATION,
+            '''\
+"""
+eBay kinda suss
+"""
+''')
+
+    @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
     def test_format_docstring_with_single_quotes(self, test_args, args):
         """Replace single triple quotes with triple double quotes."""
