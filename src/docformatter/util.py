@@ -43,6 +43,7 @@ def find_py_files(sources, recursive, exclude=None):
 
     Return: yields paths to found files.
     """
+
     def not_hidden(name):
         """Return True if file 'name' isn't .hidden."""
         return not name.startswith(".")

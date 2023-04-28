@@ -204,6 +204,11 @@ def test_args(args):
         default=False,
     )
     parser.add_argument(
+        "--black",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "--make-summary-multi-line",
         action="store_true",
         default=False,

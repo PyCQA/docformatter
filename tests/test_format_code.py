@@ -1186,6 +1186,68 @@ def test_wps3_process_step_io_data_or_href():
 """a.py"""
 ''')
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [["--black", ""]])
+    def test_format_code_strip_blank_line_for_black(
+            self,
+            test_args,
+            args,
+    ):
+        """Blank lines are stripped in black mode."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring."""
+
+    class_attribute = 1
+
+    def test_method_1(self):
+        """This is a method docstring.
+
+        With no blank line after it.
+        """
+        pass
+
+    def test_method_2(self):
+        """This is a method docstring.
+
+        With a long description followed by multiple blank lines.
+        """
+        pass
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+
+    """This is a class docstring."""
+
+    class_attribute = 1
+
+    def test_method_1(self):
+        """This is a method docstring.
+
+        With no blank line after it.
+        """
+        pass
+
+    def test_method_2(self):
+
+        """This is a method docstring.
+
+        With a long description followed by multiple blank lines.
+        """
+
+
+        pass
+''')
+
+
 class TestFormatCodeRanges:
     """Class for testing _format_code() with the line_range or length_range
     arguments."""

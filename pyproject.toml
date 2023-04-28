@@ -92,8 +92,7 @@ disable = [
 ]
 
 [tool.docformatter]
-wrap-summaries = 79
-wrap-descriptions = 72
+black = true
 non-strict = false
 
 [tool.pydocstyle]

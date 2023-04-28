@@ -172,6 +172,7 @@ class TestConfigurater:
         assert uut.args.exclude is None
         assert uut.args.wrap_summaries == 88
         assert uut.args.wrap_descriptions == 72
+        assert not uut.args.black
         assert uut.args.post_description_blank
         assert not uut.args.pre_summary_newline
         assert not uut.args.pre_summary_space
@@ -307,6 +308,110 @@ class TestConfigurater:
         [
             """\
 [tool.docformatter]
+"""
+        ],
+    )
+    def test_black_defaults(
+        self,
+        temporary_pyproject_toml,
+        config,
+    ):
+        """Black line length defaults to 88 and pre-summary-space to True."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--black",
+            "--config",
+            "/tmp/pyproject.toml",
+            "",
+        ]
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+        assert uut.args.black
+        assert uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 88
+        assert uut.args.wrap_descriptions == 88
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
+black = true
+wrap-summaries = 80
+    """
+        ],
+    )
+    def test_black_from_pyproject(
+        self,
+        temporary_pyproject_toml,
+        config,
+    ):
+        """Test black setting via pyproject.toml."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/pyproject.toml",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.black
+        assert uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 80
+        assert uut.args.wrap_descriptions == 88
+        assert uut.flargs_dct == {
+            "black": "True",
+            "wrap-summaries": "80",
+        }
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+black = True
+wrap-descriptions = 80
+"""
+        ],
+    )
+    def test_black_from_setup_cfg(
+        self,
+        temporary_setup_cfg,
+        config,
+    ):
+        """Read black config from setup.cfg."""
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/setup.cfg",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.black
+        assert uut.args.pre_summary_space
+        assert uut.args.wrap_summaries == 88
+        assert uut.args.wrap_descriptions == 80
+        assert uut.flargs_dct == {
+            "black": "True",
+            "wrap-descriptions": "80",
+        }
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
 check = true
 diff = true
 recursive = true
@@ -314,7 +419,11 @@ exclude = ["src/", "tests/"]
 """
         ],
     )
-    def test_exclude_from_pyproject_toml(self,temporary_pyproject_toml,config,):
+    def test_exclude_from_pyproject_toml(
+        self,
+        temporary_pyproject_toml,
+        config,
+    ):
         """Read exclude list from pyproject.toml.
 
         See issue #120.
@@ -338,7 +447,7 @@ exclude = ["src/", "tests/"]
             "recursive": "True",
             "check": "True",
             "diff": "True",
-            "exclude": ["src/", "tests/"]
+            "exclude": ["src/", "tests/"],
         }
 
     @pytest.mark.unit
@@ -354,7 +463,11 @@ exclude = ["src/", "tests/"]
 """
         ],
     )
-    def test_exclude_from_setup_cfg(self,temporary_setup_cfg,config,):
+    def test_exclude_from_setup_cfg(
+        self,
+        temporary_setup_cfg,
+        config,
+    ):
         """Read exclude list from setup.cfg.
 
         See issue #120.
@@ -378,7 +491,7 @@ exclude = ["src/", "tests/"]
             "recursive": "true",
             "check": "true",
             "diff": "true",
-            "exclude": '["src/", "tests/"]'
+            "exclude": '["src/", "tests/"]',
         }
 
     @pytest.mark.unit

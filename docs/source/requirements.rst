@@ -202,7 +202,12 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.1.3.2', ' Shall not place a newline between description text and a wrapped link.', ' Derived', ' Shall', ' Yes [PR #182]'
     ' docformatter_10.2', ' Should format docstrings using NumPy style.', ' Style', ' Should', ' No'
     ' docformatter_10.3', ' Should format docstrings using Google style.', ' Style', ' Should', ' No'
-    ' docformatter_10.4', ' Should format docstrings using Sphinx style.',' Style', ' Should', ' No'
+    ' docformatter_10.4', ' Should format docstrings using Sphinx style.', ' Style', ' Should', ' No'
+    ' docformatter_10.5', ' Should format docstrings compatible with black.', ' Style', ' Should', ' Yes [PR #192]'
+    ' docformatter_10.5.1', ' Should wrap summaries at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.5.2', ' Should wrap descriptions at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.5.3', ' Should insert a space before the first word in the summary if that word is quoted when in black mode.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.5.4', ' Default black mode options should be over-rideable by passing arguments or using configuration files.', ' Style', ' Should', ' Yes'
     ' docformatter_11', '**Program Control**'
     ' docformatter_11.1', ' Should check formatting and report incorrectly documented docstrings.', ' Stakeholder', ' Should', ' Yes [*PR #32*]'
     ' docformatter_11.2', ' Should fix formatting and save changes to file.', ' Stakeholder', ' Should', ' Yes'
@@ -239,6 +244,9 @@ with *convention* requirements.
 ``docformatter`` currently provides these arguments for *style* requirements.
 ::
 
+    --black [boolean, default False]
+        Boolean to indicate whether to format docstrings to be compatible
+        with black.
     --blank [boolean, default False]
         Boolean to indicate whether to add a blank line after the
         elaborate description.
@@ -303,8 +311,6 @@ The following are new *style* arguments needed to accommodate the various style 
 
     --syntax [string, default "sphinx"]
         One of sphinx, numpy, or google
-    --black [boolean, default False]
-        Formats docstrings to be compatible with black.
 
 Issue and Version Management
 ----------------------------

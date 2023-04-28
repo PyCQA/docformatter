@@ -22,7 +22,7 @@ help output provides a summary of these options:
 .. code-block:: console
 
     usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
-                        [--wrap-descriptions length] [--blank]
+                        [--wrap-descriptions length] [--black] [--blank]
                         [--pre-summary-newline] [--make-summary-multi-line]
                         [--force-wrap] [--range start_line end_line]
                         [--docstring-length min_length max_length]
@@ -51,6 +51,11 @@ help output provides a summary of these options:
                             wrap descriptions at this length; set to 0 to
                             disable wrapping
                             (default: 72)
+      --black
+                            make formatting consistent with black, setting
+                            wrap-summaries and wrap-descriptions to a default 88
+                            if not otherwise specified
+                            (default: False)
       --blank
                             add blank line after elaborate description
                             (default: False)

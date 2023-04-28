@@ -133,24 +133,54 @@ class Configurater:
             action="store",
             nargs="*",
             default=self.flargs_dct.get("non-cap", None),
-            help="list of words not to capitalize when they appear as the "
+            help="list of words not to capitalize "
+            "when they appear as the "
             "first word in the summary",
         )
         self.parser.add_argument(
+            "--black",
+            action="store_true",
+            default=self.flargs_dct.get("black", "false").lower() == "true",
+            help="make formatting compatible with standard black options "
+            "(default: False)",
+        )
+
+        self.args = self.parser.parse_known_args(self.args_lst[1:])[0]
+
+        # Default black line length is 88 so use this when not specified
+        # otherwise use PEP-8 defaults
+        if self.args.black:
+            _default_wrap_summaries = 88
+            _default_wrap_descriptions = 88
+            _default_pre_summary_space = "true"
+        else:
+            _default_wrap_summaries = 79
+            _default_wrap_descriptions = 72
+            _default_pre_summary_space = "false"
+
+        self.parser.add_argument(
             "--wrap-summaries",
-            default=int(self.flargs_dct.get("wrap-summaries", 79)),
+            default=int(
+                self.flargs_dct.get("wrap-summaries", _default_wrap_summaries)
+            ),
             type=int,
             metavar="length",
             help="wrap long summary lines at this length; "
-            "set to 0 to disable wrapping (default: 79)",
+            "set to 0 to disable wrapping (default: 79, 88 with --black "
+            "option)",
         )
         self.parser.add_argument(
             "--wrap-descriptions",
-            default=int(self.flargs_dct.get("wrap-descriptions", 72)),
+            default=int(
+                self.flargs_dct.get(
+                    "wrap-descriptions", _default_wrap_descriptions
+                )
+            ),
             type=int,
             metavar="length",
             help="wrap descriptions at this length; "
-            "set to 0 to disable wrapping (default: 72)",
+            "set to 0 to disable wrapping (default: 72, 88 with --black "
+            "option)",
         )
         self.parser.add_argument(
             "--force-wrap",
@@ -187,7 +217,9 @@ class Configurater:
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
-            default=self.flargs_dct.get("pre-summary-space", "false").lower()
+            default=self.flargs_dct.get(
+                "pre-summary-space", _default_pre_summary_space
+            ).lower()
             == "true",
             help="add a space after the opening triple quotes "
             "(default: False)",
@@ -258,6 +290,7 @@ class Configurater:
         )
 
         self.args = self.parser.parse_args(self.args_lst[1:])
+
         if self.args.line_range:
             if self.args.line_range[0] <= 0:
                 self.parser.error("--range must be positive numbers")
