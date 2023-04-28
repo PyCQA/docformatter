@@ -1,17 +1,14 @@
 # This workflow runs when a version tag is pushed.
 #
-# - Job 1:
-#     - Get new tag.
-#     - Build new release.
-#     - If release candidate tag:
-#         - Cut PR to merge files and create release/* branch.
-#         - Generate GitHub (pre-)release if build succeeds.
-#         - Upload wheel to GitHub (pre-)release if build succeeds.
-#     - If release tag:
-#         - Update CHANGELOG.md
-#         - Upload wheel to Test PyPi if build succeeds. (Future)
-#         - Test install from Test PyPi. (Future)
-#         - Upload wheel to PyPi if test install succeeds. (Future)
+# - Get new tag.
+# - Build new release.
+# - If release tag:
+#     - Build release.
+#     - Generate GitHub release if build succeeds.
+#     - Upload wheel to GitHub release if build succeeds.
+#     - Upload wheel to Test PyPi if build succeeds. (Future)
+#     - Test install from Test PyPi. (Future)
+#     - Upload wheel to PyPi if test install succeeds. (Future)
 name: Push Version Tag Workflow
 
 on:
@@ -47,69 +44,33 @@ jobs:
           pip install -U pip poetry twine
           poetry build && twine check dist/* && echo "build_ok=1" >> $GITHUB_ENV
 
-      - name: Open release pull request
-        uses: peter-evans/create-pull-request@v3
-        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) }}
-        with:
-          commit-message: "release: ${{ steps.newversion.outputs.new_version }}"
-          title: "release: ${{ steps.newversion.outputs.new_version }}"
-          body: "Please cut release ${{ steps.newversion.outputs.new_version }}"
-          branch: "release/${{ steps.newversion.outputs.new_version }}"
-          base: master
-          labels: release
-
-      - name: Cut the pre-release
-        id: cutprerelease
-        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+      - name: Cut the release
+        id: cutrelease
+        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
         uses: release-drafter/release-drafter@v5
         with:
           name: "v${{ steps.newversion.outputs.new_tag }}"
           tag: "v${{ steps.newversion.outputs.new_tag }}"
           version: "${{ steps.newversion.outputs.new_tag }}"
-          prerelease: true
+          prerelease: false
           publish: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print release candidate info
+      - name: Print release info
         run: |
-          echo ${{ steps.cutprerelease.outputs.id }}
-          echo ${{ steps.cutprerelease.outputs.name }}
-          echo ${{ steps.cutprerelease.outputs.tag_name }}
-          echo ${{ steps.cutprerelease.outputs.html_url }}
-          echo ${{ steps.cutprerelease.outputs.upload_url }}
+          echo ${{ steps.cutrelease.outputs.id }}
+          echo ${{ steps.cutrelease.outputs.name }}
+          echo ${{ steps.cutrelease.outputs.tag_name }}
+          echo ${{ steps.cutrelease.outputs.html_url }}
+          echo ${{ steps.cutrelease.outputs.upload_url }}
 
       - name: Upload wheel to GitHub release
         id: upload-wheel
-        if: ${{ contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
+        if: ${{ env.build_ok == 1 }}
         uses: shogo82148/actions-upload-release-asset@v1
         with:
-          upload_url: ${{ steps.cutprerelease.outputs.upload_url }}
-
-      - name: Generate release changelog
-        uses: heinrichreimer/github-changelog-generator-action@master
-        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sinceTag: "v1.3.1"
-          excludeTags: "latest"
-          breakingLabel: "Breaking Changes"
-          breakingLabels: "V: major"
-          enhancementLabel: "New Features"
-          enhancementLabels: "P: enhancement"
-          bugsLabel: "Bug Fixes"
-          bugLabels: "P: bug"
-          excludeLabels: "release"
-          issues: false
-          issuesWoLabels: false
-          maxIssues: 100
-          pullRequests: true
-          prWoLabels: false
-          author: true
-          unreleased: true
-          compareLink: true
-          stripGeneratorNotice: true
-          verbose: true
+          upload_url: ${{ steps.cutrelease.outputs.upload_url }}
 
 #      - name: Publish to Test PyPi
 #        if: ${{ !contains( steps.newversion.output.new_tag, 'rc' ) && env.build_ok == 1 }}

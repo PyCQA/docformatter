@@ -1,8 +1,9 @@
 # This workflow runs when a pull request is closed.
 #
 # - Gets list of PR labels.
-# - IF 'release' label:
+# - If 'release' label:
 #   - Get release version using Poetry.
+#   - Generate new CHANGELOG.
 #   - Get next semantic version.
 #   - Close old milestones.
 #   - Create new minor version milestone.
@@ -27,7 +28,7 @@ jobs:
 
       - name: Get PR labels
         id: prlabels
-        uses: joerick/pr-labels-action@v1.0.6
+        uses: joerick/pr-labels-action@v1.0.8
 
       - name: Get release version
         id: relversion
@@ -37,10 +38,35 @@ jobs:
           echo "version=$(echo $(poetry version | cut -d' ' -f2))" >> $GITHUB_OUTPUT
           echo "do_milestones=1" >> $GITHUB_ENV
 
+      - name: Generate release changelog
+        uses: heinrichreimer/github-changelog-generator-action@master
+        if: ${{ env.do_milestones == 1 }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: "v1.3.1"
+          excludeTags: "latest"
+          breakingLabel: "Breaking Changes"
+          breakingLabels: "V: major"
+          enhancementLabel: "New Features"
+          enhancementLabels: "P: enhancement"
+          bugsLabel: "Bug Fixes"
+          bugLabels: "P: bug"
+          excludeLabels: "release"
+          issues: false
+          issuesWoLabels: false
+          maxIssues: 100
+          pullRequests: true
+          prWoLabels: false
+          author: true
+          unreleased: true
+          compareLink: true
+          stripGeneratorNotice: true
+          verbose: true
+
       - name: Get next semantic version
         id: nextversion
         if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-next-semvers@v1.1.0
+        uses: WyriHaximus/github-action-next-semvers@v1.2.1
         with:
           version: ${{ steps.relversion.outputs.version }}
 
