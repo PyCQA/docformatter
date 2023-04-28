@@ -163,6 +163,7 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_4.5.1', ' One-line docstrings may end in any of the following punctuation marks [. ! ?]', ' Derived', ' May', ' Yes'
     ' docformatter_4.5.2', ' One-line docstrings will have the first word capitalized.', ' Derived', ' Shall', ' Yes'
     ' docformatter_4.5.2.1', ' First words in one-line docstrings that are variables or filenames shall remain unchanged.', ' Derived', ' Shall', ' Yes [PR #185, #188]'
+    ' docformatter_4.5.2.2', ' First words in one-line docstrings that are user-specified to not be capitalized shall remain unchanged.', ' Derived', ' Shall', ' Yes [PR #194]'
     ' docformatter_4.5.3', ' Shall not place a newline after the first line of a wrapped one-line docstring.' ' Derived', ' Shall', ' Yes [PR #179]'
     ' PEP_257_5','**Multi-line docstrings:**'
     ' PEP_257_5.1',' A summary is just like a one-line docstring.',' Convention',' Shall',' Yes'

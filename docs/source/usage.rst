@@ -40,6 +40,8 @@ help output provides a summary of these options:
       -c, --check           only check and report incorrectly formatted files
       -r, --recursive       drill down directories recursively
       -e, --exclude         in recursive mode, exclude directories and files by names
+      -n, --non-cap         list of words not to capitalize when they appear as the
+                            first word in the summary
 
       --wrap-summaries length
                             wrap long summary lines at this length; set
