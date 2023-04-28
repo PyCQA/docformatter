@@ -45,6 +45,111 @@ import docformatter.util as _util
 unicode = str
 
 
+def _do_remove_blank_lines_after_definitions(
+    modified_tokens,
+):
+    """Remove blank lines between definitions and docstrings.
+
+    Blank lines between class, method, function, and variable
+    definitions and the docstring will be removed.
+
+    Parameters
+    ----------
+    modified_tokens: list
+        The list of tokens created from the docstring.
+
+    Returns
+    -------
+    modified_tokens: list
+        The list of tokens with any blank lines following a variable
+        definition removed.
+    """
+    for _idx, _token in enumerate(modified_tokens):
+        if _token[0] == 3:
+            j = 1
+
+            # Remove newline between variable definition and docstring
+            # unless it's separating a docstring from:
+            #     * A previous docstring.
+            #     * The file's shebang.
+            while (
+                modified_tokens[_idx - j][4] == "\n"
+                and not (
+                    modified_tokens[_idx - j - 1][4].strip().endswith('"""')
+                )
+                and not modified_tokens[_idx - j - 1][4].startswith("#!/")
+            ):
+                modified_tokens.pop(_idx - j)
+                j += 1
+
+            # Remove newline between class, method, and function
+            # definitions and docstring.
+            j = 2
+            while modified_tokens[_idx - j][4] == "\n" and modified_tokens[
+                _idx - j - 2
+            ][4].strip().startswith(("def", "class")):
+                modified_tokens.pop(_idx - j)
+                j += 1
+
+    return modified_tokens
+
+
+def _do_remove_blank_lines_after_docstring(modified_tokens):
+    """Remove blank lines between docstring and first Python statement.
+
+    Parameters
+    ----------
+    modified_tokens: list
+        The list of tokens created from the docstring.
+
+    Returns
+    -------
+    modified_tokens: list
+        The list of tokens with any blank lines following a docstring
+        removed.
+    """
+    # Remove all newlines between docstring and first Python
+    # statement as long as it's not a stub function.
+    for _idx, _token in enumerate(modified_tokens):
+        j = 1
+        _num_blank_lines = 0
+        while modified_tokens[_idx - j][4] == "\n":
+            j += 1
+            _num_blank_lines += 1
+
+        with contextlib.suppress(IndexError):
+            _is_definition = (
+                _token[4].lstrip().startswith(("class ", "def ", "@"))
+            )
+            _is_docstring = (
+                modified_tokens[_idx - 2][4].strip().endswith('"""')
+            )
+            _after_definition = (
+                modified_tokens[_idx - _num_blank_lines - 4][4]
+                .lstrip()
+                .startswith(("class", "def", "@"))
+            )
+            _after_docstring = modified_tokens[_idx - 5][4].strip().endswith(
+                '"""'
+            ) or modified_tokens[_idx - 5][4].strip().startswith('"""')
+            _comment_follows = re.search(
+                r"\"\"\" *#", modified_tokens[_idx - 4][4]
+            )
+
+            if (
+                _token[0] == 1
+                and not _is_definition
+                and not _is_docstring
+                and not _comment_follows
+                and _after_definition
+                and _after_docstring
+            ):
+                for j in range(_num_blank_lines):
+                    modified_tokens.pop(_idx - j - 1)
+
+    return modified_tokens
+
+
 class FormatResult:
     """Possible exit codes."""
 
@@ -553,108 +658,3 @@ class Formatter:
             "docformatter only handles triple-quoted (single or double) "
             "strings"
         )
-
-
-def _do_remove_blank_lines_after_definitions(
-    modified_tokens,
-):
-    """Remove blank lines between definitions and docstrings.
-
-    Blank lines between class, method, function, and variable
-    definitions and the docstring will be removed.
-
-    Parameters
-    ----------
-    modified_tokens: list
-        The list of tokens created from the docstring.
-
-    Returns
-    -------
-    modified_tokens: list
-        The list of tokens with any blank lines following a variable
-        definition removed.
-    """
-    for _idx, _token in enumerate(modified_tokens):
-        if _token[0] == 3:
-            j = 1
-
-            # Remove newline between variable definition and docstring
-            # unless it's separating a docstring from:
-            #     * A previous docstring.
-            #     * The file's shebang.
-            while (
-                modified_tokens[_idx - j][4] == "\n"
-                and not (
-                    modified_tokens[_idx - j - 1][4].strip().endswith('"""')
-                )
-                and not modified_tokens[_idx - j - 1][4].startswith("#!/")
-            ):
-                modified_tokens.pop(_idx - j)
-                j += 1
-
-            # Remove newline between class, method, and function
-            # definitions and docstring.
-            j = 2
-            while modified_tokens[_idx - j][4] == "\n" and modified_tokens[
-                _idx - j - 2
-            ][4].strip().startswith(("def", "class")):
-                modified_tokens.pop(_idx - j)
-                j += 1
-
-    return modified_tokens
-
-
-def _do_remove_blank_lines_after_docstring(modified_tokens):
-    """Remove blank lines between docstring and first Python statement.
-
-    Parameters
-    ----------
-    modified_tokens: list
-        The list of tokens created from the docstring.
-
-    Returns
-    -------
-    modified_tokens: list
-        The list of tokens with any blank lines following a docstring
-        removed.
-    """
-    # Remove all newlines between docstring and first Python
-    # statement as long as it's not a stub function.
-    for _idx, _token in enumerate(modified_tokens):
-        j = 1
-        _num_blank_lines = 0
-        while modified_tokens[_idx - j][4] == "\n":
-            j += 1
-            _num_blank_lines += 1
-
-        with contextlib.suppress(IndexError):
-            _is_definition = (
-                _token[4].lstrip().startswith(("class ", "def ", "@"))
-            )
-            _is_docstring = (
-                modified_tokens[_idx - 2][4].strip().endswith('"""')
-            )
-            _after_definition = (
-                modified_tokens[_idx - _num_blank_lines - 4][4]
-                .lstrip()
-                .startswith(("class", "def", "@"))
-            )
-            _after_docstring = modified_tokens[_idx - 5][4].strip().endswith(
-                '"""'
-            ) or modified_tokens[_idx - 5][4].strip().startswith('"""')
-            _comment_follows = re.search(
-                r"\"\"\" *#", modified_tokens[_idx - 4][4]
-            )
-
-            if (
-                _token[0] == 1
-                and not _is_definition
-                and not _is_docstring
-                and not _comment_follows
-                and _after_definition
-                and _after_docstring
-            ):
-                for j in range(_num_blank_lines):
-                    modified_tokens.pop(_idx - j - 1)
-
-    return modified_tokens
