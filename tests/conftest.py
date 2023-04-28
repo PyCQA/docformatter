@@ -159,6 +159,11 @@ def test_args(args):
         nargs="*",
     )
     parser.add_argument(
+        "-n",
+        "--non-cap",
+        nargs="*",
+    )
+    parser.add_argument(
         "--wrap-summaries",
         default=79,
         type=int,

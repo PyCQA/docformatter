@@ -493,3 +493,106 @@ exclude = ["src/", "tests/"]
             "diff": "true",
             "exclude": '["src/", "tests/"]',
         }
+
+    @pytest.mark.unit
+    def test_non_capitalize_words(self, capsys):
+        """Read list of words not to capitalize.
+
+        See issue #193.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-n",
+            "qBittorrent",
+            "eBay",
+            "iPad",
+            "-c",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.non_cap == ["qBittorrent", "eBay", "iPad"]
+
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[tool.docformatter]
+check = true
+diff = true
+recursive = true
+non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
+"""
+        ],
+    )
+    def test_non_cap_from_pyproject_toml(self,temporary_pyproject_toml,
+                                         config,):
+        """Read list of words not to capitalize from pyproject.toml.
+
+        See issue #193.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/pyproject.toml",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.check
+        assert not uut.args.in_place
+        assert uut.args_lst == argb
+        assert uut.config_file == "/tmp/pyproject.toml"
+        assert uut.flargs_dct == {
+            "recursive": "True",
+            "check": "True",
+            "diff": "True",
+            "non-cap": ["qBittorrent", "iPad", "iOS", "eBay"]
+        }
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "config",
+        [
+            """\
+[docformatter]
+check = true
+diff = true
+recursive = true
+non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
+"""
+        ],
+    )
+    def test_non_cap_from_setup_cfg(self,temporary_setup_cfg,config,):
+        """Read list of words not to capitalize from setup.cfg.
+
+        See issue #193.
+        """
+        argb = [
+            "/path/to/docformatter",
+            "-c",
+            "--config",
+            "/tmp/setup.cfg",
+            "",
+        ]
+
+        uut = Configurater(argb)
+        uut.do_parse_arguments()
+
+        assert uut.args.check
+        assert not uut.args.in_place
+        assert uut.args_lst == argb
+        assert uut.config_file == "/tmp/setup.cfg"
+        assert uut.flargs_dct == {
+            "recursive": "true",
+            "check": "true",
+            "diff": "true",
+            "non-cap": '["qBittorrent", "iPad", "iOS", "eBay"]'
+        }

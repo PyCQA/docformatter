@@ -435,7 +435,7 @@ class Formatter:
             beginning = f"{open_quote}\n{indentation}"
             ending = f'\n{indentation}"""'
             summary_wrapped = _syntax.wrap_summary(
-                _strings.normalize_summary(contents),
+                _strings.normalize_summary(contents, self.args.non_cap),
                 wrap_length=self.args.wrap_summaries,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
@@ -443,7 +443,9 @@ class Formatter:
             return f"{beginning}{summary_wrapped}{ending}"
         else:
             summary_wrapped = _syntax.wrap_summary(
-                open_quote + _strings.normalize_summary(contents) + '"""',
+                open_quote
+                + _strings.normalize_summary(contents, self.args.non_cap)
+                + '"""',
                 wrap_length=self.args.wrap_summaries,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
@@ -493,7 +495,7 @@ class Formatter:
             "\n" + indentation if self.args.pre_summary_newline else ""
         )
         summary = _syntax.wrap_summary(
-            _strings.normalize_summary(summary),
+            _strings.normalize_summary(summary, self.args.non_cap),
             wrap_length=self.args.wrap_summaries,
             initial_indent=initial_indent,
             subsequent_indent=indentation,
