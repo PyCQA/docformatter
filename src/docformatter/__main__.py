@@ -45,14 +45,14 @@ def _help():
     """Print docformatter's help."""
     print(
         """\
-usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]] [--black]
-                    [--wrap-summaries length] [--wrap-descriptions length]
-                    [--force-wrap] [--tab-width width] [--blank]
-                    [--pre-summary-newline] [--pre-summary-space]
-                    [--make-summary-multi-line] [--close-quotes-on-newline]
-                    [--range line line] [--docstring-length length length]
-                    [--non-strict] [--config CONFIG] [--version]
-                    files [files ...]
+usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]]
+                    [-n [NON-CAP ...]] [--black] [--wrap-summaries length]
+                    [--wrap-descriptions length] [--force-wrap]
+                    [--tab-width width] [--blank] [--pre-summary-newline]
+                    [--pre-summary-space] [--make-summary-multi-line]
+                    [--close-quotes-on-newline] [--range line line]
+                    [--docstring-length length length] [--non-strict]
+                    [--config CONFIG] [--version] files [files ...]
 
 positional arguments:
   files                 files to format or '-' for standard in
@@ -67,6 +67,10 @@ options:
   -e [EXCLUDE ...], --exclude [EXCLUDE ...]
                         in recursive mode, exclude directories and files by
                         names
+  -n [NON-CAP ...], --non-cap [NON-CAP ...]
+                        list of words not to capitalize when they appear as the
+                        first word in the summary
+
   --black               make formatting compatible with standard black options
                         (default: False)
   --wrap-summaries length
