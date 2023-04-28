@@ -249,7 +249,7 @@ deps =
 commands =
     pip install -U pip
     pip install .
-    docformatter --config ./pyproject.toml --recursive {toxinidir}/src/docformatter
+    docformatter --black --recursive {toxinidir}/src/docformatter
     pycodestyle --ignore=E203,W503,W504 {toxinidir}/src/docformatter
     pydocstyle {toxinidir}/src/docformatter
     pylint --rcfile={toxinidir}/pyproject.toml {toxinidir}/src/docformatter
