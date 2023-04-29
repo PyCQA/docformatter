@@ -1,0 +1,144 @@
+# This workflow runs when a pull request is closed.
+#
+# - Gets list of PR labels.
+# - If 'release' label:
+#   - Get release version using Poetry.
+#   - Generate new CHANGELOG.
+#   - Tag repository with new version tag.
+#   - Build the release.
+#   - Draft a new GitHub release.
+#   - Upload the wheel to the new GitHub release.
+#   - Upload wheel to Test PyPi if build succeeds. (Future)
+#   - Test install from Test PyPi. (Future)
+#   - Upload wheel to PyPi if test install succeeds. (Future)
+name: Do Release Workflow
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  create_new_release:
+    name: Create New Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get PR labels
+        id: prlabels
+        uses: joerick/pr-labels-action@v1.0.8
+
+      - name: Get release version
+        id: relversion
+        if: contains(steps.prlabels.outputs.labels, ' release ')
+        run: |
+          pip install poetry
+          echo "version=$(echo $(poetry version | cut -d' ' -f2))" >> $GITHUB_OUTPUT
+          echo "do_release=1" >> $GITHUB_ENV
+
+      - name: Generate release changelog
+        uses: heinrichreimer/github-changelog-generator-action@master
+        if: ${{ env.do_release == 1 }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: "v1.3.1"
+          excludeTags: "latest"
+          breakingLabel: "Breaking Changes"
+          breakingLabels: "V: major"
+          enhancementLabel: "New Features"
+          enhancementLabels: "P: enhancement"
+          bugsLabel: "Bug Fixes"
+          bugLabels: "P: bug"
+          excludeLabels: "release"
+          issues: false
+          issuesWoLabels: false
+          maxIssues: 100
+          pullRequests: true
+          prWoLabels: false
+          author: true
+          unreleased: true
+          compareLink: true
+          stripGeneratorNotice: true
+          verbose: true
+
+      - name: Check if diff
+        continue-on-error: true
+        run: >
+          git diff --exit-code CHANGELOG.md &&
+          (echo "### No update" && exit 1) || (echo "### Commit update")
+
+      - uses: EndBug/add-and-commit@v9
+        name: Commit and push if diff
+        if: success()
+        with:
+          add: CHANGELOG.md
+          message: 'chore: update CHANGELOG.md for new release'
+          author_name: GitHub Actions
+          author_email: action@github.com
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          push: true
+
+      - name: Build release
+        id: build
+        if: ${{ env.do_release == 1 }}
+        run: |
+          pip install -U pip poetry twine
+          poetry build && twine check dist/* && echo "build_ok=1" >> $GITHUB_ENV
+
+      - name: Cut the release
+        id: cutrelease
+        if: ${{ env.build_ok == 1 }}
+        uses: release-drafter/release-drafter@v5
+        with:
+          name: "${{ steps.newversion.outputs.new_tag }}"
+          tag: "${{ steps.newversion.outputs.new_tag }}"
+          version: "${{ steps.newversion.outputs.new_tag }}"
+          prerelease: false
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print release info
+        run: |
+          echo ${{ steps.cutrelease.outputs.id }}
+          echo ${{ steps.cutrelease.outputs.name }}
+          echo ${{ steps.cutrelease.outputs.tag_name }}
+          echo ${{ steps.cutrelease.outputs.html_url }}
+          echo ${{ steps.cutrelease.outputs.upload_url }}
+
+      - name: Upload wheel to GitHub release
+        id: upload-wheel
+        if: ${{ env.build_ok == 1 }}
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.cutrelease.outputs.upload_url }}
+
+#      - name: Publish to Test PyPi
+#        if: ${{ env.build_ok == 1 }}
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+#          repository_url: https://test.pypi.org/legacy/
+
+#      - name: Test install from Test PyPI
+#        if: ${{ env.build_ok == 1 }}
+#        run: |
+#          sudo apt-get update
+#          pip install \
+#          --index-url https://test.pypi.org/simple/ \
+#          --extra-index-url https://pypi.org/simple \
+#          docformatter==${{ steps.newversion.outputs.new_version }} && echo "install_ok=1" >> $GITHUB_ENV
+
+#      - name: Publish to PyPi
+#        if: ${{ env.install_ok == 1 }}
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPI_API_TOKEN }}

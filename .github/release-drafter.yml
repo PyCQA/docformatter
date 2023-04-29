@@ -1,0 +1,45 @@
+name-template: '$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: 'Bug Fixes'
+    labels:
+      - 'P: bug'
+      - 'V: patch'
+  - title: '🚀Features'
+    labels:
+      - 'P: enhancement'
+      - 'V: minor'
+  - title: 'Maintenance'
+    labels:
+      - 'chore'
+change-template: '- [#$NUMBER] $TITLE  (@$AUTHOR)'
+change-title-escapes: '\<*_&'
+version-resolver:
+  major:
+    labels:
+      - 'V: major'
+  minor:
+    labels:
+      - 'V: minor'
+  patch:
+    labels:
+      - 'V: patch'
+  default: patch
+exclude-labels:
+  - 'dependencies'
+  - 'fresh'
+  - 'help wanted'
+  - 'question'
+  - 'release'
+  - 'C: convention'
+  - 'C: stakeholder'
+  - 'C: style'
+  - 'S: duplicate'
+  - 'S: feedback'
+  - 'S: invalid'
+  - 'S: merged'
+  - 'S: wontfix'
+template: |
+  ## What Changed
+
+  $CHANGES
