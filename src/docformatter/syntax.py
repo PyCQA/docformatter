@@ -30,8 +30,11 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
+FIELD_REGEX = r":[a-zA-Z0-9_\- ]*:"
+"""Regular expression to use for finding field lists."""
+
 REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?"
-"""The regular expression to use for finding reST directives."""
+"""Regular expression to use for finding reST directives."""
 
 URL_PATTERNS = (
     "afp|"
@@ -81,8 +84,7 @@ URL_PATTERNS = (
 )
 """The URL patterns to look for when finding links.
 
-Based on the table at
-<https://en.wikipedia.org/wiki/List_of_URI_schemes>
+Based on the table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
 """
 
 # This is the regex used to find URL links:
@@ -151,8 +153,8 @@ def description_to_list(
     Returns
     -------
     _lines : list
-        A list containing each line of the description with any links put
-        back together.
+          A list containing each line of the description with any links put
+          back together.
     """
     # This is a description containing only one paragraph.
     if len(re.findall(r"\n\n", text)) <= 0:
@@ -187,11 +189,9 @@ def do_clean_url(url: str, indentation: str) -> str:
 
     This function deals with situations such as:
 
-    `Get\n
-        Cookies.txt <https://chrome.google.com/webstore/detail/get-
+    `Get\n     Cookies.txt <https://chrome.google.com/webstore/detail/get-
 
     by returning:
-
     `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-
 
     Parameters
@@ -200,12 +200,11 @@ def do_clean_url(url: str, indentation: str) -> str:
         The URL that was found by the do_find_links() function and needs to be
         processed.
     indentation : str
-        The indentation pattern used.
-
+       The indentation pattern used.
     Returns
     -------
     url : str
-        The URL with internal newlines removed and excess whitespace removed.
+       The URL with internal newlines removed and excess whitespace removed.
     """
     _lines = url.splitlines()
     for _idx, _line in enumerate(_lines):
@@ -236,7 +235,25 @@ def do_find_directives(text: str) -> bool:
         Whether the docstring is a reST directive.
     """
     _rest_iter = re.finditer(REST_REGEX, text)
-    return bool([(rest.start(0), rest.end(0)) for rest in _rest_iter])
+    return bool([(_rest.start(0), _rest.end(0)) for _rest in _rest_iter])
+
+
+def do_find_field_lists(text: str) -> List[Tuple[int, int]]:
+    r"""Determine if docstring contains any field lists.
+
+    Parameters
+    ----------
+    text : str
+        The docstring description to check for field list patterns.
+
+    Returns
+    -------
+    url_index : list
+        A list of tuples with each tuple containing the starting and ending
+        position of each field list found in the passed description.
+    """
+    _field_iter = re.finditer(FIELD_REGEX, text)
+    return [(_field.start(0), _field.end(0)) for _field in _field_iter]
 
 
 def do_find_links(text: str) -> List[Tuple[int, int]]:
@@ -245,12 +262,12 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
     Parameters
     ----------
     text : str
-        the docstring description to check for a link patterns.
+        The docstring description to check for link patterns.
 
     Returns
     -------
     url_index : list
-        a list of tuples with each tuple containing the starting and ending
+        A list of tuples with each tuple containing the starting and ending
         position of each URL found in the passed description.
     """
     _url_iter = re.finditer(URL_REGEX, text)
@@ -291,6 +308,7 @@ def do_split_description(
     text: str,
     indentation: str,
     wrap_length: int,
+    style: str,
 ) -> Union[List[str], Iterable]:
     """Split the description into a list of lines.
 
@@ -303,6 +321,8 @@ def do_split_description(
         line.
     wrap_length : int
         The column to wrap each line at.
+    style : str
+        The docstring style to use for dealing with parameter lists.
 
     Returns
     -------
@@ -310,29 +330,165 @@ def do_split_description(
         A list containing each line of the description with any links put
         back together.
     """
+    _lines = []
+    _text_idx = 0
+
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
-    if not _url_idx:
+    if style == "sphinx":
+        _parameter_idx = do_find_field_lists(text)
+        _wrap_parameters = True
+    else:
+        _parameter_idx = []
+        _wrap_parameters = False
+
+    if not _url_idx and not (_parameter_idx and _wrap_parameters):
         return description_to_list(
             text,
             indentation,
             wrap_length,
         )
+
+    if _url_idx:
+        _lines, _text_idx = do_wrap_urls(
+            text,
+            _url_idx,
+            0,
+            indentation,
+            wrap_length,
+        )
+
+    if _parameter_idx:
+        _lines, _text_idx = do_wrap_parameter_lists(
+            text,
+            _parameter_idx,
+            _lines,
+            _text_idx,
+            indentation,
+            wrap_length,
+        )
+    else:
+        # Finally, add everything after the last field list directive.
+        with contextlib.suppress(IndexError):
+            _wrapped_text = description_to_list(
+                text[_text_idx:],
+                indentation,
+                wrap_length,
+            )
+            for _line in _wrapped_text:
+                _lines.append(
+                    f"{indentation}{_line.strip().replace('  ', ' ')}"
+                )
+
+    return _lines
+
+
+def do_wrap_parameter_lists(
+    text: str,
+    parameter_idx: Iterable,
+    lines: List[str],
+    text_idx: int,
+    indentation: str,
+    wrap_length: int,
+) -> Tuple[List[str], int]:
+    """Wrap parameter lists in the long description.
+
+    Parameters
+    ----------
+    text : str
+        The long description text.
+    parameter_idx : list
+        The list of parameter list indices found in the description text.
+    lines : list
+        The list of formatted lines in the description that come before the
+        first parameter list item.
+    text_idx : int
+        The index in the description of the end of the last parameter list
+        item.
+    indentation : str
+        The string to use to indent each line in the long description.
+    wrap_length : int
+         The line length at which to wrap long lines in the description.
+
+    Returns
+    -------
+    lines, text_idx : tuple
+         A list of the long description lines and the index in the long
+        description where the last parameter list item ended.
+    """
+    lines.append("")
+    for _idx, _parameter in enumerate(parameter_idx):
+        try:
+            _parameter_description = text[
+                _parameter[1] : parameter_idx[_idx + 1][0]
+            ].strip()
+        except IndexError:
+            _parameter_description = text[_parameter[1] :].strip()
+
+        if len(_parameter_description) <= (wrap_length - len(indentation)):
+            lines.append(
+                f"{indentation}{text[_parameter[0]: _parameter[1]]} "
+                f"{_parameter_description}"
+            )
+        else:
+            lines.extend(
+                textwrap.wrap(
+                    textwrap.dedent(
+                        f"{text[_parameter[0]:_parameter[1]]} {_parameter_description}"
+                    ),
+                    width=wrap_length,
+                    initial_indent=indentation,
+                    subsequent_indent=2 * indentation,
+                )
+            )
+
+        text_idx = _parameter[1]
+
+    return lines, text_idx
+
+
+def do_wrap_urls(
+    text: str,
+    url_idx: Iterable,
+    text_idx: int,
+    indentation: str,
+    wrap_length: int,
+) -> Tuple[List[str], int]:
+    """Wrap URLs in the long description.
+
+    Parameters
+    ----------
+    text : str
+        The long description text.
+    url_idx : list
+        The list of URL indices found in the description text.
+    text_idx : int
+        The index in the description of the end of the last URL.
+    indentation : str
+        The string to use to indent each line in the long description.
+    wrap_length : int
+         The line length at which to wrap long lines in the description.
+
+    Returns
+    -------
+    _lines, _text_idx : tuple
+        A list of the long description lines and the index in the long
+        description where the last URL ended.
+    """
     _lines = []
-    _text_idx = 0
-    for _idx in _url_idx:
+    for _url in url_idx:
         # Skip URL if it is simply a quoted pattern.
-        if do_skip_link(text, _idx):
+        if do_skip_link(text, _url):
             continue
 
         # If the text including the URL is longer than the wrap length,
         # we need to split the description before the URL, wrap the pre-URL
         # text, and add the URL as a separate line.
-        if len(text[_text_idx : _idx[1]]) > (wrap_length - len(indentation)):
+        if len(text[text_idx : _url[1]]) > (wrap_length - len(indentation)):
             # Wrap everything in the description before the first URL.
             _lines.extend(
                 description_to_list(
-                    text[_text_idx : _idx[0]],
+                    text[text_idx : _url[0]],
                     indentation,
                     wrap_length,
                 )
@@ -344,40 +500,36 @@ def do_split_description(
 
             # Add the URL.
             _lines.append(
-                f"{do_clean_url(text[_idx[0] : _idx[1]], indentation)}"
+                f"{do_clean_url(text[_url[0] : _url[1]], indentation)}"
             )
 
-            _text_idx = _idx[1]
+            text_idx = _url[1]
 
-    # Finally, add everything after the last URL.
-    with contextlib.suppress(IndexError):
-        _stripped_text = (
-            text[_text_idx + 1 :].strip(indentation)
-            if text[_text_idx] == "\n"
-            else text[_text_idx:].strip()
-        )
-        _lines.append(f"{indentation}{_stripped_text}")
-    return _lines
+    return _lines, text_idx
 
 
 # pylint: disable=line-too-long
-def is_some_sort_of_list(text: str, strict: bool) -> bool:
+def is_some_sort_of_list(
+    text: str,
+    strict: bool,
+    style: str,
+) -> bool:
     """Determine if docstring is a reST list.
 
     Notes
     -----
     There are five types of lists in reST/docutils that need to be handled.
 
-    * `Bullets lists
+    * `Bullet lists
     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#bullet-lists>`_
     * `Enumerated lists
-     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#enumerated-lists>`_
+    <https://docutils.sourceforge.io/docs/user/rst/quickref.html#enumerated-lists>`_
     * `Definition lists
-     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#definition-lists>`_
+    <https://docutils.sourceforge.io/docs/user/rst/quickref.html#definition-lists>`_
     * `Field lists
-     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#field-lists>`_
+    <https://docutils.sourceforge.io/docs/user/rst/quickref.html#field-lists>`_
     * `Option lists
-     <https://docutils.sourceforge.io/docs/user/rst/quickref.html#option-lists>`_
+    <https://docutils.sourceforge.io/docs/user/rst/quickref.html#option-lists>`_
     """
     split_lines = text.rstrip().splitlines()
 
@@ -391,28 +543,75 @@ def is_some_sort_of_list(text: str, strict: bool) -> bool:
     ) and not strict:
         return True
 
-    return any(
-        (
-            # "1. item"
-            re.match(r"\s*\d\.", line)
-            or
-            # "@parameter"
-            re.match(r"\s*[\-*:=@]", line)
-            or
-            # "parameter - description"
-            re.match(r".*\s+[\-*:=@]\s+", line)
-            or
-            # "parameter: description"
-            re.match(r"\s*\S+[\-*:=@]\s+", line)
-            or
-            # "parameter:\n    description"
-            re.match(r"\s*\S+:\s*$", line)
-            or
-            # "parameter -- description"
-            re.match(r"\s*\S+\s+--\s+", line)
+    if style == "sphinx":
+        return any(
+            (
+                # "* parameter" <-- Bullet list
+                # "- parameter" <-- Bullet list
+                # "+ parameter" <-- Bullet list
+                re.match(r"\s*[*\-+] [\S ]+", line)
+                or
+                # "1. item" <-- Enumerated list
+                re.match(r"\s*\d\.", line)
+                or
+                # "-a  description" <-- Option list
+                # "--long  description" <-- Option list
+                re.match(r"^-{1,2}[\S ]+ {2}\S+", line)
+                or
+                # "@parameter" <-- Epydoc style
+                re.match(r"\s*@\S*", line)
+                or
+                # "parameter : description" <-- Numpy style
+                # "parameter: description" <-- Numpy style
+                re.match(r"^\s*(?!:)\S+ ?: \S+", line)
+                or
+                # "word\n----" <-- Numpy headings
+                re.match(r"^\s*-+", line)
+                or
+                # "parameter - description"
+                re.match(r"[\S ]+ - \S+", line)
+                or
+                # "parameter -- description"
+                re.match(r"\s*\S+\s+--\s+", line)
+            )
+            for line in split_lines
         )
-        for line in split_lines
-    )
+    else:
+        return any(
+            (
+                # "* parameter" <-- Bullet list
+                # "- parameter" <-- Bullet list
+                # "+ parameter" <-- Bullet list
+                re.match(r"\s*[*\-+] [\S ]+", line)
+                or
+                # "1. item" <-- Enumerated list
+                re.match(r"\s*\d\.", line)
+                or
+                # "-a  description" <-- Option list
+                # "--long  description" <-- Option list
+                re.match(r"^-{1,2}[\S ]+ {2}\S+", line)
+                or
+                # "@parameter" <-- Epydoc style
+                re.match(r"\s*@\S*", line)
+                or
+                # ":parameter: description" <-- Sphinx style
+                re.match(r"^\s*:[\S ]+:", line)
+                or
+                # "parameter : description" <-- Numpy style
+                # "parameter: description" <-- Numpy style
+                re.match(r"^\s[\S ]+ ?: [\S ]+", line)
+                or
+                # "word\n----" <-- Numpy headings
+                re.match(r"^\s*-+", line)
+                or
+                # "parameter - description"
+                re.match(r"[\S ]+ - \S+", line)
+                or
+                # "parameter -- description"
+                re.match(r"\s*\S+\s+--\s+", line)
+            )
+            for line in split_lines
+        )
 
 
 def is_some_sort_of_code(text: str) -> bool:
@@ -492,11 +691,40 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def wrap_description(text, indentation, wrap_length, force_wrap, strict):
+def wrap_description(
+    text,
+    indentation,
+    wrap_length,
+    force_wrap,
+    strict,
+    style: str = "sphinx",
+):
     """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph
-    text, and bulleted lists alone.
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.
+
+    Parameters
+    ----------
+    text : str
+        The unwrapped description text.
+    indentation : str
+        The indentation string.
+    wrap_length : int
+        The line length at which to wrap long lines.
+    force_wrap : bool
+        Whether to force docformatter to wrap long lines when normally they
+        would remain untouched.
+    strict : bool
+        Whether to strictly follow reST syntax to identify lists.
+    style : str
+        The name of the docstring style to use when dealing with parameter
+        lists (default is sphinx).
+
+    Returns
+    -------
+    description : str
+        The description wrapped at wrap_length characters.
     """
     text = strip_leading_blank_lines(text)
 
@@ -512,11 +740,11 @@ def wrap_description(text, indentation, wrap_length, force_wrap, strict):
         and (
             is_some_sort_of_code(text)
             or do_find_directives(text)
-            or is_some_sort_of_list(text, strict)
+            or is_some_sort_of_list(text, strict, style)
         )
     ):
         return text
 
-    lines = do_split_description(text, indentation, wrap_length)
+    lines = do_split_description(text, indentation, wrap_length, style)
 
     return indentation + "\n".join(lines).strip()

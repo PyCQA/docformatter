@@ -159,6 +159,13 @@ class Configurater:
             _default_pre_summary_space = "false"
 
         self.parser.add_argument(
+            "-s",
+            "--style",
+            default=self.flargs_dct.get("style", "sphinx"),
+            help="name of the docstring style to use when formatting "
+                 "parameter lists (default: sphinx)",
+        )
+        self.parser.add_argument(
             "--wrap-summaries",
             default=int(
                 self.flargs_dct.get("wrap-summaries", _default_wrap_summaries)

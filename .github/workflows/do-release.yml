@@ -67,12 +67,14 @@ jobs:
           verbose: true
 
       - name: Check if diff
+        if: ${{ env.do_release == 1 }}
         continue-on-error: true
         run: >
           git diff --exit-code CHANGELOG.md &&
           (echo "### No update" && exit 1) || (echo "### Commit update")
 
       - uses: EndBug/add-and-commit@v9
+        if: ${{ env.do_release == 1 }}
         name: Commit and push if diff
         if: success()
         with:

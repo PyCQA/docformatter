@@ -164,6 +164,11 @@ def test_args(args):
         nargs="*",
     )
     parser.add_argument(
+        "-s",
+        "--style",
+        default="sphinx",
+    )
+    parser.add_argument(
         "--wrap-summaries",
         default=79,
         type=int,
