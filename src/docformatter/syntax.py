@@ -416,7 +416,14 @@ def do_wrap_parameter_lists(
          A list of the long description lines and the index in the long
         description where the last parameter list item ended.
     """
-    lines.append("")
+    lines.extend(
+        description_to_list(
+            text[text_idx: parameter_idx[0][0]],
+            indentation,
+            wrap_length,
+        )
+    )
+
     for _idx, _parameter in enumerate(parameter_idx):
         try:
             _parameter_description = text[
