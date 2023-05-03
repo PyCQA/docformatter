@@ -2,7 +2,7 @@ name: Issue Open Workflow
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened]
 
 jobs:
   label_issue_backlog:
