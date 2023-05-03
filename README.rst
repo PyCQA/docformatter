@@ -27,13 +27,14 @@ docformatter
 .. |PYVERS| image:: https://img.shields.io/pypi/pyversions/docformatter
 .. |PYMAT| image:: https://img.shields.io/pypi/format/docformatter
 .. |DD| image:: https://img.shields.io/pypi/dd/docformatter
+.. |PRE| image:: https://img.shields.io/github/v/release/PyCQA/docformatter?include_prereleases
 
 +----------------+----------------------------------------------------------+
 | **Code**       + |BLACK| |ISORT|                                          +
 +----------------+----------------------------------------------------------+
 | **Docstrings** + |SELF| |NUMPSTYLE|                                       +
 +----------------+----------------------------------------------------------+
-| **GitHub**     + |CI| |CONTRIBUTORS| |COMMIT|                             +
+| **GitHub**     + |CI| |CONTRIBUTORS| |COMMIT| |PRE|                       +
 +----------------+----------------------------------------------------------+
 | **PyPi**       + |VERSION| |LICENSE| |PYVERS| |PYMAT| |DD|                +
 +----------------+----------------------------------------------------------+
