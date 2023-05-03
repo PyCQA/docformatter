@@ -72,12 +72,14 @@ def _do_remove_blank_lines_after_definitions(
             # unless it's separating a docstring from:
             #     * A previous docstring.
             #     * The file's shebang.
+            #     * The import section.
             while (
                 modified_tokens[_idx - j][4] == "\n"
                 and not (
                     modified_tokens[_idx - j - 1][4].strip().endswith('"""')
                 )
                 and not modified_tokens[_idx - j - 1][4].startswith("#!/")
+                and "import" not in modified_tokens[_idx - j - 1][4]
             ):
                 modified_tokens.pop(_idx - j)
                 j += 1

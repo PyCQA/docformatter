@@ -213,8 +213,7 @@ def foo():
     def test_format_code_raw_docstring_double_quotes(self, test_args, args):
         """Should format raw docstrings with triple double quotes.
 
-        See requirement PEP_257_2.  See issue #54 for request to handle
-        raw docstrings.
+        See requirement PEP_257_2.  See issue #54 for request to handle raw docstrings.
         """
         uut = Formatter(
             test_args,
@@ -252,8 +251,7 @@ def foo():
     def test_format_code_raw_docstring_single_quotes(self, test_args, args):
         """Should format raw docstrings with triple single quotes.
 
-        See requirement PEP_257_2.  See issue #54 for request to handle
-        raw docstrings.
+        See requirement PEP_257_2.  See issue #54 for request to handle raw docstrings.
         """
         uut = Formatter(
             test_args,
@@ -293,8 +291,7 @@ def foo():
     ):
         """Should format unicode docstrings with triple double quotes.
 
-        See requirement PEP_257_3.  See issue #54 for request to handle
-        raw docstrings.
+        See requirement PEP_257_3.  See issue #54 for request to handle raw docstrings.
         """
         uut = Formatter(
             test_args,
@@ -334,8 +331,7 @@ def foo():
     ):
         """Should format unicode docstrings with triple single quotes.
 
-        See requirement PEP_257_3.  See issue #54 for request to handle
-        raw docstrings.
+        See requirement PEP_257_3.  See issue #54 for request to handle raw docstrings.
         """
         uut = Formatter(
             test_args,
@@ -639,8 +635,8 @@ def foo():
     def test_ignore_code_with_single_quote(self, test_args, args):
         """Single single quote on first line of code should remain untouched.
 
-        See requirement PEP_257_1.  See issue #66 for example of
-        docformatter breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of docformatter breaking
+        code when encountering single quote.
         """
         uut = Formatter(
             test_args,
@@ -664,8 +660,8 @@ def foo():
     def test_ignore_code_with_double_quote(self, test_args, args):
         """Single double quotes on first line of code should remain untouched.
 
-        See requirement PEP_257_1.  See issue #66 for example of
-        docformatter breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of docformatter breaking
+        code when encountering single quote.
         """
         uut = Formatter(
             test_args,
@@ -1180,18 +1176,59 @@ def test_wps3_process_step_io_data_or_href():
 
 """a.py."""
 '''
-        assert docstring == uut._do_format_code('''\
+        assert docstring == uut._do_format_code(
+            '''\
 #!/usr/bin/env python
 
 """a.py"""
-''')
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_keep_newline_after_import(
+        self,
+        test_args,
+        args,
+    ):
+        """Do not remove newlines following the import section.
+
+        See issue #203.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [["--black", ""]])
     def test_format_code_strip_blank_line_for_black(
-            self,
-            test_args,
-            args,
+        self,
+        test_args,
+        args,
     ):
         """Blank lines are stripped in black mode."""
         uut = Formatter(
@@ -1245,7 +1282,8 @@ class TestClass:
 
 
         pass
-''')
+'''
+        )
 
 
 class TestFormatCodeRanges:
