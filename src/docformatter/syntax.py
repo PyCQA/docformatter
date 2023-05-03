@@ -416,6 +416,9 @@ def is_some_sort_of_list(text: str, strict: bool) -> bool:
             or
             # "parameter -- description"
             re.match(r"\s*\S+\s+--\s+", line)
+            or
+            # "parameter::" <-- Literal block
+            re.match(r"\s*[\S ]*:{2}", line)
         )
         for line in split_lines
     )
