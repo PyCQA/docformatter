@@ -351,12 +351,18 @@ def do_split_description(
 
     # Finally, add everything after the last URL.
     with contextlib.suppress(IndexError):
-        _stripped_text = (
-            text[_text_idx + 1 :].strip(indentation)
+        _text = (
+            text[_text_idx + 1 :]
             if text[_text_idx] == "\n"
-            else text[_text_idx:].strip()
+            else text[_text_idx:]
         )
-        _lines.append(f"{indentation}{_stripped_text}")
+        _text = _text.splitlines()
+        for _idx, _line in enumerate(_text):
+            if _line not in ["", "\n", f"{indentation}"]:
+                _text[_idx] = f"{indentation}{_line.strip()}"
+
+        _lines += _text
+
     return _lines
 
 
