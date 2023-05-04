@@ -39,6 +39,7 @@ exclude-labels:
   - 'S: invalid'
   - 'S: merged'
   - 'S: wontfix'
+include-pre-releases: false
 template: |
   ## What Changed
 
