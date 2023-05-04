@@ -1029,7 +1029,7 @@ num_iterations is the number of updates - instead of a better definition of conv
         "args",
         [["--wrap-descriptions", "72", ""]],
     )
-    def test_format_docstring_with_short_inline_link(
+    def test_format_docstring_with_long_inline_link(
         self,
         test_args,
         args,

@@ -64,8 +64,12 @@ def temporary_file(contents, file_directory=".", file_prefix=""):
     finally:
         os.remove(f.name)
 
+
 @pytest.fixture(scope="function")
-def temporary_pyproject_toml(config, config_file_directory="/tmp",):
+def temporary_pyproject_toml(
+    config,
+    config_file_directory="/tmp",
+):
     """Write contents to temporary configuration and yield it."""
     f = open(f"{config_file_directory}/pyproject.toml", "wb")
     try:
@@ -75,8 +79,12 @@ def temporary_pyproject_toml(config, config_file_directory="/tmp",):
     finally:
         os.remove(f.name)
 
+
 @pytest.fixture(scope="function")
-def temporary_setup_cfg(config, config_file_directory="/tmp",):
+def temporary_setup_cfg(
+    config,
+    config_file_directory="/tmp",
+):
     """Write contents to temporary configuration and yield it."""
     f = open(f"{config_file_directory}/setup.cfg", "wb")
     try:
@@ -86,6 +94,7 @@ def temporary_setup_cfg(config, config_file_directory="/tmp",):
     finally:
         os.remove(f.name)
 
+
 @pytest.fixture(scope="function")
 def run_docformatter(arguments, temporary_file):
     """Run subprocess with same Python path as parent.
@@ -93,7 +102,7 @@ def run_docformatter(arguments, temporary_file):
     Return subprocess object.
     """
     if "DOCFORMATTER_COVERAGE" in os.environ and int(
-            os.environ["DOCFORMATTER_COVERAGE"]
+        os.environ["DOCFORMATTER_COVERAGE"]
     ):
         DOCFORMATTER_COMMAND = [
             "coverage",
