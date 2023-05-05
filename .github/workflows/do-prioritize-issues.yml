@@ -24,19 +24,19 @@ jobs:
         uses: snnaplab/get-labels-action@v1
 
       - name: Add High Urgency Labels
-        if: (contains(steps.getlabels.outputs.labels, ' S: convention ') && contains(steps.getlabels.outputs.labels, ' P: bug '))
+        if: (endsWith(steps.getlabels.outputs.labels, ' convention ') && endsWith(steps.getlabels.outputs.labels, ' bug '))
         uses: andymckay/labeler@master
         with:
           add-labels: "U: high"
 
       - name: Add Medium Urgency Labels
-        if: (contains(steps.getlabels.outputs.labels, ' S: style ') && contains (steps.getlabels.outputs.labels, ' P: bug ')) || (contains(steps.getlabels.outputs.labels, ' S: stakeholder ') && contains (steps.getlabels.outputs.labels, ' P: bug ')) || (contains(steps.getlabels.outputs.labels, ' S: convenction ') && contains (steps.getlabels.outputs.labels, ' P: enhancement '))
+        if: (endsWith(steps.getlabels.outputs.labels, ' style ') && endsWith(steps.getlabels.outputs.labels, ' bug ')) || (endsWith(steps.getlabels.outputs.labels, ' stakeholder ') && endsWith(steps.getlabels.outputs.labels, ' bug ')) || (endsWith(steps.getlabels.outputs.labels, ' convenction ') && endsWith(steps.getlabels.outputs.labels, ' enhancement '))
         uses: andymckay/labeler@master
         with:
           add-labels: "U: medium"
 
       - name: Add Low Urgency Labels
-        if: (contains(steps.getlabels.outputs.labels, ' S: style ') && contains (steps.getlabels.outputs.labels, ' P: enhancement ')) || (contains(steps.getlabels.outputs.labels, ' S: stakeholder ') && contains (steps.getlabels.outputs.labels, ' P: enhancement ')) || contains(steps.getlabels.outputs.labels, ' P: doc ') || contains (steps.getlabels.outputs.labels, ' chore ')
+        if: (endsWith(steps.getlabels.outputs.labels, ' style ') && endsWith(steps.getlabels.outputs.labels, ' enhancement ')) || (endsWith(steps.getlabels.outputs.labels, ' stakeholder ') && endsWith(steps.getlabels.outputs.labels, ' enhancement ')) || endsWith(steps.getlabels.outputs.labels, ' doc ') || contains(steps.getlabels.outputs.labels, ' chore ')
         uses: andymckay/labeler@master
         with:
           add-labels: "U: low"
