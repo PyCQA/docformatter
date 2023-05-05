@@ -1295,10 +1295,10 @@ num_iterations is the number of updates - instead of a better definition of conv
 
     User configuration is
     `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
-    
-    This allow user\'s config to only overrides defaults. Values sets from direct command
-    line parameters, environment variables or interactive prompts, takes precedence over
-    any values from the config file.
+
+    This allow user\'s config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
     """\
 ''' == uut._do_format_docstring(
             INDENTATION, docstring.strip()

@@ -370,15 +370,17 @@ def do_split_description(
     else:
         # Finally, add everything after the last field list directive.
         with contextlib.suppress(IndexError):
-            _wrapped_text = description_to_list(
-                text[_text_idx:],
-                indentation,
-                wrap_length,
+            _text = (
+                text[_text_idx + 1:]
+                if text[_text_idx] == "\n"
+                else text[_text_idx:]
             )
-            for _line in _wrapped_text:
-                _lines.append(
-                    f"{indentation}{_line.strip().replace('  ', ' ')}"
-                )
+            _text = _text.splitlines()
+            for _idx, _line in enumerate(_text):
+                if _line not in ["", "\n", f"{indentation}"]:
+                    _text[_idx] = f"{indentation}{_line.strip()}"
+
+            _lines += _text
 
     return _lines
 
