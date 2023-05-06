@@ -12,8 +12,8 @@
 name: Prioritize Issues Workflow
 
 on:
-  schedule:
-    - cron: '00 13 * * *'
+  issues:
+    - type: ['labeled', 'unlabeled']
 
 jobs:
   prioritize_issues:
