@@ -21,9 +21,7 @@ jobs:
     steps:
       - name: Get Issue Labels
         id: getlabels
-        uses: snnaplab/get-labels-action@v1
-        with:
-          number: ${{ github.event.issue.number }}
+        uses: weibullguy/get-labels-action@main
 
       - name: Add High Urgency Labels
         if: (endsWith(steps.getlabels.outputs.labels, ' convention ') && endsWith(steps.getlabels.outputs.labels, ' bug '))
