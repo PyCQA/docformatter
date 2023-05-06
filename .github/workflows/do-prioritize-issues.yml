@@ -13,7 +13,7 @@ name: Prioritize Issues Workflow
 
 on:
   issues:
-    - type: ['labeled', 'unlabeled']
+    types: ['labeled', 'unlabeled']
 
 jobs:
   prioritize_issues:
