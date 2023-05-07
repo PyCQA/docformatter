@@ -1,3 +1,6 @@
+# This workflow runs when a new issue is opened.
+#
+# - Apply the 'fresh' label.
 name: Issue Open Workflow
 
 on:

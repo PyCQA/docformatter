@@ -28,7 +28,7 @@ jobs:
         id: newversion
         run: |
           tag=${GITHUB_REF/refs\/tags\//}
-          version=$(echo $tag | sed 's/.rc[0-9]*//')
+          version=$(echo $tag | sed 's/-rc[0-9]*//')
           if [[ $tag != *"-rc"* ]]; then
             echo "do_milestones=1" >> $GITHUB_ENV
             echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
@@ -49,7 +49,7 @@ jobs:
         if: ${{ env.do_milestones == 1 }}
         uses: WyriHaximus/github-action-close-milestone@master
         with:
-          number: ${{ steps.relversion.outputs.version }}
+          number: ${{ steps.newversion.outputs.version }}
 
       - name: Create new minor release milestone
         if: ${{ env.do_milestones == 1 }}
