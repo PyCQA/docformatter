@@ -30,8 +30,8 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-FIELD_REGEX = r":[a-zA-Z0-9_\- ]*:"
-"""Regular expression to use for finding field lists."""
+SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
+"""Regular expression to use for finding Sphinx-style field lists."""
 
 REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?"
 """Regular expression to use for finding reST directives."""
@@ -178,7 +178,7 @@ def description_to_list(
             _lines.extend(_text)
         _lines.append("")
         with contextlib.suppress(IndexError):
-            if _lines[-2] == _lines[-1] == "":
+            if not _lines[-1] and not _lines[-2]:
                 _lines.pop(-1)
 
     return _lines
@@ -208,7 +208,7 @@ def do_clean_url(url: str, indentation: str) -> str:
     """
     _lines = url.splitlines()
     for _idx, _line in enumerate(_lines):
-        if indentation != "" and _line[: len(indentation)] == indentation:
+        if indentation and _line[: len(indentation)] == indentation:
             _lines[_idx] = f" {_line.strip()}"
 
     return f'{indentation}{"".join(list(_lines))}'
@@ -238,7 +238,7 @@ def do_find_directives(text: str) -> bool:
     return bool([(_rest.start(0), _rest.end(0)) for _rest in _rest_iter])
 
 
-def do_find_field_lists(text: str) -> List[Tuple[int, int]]:
+def do_find_sphinx_field_lists(text: str) -> List[Tuple[int, int]]:
     r"""Determine if docstring contains any field lists.
 
     Parameters
@@ -252,7 +252,7 @@ def do_find_field_lists(text: str) -> List[Tuple[int, int]]:
         A list of tuples with each tuple containing the starting and ending
         position of each field list found in the passed description.
     """
-    _field_iter = re.finditer(FIELD_REGEX, text)
+    _field_iter = re.finditer(SPHINX_REGEX, text)
     return [(_field.start(0), _field.end(0)) for _field in _field_iter]
 
 
@@ -330,13 +330,13 @@ def do_split_description(
         A list containing each line of the description with any links put
         back together.
     """
-    _lines = []
+    _lines: List[str] = []
     _text_idx = 0
 
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
     if style == "sphinx":
-        _parameter_idx = do_find_field_lists(text)
+        _parameter_idx = do_find_sphinx_field_lists(text)
         _wrap_parameters = True
     else:
         _parameter_idx = []
@@ -371,11 +371,10 @@ def do_split_description(
         # Finally, add everything after the last field list directive.
         with contextlib.suppress(IndexError):
             _text = (
-                text[_text_idx + 1:]
+                text[_text_idx + 1 :]
                 if text[_text_idx] == "\n"
                 else text[_text_idx:]
-            )
-            _text = _text.splitlines()
+            ).splitlines()
             for _idx, _line in enumerate(_text):
                 if _line not in ["", "\n", f"{indentation}"]:
                     _text[_idx] = f"{indentation}{_line.strip()}"
@@ -385,9 +384,9 @@ def do_split_description(
     return _lines
 
 
-def do_wrap_parameter_lists(
+def do_wrap_parameter_lists(  # noqa: PLR0913
     text: str,
-    parameter_idx: Iterable,
+    parameter_idx: List[Tuple[int, int]],
     lines: List[str],
     text_idx: int,
     indentation: str,
@@ -420,7 +419,7 @@ def do_wrap_parameter_lists(
     """
     lines.extend(
         description_to_list(
-            text[text_idx: parameter_idx[0][0]],
+            text[text_idx : parameter_idx[0][0]],
             indentation,
             wrap_length,
         )
@@ -504,7 +503,7 @@ def do_wrap_urls(
             )
 
             with contextlib.suppress(IndexError):
-                if _lines[-1] == "":
+                if not _lines[-1]:
                     _lines.pop(-1)
 
             # Add the URL.
@@ -607,7 +606,7 @@ def is_some_sort_of_list(
                 re.match(r"\s*@\S*", line)
                 or
                 # ":parameter: description" <-- Sphinx style
-                re.match(r"^\s*:[\S ]+:", line)
+                re.match(SPHINX_REGEX, line)
                 or
                 # "parameter : description" <-- Numpy style
                 # "parameter: description" <-- Numpy style
@@ -632,7 +631,7 @@ def is_some_sort_of_list(
 def is_some_sort_of_code(text: str) -> bool:
     """Return True if text looks like code."""
     return any(
-        len(word) > 50 and not re.match(URL_REGEX, word)
+        len(word) > 50 and not re.match(URL_REGEX, word)  # noqa: PLR2004
         for word in text.split()
     )
 
@@ -706,7 +705,7 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
         return summary
 
 
-def wrap_description(
+def wrap_description(  # noqa: PLR0913
     text,
     indentation,
     wrap_length,
