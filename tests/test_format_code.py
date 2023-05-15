@@ -1176,18 +1176,59 @@ def test_wps3_process_step_io_data_or_href():
 
 """a.py."""
 '''
-        assert docstring == uut._do_format_code('''\
+        assert docstring == uut._do_format_code(
+            '''\
 #!/usr/bin/env python
 
 """a.py"""
-''')
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_keep_newline_after_import(
+        self,
+        test_args,
+        args,
+    ):
+        """Do not remove newlines following the import section.
+
+        See issue #203.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [["--black", ""]])
     def test_format_code_strip_blank_line_for_black(
-            self,
-            test_args,
-            args,
+        self,
+        test_args,
+        args,
     ):
         """Blank lines are stripped in black mode."""
         uut = Formatter(
@@ -1241,7 +1282,8 @@ class TestClass:
 
 
         pass
-''')
+'''
+        )
 
 
 class TestFormatCodeRanges:

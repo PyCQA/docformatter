@@ -1,0 +1,42 @@
+# This workflow runs daily at 1pm.
+#
+# - Get list of labels.
+# - Determine issue priority based on labels:
+#   - C: convention && P: bug --> U: high
+#   - C: style && P: bug --> U: medium
+#   - C: stakeholder && P:bug --> U: medium
+#   - C: convention && P: enhancement --> U: medium
+#   - C: style && P: enhancement --> U: low
+#   - C: stakeholder && P: enhancement --> U: low
+#   - chore || P: docs --> U: low
+name: Prioritize Issues Workflow
+
+on:
+  issues:
+    types: ['labeled', 'unlabeled']
+
+jobs:
+  prioritize_issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Issue Labels
+        id: getlabels
+        uses: weibullguy/get-labels-action@main
+
+      - name: Add High Urgency Labels
+        if: (endsWith(steps.getlabels.outputs.labels, ' convention ') && endsWith(steps.getlabels.outputs.labels, ' bug '))
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "U: high"
+
+      - name: Add Medium Urgency Labels
+        if: (endsWith(steps.getlabels.outputs.labels, ' style ') && endsWith(steps.getlabels.outputs.labels, ' bug ')) || (endsWith(steps.getlabels.outputs.labels, ' stakeholder ') && endsWith(steps.getlabels.outputs.labels, ' bug ')) || (endsWith(steps.getlabels.outputs.labels, ' convenction ') && endsWith(steps.getlabels.outputs.labels, ' enhancement '))
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "U: medium"
+
+      - name: Add Low Urgency Labels
+        if: (endsWith(steps.getlabels.outputs.labels, ' style ') && endsWith(steps.getlabels.outputs.labels, ' enhancement ')) || (endsWith(steps.getlabels.outputs.labels, ' stakeholder ') && endsWith(steps.getlabels.outputs.labels, ' enhancement ')) || endsWith(steps.getlabels.outputs.labels, ' doc ') || contains(steps.getlabels.outputs.labels, ' chore ')
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "U: low"

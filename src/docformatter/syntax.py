@@ -582,6 +582,9 @@ def is_some_sort_of_list(
                 or
                 # "parameter -- description"
                 re.match(r"\s*\S+\s+--\s+", line)
+                or
+                # Literal block
+                re.match(r"[\S ]::", line)
             )
             for line in split_lines
         )
@@ -618,6 +621,9 @@ def is_some_sort_of_list(
                 or
                 # "parameter -- description"
                 re.match(r"\s*\S+\s+--\s+", line)
+                or
+                # Literal block
+                re.match(r"[\S ]*::", line)
             )
             for line in split_lines
         )

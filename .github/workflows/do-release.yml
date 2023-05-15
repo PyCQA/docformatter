@@ -10,7 +10,7 @@
 #   - Upload the wheel to the new GitHub release.
 #   - Upload wheel to Test PyPi if build succeeds. (Future)
 #   - Test install from Test PyPi. (Future)
-#   - Upload wheel to PyPi if test install succeeds. (Future)
+#   - Upload wheel to PyPi if install test succeeds. (Future)
 name: Do Release Workflow
 
 on:
@@ -47,10 +47,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: "v1.3.1"
-          excludeTags: "latest"
+          excludeTagsRegex: "-rc[0-9]"
           breakingLabel: "Breaking Changes"
           breakingLabels: "V: major"
-          enhancementLabel: "New Features"
+          enhancementLabel: "Features"
           enhancementLabels: "P: enhancement"
           bugsLabel: "Bug Fixes"
           bugLabels: "P: bug"
@@ -98,9 +98,9 @@ jobs:
         if: ${{ env.build_ok == 1 }}
         uses: release-drafter/release-drafter@v5
         with:
-          name: "${{ steps.newversion.outputs.new_tag }}"
-          tag: "${{ steps.newversion.outputs.new_tag }}"
-          version: "${{ steps.newversion.outputs.new_tag }}"
+          name: "${{ steps.relversion.outputs.new_tag }}"
+          tag: "${{ steps.relversion.outputs.new_tag }}"
+          version: "${{ steps.relversion.outputs.new_tag }}"
           prerelease: false
           publish: true
         env:
@@ -120,6 +120,7 @@ jobs:
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ steps.cutrelease.outputs.upload_url }}
+          asset_path: ./dist/*.whl
 
 #      - name: Publish to Test PyPi
 #        if: ${{ env.build_ok == 1 }}
