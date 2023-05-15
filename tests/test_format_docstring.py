@@ -216,7 +216,7 @@ Hello
         )
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--non-cap", "eBay", 'iPad', "-c", ""]])
+    @pytest.mark.parametrize("args", [["--non-cap", "eBay", "iPad", "-c", ""]])
     def test_format_docstring_with_non_cap_words(self, test_args, args):
         """Capitalize words not found in the non_cap list.
 
@@ -235,7 +235,8 @@ Hello
 """
 eBay kinda suss
 """
-''')
+''',
+        )
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
@@ -486,7 +487,9 @@ class TestFormatLists:
         )
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
+    @pytest.mark.parametrize(
+        "args", [["--wrap-descriptions", "72", "--style", "numpy", ""]]
+    )
     def test_format_docstring_should_ignore_colon_parameter_lists(
         self, test_args, args
     ):
@@ -1156,7 +1159,13 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "72", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "72",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_with_simple_link(
         self,
@@ -1195,7 +1204,13 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "88", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_keep_inline_link_together(
         self,
@@ -1234,7 +1249,13 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "88", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_keep_inline_link_together_two_paragraphs(
         self,
@@ -1243,8 +1264,8 @@ num_iterations is the number of updates - instead of a better definition of conv
     ):
         """Keep in-line links together with the display text.
 
-        If there is another paragraph following the in-line link, don't
-        strip the newline in between.
+        If there is another paragraph following the in-line link, don't strip the
+        newline in between.
 
         See issue #157.
         """
@@ -1286,7 +1307,13 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "72", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "72",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_with_short_link(
         self,
@@ -1323,7 +1350,13 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "72", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "72",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_with_only_link_in_description(
         self,
@@ -1360,7 +1393,15 @@ num_iterations is the number of updates - instead of a better definition of conv
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
-        [["--wrap-descriptions", "88", "--wrap-summaries", "88", ""]],
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
     )
     def test_format_docstring_link_only_one_newline_after_link(
         self,
@@ -1461,7 +1502,15 @@ def function2():
         assert docstring == uut._do_format_code(docstring)
 
     @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--black", ""]])
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--black",
+                "",
+            ]
+        ],
+    )
     def test_format_docstring_black(
         self,
         test_args,
@@ -1469,8 +1518,8 @@ def function2():
     ):
         """Format with black options when --black specified.
 
-        Add a space between the opening quotes and the summary if
-        content starts with a quote.
+        Add a space between the opening quotes and the summary if content starts with a
+        quote.
         """
         uut = Formatter(
             test_args,
@@ -1512,6 +1561,141 @@ def function2():
 """"This" quote starting one-line docstring will have a leading space.
 
 This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
+                "sphinx",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap sphinx style parameter lists.
+
+        See requirement docformatter_10.4.2
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    :rtype: str
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
+                "numpy",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_non_sphinx_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Ignore wrapping sphinx style parameter lists when not using sphinx style.
+
+        See requirement docformatter_10.4.1
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
 """\
 ''',
             )
@@ -1789,8 +1973,8 @@ class TestStripDocstring:
     ):
         """Raise ValueError when strings begin with single single quotes.
 
-        See requirement PEP_257_1.  See issue #66 for example of
-        docformatter breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of docformatter breaking
+        code when encountering single quote.
         """
         uut = Formatter(
             test_args,
@@ -1811,8 +1995,8 @@ class TestStripDocstring:
     ):
         """Raise ValueError when strings begin with single double quotes.
 
-        See requirement PEP_257_1.  See issue #66 for example of
-        docformatter breaking code when encountering single quote.
+        See requirement PEP_257_1.  See issue #66 for example of docformatter breaking
+        code when encountering single quote.
         """
         uut = Formatter(
             test_args,

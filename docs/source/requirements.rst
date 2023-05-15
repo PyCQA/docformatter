@@ -51,16 +51,30 @@ Thus, an autoformatting tool:
     * Would be nice to produce as much output that satisfies the *methodology* requirements.
     * Would be nice to provide arguments to allow the user to turn on/off each *methodology* requirement the tool supports.
 
-Docstring Syntax
-----------------
+Docstring Style
+---------------
 
-There are at least three "flavors" of docstrings in common use today; Sphinx,
-NumPy, and Google.  Each of these docstring flavors follow the PEP 257
-*convention* requirements.  What differs between the three docstring flavors
-is the reST syntax used in the elaborate description of the multi-line
+There are at least four "flavors" of docstrings in common use today;
+Epydoc, Sphinx, NumPy, and Google.  Each of these docstring flavors follow the
+PEP 257 *convention* requirements.  What differs between the three docstring
+flavors is the reST syntax used in the parameter description of the multi-line
 docstring.
 
 For example, here is how each syntax documents function arguments.
+
+Epydoc syntax:
+
+.. code-block::
+
+    @type num_dogs: int
+    @param num_dogs: the number of dogs
+
+Sphinx syntax:
+
+.. code-block::
+
+    :param param1: The first parameter, defaults to 1.
+    :type: int
 
 Google syntax:
 
@@ -77,13 +91,6 @@ NumPy syntax:
     ----------
     param1 : int
         The first parameter.
-
-Sphinx syntax:
-
-.. code-block::
-
-    :param param1: The first parameter, defaults to 1.
-    :type: int
 
 Syntax is also important to ``Docutils``.  An autoformatter should be aware of
 syntactical directives so they can be placed properly in the structure of the
@@ -201,8 +208,14 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.1.3.1', ' Shall maintain in-line links on one line even if the resulting line exceeds wrap length.', ' Derived', ' Shall', ' Yes [*PR #152*]'
     ' docformatter_10.1.3.2', ' Shall not place a newline between description text and a wrapped link.', ' Derived', ' Shall', ' Yes [PR #182]'
     ' docformatter_10.2', ' Should format docstrings using NumPy style.', ' Style', ' Should', ' No'
+    ' docformatter_10.2.1', ' Shall ignore docstrings in other styles when using NumPy style.', ' Shall', ' Yes'
+    ' docformatter_10.2.2', ' Shall wrap NumPy-style parameter descriptions that exceed wrap length when using NumPy style.', ' Shall', ' No'
     ' docformatter_10.3', ' Should format docstrings using Google style.', ' Style', ' Should', ' No'
-    ' docformatter_10.4', ' Should format docstrings using Sphinx style.', ' Style', ' Should', ' No'
+    ' docformatter_10.3.1', ' Shall ignore docstrings in other styles when using Google style.', ' Shall', ' Yes'
+    ' docformatter_10.3.2', ' Shall wrap Google-style parameter descriptions that exceed wrap length when using Google style.', ' Shall', ' No'
+    ' docformatter_10.4', ' Should format docstrings using Sphinx style.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.4.1', ' Shall ignore docstrings in other styles when using Sphinx style.', ' Shall', ' Yes'
+    ' docformatter_10.4.2', ' Shall wrap Sphinx-style parameter descriptions that exceed wrap length when using Sphinx style.', ' Shall', ' Yes'
     ' docformatter_10.5', ' Should format docstrings compatible with black.', ' Style', ' Should', ' Yes [PR #192]'
     ' docformatter_10.5.1', ' Should wrap summaries at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.2', ' Should wrap descriptions at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
@@ -244,6 +257,9 @@ with *convention* requirements.
 ``docformatter`` currently provides these arguments for *style* requirements.
 ::
 
+    -s, --style [string, default sphinx]
+        name of the docstring syntax style to use for formatting parameter
+        lists.
     --black [boolean, default False]
         Boolean to indicate whether to format docstrings to be compatible
         with black.
@@ -305,12 +321,6 @@ The following are new arguments that are needed to implement **should** or
     --wrap-one-line [boolean, default False]
         Boolean to indicate whether to wrap one-line docstrings.  Provides
         option for requirement PEP_257_4.1.
-
-The following are new *style* arguments needed to accommodate the various style options:
-::
-
-    --syntax [string, default "sphinx"]
-        One of sphinx, numpy, or google
 
 Issue and Version Management
 ----------------------------

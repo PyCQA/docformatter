@@ -43,6 +43,12 @@ help output provides a summary of these options:
       -n, --non-cap         list of words not to capitalize when they appear as the
                             first word in the summary
 
+      -s style, --style style
+                            the docstring style to use when formatting parameter
+                            lists (default: sphinx)
+      --black
+                            make formatting compatible with standard black options
+                            (default: False)
       --wrap-summaries length
                             wrap long summary lines at this length; set
                             to 0 to disable wrapping
@@ -51,11 +57,12 @@ help output provides a summary of these options:
                             wrap descriptions at this length; set to 0 to
                             disable wrapping
                             (default: 72)
-      --black
-                            make formatting consistent with black, setting
-                            wrap-summaries and wrap-descriptions to a default 88
-                            if not otherwise specified
-                            (default: False)
+      --force-wrap
+                            force descriptions to be wrapped even if it may result
+                            in a mess (default: False)
+      --tab_width width
+                            tabs in indentation are this many characters when
+                            wrapping lines (default: 1)
       --blank
                             add blank line after elaborate description
                             (default: False)
@@ -75,12 +82,6 @@ help output provides a summary of these options:
                             place closing triple quotes on a new-line when a
                             one-line docstring wraps to two or more lines
                             (default: False)
-      --force-wrap
-                            force descriptions to be wrapped even if it may result
-                            in a mess (default: False)
-      --tab_width width
-                            tabs in indentation are this many characters when
-                            wrapping lines (default: 1)
       --range start_line end_line
                             apply docformatter to docstrings between these lines;
                             line numbers are indexed at 1
@@ -88,8 +89,7 @@ help output provides a summary of these options:
                             apply docformatter to docstrings of given length range
       --non-strict
                             do not strictly follow reST syntax to identify lists
-                            (see issue #67)
-                            (default: False)
+                            (see issue #67) (default: False)
       --config CONFIG
                             path to file containing docformatter options
                             (default: ./pyproject.toml)

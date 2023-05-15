@@ -71,6 +71,9 @@ options:
                         list of words not to capitalize when they appear as the
                         first word in the summary
 
+  -s style, --style style
+                        the docstring style to use when formatting parameter
+                        lists (default: sphinx)
   --black               make formatting compatible with standard black options
                         (default: False)
   --wrap-summaries length

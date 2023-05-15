@@ -489,6 +489,7 @@ class Formatter:
             _syntax.is_some_sort_of_list(
                 summary,
                 self.args.non_strict,
+                self.args.style,
             )
             or _syntax.do_find_directives(summary)
         ):
@@ -613,6 +614,7 @@ class Formatter:
             wrap_length=self.args.wrap_descriptions,
             force_wrap=self.args.force_wrap,
             strict=self.args.non_strict,
+            style=self.args.style,
         )
         post_description = "\n" if self.args.post_description_blank else ""
         return f'''\

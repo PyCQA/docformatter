@@ -421,6 +421,7 @@ class TestIsSomeSortOfList:
         @param
     """,
             True,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -433,6 +434,7 @@ class TestIsSomeSortOfList:
         imag -- the imaginary part (default 0.0)
     """,
             True,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -448,7 +450,8 @@ class TestIsSomeSortOfList:
           release-1.4.1/
           release-1.5/
     """,
-            True,
+            False,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -460,6 +463,7 @@ class TestIsSomeSortOfList:
         stream (BinaryIO): Binary stream (usually a file object).
     """,
             True,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -475,6 +479,7 @@ the
 rocket.
     """,
             True,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -490,6 +495,62 @@ the
 rocket.
     """,
             False,
+            "numpy",
+        )
+
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_sphinx_style(self):
+        """Identify non-sphinx styles as lists when using sphinx style.
+
+        See requirement docformatter_10.4.1
+        """
+        assert docformatter.is_some_sort_of_list(
+            """\
+Using Numpy parameter list
+
+Parameters
+----------
+    arg1 : str
+        The first argument.
+    arg2 : int
+        The second argument.
+""",
+            False,
+            "sphinx",
+        )
+
+    @pytest.mark.unit
+    def test_not_is_some_sort_of_list_sphinx_style(self):
+        """Ignore sphinx style parameter lists when using sphinx style.
+
+        See requirement docformatter_10.4
+        """
+        assert not docformatter.is_some_sort_of_list(
+            """\
+Using Sphinx parameter list
+
+:param str arg1: the first argument.
+:param int arg2: the second argument.
+""",
+            False,
+            "sphinx",
+        )
+
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_not_sphinx_style(self):
+        """Identify sphinx styles as lists when not using sphinx style.
+
+        See requirements docformatter_10.2.1 and docformatter_10.3.1
+        """
+        assert docformatter.is_some_sort_of_list(
+            """\
+Using Sphinx parameter list
+
+:param str arg1: the first argument.
+:param int arg2: the second argument.
+""",
+            False,
+            "numpy",
         )
 
     @pytest.mark.unit
@@ -512,6 +573,7 @@ Example code2::
         pass
 """,
             False,
+            "numpy",
         )
 
 
