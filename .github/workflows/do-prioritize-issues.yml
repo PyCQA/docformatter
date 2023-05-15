@@ -12,8 +12,8 @@
 name: Prioritize Issues Workflow
 
 on:
-  schedule:
-    - cron: '00 13 * * *'
+  issues:
+    types: ['labeled', 'unlabeled']
 
 jobs:
   prioritize_issues:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Get Issue Labels
         id: getlabels
-        uses: snnaplab/get-labels-action@v1
+        uses: weibullguy/get-labels-action@main
 
       - name: Add High Urgency Labels
         if: (endsWith(steps.getlabels.outputs.labels, ' convention ') && endsWith(steps.getlabels.outputs.labels, ' bug '))
