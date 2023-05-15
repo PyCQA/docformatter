@@ -194,7 +194,7 @@ the requirement falls in, the type of requirement, and whether
     ' PEP_257_9.4',' Should be documented whether keyword arguments are part of the interface.',' Methodology',' Should',' No'
     ' docformatter_10', '**docstring Syntax**'
     ' docformatter_10.1', ' Should wrap docstrings at n characters.', ' Style', ' Should', ' Yes'
-    ' docformatter_10.1.1', ' Shall not wrap lists or syntax directive statements', ' Derived', ' Shall', ' Yes'
+    ' docformatter_10.1.1', ' Shall not wrap lists, syntax directive statements, or literal blocks', ' Derived', ' Shall', ' Yes'
     ' docformatter_10.1.1.1', ' Should allow wrapping of lists and syntax directive statements.', ' Stakeholder', ' Should', ' Yes [*PR #5*, *PR #93*]'
     ' docformatter_10.1.2', ' Should allow/disallow wrapping of one-line docstrings.', ' Derived', ' Should', ' No'
     ' docformatter_10.1.3', ' Shall not wrap links that exceed the wrap length.', ' Derived', ' Shall', ' Yes [*PR #114*]'

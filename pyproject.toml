@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.6.5"
+version = "1.7.0"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -249,8 +249,8 @@ deps =
 commands =
     pip install -U pip
     pip install .
-    docformatter --recursive {toxinidir}/src/docformatter
-    pycodestyle --ignore=E203,W503,W504 {toxinidir}/src/docformatter
+    docformatter --black --recursive {toxinidir}/src/docformatter
+    pycodestyle --exclude=.git,.tox,*.pyc,*.pyo,build,dist,*.egg-info,config,docs,locale,tests,tools --ignore=C326,C330,E121,E123,E126,E133,E203,E242,E265,E402,W503,W504 --format=pylint --max-line-length=88 {toxinidir}/src/docformatter
     pydocstyle {toxinidir}/src/docformatter
     pylint --rcfile={toxinidir}/pyproject.toml {toxinidir}/src/docformatter
     rstcheck --report-level=1 {toxinidir}/README.rst

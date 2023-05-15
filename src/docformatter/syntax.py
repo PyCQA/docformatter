@@ -351,12 +351,18 @@ def do_split_description(
 
     # Finally, add everything after the last URL.
     with contextlib.suppress(IndexError):
-        _stripped_text = (
-            text[_text_idx + 1 :].strip(indentation)
+        _text = (
+            text[_text_idx + 1 :]
             if text[_text_idx] == "\n"
-            else text[_text_idx:].strip()
+            else text[_text_idx:]
         )
-        _lines.append(f"{indentation}{_stripped_text}")
+        _text = _text.splitlines()
+        for _idx, _line in enumerate(_text):
+            if _line not in ["", "\n", f"{indentation}"]:
+                _text[_idx] = f"{indentation}{_line.strip()}"
+
+        _lines += _text
+
     return _lines
 
 
@@ -410,6 +416,9 @@ def is_some_sort_of_list(text: str, strict: bool) -> bool:
             or
             # "parameter -- description"
             re.match(r"\s*\S+\s+--\s+", line)
+            or
+            # "parameter::" <-- Literal block
+            re.match(r"\s*[\S ]*:{2}", line)
         )
         for line in split_lines
     )
@@ -495,8 +504,8 @@ def wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
 def wrap_description(text, indentation, wrap_length, force_wrap, strict):
     """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph
-    text, and bulleted lists alone.
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.
     """
     text = strip_leading_blank_lines(text)
 

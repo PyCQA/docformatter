@@ -492,6 +492,28 @@ rocket.
             False,
         )
 
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_literal_block(self):
+        """Identify literal blocks.
+
+        See issue #199 and requirement docformatter_10.1.1.1.
+        """
+        assert docformatter.is_some_sort_of_list(
+"""\
+This is a description.
+
+Example code::
+
+    config(par=value)
+
+Example code2::
+
+    with config(par=value) as f:
+        pass
+""",
+            False,
+        )
+
 
 class TestIsSomeSortOfCode:
     """Class for testing the is_some_sort_of_code() function."""
