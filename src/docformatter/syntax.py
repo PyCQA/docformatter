@@ -248,7 +248,7 @@ def do_find_field_lists(text: str) -> List[Tuple[int, int]]:
 
     Returns
     -------
-    url_index : list
+    field_index : list
         A list of tuples with each tuple containing the starting and ending
         position of each field list found in the passed description.
     """
@@ -584,7 +584,7 @@ def is_some_sort_of_list(
                 re.match(r"\s*\S+\s+--\s+", line)
                 or
                 # Literal block
-                re.match(r"[\S ]::", line)
+                re.match(r"[\S ]*::", line)
             )
             for line in split_lines
         )
