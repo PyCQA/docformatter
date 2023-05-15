@@ -28,7 +28,7 @@ repos:
           additional_dependencies: [tomli]
           args: [--in-place, --config, ./pyproject.toml]
     - repo: https://github.com/charliermarsh/ruff-pre-commit
-      rev: 'v0.0.265'
+      rev: 'v0.0.267'
       hooks:
         - id: ruff
           args: [ --select, "PL", --select, "F" ]
@@ -39,7 +39,7 @@ repos:
           additional_dependencies: [toml]
           args: [--config, ./pyproject.toml]
     - repo: https://github.com/pre-commit/mirrors-mypy
-      rev: v1.1.1
+      rev: v1.3.0
       hooks:
         - id: mypy
           additional_dependencies: [types-python-dateutil]
