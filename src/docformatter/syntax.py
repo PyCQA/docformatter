@@ -297,9 +297,7 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
     _do_skip = re.search(URL_SKIP_REGEX, text[index[0] : index[1]]) is not None
 
     with contextlib.suppress(IndexError):
-        _do_skip = _do_skip or (
-            text[index[0]] == "<" and text[index[1]] != ">"
-        )
+        _do_skip = _do_skip or (text[index[0]] == "<" and text[index[1]] != ">")
 
     return _do_skip
 
@@ -371,9 +369,7 @@ def do_split_description(
         # Finally, add everything after the last field list directive.
         with contextlib.suppress(IndexError):
             _text = (
-                text[_text_idx + 1 :]
-                if text[_text_idx] == "\n"
-                else text[_text_idx:]
+                text[_text_idx + 1 :] if text[_text_idx] == "\n" else text[_text_idx:]
             ).splitlines()
             for _idx, _line in enumerate(_text):
                 if _line not in ["", "\n", f"{indentation}"]:
@@ -442,7 +438,8 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
             lines.extend(
                 textwrap.wrap(
                     textwrap.dedent(
-                        f"{text[_parameter[0]:_parameter[1]]} {_parameter_description}"
+                        f"{text[_parameter[0]:_parameter[1]]} "
+                        f"{_parameter_description.replace(2*indentation, '')}"
                     ),
                     width=wrap_length,
                     initial_indent=indentation,
@@ -507,9 +504,7 @@ def do_wrap_urls(
                     _lines.pop(-1)
 
             # Add the URL.
-            _lines.append(
-                f"{do_clean_url(text[_url[0] : _url[1]], indentation)}"
-            )
+            _lines.append(f"{do_clean_url(text[_url[0] : _url[1]], indentation)}")
 
             text_idx = _url[1]
 
@@ -545,8 +540,7 @@ def is_some_sort_of_list(
     # Very large number of lines but short columns probably means a list of
     # items.
     if (
-        len(split_lines)
-        / max([len(line.strip()) for line in split_lines] + [1])
+        len(split_lines) / max([len(line.strip()) for line in split_lines] + [1])
         > HEURISTIC_MIN_LIST_ASPECT_RATIO
     ) and not strict:
         return True
@@ -680,9 +674,7 @@ def strip_leading_blank_lines(text):
     """Return text with leading blank lines removed."""
     split = text.splitlines()
 
-    found = next(
-        (index for index, line in enumerate(split) if line.strip()), 0
-    )
+    found = next((index for index, line in enumerate(split) if line.strip()), 0)
 
     return "\n".join(split[found:])
 

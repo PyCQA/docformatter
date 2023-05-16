@@ -34,7 +34,7 @@ include = ["LICENSE"]
 [tool.poetry.dependencies]
 python = "^3.7"
 charset_normalizer = "^3.0.0"
-tomli = {version = "^2.0.0", optional = true}
+tomli = {version = "^2.0.0", python = "<3.11", optional = true}
 untokenize = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
@@ -52,6 +52,7 @@ pylint = [
 ]
 pytest = "^7.1.0"
 pytest-cov = "^4.0.0"
+ruff = "^0.0.267"
 rstcheck = "^6.1.0"
 tox = "<4.0.0"
 Sphinx = [
@@ -134,7 +135,7 @@ show_missing = true
 output = 'coverage.xml'
 
 [tool.black]
-line-length = 79
+line-length = 88
 target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
@@ -164,7 +165,7 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
-line_length = 79
+line_length = 88
 
 [tool.tox]
 legacy_tox_ini = """
@@ -242,7 +243,7 @@ deps =
     charset_normalizer
     pycodestyle
     pydocstyle
-    pylint
+    ruff
     rstcheck
     toml
     untokenize
@@ -252,6 +253,6 @@ commands =
     docformatter --black --recursive {toxinidir}/src/docformatter
     pycodestyle --exclude=.git,.tox,*.pyc,*.pyo,build,dist,*.egg-info,config,docs,locale,tests,tools --ignore=C326,C330,E121,E123,E126,E133,E203,E242,E265,E402,W503,W504 --format=pylint --max-line-length=88 {toxinidir}/src/docformatter
     pydocstyle {toxinidir}/src/docformatter
-    pylint --rcfile={toxinidir}/pyproject.toml {toxinidir}/src/docformatter
+    ruff check --select "PL" --select "F" {toxinidir}/src/docformatter
     rstcheck --report-level=1 {toxinidir}/README.rst
 """

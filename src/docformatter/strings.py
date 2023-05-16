@@ -27,10 +27,10 @@
 # Standard Library Imports
 import contextlib
 import re
-from typing import List
+from typing import List, Match, Optional, Union
 
 
-def find_shortest_indentation(lines):
+def find_shortest_indentation(lines: List[str]) -> str:
     """Determine the shortest indentation in a list of lines.
 
     Parameters
@@ -58,17 +58,17 @@ def find_shortest_indentation(lines):
     return indentation or ""
 
 
-def is_probably_beginning_of_sentence(line):
+def is_probably_beginning_of_sentence(line: str) -> Union[Match[str], None, bool]:
     """Determine if the line begins a sentence.
 
     Parameters
     ----------
-    line:
+    line : str
         The line to be tested.
 
     Returns
     -------
-    is_beginning: bool
+    is_beginning : bool
         True if this token is the beginning of a sentence.
     """
     # Check heuristically for a parameter list.
@@ -83,10 +83,22 @@ def is_probably_beginning_of_sentence(line):
     return is_beginning_of_sentence and not is_pydoc_ref
 
 
-def normalize_line(line, newline):
+def normalize_line(line: str, newline: str) -> str:
     """Return line with fixed ending, if ending was present in line.
 
     Otherwise, does nothing.
+
+    Parameters
+    ----------
+    line : str
+        The line to normalize.
+    newline : str
+        The newline character to use for line endings.
+
+    Returns
+    -------
+    normalized_line : str
+        The supplied line with line endings replaced by the newline.
     """
     stripped = line.rstrip("\n\r")
     return stripped + newline if stripped != line else line
@@ -100,7 +112,7 @@ def normalize_line_endings(lines, newline):
     return "".join([normalize_line(line, newline) for line in lines])
 
 
-def normalize_summary(summary: str, noncap: List[str] = None) -> str:
+def normalize_summary(summary: str, noncap: Optional[List[str]] = None) -> str:
     """Return normalized docstring summary.
 
     A normalized docstring summary will have the first word capitalized and
@@ -161,7 +173,7 @@ def split_first_sentence(text):
     while rest:
         split = re.split(r"(\s)", rest, maxsplit=1)
         word = split[0]
-        if len(split) == 3:
+        if len(split) == 3:  # noqa PLR2004
             delimiter = split[1]
             rest = split[2]
         else:
@@ -211,8 +223,7 @@ def split_summary_and_description(contents):
     if split[0].strip() and split[1].strip():
         return (
             split[0].strip(),
-            find_shortest_indentation(split[1].splitlines()[1:])
-            + split[1].strip(),
+            find_shortest_indentation(split[1].splitlines()[1:]) + split[1].strip(),
         )
 
     return contents, ""
