@@ -19,6 +19,9 @@ to install with TOML support:
 
     $ pip install --upgrade docformatter[tomli]
 
+This is only necessary if you are using Python < 3.11.  Beginning with Python 3.11,
+docformatter will utilize ``tomllib`` from the standard library.
+
 Install from GitHub
 -------------------
 

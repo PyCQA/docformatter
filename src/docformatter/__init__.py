@@ -27,11 +27,11 @@ __all__ = ["__version__"]
 
 # docformatter Local Imports
 from .__pkginfo__ import __version__
-from .strings import *
-from .syntax import *
-from .util import *
+from .strings import *  # noqa F403
+from .syntax import *  # noqa F403
+from .util import *  # noqa F403
 
 # Have isort skip these they require the functions above.
-from .configuration import Configurater  # isort: skip
-from .encode import Encoder  # isort: skip
-from .format import Formatter, FormatResult  # isort: skip
+from .configuration import Configurater  # isort: skip # noqa F401
+from .encode import Encoder  # isort: skip # noqa F401
+from .format import Formatter, FormatResult  # isort: skip # noqa F401

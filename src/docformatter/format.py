@@ -65,7 +65,7 @@ def _do_remove_blank_lines_after_definitions(
         definition removed.
     """
     for _idx, _token in enumerate(modified_tokens):
-        if _token[0] == 3:
+        if _token[0] == 3:  # noqa PLR2004
             j = 1
 
             # Remove newline between variable definition and docstring
@@ -75,9 +75,7 @@ def _do_remove_blank_lines_after_definitions(
             #     * The import section.
             while (
                 modified_tokens[_idx - j][4] == "\n"
-                and not (
-                    modified_tokens[_idx - j - 1][4].strip().endswith('"""')
-                )
+                and not (modified_tokens[_idx - j - 1][4].strip().endswith('"""'))
                 and not modified_tokens[_idx - j - 1][4].startswith("#!/")
                 and "import" not in modified_tokens[_idx - j - 1][4]
             ):
@@ -120,12 +118,8 @@ def _do_remove_blank_lines_after_docstring(modified_tokens):
             _num_blank_lines += 1
 
         with contextlib.suppress(IndexError):
-            _is_definition = (
-                _token[4].lstrip().startswith(("class ", "def ", "@"))
-            )
-            _is_docstring = (
-                modified_tokens[_idx - 2][4].strip().endswith('"""')
-            )
+            _is_definition = _token[4].lstrip().startswith(("class ", "def ", "@"))
+            _is_docstring = modified_tokens[_idx - 2][4].strip().endswith('"""')
             _after_definition = (
                 modified_tokens[_idx - _num_blank_lines - 4][4]
                 .lstrip()
@@ -134,9 +128,7 @@ def _do_remove_blank_lines_after_docstring(modified_tokens):
             _after_docstring = modified_tokens[_idx - 5][4].strip().endswith(
                 '"""'
             ) or modified_tokens[_idx - 5][4].strip().startswith('"""')
-            _comment_follows = re.search(
-                r"\"\"\" *#", modified_tokens[_idx - 4][4]
-            )
+            _comment_follows = re.search(r"\"\"\" *#", modified_tokens[_idx - 4][4])
 
             if (
                 _token[0] == 1
@@ -337,9 +329,7 @@ class Formatter:
             The text from the source file.
         """
         try:
-            _original_newline = self.encodor.do_find_newline(
-                source.splitlines(True)
-            )
+            _original_newline = self.encodor.do_find_newline(source.splitlines(True))
             _code = self._format_code(source)
 
             return _strings.normalize_line_endings(
@@ -371,9 +361,7 @@ class Formatter:
             assert self.args.line_range[0] > 0 and self.args.line_range[1] > 0
 
         if self.args.length_range is not None:
-            assert (
-                self.args.length_range[0] > 0 and self.args.length_range[1] > 0
-            )
+            assert self.args.length_range[0] > 0 and self.args.length_range[1] > 0
 
         modified_tokens = []
 
@@ -389,6 +377,7 @@ class Formatter:
                 end,
                 line,
             ) in tokenize.generate_tokens(sio.readline):
+                _token_string = token_string
                 if (
                     token_type == tokenize.STRING
                     and token_string.startswith(self.QUOTE_TYPES)
@@ -397,15 +386,13 @@ class Formatter:
                         or previous_token_type == tokenize.NEWLINE
                         or only_comments_so_far
                     )
-                    and _util.is_in_range(
-                        self.args.line_range, start[0], end[0]
-                    )
+                    and _util.is_in_range(self.args.line_range, start[0], end[0])
                     and _util.has_correct_length(
                         self.args.length_range, start[0], end[0]
                     )
                 ):
                     indentation = " " * (len(line) - len(line.lstrip()))
-                    token_string = self._do_format_docstring(
+                    _token_string = self._do_format_docstring(
                         indentation,
                         token_string,
                     )
@@ -418,22 +405,16 @@ class Formatter:
                     only_comments_so_far = False
 
                 previous_token_type = token_type
-                modified_tokens.append(
-                    (token_type, token_string, start, end, line)
-                )
+                modified_tokens.append((token_type, _token_string, start, end, line))
 
-            modified_tokens = _do_remove_blank_lines_after_definitions(
-                modified_tokens
-            )
-            modified_tokens = _do_remove_blank_lines_after_docstring(
-                modified_tokens
-            )
+            modified_tokens = _do_remove_blank_lines_after_definitions(modified_tokens)
+            modified_tokens = _do_remove_blank_lines_after_docstring(modified_tokens)
 
             return untokenize.untokenize(modified_tokens)
         except tokenize.TokenError:
             return source
 
-    def _do_format_docstring(
+    def _do_format_docstring(  # noqa PLR0911
         self,
         indentation: str,
         docstring: str,
@@ -479,10 +460,7 @@ class Formatter:
         summary, description = _strings.split_summary_and_description(contents)
 
         # Leave docstrings with underlined summaries alone.
-        if (
-            _syntax.remove_section_header(description).strip()
-            != description.strip()
-        ):
+        if _syntax.remove_section_header(description).strip() != description.strip():
             return docstring
 
         if not self.args.force_wrap and (
@@ -595,13 +573,9 @@ class Formatter:
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
         initial_indent = (
-            indentation
-            if self.args.pre_summary_newline
-            else 3 * " " + indentation
+            indentation if self.args.pre_summary_newline else 3 * " " + indentation
         )
-        pre_summary = (
-            "\n" + indentation if self.args.pre_summary_newline else ""
-        )
+        pre_summary = "\n" + indentation if self.args.pre_summary_newline else ""
         summary = _syntax.wrap_summary(
             _strings.normalize_summary(summary, self.args.non_cap),
             wrap_length=self.args.wrap_summaries,
@@ -659,6 +633,5 @@ class Formatter:
                 ].strip(), quote.replace("'", '"')
 
         raise ValueError(
-            "docformatter only handles triple-quoted (single or double) "
-            "strings"
+            "docformatter only handles triple-quoted (single or double) " "strings"
         )
