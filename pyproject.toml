@@ -167,6 +167,17 @@ use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
 
+[tool.rstcheck]
+report = "warning"
+ignore_directives = [
+	"automodule",
+	"tabularcolumns",
+	"toctree",
+]
+ignore_roles = [
+	"numref",
+]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]

@@ -63,6 +63,11 @@ Features
   whitespace. Such trailing whitespace is visually indistinguishable
   and some editors (or more recently, reindent.py) will trim them.
 
+``docformatter`` formats docstrings compatible with ``black`` when passed the
+``--black`` option.
+
+``docformatter`` formats field lists that use Epytext or Sphinx styles.
+
 See the the full documentation at `read-the-docs`_, especially the
 `requirements`_ section for a more detailed discussion of PEP 257 and other
 requirements.
@@ -81,6 +86,8 @@ Or, if you want to use pyproject.toml to configure docformatter and you're using
 Python < 3.11::
 
     $ pip install --upgrade docformatter[tomli]
+
+With Python >=3.11, ``tomllib`` from the standard library is used.
 
 Or, if you want to use a release candidate (or any other tag)::
 

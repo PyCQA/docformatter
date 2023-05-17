@@ -55,14 +55,14 @@ Docstring Style
 ---------------
 
 There are at least four "flavors" of docstrings in common use today;
-Epydoc, Sphinx, NumPy, and Google.  Each of these docstring flavors follow the
+Epytext, Sphinx, NumPy, and Google.  Each of these docstring flavors follow the
 PEP 257 *convention* requirements.  What differs between the three docstring
 flavors is the reST syntax used in the parameter description of the multi-line
 docstring.
 
 For example, here is how each syntax documents function arguments.
 
-Epydoc syntax:
+Epytext syntax:
 
 .. code-block::
 
@@ -221,6 +221,9 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.5.2', ' Should wrap descriptions at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.3', ' Should insert a space before the first word in the summary if that word is quoted when in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.4', ' Default black mode options should be over-rideable by passing arguments or using configuration files.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.6', ' Should format docstrings using Epytext style.', ' Style', ' Should', ' Yes'
+    ' docformatter_10.6.1', ' Shall ignore docstrings in other styles when using Epytext style.', ' Shall', ' Yes'
+    ' docformatter_10.6.2', ' Shall wrap Epytext-style parameter descriptions that exceed wrap length when using Epytext style.', ' Shall', ' Yes'
     ' docformatter_11', '**Program Control**'
     ' docformatter_11.1', ' Should check formatting and report incorrectly documented docstrings.', ' Stakeholder', ' Should', ' Yes [*PR #32*]'
     ' docformatter_11.2', ' Should fix formatting and save changes to file.', ' Stakeholder', ' Should', ' Yes'
