@@ -24,12 +24,7 @@
 """Formats docstrings to follow PEP 257."""
 
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # Standard Library Imports
 import contextlib
@@ -73,7 +68,7 @@ options:
 
   -s style, --style style
                         the docstring style to use when formatting parameter
-                        lists (default: sphinx)
+                        lists.  One of epytext, sphinx. (default: sphinx)
   --black               make formatting compatible with standard black options
                         (default: False)
   --wrap-summaries length
