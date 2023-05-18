@@ -1562,6 +1562,141 @@ This long description will be wrapped at 88 characters because we passed the --b
                 "--wrap-summaries",
                 "88",
                 "--style",
+                "epytext",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_epytext_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap epytext style parameter lists.
+
+        See requirement docformatter_10.6.2
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.  See http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
+                "numpy",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_non_epytext_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Ignore wrapping epytext style parameter lists when not using epytext style.
+
+        See requirement docformatter_10.6.1
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.  See http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
                 "sphinx",
                 "",
             ]
