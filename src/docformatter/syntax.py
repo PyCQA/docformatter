@@ -30,11 +30,32 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
-SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
-"""Regular expression to use for finding Sphinx-style field lists."""
+BULLET_REGEX = r"\s*[*\-+] [\S ]+"
+"""Regular expression to use for finding bullet lists."""
+
+ENUM_REGEX = r"\s*\d\."
+"""Regular expression to use for finding enumerated lists."""
+
+EPYTEXT_REGEX = r"@[a-zA-Z0-9_\-\s]+:"
+"""Regular expression to use for finding Epytext-style field lists."""
+
+GOOGLE_REGEX = r"^ *[a-zA-Z0-9_\- ]*:$"
+"""Regular expression to use for finding Google-style field lists."""
+
+LITERAL_REGEX = r"[\S ]*::"
+"""Regular expression to use for finding literal blocks."""
+
+NUMPY_REGEX = r"^\s[a-zA-Z0-9_\- ]+ ?: [\S ]+"
+"""Regular expression to use for finding Numpy-style field lists."""
+
+OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
+"""Regular expression to use for finding option lists."""
 
 REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?"
 """Regular expression to use for finding reST directives."""
+
+SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
+"""Regular expression to use for finding Sphinx-style field lists."""
 
 URL_PATTERNS = (
     "afp|"
@@ -238,22 +259,36 @@ def do_find_directives(text: str) -> bool:
     return bool([(_rest.start(0), _rest.end(0)) for _rest in _rest_iter])
 
 
-def do_find_sphinx_field_lists(text: str) -> List[Tuple[int, int]]:
+def do_find_field_lists(text: str, style: str):
     r"""Determine if docstring contains any field lists.
 
     Parameters
     ----------
     text : str
         The docstring description to check for field list patterns.
+    style : str
+        The field list style used.
 
     Returns
     -------
-    field_index : list
+    _field_idx, _wrap_parameters : tuple
         A list of tuples with each tuple containing the starting and ending
         position of each field list found in the passed description.
+        A boolean indicating whether long field list lines should be wrapped.
     """
-    _field_iter = re.finditer(SPHINX_REGEX, text)
-    return [(_field.start(0), _field.end(0)) for _field in _field_iter]
+    _field_idx = []
+    _wrap_parameters = False
+
+    if style == "epytext":
+        _field_iter = re.finditer(EPYTEXT_REGEX, text)
+        _field_idx = [(_field.start(0), _field.end(0)) for _field in _field_iter]
+        _wrap_parameters = True
+    elif style == "sphinx":
+        _field_iter = re.finditer(SPHINX_REGEX, text)
+        _field_idx = [(_field.start(0), _field.end(0)) for _field in _field_iter]
+        _wrap_parameters = True
+
+    return _field_idx, _wrap_parameters
 
 
 def do_find_links(text: str) -> List[Tuple[int, int]]:
@@ -333,12 +368,9 @@ def do_split_description(
 
     # Check if the description contains any URLs.
     _url_idx = do_find_links(text)
-    if style == "sphinx":
-        _parameter_idx = do_find_sphinx_field_lists(text)
-        _wrap_parameters = True
-    else:
-        _parameter_idx = []
-        _wrap_parameters = False
+
+    # Check if the description contains any field lists.
+    _parameter_idx, _wrap_parameters = do_find_field_lists(text, style)
 
     if not _url_idx and not (_parameter_idx and _wrap_parameters):
         return description_to_list(
@@ -511,6 +543,47 @@ def do_wrap_urls(
     return _lines, text_idx
 
 
+def is_some_sort_of_field_list(
+    text: str,
+    style: str,
+) -> bool:
+    """Determine if docstring contains field lists.
+
+    Parameters
+    ----------
+    text : str
+        The docstring text.
+    style : str
+        The field list style to use.
+
+    Returns
+    -------
+    is_field_list : bool
+        Whether the field list pattern for style was found in the docstring.
+    """
+    split_lines = text.rstrip().splitlines()
+
+    if style == "epytext":
+        return any(
+            (
+                # "@param x:" <-- Epytext style
+                # "@type x:" <-- Epytext style
+                re.match(EPYTEXT_REGEX, line)
+            )
+            for line in split_lines
+        )
+    elif style == "sphinx":
+        return any(
+            (
+                # ":parameter: description" <-- Sphinx style
+                re.match(SPHINX_REGEX, line)
+            )
+            for line in split_lines
+        )
+
+    return False
+
+
 # pylint: disable=line-too-long
 def is_some_sort_of_list(
     text: str,
@@ -545,81 +618,55 @@ def is_some_sort_of_list(
     ) and not strict:
         return True
 
-    if style == "sphinx":
-        return any(
-            (
-                # "* parameter" <-- Bullet list
-                # "- parameter" <-- Bullet list
-                # "+ parameter" <-- Bullet list
-                re.match(r"\s*[*\-+] [\S ]+", line)
-                or
-                # "1. item" <-- Enumerated list
-                re.match(r"\s*\d\.", line)
-                or
-                # "-a  description" <-- Option list
-                # "--long  description" <-- Option list
-                re.match(r"^-{1,2}[\S ]+ {2}\S+", line)
-                or
-                # "@parameter" <-- Epydoc style
-                re.match(r"\s*@\S*", line)
-                or
-                # "parameter : description" <-- Numpy style
-                # "parameter: description" <-- Numpy style
-                re.match(r"^\s*(?!:)\S+ ?: \S+", line)
-                or
-                # "word\n----" <-- Numpy headings
-                re.match(r"^\s*-+", line)
-                or
-                # "parameter - description"
-                re.match(r"[\S ]+ - \S+", line)
-                or
-                # "parameter -- description"
-                re.match(r"\s*\S+\s+--\s+", line)
-                or
-                # Literal block
-                re.match(r"[\S ]*::", line)
-            )
-            for line in split_lines
+    if is_some_sort_of_field_list(text, style):
+        return False
+
+    return any(
+        (
+            # "* parameter" <-- Bullet list
+            # "- parameter" <-- Bullet list
+            # "+ parameter" <-- Bullet list
+            re.match(BULLET_REGEX, line)
+            or
+            # "1. item" <-- Enumerated list
+            re.match(ENUM_REGEX, line)
+            or
+            # "-a  description" <-- Option list
+            # "--long  description" <-- Option list
+            re.match(OPTION_REGEX, line)
+            or
+            # "@param x:" <-- Epytext style
+            # "@type x:" <-- Epytext style
+            re.match(EPYTEXT_REGEX, line)
+            or
+            # ":parameter: description" <-- Sphinx style
+            re.match(SPHINX_REGEX, line)
+            or
+            # "parameter : description" <-- Numpy style
+            # "parameter: description" <-- Numpy style
+            re.match(NUMPY_REGEX, line)
+            or
+            # "word\n----" <-- Numpy headings
+            re.match(r"^\s*-+", line)
+            or
+            # "Args:" <-- Google style
+            # "parameter:" <-- Google style
+            re.match(GOOGLE_REGEX, line)
+            or
+            # "parameter - description"
+            re.match(r"[\S ]+ - \S+", line)
+            or
+            # "parameter -- description"
+            re.match(r"\s*\S+\s+--\s+", line)
+            or
+            # Literal block
+            re.match(LITERAL_REGEX, line)
+            or
+            # "@parameter"
+            re.match(r"^ *@[a-zA-Z0-9_\- ]*(?:(?!:).)*$", line)
         )
-    else:
-        return any(
-            (
-                # "* parameter" <-- Bullet list
-                # "- parameter" <-- Bullet list
-                # "+ parameter" <-- Bullet list
-                re.match(r"\s*[*\-+] [\S ]+", line)
-                or
-                # "1. item" <-- Enumerated list
-                re.match(r"\s*\d\.", line)
-                or
-                # "-a  description" <-- Option list
-                # "--long  description" <-- Option list
-                re.match(r"^-{1,2}[\S ]+ {2}\S+", line)
-                or
-                # "@parameter" <-- Epydoc style
-                re.match(r"\s*@\S*", line)
-                or
-                # ":parameter: description" <-- Sphinx style
-                re.match(SPHINX_REGEX, line)
-                or
-                # "parameter : description" <-- Numpy style
-                # "parameter: description" <-- Numpy style
-                re.match(r"^\s[\S ]+ ?: [\S ]+", line)
-                or
-                # "word\n----" <-- Numpy headings
-                re.match(r"^\s*-+", line)
-                or
-                # "parameter - description"
-                re.match(r"[\S ]+ - \S+", line)
-                or
-                # "parameter -- description"
-                re.match(r"\s*\S+\s+--\s+", line)
-                or
-                # Literal block
-                re.match(r"[\S ]*::", line)
-            )
-            for line in split_lines
-        )
+        for line in split_lines
+    )
 
 
 def is_some_sort_of_code(text: str) -> bool:

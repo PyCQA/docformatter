@@ -71,9 +71,7 @@ Hello.
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_summary_that_ends_in_quote(
-        self, test_args, args
-    ):
+    def test_format_docstring_with_summary_that_ends_in_quote(self, test_args, args):
         """Return one-line docstring with period after quote."""
         uut = Formatter(
             test_args,
@@ -261,9 +259,7 @@ Hello.
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_single_quotes_multi_line(
-        self, test_args, args
-    ):
+    def test_format_docstring_with_single_quotes_multi_line(self, test_args, args):
         """Replace single triple quotes with triple double quotes."""
         uut = Formatter(
             test_args,
@@ -290,9 +286,7 @@ Hello.
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_underlined_summaries_alone(
-        self, test_args, args
-    ):
+    def test_format_docstring_leave_underlined_summaries_alone(self, test_args, args):
         """Leave underlined summary lines as is."""
         uut = Formatter(
             test_args,
@@ -336,9 +330,7 @@ Hello.
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_link_only_docstring_alone(
-        self, test_args, args
-    ):
+    def test_format_docstring_leave_link_only_docstring_alone(self, test_args, args):
         """Leave docstrings that consist of only a link alone."""
         uut = Formatter(
             test_args,
@@ -441,9 +433,7 @@ class TestFormatLists:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
-    def test_format_docstring_should_ignore_numbered_lists(
-        self, test_args, args
-    ):
+    def test_format_docstring_should_ignore_numbered_lists(self, test_args, args):
         """Ignore lists beginning with numbers."""
         uut = Formatter(
             test_args,
@@ -465,9 +455,7 @@ class TestFormatLists:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [["--wrap-descriptions", "72", ""]])
-    def test_format_docstring_should_ignore_parameter_lists(
-        self, test_args, args
-    ):
+    def test_format_docstring_should_ignore_parameter_lists(self, test_args, args):
         """Ignore lists beginning with <word> -."""
         uut = Formatter(
             test_args,
@@ -1480,9 +1468,7 @@ class TestClass:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_no_newline_in_summary_with_symbol(
-        self, test_args, args
-    ):
+    def test_format_docstring_no_newline_in_summary_with_symbol(self, test_args, args):
         """Wrap summary with symbol should not add newline.
 
         See issue #79.
@@ -1561,6 +1547,141 @@ def function2():
 """"This" quote starting one-line docstring will have a leading space.
 
 This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
+                "epytext",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_epytext_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Wrap epytext style parameter lists.
+
+        See requirement docformatter_10.6.2
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.  See http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--style",
+                "numpy",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_non_epytext_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Ignore wrapping epytext style parameter lists when not using epytext style.
+
+        See requirement docformatter_10.6.1
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.  See http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
 """\
 ''',
             )
@@ -1672,7 +1793,9 @@ This long description will be wrapped at 88 characters because we passed the --b
                 '''\
 """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
 
     :param str text: the text argument.
     :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
@@ -1857,7 +1980,7 @@ class TestStripDocstring:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_strip_docstring_with_single_quotes(
+    def test_strip_docstring_with_triple_single_quotes(
         self,
         test_args,
         args,
@@ -1897,7 +2020,7 @@ class TestStripDocstring:
         )
 
         docstring, open_quote = uut._do_strip_docstring('""""""')
-        assert docstring == ""
+        assert not docstring
         assert open_quote == '"""'
 
     @pytest.mark.unit

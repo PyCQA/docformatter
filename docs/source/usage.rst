@@ -45,7 +45,7 @@ help output provides a summary of these options:
 
       -s style, --style style
                             the docstring style to use when formatting parameter
-                            lists (default: sphinx)
+                            lists.  One of epytext, sphinx. (default: sphinx)
       --black
                             make formatting compatible with standard black options
                             (default: False)

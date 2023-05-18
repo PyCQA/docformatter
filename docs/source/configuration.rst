@@ -79,10 +79,9 @@ and
     ``""""This" summary does get a space."""`` becomes ``""" "This" summary does get a space."""``
 
 The ``--style`` argument takes a string which is the name of the parameter
-list style you are using.  Currently, only ``sphinx`` is recognized, but
-``epydoc``, ``numpy``, and ``google`` are future styles.  For the selected
-style, each line in the parameter lists will be wrapped at the
-``--wrap-descriptions`` length as well as any portion of the elaborate
-description preceding the parameter list.  Parameter lists that don't follow the
-passed style will cause the entire elaborate description to be ignored and
-remain unwrapped.
+list style you are using.  Currently, only ``sphinx`` and ``epytext`` are recognized,
+but ``numpy`` and ``google`` are future styles.  For the selected style, each line in
+the parameter lists will be wrapped at the ``--wrap-descriptions`` length as well as
+any portion of the elaborate description preceding the parameter list.  Parameter lists
+that don't follow the passed style will cause the entire elaborate description to be
+ignored and remain unwrapped.
