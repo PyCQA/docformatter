@@ -2,7 +2,25 @@
 
 ## [Unreleased](https://github.com/PyCQA/docformatter/tree/HEAD)
 
-[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.5...HEAD)
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.0...HEAD)
+
+Features
+
+- feat: use tomllib for Python 3.11+ [\#208](https://github.com/PyCQA/docformatter/pull/208) ([weibullguy](https://github.com/weibullguy))
+- feat: wrap Sphinx style long parameter descriptions [\#201](https://github.com/PyCQA/docformatter/pull/201) ([weibullguy](https://github.com/weibullguy))
+
+**Merged pull requests:**
+
+- chore: update pre-commit-config [\#209](https://github.com/PyCQA/docformatter/pull/209) ([weibullguy](https://github.com/weibullguy))
+
+## [v1.7.0](https://github.com/PyCQA/docformatter/tree/v1.7.0) (2023-05-15)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.5...v1.7.0)
+
+Features
+
+- feat: add option to format compatible with black [\#196](https://github.com/PyCQA/docformatter/pull/196) ([weibullguy](https://github.com/weibullguy))
+- feat: add option for user to provide list of words not to capitalize [\#195](https://github.com/PyCQA/docformatter/pull/195) ([weibullguy](https://github.com/weibullguy))
 
 **Merged pull requests:**
 
@@ -11,11 +29,6 @@
 ## [v1.6.5](https://github.com/PyCQA/docformatter/tree/v1.6.5) (2023-05-03)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.4...v1.6.5)
-
-Features
-
-- feat: add option to format compatible with black [\#196](https://github.com/PyCQA/docformatter/pull/196) ([weibullguy](https://github.com/weibullguy))
-- feat: add option for user to provide list of words not to capitalize [\#195](https://github.com/PyCQA/docformatter/pull/195) ([weibullguy](https://github.com/weibullguy))
 
 Bug Fixes
 
@@ -117,20 +130,9 @@ Bug Fixes
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.4...v1.5.0)
 
-Features
-
-- feat: add option to place closing quotes on newline [\#104](https://github.com/PyCQA/docformatter/pull/104) ([weibullguy](https://github.com/weibullguy))
-- feat: add support for setup.cfg and tox.ini configuration files [\#101](https://github.com/PyCQA/docformatter/pull/101) ([weibullguy](https://github.com/weibullguy))
-
-Bug Fixes
-
-- feat: adjust for tab when wrapping [\#105](https://github.com/PyCQA/docformatter/pull/105) ([weibullguy](https://github.com/weibullguy))
-- fix: definitions corrupted with in-line comment [\#99](https://github.com/PyCQA/docformatter/pull/99) ([weibullguy](https://github.com/weibullguy))
-
 **Merged pull requests:**
 
 - chore: add workflow actions [\#108](https://github.com/PyCQA/docformatter/pull/108) ([weibullguy](https://github.com/weibullguy))
-- test: move remaining tests to tests/ directory [\#102](https://github.com/PyCQA/docformatter/pull/102) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.4](https://github.com/PyCQA/docformatter/tree/v1.4) (2020-12-27)
 
