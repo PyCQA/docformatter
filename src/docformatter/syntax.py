@@ -110,13 +110,16 @@ Based on the table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
 
 # This is the regex used to find URL links:
 #
-# (`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')? is used to find in-line links that
+# (__ |`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')? is used to find in-line links that
 # should remain on a single line even if it exceeds the wrap length.
+#   __ is used to find to underscores followed by a single space.
+#   This finds patterns like: __ https://sw.kovidgoyal.net/kitty/graphics-protocol/
+#
 #   `{{2}} is used to find two back-tick characters.
 #   This finds patterns like: ``http://www.example.com``
 #
-#   `\w[\w. :#\n]* matches the back-tick character immediately followed by one
-#   letter, then followed by any number of letters, periods, spaces, colons,
+#   `\w[a-zA-Z0-9. :#\n]* matches the back-tick character immediately followed by one
+#   letter, then followed by any number of letters, numbers, periods, spaces, colons,
 #   hash marks or newlines.
 #   This finds patterns like: `Link text <https://domain.invalid/>`_
 #
@@ -137,8 +140,10 @@ Based on the table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
 #   (//)? matches two forward slashes zero or one time.
 #   (\S*) matches any non-whitespace character between zero and infinity times.
 #   >? matches the character > between zero and one times.
-URL_REGEX = rf"(`{{2}}|`\w[\w. :#\n]*|\.\. _?[\w. :]+|')?<?({URL_PATTERNS}):(\
-//)?(\S*)>?"
+URL_REGEX = (
+    rf"(__ |`{{2}}|`\w[\w :#\n]*[.|\.\. _?[\w. :]+|')?<?"
+    rf"({URL_PATTERNS}):(\//)?(\S*)>?"
+)
 
 URL_SKIP_REGEX = rf"({URL_PATTERNS}):(/){{0,2}}(``|')"
 """The regex used to ignore found hyperlinks.
@@ -195,9 +200,11 @@ def description_to_list(
             initial_indent=indentation,
             subsequent_indent=indentation,
         )
+
         if _text:
             _lines.extend(_text)
         _lines.append("")
+
         with contextlib.suppress(IndexError):
             if not _lines[-1] and not _lines[-2]:
                 _lines.pop(-1)
@@ -530,9 +537,8 @@ def do_wrap_urls(
                     wrap_length,
                 )
             )
-
             with contextlib.suppress(IndexError):
-                if not _lines[-1]:
+                if not text[_url[0] - len(indentation) - 2] == "\n" and not _lines[-1]:
                     _lines.pop(-1)
 
             # Add the URL.
