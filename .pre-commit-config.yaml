@@ -21,13 +21,13 @@ repos:
         - id: isort
           args: [--settings-file, ./pyproject.toml]
     - repo: https://github.com/PyCQA/docformatter
-      rev: v1.7.0
+      rev: v1.7.1
       hooks:
         - id: docformatter
           additional_dependencies: [tomli]
           args: [--in-place, --config, ./pyproject.toml]
     - repo: https://github.com/charliermarsh/ruff-pre-commit
-      rev: 'v0.0.267'
+      rev: 'v0.0.269'
       hooks:
         - id: ruff
           args: [ --select, "PL", --select, "F" ]

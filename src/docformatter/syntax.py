@@ -51,7 +51,7 @@ NUMPY_REGEX = r"^\s[a-zA-Z0-9_\- ]+ ?: [\S ]+"
 OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
 """Regular expression to use for finding option lists."""
 
-REST_REGEX = r"(\.{2}|``) ?[\w-]+(:{1,2}|``)?"
+REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
 """Regular expression to use for finding reST directives."""
 
 SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
