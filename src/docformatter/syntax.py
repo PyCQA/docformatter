@@ -30,6 +30,8 @@ import re
 import textwrap
 from typing import Iterable, List, Tuple, Union
 
+DEFAULT_INDENT = 4
+
 BULLET_REGEX = r"\s*[*\-+] [\S ]+"
 """Regular expression to use for finding bullet lists."""
 
@@ -466,7 +468,9 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
                 _parameter[1] : parameter_idx[_idx + 1][0]
             ].strip()
         except IndexError:
-            _parameter_description = text[_parameter[1] :].strip()
+            _parameter_description = (
+                text[_parameter[1] :].strip().replace("  ", "").replace("\t", "")
+            )
 
         if len(_parameter_description) <= (wrap_length - len(indentation)):
             lines.append(
@@ -474,15 +478,20 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
                 f"{_parameter_description}"
             )
         else:
+            if len(indentation) > DEFAULT_INDENT:
+                _subsequent = indentation + int(0.5 * len(indentation)) * " "
+            else:
+                _subsequent = 2 * indentation
+
             lines.extend(
                 textwrap.wrap(
                     textwrap.dedent(
                         f"{text[_parameter[0]:_parameter[1]]} "
-                        f"{_parameter_description.replace(2*indentation, '')}"
+                        f"{_parameter_description.strip()}"
                     ),
                     width=wrap_length,
                     initial_indent=indentation,
-                    subsequent_indent=2 * indentation,
+                    subsequent_indent=_subsequent,
                 )
             )
 
@@ -537,12 +546,19 @@ def do_wrap_urls(
                     wrap_length,
                 )
             )
+
             with contextlib.suppress(IndexError):
-                if not text[_url[0] - len(indentation) - 2] == "\n" and not _lines[-1]:
+                if text[_url[0] - len(indentation) - 2] != "\n" and not _lines[-1]:
                     _lines.pop(-1)
 
-            # Add the URL.
-            _lines.append(f"{do_clean_url(text[_url[0] : _url[1]], indentation)}")
+            # Add the URL making sure that the leading quote is kept with a quoted URL.
+            _text = f"{text[_url[0]: _url[1]]}"
+            with contextlib.suppress(IndexError):
+                if _lines[0][-1] == '"':
+                    _lines[0] = _lines[0][:-1]
+                    _text = f'"{text[_url[0] : _url[1]]}'
+
+            _lines.append(f"{do_clean_url(_text, indentation)}")
 
             text_idx = _url[1]
 
