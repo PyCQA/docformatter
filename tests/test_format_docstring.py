@@ -935,6 +935,60 @@ num_iterations is the number of updates - instead of a better definition of conv
         )
 
     @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_with_class_attributes(self, test_args, args):
+        """Wrap long class attribute docstrings."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be
+    reformatted nicely by docformatter."""
+'''
+        assert docstring == uut._do_format_code(
+            '''\
+class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
+'''
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_no_newline_in_summary_with_symbol(self, test_args, args):
+        """Wrap summary with symbol should not add newline.
+
+        See issue #79.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
+    -v."""
+'''
+        assert docstring == uut._do_format_code(docstring)
+
+
+class TestFormatWrapURL:
+    """Class for testing _do_format_docstring() with line wrapping and URLs."""
+
+    @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
         [["--wrap-descriptions", "72", ""]],
@@ -1472,39 +1526,10 @@ __ https://sw.kovidgoyal.net/kitty/graphics-protocol/
 
     @pytest.mark.unit
     @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_class_attributes(self, test_args, args):
-        """Wrap long class attribute docstrings."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
+    def test_format_docstring_with_quoted_link(self, test_args, args):
+        """Anonymous link references should not be wrapped into the link.
 
-        docstring = '''\
-class TestClass:
-    """This is a class docstring."""
-
-    test_int = 1
-    """This is a very, very, very long docstring that should really be
-    reformatted nicely by docformatter."""
-'''
-        assert docstring == uut._do_format_code(
-            '''\
-class TestClass:
-    """This is a class docstring."""
-
-    test_int = 1
-    """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
-'''
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_no_newline_in_summary_with_symbol(self, test_args, args):
-        """Wrap summary with symbol should not add newline.
-
-        See issue #79.
+        See issue #218.
         """
         uut = Formatter(
             test_args,
@@ -1514,11 +1539,32 @@ class TestClass:
         )
 
         docstring = '''\
-def function2():
-    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
-    -v."""
+"""Construct a candidate project URL from the bundle and app name.
+
+It's not a perfect guess, but it's better than having
+"https://example.com".
+
+:param bundle: The bundle identifier.
+:param app_name: The app name.
+:returns: The candidate project URL
+"""
 '''
-        assert docstring == uut._do_format_code(docstring)
+        assert docstring == uut._do_format_code(
+            '''\
+"""Construct a candidate project URL from the bundle and app name.
+
+It's not a perfect guess, but it's better than having "https://example.com".
+
+:param bundle: The bundle identifier.
+:param app_name: The app name.
+:returns: The candidate project URL
+"""
+'''
+        )
+
+
+class TestFormatWrapBlack:
+    """Class for testing _do_format_docstring() with line wrapping and black option."""
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -1584,6 +1630,10 @@ This long description will be wrapped at 88 characters because we passed the --b
 ''',
             )
         )
+
+
+class TestFormatWrapEpytext:
+    """Class for testing _do_format_docstring() with line wrapping and Epytext lists."""
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
@@ -1720,6 +1770,10 @@ This long description will be wrapped at 88 characters because we passed the --b
             )
         )
 
+
+class TestFormatWrapSphinx:
+    """Class for testing _do_format_docstring() with line wrapping and Sphinx lists."""
+
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
@@ -1853,6 +1907,118 @@ This long description will be wrapped at 88 characters because we passed the --b
     :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
     :rtype: str
 """\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_remove_excess_whitespace(
+        self,
+        test_args,
+        args,
+    ):
+        """Should remove unneeded whitespace.
+
+        See issue #217
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Base for all Commands.
+
+    :param logger: Logger for console and logfile.
+    :param console: Facilitates console interaction and input solicitation.
+    :param tools: Cache of tools populated by Commands as they are required.
+    :param apps: Dictionary of project's Apps keyed by app name.
+    :param base_path: Base directory for Briefcase project.
+    :param data_path: Base directory for Briefcase tools, support packages, etc.
+    :param is_clone: Flag that Command was triggered by the user's requested Command;
+        for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Base for all Commands.
+
+:param logger: Logger for console and logfile.
+:param console: Facilitates console interaction and input solicitation.
+:param tools: Cache of tools populated by Commands as they are required.
+:param apps: Dictionary of project's Apps keyed by app name.
+:param base_path: Base directory for Briefcase project.
+:param data_path: Base directory for Briefcase tools, support packages, etc.
+:param is_clone: Flag that Command was triggered by the user's requested Command;
+    for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+"""\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_two_directives_in_row(
+        self,
+        test_args,
+        args,
+    ):
+        """Should remove unneeded whitespace.
+
+        See issue #215.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """\
 ''',
             )
         )

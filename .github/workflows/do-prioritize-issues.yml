@@ -24,19 +24,22 @@ jobs:
         uses: weibullguy/get-labels-action@main
 
       - name: Add High Urgency Labels
-        if: (endsWith(steps.getlabels.outputs.labels, 'convention') && endsWith(steps.getlabels.outputs.labels, 'bug'))
+        if: |
+          ${{ (contains(steps.getlabels.outputs.labels, "C: convention") && contains (steps.getlabels.outputs.labels, "P: bug")) }}
         uses: andymckay/labeler@master
         with:
           add-labels: "U: high"
 
       - name: Add Medium Urgency Labels
-        if: (endsWith(steps.getlabels.outputs.labels, 'style') && endsWith(steps.getlabels.outputs.labels, 'bug')) || (endsWith(steps.getlabels.outputs.labels, 'stakeholder') && endsWith(steps.getlabels.outputs.labels, 'bug')) || (endsWith(steps.getlabels.outputs.labels, 'convention') && endsWith(steps.getlabels.outputs.labels, 'enhancement'))
+        if: |
+          ${{ (contains(steps.getlabels.outputs.labels, "C: style") && contains(steps.getlabels.outputs.labels, "P: bug")) || (contains(steps.getlabels.outputs.labels, "C: stakeholder") && contains(steps.getlabels.outputs.labels, "P: bug")) || (contains(steps.getlabels.outputs.labels, "C: convention") && contains(steps.getlabels.outputs.labels, "P: enhancement")) }}
         uses: andymckay/labeler@master
         with:
           add-labels: "U: medium"
 
       - name: Add Low Urgency Labels
-        if: (endsWith(steps.getlabels.outputs.labels, 'style') && endsWith(steps.getlabels.outputs.labels, 'enhancement')) || (endsWith(steps.getlabels.outputs.labels, 'stakeholder') && endsWith(steps.getlabels.outputs.labels, 'enhancement')) || contains(steps.getlabels.outputs.labels, 'doc') || contains(steps.getlabels.outputs.labels, 'chore')
+        if: |
+          ${{ (contains(steps.getlabels.outputs.labels, "C: style") && contains(steps.getlabels.outputs.labels, "P: enhancement")) || (contains(steps.getlabels.outputs.labels, "C: stakeholder") && contains(steps.getlabels.outputs.labels, "P: enhancement")) || contains(steps.getlabels.outputs.labels, "doc") || contains(steps.getlabels.outputs.labels, "chore") }}
         uses: andymckay/labeler@master
         with:
           add-labels: "U: low"
