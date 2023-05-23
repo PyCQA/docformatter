@@ -555,7 +555,7 @@ def do_wrap_urls(
             _text = f"{text[_url[0]: _url[1]]}"
             with contextlib.suppress(IndexError):
                 if _lines[0][-1] == '"':
-                    _lines[0] = _lines[0][:-1]
+                    _lines[0] = _lines[0][:-2]
                     _text = f'"{text[_url[0] : _url[1]]}'
 
             _lines.append(f"{do_clean_url(_text, indentation)}")
