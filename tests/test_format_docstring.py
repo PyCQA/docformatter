@@ -1931,7 +1931,7 @@ class TestFormatWrapSphinx:
     ):
         """Should remove unneeded whitespace.
 
-        See issue #217
+        See issue #217 and #222
         """
         uut = Formatter(
             test_args,

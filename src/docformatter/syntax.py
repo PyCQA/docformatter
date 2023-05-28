@@ -379,9 +379,20 @@ def do_split_description(
     _url_idx = do_find_links(text)
 
     # Check if the description contains any field lists.
-    _parameter_idx, _wrap_parameters = do_find_field_lists(text, style)
+    _field_idx, _wrap_fields = do_find_field_lists(text, style)
 
-    if not _url_idx and not (_parameter_idx and _wrap_parameters):
+    # Field list wrapping takes precedence over URL wrapping.
+    for _fieldl, _fieldu in _field_idx:
+        for _key, _value in enumerate(_url_idx):
+            if (
+                _value[0] == _fieldl
+                or _value[0] == _fieldu
+                or _value[1] == _fieldl
+                or _value[1] == _fieldu
+            ):
+                _url_idx.pop(_key)
+
+    if not _url_idx and not (_field_idx and _wrap_fields):
         return description_to_list(
             text,
             indentation,
@@ -397,10 +408,10 @@ def do_split_description(
             wrap_length,
         )
 
-    if _parameter_idx:
-        _lines, _text_idx = do_wrap_parameter_lists(
+    if _field_idx:
+        _lines, _text_idx = do_wrap_field_lists(
             text,
-            _parameter_idx,
+            _field_idx,
             _lines,
             _text_idx,
             indentation,
@@ -421,22 +432,22 @@ def do_split_description(
     return _lines
 
 
-def do_wrap_parameter_lists(  # noqa: PLR0913
+def do_wrap_field_lists(  # noqa: PLR0913
     text: str,
-    parameter_idx: List[Tuple[int, int]],
+    field_idx: List[Tuple[int, int]],
     lines: List[str],
     text_idx: int,
     indentation: str,
     wrap_length: int,
 ) -> Tuple[List[str], int]:
-    """Wrap parameter lists in the long description.
+    """Wrap field lists in the long description.
 
     Parameters
     ----------
     text : str
         The long description text.
-    parameter_idx : list
-        The list of parameter list indices found in the description text.
+    field_idx : list
+        The list of field list indices found in the description text.
     lines : list
         The list of formatted lines in the description that come before the
         first parameter list item.
@@ -456,26 +467,23 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
     """
     lines.extend(
         description_to_list(
-            text[text_idx : parameter_idx[0][0]],
+            text[text_idx : field_idx[0][0]],
             indentation,
             wrap_length,
         )
     )
 
-    for _idx, _parameter in enumerate(parameter_idx):
+    for _idx, _field in enumerate(field_idx):
         try:
-            _parameter_description = text[
-                _parameter[1] : parameter_idx[_idx + 1][0]
-            ].strip()
+            _field_description = text[_field[1] : field_idx[_idx + 1][0]].strip()
         except IndexError:
-            _parameter_description = (
-                text[_parameter[1] :].strip().replace("  ", "").replace("\t", "")
-            )
+            _field_description = text[
+                _field[1] :
+            ].strip()  # .replace("  ", "").replace("\t", "")
 
-        if len(_parameter_description) <= (wrap_length - len(indentation)):
+        if len(_field_description) <= (wrap_length - len(indentation)):
             lines.append(
-                f"{indentation}{text[_parameter[0]: _parameter[1]]} "
-                f"{_parameter_description}"
+                f"{indentation}{text[_field[0]: _field[1]]} " f"{_field_description}"
             )
         else:
             if len(indentation) > DEFAULT_INDENT:
@@ -483,19 +491,20 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
             else:
                 _subsequent = 2 * indentation
 
-            lines.extend(
-                textwrap.wrap(
-                    textwrap.dedent(
-                        f"{text[_parameter[0]:_parameter[1]]} "
-                        f"{_parameter_description.strip()}"
-                    ),
-                    width=wrap_length,
-                    initial_indent=indentation,
-                    subsequent_indent=_subsequent,
-                )
+            _wrapped_fields = textwrap.wrap(
+                textwrap.dedent(
+                    f"{text[_field[0]:_field[1]]} " f"{_field_description.strip()}"
+                ),
+                width=wrap_length,
+                initial_indent=indentation,
+                subsequent_indent=_subsequent,
             )
+            for _idx, _f in enumerate(_wrapped_fields):
+                _indent = indentation if _idx == 0 else _subsequent
+                _wrapped_fields[_idx] = f"{_indent}{re.sub(' +', ' ', _f.strip())}"
+            lines.extend(_wrapped_fields)
 
-        text_idx = _parameter[1]
+        text_idx = _field[1]
 
     return lines, text_idx
 
