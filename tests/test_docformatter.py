@@ -464,7 +464,7 @@ def foo():
 @@ -1,6 +1,7 @@
  def foo():
      """Description from issue #150 that was being improperly wrapped.
-
+ 
 -    The text file can be retrieved via the Chrome plugin `Get
 -    Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
@@ -512,7 +512,7 @@ def foo():
         assert '''\
 @@ -1,10 +1,9 @@
  """Create a wrapper around a WiX install.
-
+ 
 -    :param tools: ToolCache of available tools.
 -    :param wix_home: The path of the WiX installation.
 -    :param bin_install: Is the install a binaries-only install? A full
@@ -576,7 +576,7 @@ def foo():
 +
      - My list item
      - My list item
-
+ 
 -
      """
 ''' == "\n".join(
@@ -714,7 +714,7 @@ pre-summary-space = false
 @@ -1,3 +1,2 @@
              class TestFoo():
                  """Docstring that should not have a pre-summary space."""
--
+-            
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -723,10 +723,10 @@ pre-summary-space = false
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
-                class TestFoo():
-                    """Docstring that should have a pre-summary space."""
-                '''
+'''\
+class TestFoo():
+    """Docstring that should have a pre-summary space."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -761,11 +761,10 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,2 @@
-                 class TestFoo():
--                    """Docstring that should have a pre-summary space."""
--
-+                    """ Docstring that should have a pre-summary space."""
+@@ -1,2 +1,2 @@
+ class TestFoo():
+-    """Docstring that should have a pre-summary space."""
++    """ Docstring that should have a pre-summary space."""
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -774,13 +773,13 @@ pre-summary-space = false
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
-            class TestFoo():
-                """Docstring that should not have a pre-summary newline.
+'''\
+class TestFoo():
+    """Docstring that should not have a pre-summary newline.
 
-                This is a multi-line docstring that should not have a
-                newline placed before the summary."""
-            '''
+    This is a multi-line docstring that should not have a
+    newline placed before the summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -815,17 +814,15 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,6 @@
-             class TestFoo():
-                 """Docstring that should not have a pre-summary newline.
--
--                This is a multi-line docstring that should not have a
--                newline placed before the summary."""
--
-+
-+                This is a multi-line docstring that should not have a
-+                newline placed before the summary.
-+                """
+@@ -1,5 +1,6 @@
+ class TestFoo():
+     """Docstring that should not have a pre-summary newline.
+ 
+-    This is a multi-line docstring that should not have a
+-    newline placed before the summary."""
++    This is a multi-line docstring that should not have a newline placed
++    before the summary.
++    """
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -880,7 +877,7 @@ class TestFoo():
 -    """Docstring that should have a pre-summary newline.
 +    """
 +    Docstring that should have a pre-summary newline.
-
+ 
 -    This is a multi-line docstring that should have a newline
 -    placed before the summary."""
 +    This is a multi-line docstring that should have a newline placed
@@ -894,11 +891,11 @@ class TestFoo():
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
-                class TestFoo():
-                    """Really long summary docstring that should not be
-                    split into a multiline summary."""
-                '''
+'''\
+    class TestFoo():
+        """Really long summary docstring that should not be
+        split into a multiline summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -933,13 +930,12 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,4 +1,3 @@
-                 class TestFoo():
--                    """Really long summary docstring that should not be
--                    split into a multiline summary."""
--
-+                    """Really long summary docstring that should not be split
-+                    into a multiline summary."""
+@@ -1,3 +1,3 @@
+     class TestFoo():
+-        """Really long summary docstring that should not be
+-        split into a multiline summary."""
++        """Really long summary docstring that should not be split into a
++        multiline summary."""
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -948,11 +944,11 @@ class TestFoo():
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
-                    class TestFoo():
-                        """Really long summary docstring that should be
-                        split into a multiline summary."""
-                    '''
+'''\
+    class TestFoo():
+        """Really long summary docstring that should be
+        split into a multiline summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -987,13 +983,12 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,4 +1,3 @@
-                     class TestFoo():
--                        """Really long summary docstring that should be
--                        split into a multiline summary."""
--
-+                        """Really long summary docstring that should be split
-+                        into a multiline summary."""
+@@ -1,3 +1,3 @@
+     class TestFoo():
+-        """Really long summary docstring that should be
+-        split into a multiline summary."""
++        """Really long summary docstring that should be split into a multiline
++        summary."""
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1002,7 +997,7 @@ class TestFoo():
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
+'''\
 class TestFoo():
     """Summary docstring that is followed by a description.
 
@@ -1047,7 +1042,7 @@ class TestFoo():
 @@ -1,6 +1,6 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
-
+ 
 -    This is the description and it shouldn\'t have a blank line
 -    inserted after it.
 +    This is the description and it shouldn\'t have a blank line inserted
@@ -1061,7 +1056,7 @@ class TestFoo():
     @pytest.mark.parametrize(
         "contents",
         [
-            '''\
+'''\
 class TestFoo():
     """Summary docstring that is followed by a description.
 
@@ -1106,7 +1101,7 @@ class TestFoo():
 @@ -1,6 +1,7 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
-
+ 
 -    This is the description and it should have a blank line
 -    inserted after it.
 +    This is the description and it should have a blank line inserted

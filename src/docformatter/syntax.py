@@ -499,9 +499,12 @@ def do_wrap_field_lists(  # noqa: PLR0913
                 initial_indent=indentation,
                 subsequent_indent=_subsequent,
             )
-            for _idx, _f in enumerate(_wrapped_fields):
+            for _idx, _wrapped_field in enumerate(_wrapped_fields):
                 _indent = indentation if _idx == 0 else _subsequent
-                _wrapped_fields[_idx] = f"{_indent}{re.sub(' +', ' ', _f.strip())}"
+                _wrapped_fields[
+                    _idx
+                ] = f"{_indent}{re.sub(' +', ' ', _wrapped_field.strip())}"
+
             lines.extend(_wrapped_fields)
 
         text_idx = _field[1]
