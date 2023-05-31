@@ -477,13 +477,14 @@ def do_wrap_field_lists(  # noqa: PLR0913
         try:
             _field_description = text[_field[1] : field_idx[_idx + 1][0]].strip()
         except IndexError:
-            _field_description = text[
-                _field[1] :
-            ].strip()  # .replace("  ", "").replace("\t", "")
+            _field_description = text[_field[1] :].strip()
+
+        if _field_description:
+            _field_description = f" {_field_description}"
 
         if len(_field_description) <= (wrap_length - len(indentation)):
             lines.append(
-                f"{indentation}{text[_field[0]: _field[1]]} " f"{_field_description}"
+                f"{indentation}{text[_field[0]: _field[1]]}{_field_description}"
             )
         else:
             if len(indentation) > DEFAULT_INDENT:
@@ -493,16 +494,16 @@ def do_wrap_field_lists(  # noqa: PLR0913
 
             _wrapped_fields = textwrap.wrap(
                 textwrap.dedent(
-                    f"{text[_field[0]:_field[1]]} " f"{_field_description.strip()}"
+                    f"{text[_field[0]:_field[1]]} {_field_description.strip()}"
                 ),
                 width=wrap_length,
                 initial_indent=indentation,
                 subsequent_indent=_subsequent,
             )
-            for _idx, _wrapped_field in enumerate(_wrapped_fields):
-                _indent = indentation if _idx == 0 else _subsequent
+            for _wrapped_idx, _wrapped_field in enumerate(_wrapped_fields):
+                _indent = indentation if _wrapped_idx == 0 else _subsequent
                 _wrapped_fields[
-                    _idx
+                    _wrapped_idx
                 ] = f"{_indent}{re.sub(' +', ' ', _wrapped_field.strip())}"
 
             lines.extend(_wrapped_fields)
