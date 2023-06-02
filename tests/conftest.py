@@ -178,6 +178,10 @@ def test_args(args):
         default="sphinx",
     )
     parser.add_argument(
+        "--rest-section-adorns",
+        default=r"[=\-`:'\"~^_*+#<>]{4,}",
+    )
+    parser.add_argument(
         "--wrap-summaries",
         default=79,
         type=int,

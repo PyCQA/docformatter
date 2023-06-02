@@ -623,6 +623,7 @@ def is_some_sort_of_field_list(
 def is_some_sort_of_list(
     text: str,
     strict: bool,
+    rest_sections: str,
     style: str,
 ) -> bool:
     """Determine if docstring is a reST list.
@@ -665,6 +666,11 @@ def is_some_sort_of_list(
             or
             # "1. item" <-- Enumerated list
             re.match(ENUM_REGEX, line)
+            or
+            # "====\ndescription\n====" <-- reST section
+            # "----\ndescription\n----" <-- reST section
+            # "description\n----" <-- reST section
+            re.match(rest_sections, line)
             or
             # "-a  description" <-- Option list
             # "--long  description" <-- Option list
@@ -785,6 +791,7 @@ def wrap_description(  # noqa: PLR0913
     wrap_length,
     force_wrap,
     strict,
+    rest_sections,
     style: str = "sphinx",
 ):
     """Return line-wrapped description text.
@@ -828,7 +835,7 @@ def wrap_description(  # noqa: PLR0913
         and (
             is_some_sort_of_code(text)
             or do_find_directives(text)
-            or is_some_sort_of_list(text, strict, style)
+            or is_some_sort_of_list(text, strict, rest_sections, style)
         )
     ):
         return text
