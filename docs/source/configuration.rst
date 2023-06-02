@@ -85,3 +85,36 @@ the parameter lists will be wrapped at the ``--wrap-descriptions`` length as wel
 any portion of the elaborate description preceding the parameter list.  Parameter lists
 that don't follow the passed style will cause the entire elaborate description to be
 ignored and remain unwrapped.
+
+A Note on reST Header Adornments Regex
+--------------------------------------
+``docformatter-1.7.2`` added a new option ``--rest-section-adorns``.  This allows for
+setting the characters used as overline and underline adornments for reST section
+headers.  The default is
+
+Per the `ReStructuredText Markup Specification <https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#sections>`_,
+the following are all valid adornment characters,
+
+.. code-block::
+
+    ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
+
+Thus, the default regular expression ``[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}``
+looks for any of these characters appearing at least four times in a row.  Note that the
+list of valid adornment characters includes the double quote (").  Four
+repetitions was selected because:
+
+    * Docstrings open and close with triple double quotes.
+    * Doctests begin with >>>.
+    * It would be rare for a section header to consist of fewer than four characters.
+
+The user can override this default list of characters by passing a regex from the
+command line or setting the ``rest-section-adorns`` option in the configuration file.
+It may be usefule to set this regex to only include the subset of characters you
+actually use in your docstrings.  For example, to only recognize the recommended list
+in the ReStructuredText Markup Specification, the following regular expression would
+be used:
+
+.. code-block::
+
+    [=-`:.'"~^_*+#]{4,}

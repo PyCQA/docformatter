@@ -46,6 +46,9 @@ help output provides a summary of these options:
       -s style, --style style
                             the docstring style to use when formatting parameter
                             lists.  One of epytext, sphinx. (default: sphinx)
+      --rest-section-adorns REGEX
+                            regular expression for identifying reST section adornments
+                            (default: [[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}]{4,})
       --black
                             make formatting compatible with standard black options
                             (default: False)
