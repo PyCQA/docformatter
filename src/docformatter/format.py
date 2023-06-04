@@ -34,7 +34,7 @@ import tokenize
 from typing import TextIO, Tuple
 
 # Third Party Imports
-import untokenize
+import untokenize  # type: ignore
 
 # docformatter Package Imports
 import docformatter.encode as _encode
@@ -177,7 +177,7 @@ class Formatter:
     parser = None
     """Parser object."""
 
-    args: argparse.Namespace = None
+    args: argparse.Namespace = argparse.Namespace()
 
     def __init__(
         self,

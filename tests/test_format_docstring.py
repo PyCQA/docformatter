@@ -2023,6 +2023,61 @@ class TestFormatWrapSphinx:
             )
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_name_included_wrap_length(
+        self,
+        test_args,
+        args,
+    ):
+        """Should consider field name, not just field body, when wrapping.
+
+        See issue #228.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that will be
+        written.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that
+        will be written.
+    """\
+''',
+            )
+        )
+
 
 class TestFormatStyleOptions:
     """Class for testing format_docstring() when requesting style options."""

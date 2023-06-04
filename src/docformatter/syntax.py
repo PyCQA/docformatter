@@ -480,7 +480,7 @@ def do_wrap_field_lists(  # noqa: PLR0913
             field_idx,
             _idx,
         )
-        if len(_field_body) <= (wrap_length - len(indentation)):
+        if len(f"{_field_name}{_field_body}") <= (wrap_length - len(indentation)):
             lines.append(f"{indentation}{_field_name}{_field_body}")
         else:
             lines.extend(
