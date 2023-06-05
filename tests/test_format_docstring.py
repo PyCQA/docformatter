@@ -2078,6 +2078,55 @@ class TestFormatWrapSphinx:
             )
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_body_not_a_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Should not add a space after the field name when the body is not a link.
+
+        See issue #229.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""CC.
+
+    :meth:`!X`
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :meth:`!X`
+    """\
+''',
+            )
+        )
+
 
 class TestFormatStyleOptions:
     """Class for testing format_docstring() when requesting style options."""

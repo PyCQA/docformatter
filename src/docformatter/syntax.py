@@ -479,9 +479,14 @@ def do_wrap_field_lists(  # noqa: PLR0913
             text,
             field_idx,
             _idx,
-        )
-        if len(f"{_field_name}{_field_body}") <= (wrap_length - len(indentation)):
-            lines.append(f"{indentation}{_field_name}{_field_body}")
+        ).strip()
+
+        if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
+            if _field_body.startswith("`!"):
+                _field = f"{_field_name}{_field_body}"
+            else:
+                _field = f"{_field_name} {_field_body}"
+            lines.append(f"{indentation}{_field}")
         else:
             lines.extend(
                 _do_wrap_field(_field_name, _field_body, indentation, wrap_length)
