@@ -56,7 +56,7 @@ OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
 REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
 """Regular expression to use for finding reST directives."""
 
-SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
+SPHINX_REGEX = r":[a-zA-Z0-9_\-() ]*:"
 """Regular expression to use for finding Sphinx-style field lists."""
 
 URL_PATTERNS = (
@@ -482,7 +482,7 @@ def do_wrap_field_lists(  # noqa: PLR0913
         ).strip()
 
         if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
-            if _field_body.startswith("`!"):
+            if _field_body.startswith("`"):
                 _field = f"{_field_name}{_field_body}"
             else:
                 _field = f"{_field_name} {_field_body}"

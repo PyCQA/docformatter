@@ -1796,7 +1796,7 @@ class TestFormatWrapSphinx:
     ):
         """Wrap sphinx style parameter lists.
 
-        See requirement docformatter_10.4.2
+        See requirement docformatter_10.4.2 and issue #230.
         """
         uut = Formatter(
             test_args,
@@ -1840,6 +1840,31 @@ class TestFormatWrapSphinx:
     :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
     :rtype: str
 """\
+''',
+            )
+        )
+
+        # Issue #230 required adding parenthesis to the SPHINX_REGEX.
+        assert (
+            (
+                '''\
+"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """\
 ''',
             )
         )
@@ -2098,7 +2123,7 @@ class TestFormatWrapSphinx:
     ):
         """Should not add a space after the field name when the body is not a link.
 
-        See issue #229.
+        See issue #229 and issue #230.
         """
         uut = Formatter(
             test_args,
@@ -2122,6 +2147,26 @@ class TestFormatWrapSphinx:
 """CC.
 
     :meth:`!X`
+    """\
+''',
+            )
+        )
+
+        assert (
+            (
+                '''\
+"""CC.
+
+    :math:`-`
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :math: `-`
     """\
 ''',
             )

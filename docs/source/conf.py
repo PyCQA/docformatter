@@ -11,7 +11,7 @@
 project = "docformatter"
 copyright = "2022-2023, Steven Myint"
 author = "Steven Myint"
-release = "1.7.2-rc7"
+release = "1.7.2-rc8"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
