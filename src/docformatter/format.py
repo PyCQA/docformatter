@@ -459,7 +459,13 @@ class Formatter:
 
         summary, description = _strings.split_summary_and_description(contents)
 
-        # Leave docstrings with underlined summaries alone.
+        # Leave docstrings with only field lists alone.
+        if _syntax.is_some_sort_of_field_list(summary, self.args.style):
+            return docstring
+
+        # Leave docstrings with underlined descriptions alone.
+        # TODO: Deprecate the remove_section_header method now that section headers
+        #  are being handled.
         if _syntax.remove_section_header(description).strip() != description.strip():
             return docstring
 

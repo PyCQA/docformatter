@@ -224,11 +224,25 @@ Print my path and return error code
             standard_in=None,
         )
         assert ret_code == 3  # FormatResult.check_failed
-        if diff:
-            assert "Print my path" in stdout.getvalue()
-        else:
+        if not diff:
             assert stdout.getvalue() == ""
+        else:
+            assert "Print my path" in stdout.getvalue()
         assert stderr.getvalue().strip() == temporary_file
+
+    def test_help_output(self):
+        """Ensure help message is printed when passed --help."""
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        args = ["--help"]
+
+        ret_code = main._main(
+            argv=args,
+            standard_out=stdout,
+            standard_error=stderr,
+            standard_in=None,
+        )
+        assert ret_code == 0
 
 
 class TestEndToEnd:

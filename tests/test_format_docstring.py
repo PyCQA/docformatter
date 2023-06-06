@@ -427,6 +427,33 @@ def Class3:
 '''
         assert docstring == uut._do_format_code(docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_no_summary_sphinx_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Leave docstring alone if it only contains Sphinx style directives.
+
+        See issue #232.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def function:
+    """
+    :param x: X
+    :param y: Y
+    """
+'''
+        assert docstring == uut._do_format_code(docstring)
+
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
