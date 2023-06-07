@@ -2143,14 +2143,14 @@ class TestFormatWrapSphinx:
             ]
         ],
     )
-    def test_format_docstring_sphinx_style_field_body_not_a_link(
+    def test_format_docstring_sphinx_style_field_body_is_a_link(
         self,
         test_args,
         args,
     ):
-        """Should not add a space after the field name when the body is not a link.
+        """Should not add a space after the field name when the body is a link.
 
-        See issue #229 and issue #230.
+        See docformatter_10.4.3.1, issue #229, and issue #230.
         """
         uut = Formatter(
             test_args,
@@ -2195,6 +2195,63 @@ class TestFormatWrapSphinx:
 
     :math: `-`
     """\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_body_is_blank(
+        self,
+        test_args,
+        args,
+    ):
+        """Should not add a space after the field name when the body is blank.
+
+        See docformatter_10.4.3.2 and issue #224.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Add trackers to a torrent.
+
+    :raises NotFound404Error:
+    :param torrent_hash: hash for torrent
+    :param urls: tracker URLs to add to torrent
+    :return: None
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""
+Add trackers to a torrent.
+
+:raises NotFound404Error:
+
+:param torrent_hash: hash for torrent
+:param urls: tracker URLs to add to torrent
+:return: None
+"""\
 ''',
             )
         )

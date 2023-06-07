@@ -482,7 +482,7 @@ def do_wrap_field_lists(  # noqa: PLR0913
         ).strip()
 
         if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
-            if _field_body.startswith("`"):
+            if _field_body.startswith("`") or not _field_body:
                 _field = f"{_field_name}{_field_body}"
             else:
                 _field = f"{_field_name} {_field_body}"
