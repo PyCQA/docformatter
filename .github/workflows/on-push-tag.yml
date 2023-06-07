@@ -14,6 +14,74 @@ on:
       - 'v*'
 
 jobs:
+  update_changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Get new tag
+        id: newversion
+        run: |
+          tag=${GITHUB_REF/refs\/tags\//}
+          version=$(echo $tag | sed 's/-rc[0-9]*//')
+          if [[ $tag != *"-rc"* ]]; then
+            echo "do_changelog=1" >> $GITHUB_ENV
+            echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
+            echo "version=$(echo $version)" >> $GITHUB_OUTPUT
+          fi
+          echo "New tag is: $tag"
+          echo "New version is: $version"
+          echo "GitHub ref: ${{ github.ref }}"
+
+      - name: Generate release changelog
+        uses: heinrichreimer/github-changelog-generator-action@master
+        if: ${{ env.do_changelog == 1 }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: "v1.3.1"
+          excludeTagsRegex: "-rc[0-9]"
+          breakingLabel: "Breaking Changes"
+          breakingLabels: "V: major"
+          enhancementLabel: "Features"
+          enhancementLabels: "P: enhancement"
+          bugsLabel: "Bug Fixes"
+          bugLabels: "P: bug"
+          excludeLabels: "release"
+          issues: false
+          issuesWoLabels: false
+          maxIssues: 100
+          pullRequests: true
+          prWoLabels: false
+          author: true
+          unreleased: true
+          compareLink: true
+          stripGeneratorNotice: true
+          verbose: true
+
+      - name: Check if diff
+        if: ${{ env.do_changelog == 1 }}
+        continue-on-error: true
+        run: >
+          git diff --exit-code CHANGELOG.md &&
+          (echo "### No update" && exit 1) || (echo "### Commit update")
+
+      - uses: EndBug/add-and-commit@v9
+        name: Commit and push if diff
+        if: ${{ env.do_changelog == 1 }}
+        with:
+          add: CHANGELOG.md
+          message: 'chore: update CHANGELOG.md for new release'
+          author_name: GitHub Actions
+          author_email: action@github.com
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          push: true
+
   manage_milestones:
     name: Manage Milestones
     runs-on: ubuntu-latest

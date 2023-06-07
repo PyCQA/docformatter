@@ -41,50 +41,6 @@ jobs:
           echo "version=$(echo $(poetry version | cut -d' ' -f2))" >> $GITHUB_OUTPUT
           echo "do_release=1" >> $GITHUB_ENV
 
-      - name: Generate release changelog
-        uses: heinrichreimer/github-changelog-generator-action@master
-        if: ${{ env.do_release == 1 }}
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sinceTag: "v1.3.1"
-          excludeTagsRegex: "-rc[0-9]"
-          breakingLabel: "Breaking Changes"
-          breakingLabels: "V: major"
-          enhancementLabel: "Features"
-          enhancementLabels: "P: enhancement"
-          bugsLabel: "Bug Fixes"
-          bugLabels: "P: bug"
-          excludeLabels: "release"
-          issues: false
-          issuesWoLabels: false
-          maxIssues: 100
-          pullRequests: true
-          prWoLabels: false
-          author: true
-          unreleased: true
-          compareLink: true
-          stripGeneratorNotice: true
-          verbose: true
-
-      - name: Check if diff
-        if: ${{ env.do_release == 1 }}
-        continue-on-error: true
-        run: >
-          git diff --exit-code CHANGELOG.md &&
-          (echo "### No update" && exit 1) || (echo "### Commit update")
-
-      - uses: EndBug/add-and-commit@v9
-        name: Commit and push if diff
-        if: ${{ env.do_release == 1 }}
-        with:
-          add: CHANGELOG.md
-          message: 'chore: update CHANGELOG.md for new release'
-          author_name: GitHub Actions
-          author_email: action@github.com
-          committer_name: GitHub Actions
-          committer_email: actions@github.com
-          push: true
-
       - name: Build release
         id: build
         if: ${{ env.do_release == 1 }}
