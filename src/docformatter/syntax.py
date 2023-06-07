@@ -56,7 +56,7 @@ OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
 REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
 """Regular expression to use for finding reST directives."""
 
-SPHINX_REGEX = r":[a-zA-Z0-9_\- ]*:"
+SPHINX_REGEX = r":[a-zA-Z0-9_\-() ]*:"
 """Regular expression to use for finding Sphinx-style field lists."""
 
 URL_PATTERNS = (
@@ -368,7 +368,7 @@ def do_split_description(
 
     Returns
     -------
-    lines : list
+    _lines : list
         A list containing each line of the description with any links put
         back together.
     """
@@ -379,9 +379,20 @@ def do_split_description(
     _url_idx = do_find_links(text)
 
     # Check if the description contains any field lists.
-    _parameter_idx, _wrap_parameters = do_find_field_lists(text, style)
+    _field_idx, _wrap_fields = do_find_field_lists(text, style)
 
-    if not _url_idx and not (_parameter_idx and _wrap_parameters):
+    # Field list wrapping takes precedence over URL wrapping.
+    for _fieldl, _fieldu in _field_idx:
+        for _key, _value in enumerate(_url_idx):
+            if (
+                _value[0] == _fieldl
+                or _value[0] == _fieldu
+                or _value[1] == _fieldl
+                or _value[1] == _fieldu
+            ):
+                _url_idx.pop(_key)
+
+    if not _url_idx and not (_field_idx and _wrap_fields):
         return description_to_list(
             text,
             indentation,
@@ -397,17 +408,17 @@ def do_split_description(
             wrap_length,
         )
 
-    if _parameter_idx:
-        _lines, _text_idx = do_wrap_parameter_lists(
+    if _field_idx:
+        _lines, _text_idx = do_wrap_field_lists(
             text,
-            _parameter_idx,
+            _field_idx,
             _lines,
             _text_idx,
             indentation,
             wrap_length,
         )
     else:
-        # Finally, add everything after the last field list directive.
+        # Finally, add everything after the last URL or field list directive.
         with contextlib.suppress(IndexError):
             _text = (
                 text[_text_idx + 1 :] if text[_text_idx] == "\n" else text[_text_idx:]
@@ -421,22 +432,22 @@ def do_split_description(
     return _lines
 
 
-def do_wrap_parameter_lists(  # noqa: PLR0913
+def do_wrap_field_lists(  # noqa: PLR0913
     text: str,
-    parameter_idx: List[Tuple[int, int]],
+    field_idx: List[Tuple[int, int]],
     lines: List[str],
     text_idx: int,
     indentation: str,
     wrap_length: int,
 ) -> Tuple[List[str], int]:
-    """Wrap parameter lists in the long description.
+    """Wrap field lists in the long description.
 
     Parameters
     ----------
     text : str
         The long description text.
-    parameter_idx : list
-        The list of parameter list indices found in the description text.
+    field_idx : list
+        The list of field list indices found in the description text.
     lines : list
         The list of formatted lines in the description that come before the
         first parameter list item.
@@ -456,46 +467,32 @@ def do_wrap_parameter_lists(  # noqa: PLR0913
     """
     lines.extend(
         description_to_list(
-            text[text_idx : parameter_idx[0][0]],
+            text[text_idx : field_idx[0][0]],
             indentation,
             wrap_length,
         )
     )
 
-    for _idx, _parameter in enumerate(parameter_idx):
-        try:
-            _parameter_description = text[
-                _parameter[1] : parameter_idx[_idx + 1][0]
-            ].strip()
-        except IndexError:
-            _parameter_description = (
-                text[_parameter[1] :].strip().replace("  ", "").replace("\t", "")
-            )
+    for _idx, __ in enumerate(field_idx):
+        _field_name = text[field_idx[_idx][0] : field_idx[_idx][1]]
+        _field_body = _do_join_field_body(
+            text,
+            field_idx,
+            _idx,
+        ).strip()
 
-        if len(_parameter_description) <= (wrap_length - len(indentation)):
-            lines.append(
-                f"{indentation}{text[_parameter[0]: _parameter[1]]} "
-                f"{_parameter_description}"
-            )
-        else:
-            if len(indentation) > DEFAULT_INDENT:
-                _subsequent = indentation + int(0.5 * len(indentation)) * " "
+        if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
+            if _field_body.startswith("`") or not _field_body:
+                _field = f"{_field_name}{_field_body}"
             else:
-                _subsequent = 2 * indentation
-
+                _field = f"{_field_name} {_field_body}"
+            lines.append(f"{indentation}{_field}")
+        else:
             lines.extend(
-                textwrap.wrap(
-                    textwrap.dedent(
-                        f"{text[_parameter[0]:_parameter[1]]} "
-                        f"{_parameter_description.strip()}"
-                    ),
-                    width=wrap_length,
-                    initial_indent=indentation,
-                    subsequent_indent=_subsequent,
-                )
+                _do_wrap_field(_field_name, _field_body, indentation, wrap_length)
             )
 
-        text_idx = _parameter[1]
+        text_idx = field_idx[_idx][1]
 
     return lines, text_idx
 
@@ -610,6 +607,7 @@ def is_some_sort_of_field_list(
 def is_some_sort_of_list(
     text: str,
     strict: bool,
+    rest_sections: str,
     style: str,
 ) -> bool:
     """Determine if docstring is a reST list.
@@ -652,6 +650,11 @@ def is_some_sort_of_list(
             or
             # "1. item" <-- Enumerated list
             re.match(ENUM_REGEX, line)
+            or
+            # "====\ndescription\n====" <-- reST section
+            # "----\ndescription\n----" <-- reST section
+            # "description\n----" <-- reST section
+            re.match(rest_sections, line)
             or
             # "-a  description" <-- Option list
             # "--long  description" <-- Option list
@@ -772,6 +775,7 @@ def wrap_description(  # noqa: PLR0913
     wrap_length,
     force_wrap,
     strict,
+    rest_sections,
     style: str = "sphinx",
 ):
     """Return line-wrapped description text.
@@ -792,6 +796,8 @@ def wrap_description(  # noqa: PLR0913
         would remain untouched.
     strict : bool
         Whether to strictly follow reST syntax to identify lists.
+    rest_sections : str
+        A regular expression used to find reST section header adornments.
     style : str
         The name of the docstring style to use when dealing with parameter
         lists (default is sphinx).
@@ -815,7 +821,7 @@ def wrap_description(  # noqa: PLR0913
         and (
             is_some_sort_of_code(text)
             or do_find_directives(text)
-            or is_some_sort_of_list(text, strict, style)
+            or is_some_sort_of_list(text, strict, rest_sections, style)
         )
     ):
         return text
@@ -823,3 +829,71 @@ def wrap_description(  # noqa: PLR0913
     lines = do_split_description(text, indentation, wrap_length, style)
 
     return indentation + "\n".join(lines).strip()
+
+
+def _do_join_field_body(text, field_idx, idx):
+    """Join the filed body lines into a single line that can be wrapped.
+
+    Parameters
+    ----------
+    text : str
+        The docstring long description text that contains field lists.
+    field_idx : list
+        The list of tuples containing the found field list start and end position.
+
+    Returns
+    -------
+    _field_body : str
+        The field body collapsed into a single line.
+    """
+    try:
+        _field_body = text[field_idx[idx][1] : field_idx[idx + 1][0]].strip()
+    except IndexError:
+        _field_body = text[field_idx[idx][1] :].strip()
+
+    _field_body = " ".join(
+        [_line.strip() for _line in _field_body.splitlines()]
+    ).strip()
+
+    if _field_body:
+        _field_body = f" {_field_body}"
+
+    return _field_body
+
+
+def _do_wrap_field(field_name, field_body, indentation, wrap_length):
+    """Wrap complete field at wrap_length characters.
+
+    Parameters
+    ----------
+    field_name : str
+        The name text of the field.
+    field_body : str
+        The body text of the field.
+    indentation : str
+        The string to use for indentation of the first line in the field.
+    wrap_length : int
+        The number of characters at which to wrap the field.
+
+    Returns
+    -------
+    _wrapped_field : str
+        The field wrapped at wrap_length characters.
+    """
+    if len(indentation) > DEFAULT_INDENT:
+        _subsequent = indentation + int(0.5 * len(indentation)) * " "
+    else:
+        _subsequent = 2 * indentation
+
+    _wrapped_field = textwrap.wrap(
+        textwrap.dedent(f"{field_name} {field_body.strip()}"),
+        width=wrap_length,
+        initial_indent=indentation,
+        subsequent_indent=_subsequent,
+    )
+
+    for _idx, _field in enumerate(_wrapped_field):
+        _indent = indentation if _idx == 0 else _subsequent
+        _wrapped_field[_idx] = f"{_indent}{re.sub(' +', ' ', _field.strip())}"
+
+    return _wrapped_field

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.7.1"
+version = "1.7.2"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -95,6 +95,9 @@ disable = [
 [tool.docformatter]
 black = true
 non-strict = false
+non-cap = [
+	"docformatter",
+]
 
 [tool.pydocstyle]
 convention = "pep257"

@@ -57,8 +57,7 @@ Docstring Style
 There are at least four "flavors" of docstrings in common use today;
 Epytext, Sphinx, NumPy, and Google.  Each of these docstring flavors follow the
 PEP 257 *convention* requirements.  What differs between the three docstring
-flavors is the reST syntax used in the parameter description of the multi-line
-docstring.
+flavors is the reST syntax used in the field list of the multi-line docstring.
 
 For example, here is how each syntax documents function arguments.
 
@@ -97,11 +96,10 @@ syntactical directives so they can be placed properly in the structure of the
 docstring.  To accommodate the various syntax flavors used in docstrings, a
 third requirement category is introduced, *style*.
 
-Another consideration in for the *style* category is line wrapping.
-According to PEP 257, splitting a one-line docstring is to allow "Emacs’
-``fill-paragraph`` command" to be used.  The ``fill-paragraph`` command is a
-line-wrapping command.  Additionally, it would be desirable to wrap
-docstrings for visual continuity with the code.
+Another consideration in the *style* category is line wrapping.  According to PEP
+257, splitting a one-line docstring is to allow "Emacs’ ``fill-paragraph`` command"
+to be used.  The ``fill-paragraph`` command is a line-wrapping command.  Additionally,
+it would be desirable to wrap docstrings for visual continuity with the code.
 
 NumPy makes a stylistic decision to place a blank line after the long
 description.
@@ -141,7 +139,7 @@ The following items are exceptions or interpretations of the PEP 257
 requirements:
 
     * One-line and summary lines can end with any punctuation.  ``docformatter`` will recognize any of [. ! ?].  Exception to requirement PEP_257_4.5; consistent with Google style.  See also #56 for situations when this is not desired.
-    * One-line and summary lines will have the first word capitalized.  ``docformatter`` will capitalize the first word for grammatical correctness.  Interpretation of requirement PEP_257_4.5.
+    * One-line and summary lines will have the first word capitalized.  ``docformatter`` will capitalize the first word for grammatical correctness.  Interpretation of requirement PEP_257_4.5.  Some proper nouns are explicitly spelled using a lowercase letter (e.g., ``docformatter``).  A user option is provided for a list of words to maintain lower case.
     * PEP 257 discusses placing closing quotes on a new line in the multi-line section.  However, it really makes no sense here as there is no way this condition could be met for a multi-line docstring.  Given the basis provided in PEP 257, this requirement really applies to wrapped one-liners.  Thus, this is assumed to apply to wrapped one-liners and the closing quotes will be placed on a line by themselves in this case.  However, an argument will be provided to allow the user to select their desired behavior.  Interpretation of requirement PEP_257_5.5.
 
 These give rise to the *derived* requirement category which would also cover
@@ -208,22 +206,28 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.1.3.1', ' Shall maintain in-line links on one line even if the resulting line exceeds wrap length.', ' Derived', ' Shall', ' Yes [*PR #152*]'
     ' docformatter_10.1.3.2', ' Shall not place a newline between description text and a wrapped link.', ' Derived', ' Shall', ' Yes [PR #182]'
     ' docformatter_10.2', ' Should format docstrings using NumPy style.', ' Style', ' Should', ' No'
-    ' docformatter_10.2.1', ' Shall ignore docstrings in other styles when using NumPy style.', ' Shall', ' Yes'
+    ' docformatter_10.2.1', ' Shall ignore docstrings in other styles when using NumPy style.', ' Style', ' Shall', ' Yes'
     ' docformatter_10.2.2', ' Shall wrap NumPy-style parameter descriptions that exceed wrap length when using NumPy style.', ' Shall', ' No'
     ' docformatter_10.3', ' Should format docstrings using Google style.', ' Style', ' Should', ' No'
-    ' docformatter_10.3.1', ' Shall ignore docstrings in other styles when using Google style.', ' Shall', ' Yes'
+    ' docformatter_10.3.1', ' Shall ignore docstrings in other styles when using Google style.', ' Style', ' Shall', ' Yes'
     ' docformatter_10.3.2', ' Shall wrap Google-style parameter descriptions that exceed wrap length when using Google style.', ' Shall', ' No'
     ' docformatter_10.4', ' Should format docstrings using Sphinx style.', ' Style', ' Should', ' Yes'
-    ' docformatter_10.4.1', ' Shall ignore docstrings in other styles when using Sphinx style.', ' Shall', ' Yes'
+    ' docformatter_10.4.1', ' Shall ignore docstrings in other styles when using Sphinx style.', ' Style', ' Shall', ' Yes'
     ' docformatter_10.4.2', ' Shall wrap Sphinx-style parameter descriptions that exceed wrap length when using Sphinx style.', ' Shall', ' Yes'
+    ' docformatter_10.4.3', ' Shall ensure one blank space between a field name and field body.', ' Style', ' Shall', ' Yes [PR #220]'
+    ' docformatter_10.4.3.1', ' Shall NOT add a blank space after a field name when the field body is a link.', ' Style', ' Shall', ' Yes [PR #220]'
+    ' docformatter_10.4.3.2', ' Shall NOT add a blank space after a field name when there is no field body.', ' Style', ' Shall', ' Yes [PR #220]'
     ' docformatter_10.5', ' Should format docstrings compatible with black.', ' Style', ' Should', ' Yes [PR #192]'
     ' docformatter_10.5.1', ' Should wrap summaries at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.2', ' Should wrap descriptions at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.3', ' Should insert a space before the first word in the summary if that word is quoted when in black mode.', ' Style', ' Should', ' Yes'
     ' docformatter_10.5.4', ' Default black mode options should be over-rideable by passing arguments or using configuration files.', ' Style', ' Should', ' Yes'
     ' docformatter_10.6', ' Should format docstrings using Epytext style.', ' Style', ' Should', ' Yes'
-    ' docformatter_10.6.1', ' Shall ignore docstrings in other styles when using Epytext style.', ' Shall', ' Yes'
+    ' docformatter_10.6.1', ' Shall ignore docstrings in other styles when using Epytext style.', ' Style', ' Shall', ' Yes'
     ' docformatter_10.6.2', ' Shall wrap Epytext-style parameter descriptions that exceed wrap length when using Epytext style.', ' Shall', ' Yes'
+    ' docformatter_10.7', ' Should format docstrings using ReStructured Text (reST) directives.', ' Style', ' Should', ' No'
+    ' docformatter_10.7.1', ' Shall NOT wrap section headers or their adornments.', ' Style', 'Shall', ' Yes [PR #220]'
+    ' docformatter_10.7.2', ' Shall NOT wrap literal blocks.', ' Style', ' Shall', ' Yes [PR #211]'
     ' docformatter_11', '**Program Control**'
     ' docformatter_11.1', ' Should check formatting and report incorrectly documented docstrings.', ' Stakeholder', ' Should', ' Yes [*PR #32*]'
     ' docformatter_11.2', ' Should fix formatting and save changes to file.', ' Stakeholder', ' Should', ' Yes'
@@ -263,6 +267,11 @@ with *convention* requirements.
     -s, --style [string, default sphinx]
         name of the docstring syntax style to use for formatting parameter
         lists.
+    --rest-section-adorns [REGEX, default [!\"#$%&'()*+,-./\\:;<=>?@[]^_`{|}~]{4,}]
+        regular expression for identifying reST section adornments
+    -n, --non-cap [string, default []]
+        list of words not to capitalize when they appear as the first word in the
+        summary
     --black [boolean, default False]
         Boolean to indicate whether to format docstrings to be compatible
         with black.

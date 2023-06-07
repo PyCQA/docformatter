@@ -97,9 +97,7 @@ def foo():
 '''
         ],
     )
-    @pytest.mark.parametrize(
-        "diff", [True, False], ids=["show-diff", "no-diff"]
-    )
+    @pytest.mark.parametrize("diff", [True, False], ids=["show-diff", "no-diff"])
     def test_in_place(self, temporary_file, contents, diff):
         """Should make changes and save back to file."""
         output_file = io.StringIO()
@@ -179,12 +177,8 @@ def foo():
         "contents",
         ["""Totally fine docstring, do not report anything."""],
     )
-    @pytest.mark.parametrize(
-        "diff", [True, False], ids=["show-diff", "no-diff"]
-    )
-    def test_check_mode_correct_docstring(
-        self, temporary_file, contents, diff
-    ):
+    @pytest.mark.parametrize("diff", [True, False], ids=["show-diff", "no-diff"])
+    def test_check_mode_correct_docstring(self, temporary_file, contents, diff):
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -214,12 +208,8 @@ Print my path and return error code
 '''
         ],
     )
-    @pytest.mark.parametrize(
-        "diff", [True, False], ids=["show-diff", "no-diff"]
-    )
-    def test_check_mode_incorrect_docstring(
-        self, temporary_file, contents, diff
-    ):
+    @pytest.mark.parametrize("diff", [True, False], ids=["show-diff", "no-diff"])
+    def test_check_mode_incorrect_docstring(self, temporary_file, contents, diff):
         """"""
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -234,11 +224,25 @@ Print my path and return error code
             standard_in=None,
         )
         assert ret_code == 3  # FormatResult.check_failed
-        if diff:
-            assert "Print my path" in stdout.getvalue()
-        else:
+        if not diff:
             assert stdout.getvalue() == ""
+        else:
+            assert "Print my path" in stdout.getvalue()
         assert stderr.getvalue().strip() == temporary_file
+
+    def test_help_output(self):
+        """Ensure help message is printed when passed --help."""
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        args = ["--help"]
+
+        ret_code = main._main(
+            argv=args,
+            standard_out=stdout,
+            standard_error=stderr,
+            standard_in=None,
+        )
+        assert ret_code == 0
 
 
 class TestEndToEnd:
@@ -273,10 +277,7 @@ class TestEndToEnd:
 -        """
 +        """Hello world."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -309,10 +310,7 @@ def foo():
 +    """Hello world this is a summary
 +    that will get wrapped."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -340,10 +338,7 @@ def foo():
     ):
         """Long sentences remain long with wrapping turned off."""
         assert "" == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -373,10 +368,7 @@ def foo():
     ):
         """Short sentences remain short with wrapping turned off."""
         assert "" == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -406,10 +398,7 @@ def foo():
 -    the trailing period  """
 +    the trailing period."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -448,10 +437,7 @@ def foo():
         See issue #145. See requirement docformatter_10.1.3.1.
         """
         assert "" == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -462,7 +448,7 @@ def foo():
 def foo():
     """Description from issue #150 that was being improperly wrapped.
 
-    The text file can be retrieved via the Chrome plugin `Get 
+    The text file can be retrieved via the Chrome plugin `Get
     Cookies.txt <https://chrome.google.com/webstore/detail/get-
     cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
 '''
@@ -493,7 +479,7 @@ def foo():
  def foo():
      """Description from issue #150 that was being improperly wrapped.
  
--    The text file can be retrieved via the Chrome plugin `Get 
+-    The text file can be retrieved via the Chrome plugin `Get
 -    Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
 +    The text file can be retrieved via the Chrome plugin
@@ -501,10 +487,63 @@ def foo():
 +    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing.
 +    """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
+        )
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            '''\
+"""Create a wrapper around a WiX install.
+
+    :param tools: ToolCache of available tools.
+    :param wix_home: The path of the WiX installation.
+    :param bin_install: Is the install a binaries-only install? A full
+        MSI install of WiX has a `/bin` folder in the paths; a
+        binaries-only install does not.
+    :returns: A valid WiX SDK wrapper. If WiX is not available, and was
+        not installed, raises MissingToolError.
+    """\
+'''
+        ],
+    )
+    @pytest.mark.parametrize(
+        "arguments",
+        [["--black"]],
+    )
+    def test_end_to_end_no_excessive_whitespace(
+        self,
+        run_docformatter,
+        temporary_file,
+        arguments,
+        contents,
+    ):
+        """Remove all excess whitespace in the middle of wrappped lines.
+
+        See issue #222.
+        """
+        assert '''\
+@@ -1,10 +1,9 @@
+ """Create a wrapper around a WiX install.
+ 
+-    :param tools: ToolCache of available tools.
+-    :param wix_home: The path of the WiX installation.
+-    :param bin_install: Is the install a binaries-only install? A full
+-        MSI install of WiX has a `/bin` folder in the paths; a
+-        binaries-only install does not.
+-    :returns: A valid WiX SDK wrapper. If WiX is not available, and was
+-        not installed, raises MissingToolError.
+-    """
++:param tools: ToolCache of available tools.
++:param wix_home: The path of the WiX installation.
++:param bin_install: Is the install a binaries-only install? A full MSI install of WiX
++has a `/bin` folder in the paths; a binaries-only install does not.
++:returns: A valid WiX SDK wrapper. If WiX is not available, and was not installed,
++raises MissingToolError.
++"""
+''' == "\n".join(
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -555,10 +594,7 @@ def foo():
 -
      """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -578,15 +614,9 @@ def foo():
     ):
         """"""
         if arguments[1] == "0":
-            assert (
-                "must be positive"
-                in run_docformatter.communicate()[1].decode()
-            )
+            assert "must be positive" in run_docformatter.communicate()[1].decode()
         if arguments[1] == "3":
-            assert (
-                "should be less than"
-                in run_docformatter.communicate()[1].decode()
-            )
+            assert "should be less than" in run_docformatter.communicate()[1].decode()
 
     @pytest.mark.system
     @pytest.mark.parametrize("arguments", [[]])
@@ -644,14 +674,10 @@ Hello world"""
             assert "cannot mix" in run_docformatter.communicate()[1].decode()
 
         if arguments[0] == "--in-place":
-            assert (
-                "cannot be used" in run_docformatter.communicate()[1].decode()
-            )
+            assert "cannot be used" in run_docformatter.communicate()[1].decode()
 
         if arguments[0] == "--recursive":
-            assert (
-                "cannot be used" in run_docformatter.communicate()[1].decode()
-            )
+            assert "cannot be used" in run_docformatter.communicate()[1].decode()
 
 
 class TestEndToEndPyproject:
@@ -704,10 +730,7 @@ pre-summary-space = false
                  """Docstring that should not have a pre-summary space."""
 -            
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -715,9 +738,9 @@ pre-summary-space = false
         "contents",
         [
             '''\
-                class TestFoo():
-                    """Docstring that should have a pre-summary space."""
-                '''
+class TestFoo():
+    """Docstring that should have a pre-summary space."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -752,16 +775,12 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,2 @@
-                 class TestFoo():
--                    """Docstring that should have a pre-summary space."""
--                
-+                    """ Docstring that should have a pre-summary space."""
+@@ -1,2 +1,2 @@
+ class TestFoo():
+-    """Docstring that should have a pre-summary space."""
++    """ Docstring that should have a pre-summary space."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -769,12 +788,12 @@ pre-summary-space = false
         "contents",
         [
             '''\
-            class TestFoo():
-                """Docstring that should not have a pre-summary newline.
-                
-                This is a multi-line docstring that should not have a 
-                newline placed before the summary."""
-            '''
+class TestFoo():
+    """Docstring that should not have a pre-summary newline.
+
+    This is a multi-line docstring that should not have a
+    newline placed before the summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -809,22 +828,17 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,6 @@
-             class TestFoo():
-                 """Docstring that should not have a pre-summary newline.
--                
--                This is a multi-line docstring that should not have a 
--                newline placed before the summary."""
--            
-+
-+                This is a multi-line docstring that should not have a
-+                newline placed before the summary.
-+                """
+@@ -1,5 +1,6 @@
+ class TestFoo():
+     """Docstring that should not have a pre-summary newline.
+ 
+-    This is a multi-line docstring that should not have a
+-    newline placed before the summary."""
++    This is a multi-line docstring that should not have a newline placed
++    before the summary.
++    """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -835,7 +849,7 @@ pre-summary-space = false
 class TestFoo():
     """Docstring that should have a pre-summary newline.
 
-    This is a multi-line docstring that should have a newline 
+    This is a multi-line docstring that should have a newline
     placed before the summary."""
 '''
         ],
@@ -878,16 +892,13 @@ class TestFoo():
 +    """
 +    Docstring that should have a pre-summary newline.
  
--    This is a multi-line docstring that should have a newline 
+-    This is a multi-line docstring that should have a newline
 -    placed before the summary."""
 +    This is a multi-line docstring that should have a newline placed
 +    before the summary.
 +    """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -895,10 +906,10 @@ class TestFoo():
         "contents",
         [
             '''\
-                class TestFoo():
-                    """Really long summary docstring that should not be 
-                    split into a multiline summary."""
-                '''
+    class TestFoo():
+        """Really long summary docstring that should not be
+        split into a multiline summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -933,18 +944,14 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,4 +1,3 @@
-                 class TestFoo():
--                    """Really long summary docstring that should not be 
--                    split into a multiline summary."""
--                
-+                    """Really long summary docstring that should not be split
-+                    into a multiline summary."""
+@@ -1,3 +1,3 @@
+     class TestFoo():
+-        """Really long summary docstring that should not be
+-        split into a multiline summary."""
++        """Really long summary docstring that should not be split into a
++        multiline summary."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -952,10 +959,10 @@ class TestFoo():
         "contents",
         [
             '''\
-                    class TestFoo():
-                        """Really long summary docstring that should be 
-                        split into a multiline summary."""
-                    '''
+    class TestFoo():
+        """Really long summary docstring that should be
+        split into a multiline summary."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -990,18 +997,14 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,4 +1,3 @@
-                     class TestFoo():
--                        """Really long summary docstring that should be 
--                        split into a multiline summary."""
--                    
-+                        """Really long summary docstring that should be split
-+                        into a multiline summary."""
+@@ -1,3 +1,3 @@
+     class TestFoo():
+-        """Really long summary docstring that should be
+-        split into a multiline summary."""
++        """Really long summary docstring that should be split into a multiline
++        summary."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -1011,8 +1014,8 @@ class TestFoo():
             '''\
 class TestFoo():
     """Summary docstring that is followed by a description.
-
-    This is the description and it shouldn't have a blank line 
+ 
+    This is the description and it shouldn't have a blank line
     inserted after it.
     """
 '''
@@ -1053,17 +1056,15 @@ class TestFoo():
 @@ -1,6 +1,6 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
- 
--    This is the description and it shouldn\'t have a blank line 
+- 
+-    This is the description and it shouldn\'t have a blank line
 -    inserted after it.
++
 +    This is the description and it shouldn\'t have a blank line inserted
 +    after it.
      """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -1073,8 +1074,8 @@ class TestFoo():
             '''\
 class TestFoo():
     """Summary docstring that is followed by a description.
-
-    This is the description and it should have a blank line 
+ 
+    This is the description and it should have a blank line
     inserted after it.
     """
 '''
@@ -1115,18 +1116,16 @@ class TestFoo():
 @@ -1,6 +1,7 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
- 
--    This is the description and it should have a blank line 
+- 
+-    This is the description and it should have a blank line
 -    inserted after it.
++
 +    This is the description and it should have a blank line inserted
 +    after it.
 +
      """
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -1135,7 +1134,7 @@ class TestFoo():
         [
             '''\
 class foo():
-    """Hello world is a long sentence that will be wrapped at 12 
+    """Hello world is a long sentence that will be wrapped at 12
     characters because I\'m using that option in pyproject.toml."""
 '''
         ],
@@ -1174,7 +1173,7 @@ class foo():
         assert '''\
 @@ -1,3 +1,18 @@
  class foo():
--    """Hello world is a long sentence that will be wrapped at 12 
+-    """Hello world is a long sentence that will be wrapped at 12
 -    characters because I\'m using that option in pyproject.toml."""
 +    """Hello
 +    world is
@@ -1194,10 +1193,7 @@ class foo():
 +    ject.tom
 +    l."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
 
@@ -1251,10 +1247,7 @@ pre-summary-space = false
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
 
     @pytest.mark.system
@@ -1301,10 +1294,7 @@ diff = false
         See issue #122.
         """
         assert "" == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
         with open(temporary_file, "r") as f:
             assert (
@@ -1359,9 +1349,7 @@ diff = false
         See issue #122.
         """
         _results = run_docformatter.communicate()
-        assert "" == "\n".join(
-            _results[0].decode().replace("\r", "").split("\n")[2:]
-        )
+        assert "" == "\n".join(_results[0].decode().replace("\r", "").split("\n")[2:])
         assert temporary_file == _results[1].decode().rstrip("\n")
 
     @pytest.mark.system
@@ -1412,8 +1400,5 @@ diff = true
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
 ''' == "\n".join(
-            run_docformatter.communicate()[0]
-            .decode()
-            .replace("\r", "")
-            .split("\n")[2:]
+            run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )

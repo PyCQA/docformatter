@@ -139,9 +139,8 @@ class Configurater:
             action="store",
             nargs="*",
             default=self.flargs_dct.get("non-cap", None),
-            help="list of words not to capitalize "
-            "when they appear as the "
-            "first word in the summary",
+            help="list of words not to capitalize when they appear as the first word "
+            "in the summary",
         )
         self.parser.add_argument(
             "--black",
@@ -170,6 +169,15 @@ class Configurater:
             default=self.flargs_dct.get("style", "sphinx"),
             help="name of the docstring style to use when formatting "
             "parameter lists (default: sphinx)",
+        )
+        self.parser.add_argument(
+            "--rest-section-adorns",
+            type=str,
+            dest="rest_section_adorns",
+            default=self.flargs_dct.get(
+                "rest_section_adorns", r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}"
+            ),
+            help="regex for identifying reST section header adornments",
         )
         self.parser.add_argument(
             "--wrap-summaries",
@@ -229,7 +237,7 @@ class Configurater:
                 "pre-summary-space", _default_pre_summary_space
             ).lower()
             == "true",
-            help="add a space after the opening triple quotes " "(default: False)",
+            help="add a space after the opening triple quotes (default: False)",
         )
         self.parser.add_argument(
             "--make-summary-multi-line",

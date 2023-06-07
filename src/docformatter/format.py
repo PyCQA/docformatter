@@ -34,7 +34,7 @@ import tokenize
 from typing import TextIO, Tuple
 
 # Third Party Imports
-import untokenize
+import untokenize  # type: ignore
 
 # docformatter Package Imports
 import docformatter.encode as _encode
@@ -177,7 +177,7 @@ class Formatter:
     parser = None
     """Parser object."""
 
-    args: argparse.Namespace = None
+    args: argparse.Namespace = argparse.Namespace()
 
     def __init__(
         self,
@@ -459,7 +459,13 @@ class Formatter:
 
         summary, description = _strings.split_summary_and_description(contents)
 
-        # Leave docstrings with underlined summaries alone.
+        # Leave docstrings with only field lists alone.
+        if _syntax.is_some_sort_of_field_list(summary, self.args.style):
+            return docstring
+
+        # Leave docstrings with underlined descriptions alone.
+        # TODO: Deprecate the remove_section_header method now that section headers
+        #  are being handled.
         if _syntax.remove_section_header(description).strip() != description.strip():
             return docstring
 
@@ -467,9 +473,11 @@ class Formatter:
             _syntax.is_some_sort_of_list(
                 summary,
                 self.args.non_strict,
+                self.args.rest_section_adorns,
                 self.args.style,
             )
             or _syntax.do_find_directives(summary)
+            or _syntax.do_find_links(summary)
         ):
             # Something is probably not right with the splitting.
             return docstring
@@ -588,6 +596,7 @@ class Formatter:
             wrap_length=self.args.wrap_descriptions,
             force_wrap=self.args.force_wrap,
             strict=self.args.non_strict,
+            rest_sections=self.args.rest_section_adorns,
             style=self.args.style,
         )
         post_description = "\n" if self.args.post_description_blank else ""

@@ -43,6 +43,8 @@ from mock import patch
 # docformatter Package Imports
 import docformatter
 
+REST_SECTION_REGEX = r"[=\-`:'\"~^_*+#<>]{4,}"
+
 
 class TestFindPyFiles:
     """Class for testing the find_py_files() function."""
@@ -108,9 +110,7 @@ class TestFindPyFiles:
                 "/root/folder_one/one.py",
                 "/root/folder_two/two.py",
             ]
-            test_exclude_py = list(
-                docformatter.find_py_files(sources, True, ".py")
-            )
+            test_exclude_py = list(docformatter.find_py_files(sources, True, ".py"))
             assert not test_exclude_py
             test_exclude_two_and_three = list(
                 docformatter.find_py_files(
@@ -121,9 +121,7 @@ class TestFindPyFiles:
             test_exclude_files = list(
                 docformatter.find_py_files(sources, True, ["one.py", "two.py"])
             )
-            assert test_exclude_files == [
-                "/root/folder_one/folder_three/three.py"
-            ]
+            assert test_exclude_files == ["/root/folder_one/folder_three/three.py"]
 
     @pytest.mark.unit
     def test_nothing_is_excluded(self):
@@ -139,17 +137,13 @@ class TestFindPyFiles:
         with patch("os.walk", return_value=patch_data), patch(
             "os.path.isdir", return_value=True
         ):
-            test_exclude_nothing = list(
-                docformatter.find_py_files(sources, True, [])
-            )
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True, []))
             assert test_exclude_nothing == [
                 "/root/folder_one/one.py",
                 "/root/folder_one/folder_three/three.py",
                 "/root/folder_two/two.py",
             ]
-            test_exclude_nothing = list(
-                docformatter.find_py_files(sources, True)
-            )
+            test_exclude_nothing = list(docformatter.find_py_files(sources, True))
             assert test_exclude_nothing == [
                 "/root/folder_one/one.py",
                 "/root/folder_one/folder_three/three.py",
@@ -161,7 +155,7 @@ class TestHasCorrectLength:
     """Class for testing the has_correct_length() function."""
 
     @pytest.mark.unit
-    def test_has_correct_length(self):
+    def test_has_correct_length_none(self):
         """Return True when passed line_length=None."""
         assert docformatter.has_correct_length(None, 1, 9)
 
@@ -243,9 +237,7 @@ class TestDoFindLinks:
         assert docformatter.do_find_links(text) == [(28, 44)]
         text = "This is a bitcoin URL pattern: bitcoin:<address>[?[amount=<size>][&][label=<label>][&][message=<message>]]"
         assert docformatter.do_find_links(text) == [(31, 106)]
-        text = (
-            "This is a chrome URL pattern: chrome://<package>/<section>/<path>"
-        )
+        text = "This is a chrome URL pattern: chrome://<package>/<section>/<path>"
         assert docformatter.do_find_links(text) == [(30, 65)]
         text = "This is a Java compressed archive URL pattern: jar:<url>!/[<entry>]"
         assert docformatter.do_find_links(text) == [(47, 67)]
@@ -269,9 +261,7 @@ class TestDoFindLinks:
     @pytest.mark.unit
     def test_do_find_file_transfer_protocol_link(self):
         """Identify file://, ftp://, ftps://, and sftp:// as a link."""
-        text = (
-            "This is a URL pattern for addressing a file: file://[host]/path"
-        )
+        text = "This is a URL pattern for addressing a file: file://[host]/path"
         assert docformatter.do_find_links(text) == [(39, 44), (45, 63)]
         text = "This is a File Transfer Protocol URL pattern: ftp://[user[:password]@]host[:port]/url-path"
         assert docformatter.do_find_links(text) == [(46, 90)]
@@ -287,7 +277,9 @@ class TestDoFindLinks:
         assert docformatter.do_find_links(text) == [(39, 71)]
         text = "This is a remote synchronization URL pattern: rsync://<host>[:<port>]/<path>"
         assert docformatter.do_find_links(text) == [(46, 76)]
-        text = "This is a telnet URL pattern: telnet://<user>:<password>@<host>[:<port>/]"
+        text = (
+            "This is a telnet URL pattern: telnet://<user>:<password>@<host>[:<port>/]"
+        )
         assert docformatter.do_find_links(text) == [(30, 73)]
         text = "This is a Virtual Network Computing URL pattern: vnc://[<host>[:<port>]][?<params>]"
         assert docformatter.do_find_links(text) == [(49, 83)]
@@ -353,9 +345,7 @@ class TestDoFindLinks:
         assert docformatter.do_find_links(text) == [(61, 91)]
         text = "This is a Secure Lightweight Directory Access Protocol URL pattern: ldaps://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?[<filter>][?<extensions>]]]]]"
         assert docformatter.do_find_links(text) == [(68, 99)]
-        text = (
-            "This is an Amazon S3 bucket URL pattern: s3://mybucket/puppy.jpg"
-        )
+        text = "This is an Amazon S3 bucket URL pattern: s3://mybucket/puppy.jpg"
         assert docformatter.do_find_links(text) == [(41, 64)]
 
     @pytest.mark.unit
@@ -421,6 +411,7 @@ class TestIsSomeSortOfList:
         @param
     """,
             True,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -434,6 +425,7 @@ class TestIsSomeSortOfList:
         imag -- the imaginary part (default 0.0)
     """,
             True,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -451,6 +443,7 @@ class TestIsSomeSortOfList:
           release-1.5/
     """,
             False,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -463,6 +456,7 @@ class TestIsSomeSortOfList:
         stream (BinaryIO): Binary stream (usually a file object).
     """,
             True,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -479,6 +473,7 @@ the
 rocket.
     """,
             True,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -495,6 +490,7 @@ the
 rocket.
     """,
             False,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -516,6 +512,7 @@ Parameters
         The second argument.
 """,
             False,
+            REST_SECTION_REGEX,
             "sphinx",
         )
 
@@ -533,6 +530,7 @@ Using Sphinx parameter list
 :param int arg2: the second argument.
 """,
             False,
+            REST_SECTION_REGEX,
             "sphinx",
         )
 
@@ -550,6 +548,7 @@ Using Sphinx parameter list
 :param int arg2: the second argument.
 """,
             False,
+            REST_SECTION_REGEX,
             "numpy",
         )
 
@@ -560,7 +559,7 @@ Using Sphinx parameter list
         See issue #199 and requirement docformatter_10.1.1.1.
         """
         assert docformatter.is_some_sort_of_list(
-"""\
+            """\
 This is a description.
 
 Example code::
@@ -573,6 +572,29 @@ Example code2::
         pass
 """,
             False,
+            REST_SECTION_REGEX,
+            "numpy",
+        )
+
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_rest_header(self):
+        """Identify reST header patterns.
+
+        See issue #225.
+        """
+        assert docformatter.is_some_sort_of_list(
+            """\
+===============================
+Example of creating an example.
+===============================
+
+.. currentmodule:: my_project
+
+In this example, we illustrate how to create
+an example.
+""",
+            False,
+            REST_SECTION_REGEX,
             "numpy",
         )
 

@@ -21,13 +21,15 @@ help output provides a summary of these options:
 
 .. code-block:: console
 
-    usage: docformatter [-h] [-i | -c] [-r] [--wrap-summaries length]
-                        [--wrap-descriptions length] [--black] [--blank]
-                        [--pre-summary-newline] [--make-summary-multi-line]
-                        [--force-wrap] [--range start_line end_line]
-                        [--docstring-length min_length max_length]
-                        [--config CONFIG] [--version]
-                        files [files ...]
+    usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]]
+                        [-n [NON-CAP ...]] [-s [style]] [--rest-section-adorns REGEX]
+                        [--black] [--wrap-summaries length]
+                        [--wrap-descriptions length] [--force-wrap]
+                        [--tab-width width] [--blank] [--pre-summary-newline]
+                        [--pre-summary-space] [--make-summary-multi-line]
+                        [--close-quotes-on-newline] [--range line line]
+                        [--docstring-length length length] [--non-strict]
+                        [--config CONFIG] [--version] files [files ...]
 
     Formats docstrings to follow PEP 257.
 
@@ -46,17 +48,17 @@ help output provides a summary of these options:
       -s style, --style style
                             the docstring style to use when formatting parameter
                             lists.  One of epytext, sphinx. (default: sphinx)
-      --black
-                            make formatting compatible with standard black options
+      --rest-section-adorns REGEX
+                            regular expression for identifying reST section adornments
+                            (default: [!\"#$%&'()*+,-./\\:;<=>?@[]^_`{|}~]{4,})
+      --black               make formatting compatible with standard black options
                             (default: False)
       --wrap-summaries length
-                            wrap long summary lines at this length; set
-                            to 0 to disable wrapping
-                            (default: 79)
+                            wrap long summary lines at this length; set to 0 to
+                            disable wrapping (default: 79, 88 with --black option)
       --wrap-descriptions length
-                            wrap descriptions at this length; set to 0 to
-                            disable wrapping
-                            (default: 72)
+                            wrap descriptions at this length; set to 0 to disable
+                            wrapping (default: 72, 88 with --black option)
       --force-wrap
                             force descriptions to be wrapped even if it may result
                             in a mess (default: False)

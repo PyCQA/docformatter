@@ -427,6 +427,33 @@ def Class3:
 '''
         assert docstring == uut._do_format_code(docstring)
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_no_summary_sphinx_style(
+        self,
+        test_args,
+        args,
+    ):
+        """Leave docstring alone if it only contains Sphinx style directives.
+
+        See issue #232.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+def function:
+    """
+    :param x: X
+    :param y: Y
+    """
+'''
+        assert docstring == uut._do_format_code(docstring)
+
 
 class TestFormatLists:
     """Class for testing format_docstring() with lists in the docstring."""
@@ -1796,7 +1823,7 @@ class TestFormatWrapSphinx:
     ):
         """Wrap sphinx style parameter lists.
 
-        See requirement docformatter_10.4.2
+        See requirement docformatter_10.4.2 and issue #230.
         """
         uut = Formatter(
             test_args,
@@ -1840,6 +1867,31 @@ class TestFormatWrapSphinx:
     :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
     :rtype: str
 """\
+''',
+            )
+        )
+
+        # Issue #230 required adding parenthesis to the SPHINX_REGEX.
+        assert (
+            (
+                '''\
+"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """\
 ''',
             )
         )
@@ -1931,7 +1983,7 @@ class TestFormatWrapSphinx:
     ):
         """Should remove unneeded whitespace.
 
-        See issue #217
+        See issue #217 and #222
         """
         uut = Formatter(
             test_args,
@@ -2019,6 +2071,187 @@ class TestFormatWrapSphinx:
 
     :return: Requests :class:`~requests.Session` object
     """\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_name_included_wrap_length(
+        self,
+        test_args,
+        args,
+    ):
+        """Should consider field name, not just field body, when wrapping.
+
+        See issue #228.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that will be
+        written.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that
+        will be written.
+    """\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_body_is_a_link(
+        self,
+        test_args,
+        args,
+    ):
+        """Should not add a space after the field name when the body is a link.
+
+        See docformatter_10.4.3.1, issue #229, and issue #230.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""CC.
+
+    :meth:`!X`
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :meth:`!X`
+    """\
+''',
+            )
+        )
+
+        assert (
+            (
+                '''\
+"""CC.
+
+    :math:`-`
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    :math: `-`
+    """\
+''',
+            )
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_body_is_blank(
+        self,
+        test_args,
+        args,
+    ):
+        """Should not add a space after the field name when the body is blank.
+
+        See docformatter_10.4.3.2 and issue #224.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        assert (
+            (
+                '''\
+"""Add trackers to a torrent.
+
+    :raises NotFound404Error:
+    :param torrent_hash: hash for torrent
+    :param urls: tracker URLs to add to torrent
+    :return: None
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""
+Add trackers to a torrent.
+
+:raises NotFound404Error:
+
+:param torrent_hash: hash for torrent
+:param urls: tracker URLs to add to torrent
+:return: None
+"""\
 ''',
             )
         )

@@ -1,3 +1,4 @@
+# type: ignore
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -5,11 +6,12 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+"""Configuration file for the Sphinx documentation builder."""
 
 project = "docformatter"
 copyright = "2022-2023, Steven Myint"
 author = "Steven Myint"
-release = "1.7.1"
+release = "1.7.2"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

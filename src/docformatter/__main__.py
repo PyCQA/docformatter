@@ -41,7 +41,8 @@ def _help():
     print(
         """\
 usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]]
-                    [-n [NON-CAP ...]] [--black] [--wrap-summaries length]
+                    [-n [NON-CAP ...]] [-s [style]] [--rest-section-adorns REGEX]
+                    [--black] [--wrap-summaries length]
                     [--wrap-descriptions length] [--force-wrap]
                     [--tab-width width] [--blank] [--pre-summary-newline]
                     [--pre-summary-space] [--make-summary-multi-line]
@@ -69,6 +70,9 @@ options:
   -s style, --style style
                         the docstring style to use when formatting parameter
                         lists.  One of epytext, sphinx. (default: sphinx)
+  --rest-section-adorns REGEX
+                        regular expression for identifying reST section adornments
+                        (default: [!\"#$%&'()*+,-./\\:;<=>?@[]^_`{|}~]{4,})
   --black               make formatting compatible with standard black options
                         (default: False)
   --wrap-summaries length
@@ -113,7 +117,7 @@ def _main(argv, standard_out, standard_error, standard_in):
 
     if "--help" in configurator.args_lst:
         _help()
-        sys.exit()
+        return 0
     else:
         configurator.do_parse_arguments()
 
