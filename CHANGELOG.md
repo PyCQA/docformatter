@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/PyCQA/docformatter/tree/HEAD)
+## [v1.7.1](https://github.com/PyCQA/docformatter/tree/v1.7.1) (2023-05-19)
 
-[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.0...HEAD)
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.0...v1.7.1)
 
 Features
 
@@ -108,31 +108,19 @@ Bug Fixes
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.5.0...v1.5.1)
 
-Features
-
-- feat: format class attribute docstrings [\#116](https://github.com/PyCQA/docformatter/pull/116) ([weibullguy](https://github.com/weibullguy))
-
 Bug Fixes
 
 - Fix incorrect pyproject.toml parsing of boolean values [\#133](https://github.com/PyCQA/docformatter/pull/133) ([weibullguy](https://github.com/weibullguy))
-- fix: don't wrap URLs [\#115](https://github.com/PyCQA/docformatter/pull/115) ([weibullguy](https://github.com/weibullguy))
 
 **Merged pull requests:**
 
 - chore: update CI workflow so 3.6 still runs [\#132](https://github.com/PyCQA/docformatter/pull/132) ([weibullguy](https://github.com/weibullguy))
 - No empty lines before class and method docstrings [\#131](https://github.com/PyCQA/docformatter/pull/131) ([mcflugen](https://github.com/mcflugen))
 - Allow showing the diff when using --in-place or --check with --diff [\#128](https://github.com/PyCQA/docformatter/pull/128) ([BenjaminSchubert](https://github.com/BenjaminSchubert))
-- chore: move script to src layout and make a package [\#117](https://github.com/PyCQA/docformatter/pull/117) ([weibullguy](https://github.com/weibullguy))
-- refactor: move encoding/decoding functions to encodor class [\#111](https://github.com/PyCQA/docformatter/pull/111) ([weibullguy](https://github.com/weibullguy))
-- refactor: move functions to classes [\#110](https://github.com/PyCQA/docformatter/pull/110) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.5.0](https://github.com/PyCQA/docformatter/tree/v1.5.0) (2022-08-19)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.4...v1.5.0)
-
-**Merged pull requests:**
-
-- chore: add workflow actions [\#108](https://github.com/PyCQA/docformatter/pull/108) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.4](https://github.com/PyCQA/docformatter/tree/v1.4) (2020-12-27)
 
