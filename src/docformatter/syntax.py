@@ -479,13 +479,10 @@ def do_wrap_field_lists(  # noqa: PLR0913
             text,
             field_idx,
             _idx,
-        ).strip()
+        )
 
         if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
-            if _field_body.startswith("`") or not _field_body:
-                _field = f"{_field_name}{_field_body}"
-            else:
-                _field = f"{_field_name} {_field_body}"
+            _field = f"{_field_name}{_field_body}"
             lines.append(f"{indentation}{_field}")
         else:
             lines.extend(
@@ -855,8 +852,10 @@ def _do_join_field_body(text, field_idx, idx):
         [_line.strip() for _line in _field_body.splitlines()]
     ).strip()
 
-    if _field_body:
+    if not _field_body.startswith("`"):
         _field_body = f" {_field_body}"
+    if text[field_idx[idx][1] : field_idx[idx][1] + 1] == "\n":
+        _field_body = "\n"
 
     return _field_body
 

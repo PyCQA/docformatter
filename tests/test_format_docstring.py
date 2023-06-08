@@ -2234,6 +2234,7 @@ class TestFormatWrapSphinx:
 """Add trackers to a torrent.
 
     :raises NotFound404Error:
+
     :param torrent_hash: hash for torrent
     :param urls: tracker URLs to add to torrent
     :return: None
