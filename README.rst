@@ -181,6 +181,22 @@ gets formatted into this
         if factorial(10):
             launch_rocket()
 
+
+Pre-commit hook
+===============
+
+Add docformatter to your ``.prepre-commit-config.yaml`` as follows.
+
+.. code-block:: yaml
+
+    - repo: https://github.com/PyCQA/docformatter
+      rev: v1.7.1
+      hooks:
+        - id: docformatter
+          additional_dependencies: [tomli]
+          args: [--in-place, --config, ./pyproject.toml]
+
+
 Marketing
 =========
 Do you use *docformatter*?  What style docstrings do you use?  Add some badges to your project's **README** and let everyone know.
