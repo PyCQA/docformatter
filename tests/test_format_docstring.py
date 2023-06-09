@@ -2150,7 +2150,7 @@ class TestFormatWrapSphinx:
     ):
         """Should not add a space after the field name when the body is a link.
 
-        See docformatter_10.4.3.1, issue #229, and issue #230.
+        See docformatter_10.4.3.1, issue #229, issue #230, issue #234, and issue #235.
         """
         uut = Formatter(
             test_args,
@@ -2199,6 +2199,52 @@ class TestFormatWrapSphinx:
             )
         )
 
+        assert (
+            (
+                '''\
+"""CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+ """CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """\
+''',
+            )
+        )
+
+        assert (
+            (
+                '''\
+"""CC.
+
+    C.
+
+    C,
+    :math:`[0, 1]`.
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""CC.
+
+    C.
+
+    C,
+    :math:`[0, 1]`.
+"""\
+''',
+            )
+        )
+
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "args",
@@ -2234,6 +2280,7 @@ class TestFormatWrapSphinx:
 """Add trackers to a torrent.
 
     :raises NotFound404Error:
+
     :param torrent_hash: hash for torrent
     :param urls: tracker URLs to add to torrent
     :return: None
