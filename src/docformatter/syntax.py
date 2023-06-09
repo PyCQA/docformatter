@@ -162,7 +162,7 @@ HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
 
 
 def description_to_list(
-    text: str,
+    description: str,
     indentation: str,
     wrap_length: int,
 ) -> List[str]:
@@ -170,7 +170,7 @@ def description_to_list(
 
     Parameters
     ----------
-    text : str
+    description : str
         The docstring description.
     indentation : str
         The indentation (number of spaces or tabs) to place in front of each
@@ -180,38 +180,43 @@ def description_to_list(
 
     Returns
     -------
-    _lines : list
-          A list containing each line of the description with any links put
-          back together.
+    _wrapped_lines : list
+          A list containing each line of the description wrapped at wrap_length.
     """
     # This is a description containing only one paragraph.
-    if len(re.findall(r"\n\n", text)) <= 0:
+    if len(re.findall(r"\n\n", description)) <= 0:
         return textwrap.wrap(
-            textwrap.dedent(text),
+            textwrap.dedent(description),
             width=wrap_length,
             initial_indent=indentation,
             subsequent_indent=indentation,
         )
 
     # This is a description containing multiple paragraphs.
-    _lines = []
-    for _line in text.split("\n\n"):
-        _text = textwrap.wrap(
+    _wrapped_lines = []
+    for _line in description.split("\n\n"):
+        _wrapped_line = textwrap.wrap(
             textwrap.dedent(_line),
             width=wrap_length,
             initial_indent=indentation,
             subsequent_indent=indentation,
         )
 
-        if _text:
-            _lines.extend(_text)
-        _lines.append("")
+        if _wrapped_line:
+            _wrapped_lines.extend(_wrapped_line)
+        _wrapped_lines.append("")
 
         with contextlib.suppress(IndexError):
-            if not _lines[-1] and not _lines[-2]:
-                _lines.pop(-1)
+            if not _wrapped_lines[-1] and not _wrapped_lines[-2]:
+                _wrapped_lines.pop(-1)
 
-    return _lines
+    if (
+        description[-len(indentation) - 1 : -len(indentation)] == "\n"
+        and description[-len(indentation) - 2 : -len(indentation)] != "\n\n"
+    ):
+        _wrapped_lines.pop(-1)
+
+    return _wrapped_lines
 
 
 def do_clean_url(url: str, indentation: str) -> str:
@@ -481,7 +486,7 @@ def do_wrap_field_lists(  # noqa: PLR0913
             _idx,
         )
 
-        if len(f"{_field_name} {_field_body}") <= (wrap_length - len(indentation)):
+        if len(f"{_field_name}{_field_body}") <= (wrap_length - len(indentation)):
             _field = f"{_field_name}{_field_body}"
             lines.append(f"{indentation}{_field}")
         else:
@@ -885,7 +890,7 @@ def _do_wrap_field(field_name, field_body, indentation, wrap_length):
         _subsequent = 2 * indentation
 
     _wrapped_field = textwrap.wrap(
-        textwrap.dedent(f"{field_name} {field_body.strip()}"),
+        textwrap.dedent(f"{field_name}{field_body}"),
         width=wrap_length,
         initial_indent=indentation,
         subsequent_indent=_subsequent,
