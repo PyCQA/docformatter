@@ -554,6 +554,29 @@ class TestFormatLists:
             docstring,
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_should_leave_list_alone_with_rest(self, test_args, args):
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""CC.
+
+    C.
+
+    C
+    c :math:`[0, 1]`.
+    """'''
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
+        )
+
 
 class TestFormatWrap:
     """Class for testing _do_format_docstring() with line wrapping."""
@@ -1718,14 +1741,14 @@ class TestFormatWrapEpytext:
                 '''\
 """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
-    and bulleted lists alone.  See http://www.docformatter.com/.
+We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+and bulleted lists alone.  See http://www.docformatter.com/.
 
-    @param text: the text argument.
-    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
-    @param wrap_length: the wrap_length argument
-    @param force_wrap: the force_warp argument.
-    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+@param text: the text argument.
+@param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+@param wrap_length: the wrap_length argument
+@param force_wrap: the force_warp argument.
+@return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
 """\
 ''',
             )

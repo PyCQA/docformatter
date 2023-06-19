@@ -460,7 +460,10 @@ class Formatter:
         summary, description = _strings.split_summary_and_description(contents)
 
         # Leave docstrings with only field lists alone.
-        if _syntax.is_some_sort_of_field_list(summary, self.args.style):
+        if _syntax.is_some_sort_of_field_list(
+            summary,
+            self.args.style,
+        ):
             return docstring
 
         # Leave docstrings with underlined descriptions alone.

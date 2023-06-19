@@ -28,8 +28,7 @@ import collections
 import io
 import locale
 import sys
-from os import PathLike
-from typing import Any, Dict, List
+from typing import Dict, List
 
 # Third Party Imports
 from charset_normalizer import from_path  # pylint: disable=import-error
@@ -49,7 +48,7 @@ class Encoder:
         self.encoding = "latin-1"
         self.system_encoding = locale.getpreferredencoding() or sys.getdefaultencoding()
 
-    def do_detect_encoding(self, filename: PathLike[Any]) -> None:
+    def do_detect_encoding(self, filename) -> None:
         """Return the detected file encoding.
 
         Parameters
@@ -90,9 +89,16 @@ class Encoder:
             elif line.endswith(self.LF):
                 counter[self.LF] += 1
 
-        return (sorted(counter, key=counter.get, reverse=True) or [self.LF])[0]
+        return (
+            sorted(
+                counter,
+                key=counter.get,  # type: ignore
+                reverse=True,
+            )
+            or [self.LF]
+        )[0]
 
-    def do_open_with_encoding(self, filename: PathLike[Any], mode: str = "r"):
+    def do_open_with_encoding(self, filename, mode: str = "r"):
         """Return opened file with a specific encoding.
 
         Parameters
