@@ -887,9 +887,12 @@ def _do_join_field_body(text, field_idx, idx):
         [_line.strip() for _line in _field_body.splitlines()]
     ).strip()
 
-    if not _field_body.startswith("`"):
+    # Add a space before the field body unless the field body is a link.
+    if not _field_body.startswith("`") and _field_body:
         _field_body = f" {_field_body}"
-    if text[field_idx[idx][1] : field_idx[idx][1] + 1] == "\n":
+
+    # Is there a blank line between field lists?  Keep it if so.
+    if text[field_idx[idx][1] : field_idx[idx][1] + 2] == "\n\n":
         _field_body = "\n"
 
     return _field_body

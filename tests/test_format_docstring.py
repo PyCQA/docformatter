@@ -577,6 +577,32 @@ class TestFormatLists:
             docstring,
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_should_leave_alembic_alone(self, test_args, args):
+        """Should not reformat alembic information.
+
+        See issue #242.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""Add some column.
+
+    Revision ID: <some id>>
+    Revises: <some other id>
+    Create Date: 2023-01-06 10:13:28.156709
+    """'''
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
+        )
+
 
 class TestFormatWrap:
     """Class for testing _do_format_docstring() with line wrapping."""
@@ -2286,9 +2312,11 @@ class TestFormatWrapSphinx:
         test_args,
         args,
     ):
-        """Should not add a space after the field name when the body is blank.
+        """Retain newline after the field list when it's in the original docstring.
 
-        See docformatter_10.4.3.2 and issue #224.
+        Also do not return a field body that is just whitespace.
+
+        See docformatter_10.4.3.2, issue #224, and issue #239.
         """
         uut = Formatter(
             test_args,
@@ -2322,6 +2350,35 @@ Add trackers to a torrent.
 :param urls: tracker URLs to add to torrent
 :return: None
 """\
+''',
+            )
+        )
+
+        assert (
+            (
+                '''\
+"""Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""
+Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """\
 ''',
             )
         )
