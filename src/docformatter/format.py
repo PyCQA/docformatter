@@ -256,7 +256,7 @@ class Formatter:
             try:
                 result = self._do_format_file(filename)
                 outcomes[result] += 1
-            except IOError as exception:
+            except OSError as exception:
                 outcomes[FormatResult.error] += 1
                 print(unicode(exception), file=self.stderror)
 

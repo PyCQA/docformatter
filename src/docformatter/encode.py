@@ -25,7 +25,6 @@
 
 # Standard Library Imports
 import collections
-import io
 import locale
 import sys
 from typing import Dict, List
@@ -113,6 +112,6 @@ class Encoder:
         contents : TextIO
             The contents of the file.
         """
-        return io.open(
+        return open(
             filename, mode=mode, encoding=self.encoding, newline=""
         )  # Preserve line endings

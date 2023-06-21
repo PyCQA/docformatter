@@ -24,8 +24,6 @@
 """Formats docstrings to follow PEP 257."""
 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # Standard Library Imports
 import contextlib
 import signal
