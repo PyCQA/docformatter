@@ -598,6 +598,24 @@ an example.
             "numpy",
         )
 
+    @pytest.mark.unit
+    def test_is_some_sort_of_list_alembic_header(self):
+        """Identify alembic header patterns.
+
+        See issue #242.
+        """
+        assert docformatter.is_some_sort_of_list(
+            """Add some column.
+
+    Revision ID: <some id>>
+    Revises: <some other id>
+    Create Date: 2023-01-06 10:13:28.156709
+    """,
+            False,
+            REST_SECTION_REGEX,
+            "numpy",
+        )
+
 
 class TestIsSomeSortOfCode:
     """Class for testing the is_some_sort_of_code() function."""

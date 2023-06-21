@@ -32,6 +32,9 @@ from typing import Iterable, List, Tuple, Union
 
 DEFAULT_INDENT = 4
 
+ALEMBIC_REGEX = r"^ *[a-zA-Z0-9_\- ]*: "
+"""Regular expression to use for finding alembic headers."""
+
 BULLET_REGEX = r"\s*[*\-+] [\S ]+"
 """Regular expression to use for finding bullet lists."""
 
@@ -664,7 +667,6 @@ def is_some_sort_of_list(
             re.match(SPHINX_REGEX, line)
             or
             # "parameter : description" <-- Numpy style
-            # "parameter: description" <-- Numpy style
             re.match(NUMPY_REGEX, line)
             or
             # "word\n----" <-- Numpy headings
@@ -688,6 +690,11 @@ def is_some_sort_of_list(
             or
             # "    c :math:`[0, `]`.
             re.match(r" *\w *:[a-zA-Z0-9_\- ]*:", line)
+            or
+            # "Revision ID: <some id>>"
+            # "Revises: <some other id>"
+            # "Create Date: 2023-01-06 10:13:28.156709"
+            re.match(ALEMBIC_REGEX, line)
         )
         for line in split_lines
     )

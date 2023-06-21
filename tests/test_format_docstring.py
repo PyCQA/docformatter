@@ -577,32 +577,6 @@ class TestFormatLists:
             docstring,
         )
 
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_should_leave_alembic_alone(self, test_args, args):
-        """Should not reformat alembic information.
-
-        See issue #242.
-        """
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        docstring = '''\
-"""Add some column.
-
-    Revision ID: <some id>>
-    Revises: <some other id>
-    Create Date: 2023-01-06 10:13:28.156709
-    """'''
-        assert docstring == uut._do_format_docstring(
-            INDENTATION,
-            docstring,
-        )
-
 
 class TestFormatWrap:
     """Class for testing _do_format_docstring() with line wrapping."""
