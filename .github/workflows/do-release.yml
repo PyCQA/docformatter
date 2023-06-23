@@ -3,8 +3,6 @@
 # - Gets list of PR labels.
 # - If 'release' label:
 #   - Get release version using Poetry.
-#   - Generate new CHANGELOG.
-#   - Tag repository with new version tag.
 #   - Build the release.
 #   - Draft a new GitHub release.
 #   - Upload the wheel to the new GitHub release.

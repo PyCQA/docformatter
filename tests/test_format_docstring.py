@@ -554,6 +554,29 @@ class TestFormatLists:
             docstring,
         )
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_docstring_should_leave_list_alone_with_rest(self, test_args, args):
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        docstring = '''\
+"""CC.
+
+    C.
+
+    C
+    c :math:`[0, 1]`.
+    """'''
+        assert docstring == uut._do_format_docstring(
+            INDENTATION,
+            docstring,
+        )
+
 
 class TestFormatWrap:
     """Class for testing _do_format_docstring() with line wrapping."""
@@ -1718,14 +1741,14 @@ class TestFormatWrapEpytext:
                 '''\
 """Return line-wrapped description text.
 
-    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
-    and bulleted lists alone.  See http://www.docformatter.com/.
+We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+and bulleted lists alone.  See http://www.docformatter.com/.
 
-    @param text: the text argument.
-    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
-    @param wrap_length: the wrap_length argument
-    @param force_wrap: the force_warp argument.
-    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+@param text: the text argument.
+@param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+@param wrap_length: the wrap_length argument
+@param force_wrap: the force_warp argument.
+@return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
 """\
 ''',
             )
@@ -2263,9 +2286,11 @@ class TestFormatWrapSphinx:
         test_args,
         args,
     ):
-        """Should not add a space after the field name when the body is blank.
+        """Retain newline after the field list when it's in the original docstring.
 
-        See docformatter_10.4.3.2 and issue #224.
+        Also do not return a field body that is just whitespace.
+
+        See docformatter_10.4.3.2, issue #224, and issue #239.
         """
         uut = Formatter(
             test_args,
@@ -2299,6 +2324,35 @@ Add trackers to a torrent.
 :param urls: tracker URLs to add to torrent
 :return: None
 """\
+''',
+            )
+        )
+
+        assert (
+            (
+                '''\
+"""Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """\
+'''
+            )
+            == uut._do_format_docstring(
+                INDENTATION,
+                '''\
+"""
+Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """\
 ''',
             )
         )

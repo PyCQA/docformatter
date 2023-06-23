@@ -21,7 +21,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides docformatter's Syntaxor class."""
+"""This module provides docformatter's syntax functions."""
 
 
 # Standard Library Imports
@@ -31,6 +31,9 @@ import textwrap
 from typing import Iterable, List, Tuple, Union
 
 DEFAULT_INDENT = 4
+
+ALEMBIC_REGEX = r"^ *[a-zA-Z0-9_\- ]*: "
+"""Regular expression to use for finding alembic headers."""
 
 BULLET_REGEX = r"\s*[*\-+] [\S ]+"
 """Regular expression to use for finding bullet lists."""
@@ -294,12 +297,16 @@ def do_find_field_lists(text: str, style: str):
     _wrap_parameters = False
 
     if style == "epytext":
-        _field_iter = re.finditer(EPYTEXT_REGEX, text)
-        _field_idx = [(_field.start(0), _field.end(0)) for _field in _field_iter]
+        _field_idx = [
+            (_field.start(0), _field.end(0))
+            for _field in re.finditer(EPYTEXT_REGEX, text)
+        ]
         _wrap_parameters = True
     elif style == "sphinx":
-        _field_iter = re.finditer(SPHINX_REGEX, text)
-        _field_idx = [(_field.start(0), _field.end(0)) for _field in _field_iter]
+        _field_idx = [
+            (_field.start(0), _field.end(0))
+            for _field in re.finditer(SPHINX_REGEX, text)
+        ]
         _wrap_parameters = True
 
     return _field_idx, _wrap_parameters
@@ -384,18 +391,16 @@ def do_split_description(
     _url_idx = do_find_links(text)
 
     # Check if the description contains any field lists.
-    _field_idx, _wrap_fields = do_find_field_lists(text, style)
+    _field_idx, _wrap_fields = do_find_field_lists(
+        text,
+        style,
+    )
 
     # Field list wrapping takes precedence over URL wrapping.
-    for _fieldl, _fieldu in _field_idx:
-        for _key, _value in enumerate(_url_idx):
-            if (
-                _value[0] == _fieldl
-                or _value[0] == _fieldu
-                or _value[1] == _fieldl
-                or _value[1] == _fieldu
-            ):
-                _url_idx.pop(_key)
+    _url_idx = _field_over_url(
+        _field_idx,
+        _url_idx,
+    )
 
     if not _url_idx and not (_field_idx and _wrap_fields):
         return description_to_list(
@@ -424,15 +429,7 @@ def do_split_description(
         )
     else:
         # Finally, add everything after the last URL or field list directive.
-        with contextlib.suppress(IndexError):
-            _text = (
-                text[_text_idx + 1 :] if text[_text_idx] == "\n" else text[_text_idx:]
-            ).splitlines()
-            for _idx, _line in enumerate(_text):
-                if _line not in ["", "\n", f"{indentation}"]:
-                    _text[_idx] = f"{indentation}{_line.strip()}"
-
-            _lines += _text
+        _lines += _do_close_description(text, _text_idx, indentation)
 
     return _lines
 
@@ -670,7 +667,6 @@ def is_some_sort_of_list(
             re.match(SPHINX_REGEX, line)
             or
             # "parameter : description" <-- Numpy style
-            # "parameter: description" <-- Numpy style
             re.match(NUMPY_REGEX, line)
             or
             # "word\n----" <-- Numpy headings
@@ -691,6 +687,14 @@ def is_some_sort_of_list(
             or
             # "@parameter"
             re.match(r"^ *@[a-zA-Z0-9_\- ]*(?:(?!:).)*$", line)
+            or
+            # "    c :math:`[0, `]`.
+            re.match(r" *\w *:[a-zA-Z0-9_\- ]*:", line)
+            or
+            # "Revision ID: <some id>>"
+            # "Revises: <some other id>"
+            # "Create Date: 2023-01-06 10:13:28.156709"
+            re.match(ALEMBIC_REGEX, line)
         )
         for line in split_lines
     )
@@ -833,6 +837,39 @@ def wrap_description(  # noqa: PLR0913
     return indentation + "\n".join(lines).strip()
 
 
+def _do_close_description(
+    text: str,
+    text_idx: int,
+    indentation: str,
+) -> List[str]:
+    """Wrap any description following the last URL or field list.
+
+    Parameters
+    ----------
+    text : str
+        The docstring text.
+    text_idx : int
+        The index of the last URL or field list match.
+    indentation : str
+        The indentation string to use with docstrings.
+
+    Returns
+    -------
+    _split_lines : str
+        The text input split into individual lines.
+    """
+    _split_lines = []
+    with contextlib.suppress(IndexError):
+        _split_lines = (
+            text[text_idx + 1 :] if text[text_idx] == "\n" else text[text_idx:]
+        ).splitlines()
+        for _idx, _line in enumerate(_split_lines):
+            if _line not in ["", "\n", f"{indentation}"]:
+                _split_lines[_idx] = f"{indentation}{_line.strip()}"
+
+    return _split_lines
+
+
 def _do_join_field_body(text, field_idx, idx):
     """Join the filed body lines into a single line that can be wrapped.
 
@@ -857,9 +894,12 @@ def _do_join_field_body(text, field_idx, idx):
         [_line.strip() for _line in _field_body.splitlines()]
     ).strip()
 
-    if not _field_body.startswith("`"):
+    # Add a space before the field body unless the field body is a link.
+    if not _field_body.startswith("`") and _field_body:
         _field_body = f" {_field_body}"
-    if text[field_idx[idx][1] : field_idx[idx][1] + 1] == "\n":
+
+    # Is there a blank line between field lists?  Keep it if so.
+    if text[field_idx[idx][1] : field_idx[idx][1] + 2] == "\n\n":
         _field_body = "\n"
 
     return _field_body
@@ -901,3 +941,35 @@ def _do_wrap_field(field_name, field_body, indentation, wrap_length):
         _wrapped_field[_idx] = f"{_indent}{re.sub(' +', ' ', _field.strip())}"
 
     return _wrapped_field
+
+
+def _field_over_url(
+    field_idx: List[Tuple[int, int]],
+    url_idx: List[Tuple[int, int]],
+):
+    """Remove URL indices that overlap with filed list indices.
+
+    Parameters
+    ----------
+    field_idx : list
+        The list of field list index tuples.
+    url_idx : list
+        The list of URL index tuples.
+
+    Returns
+    -------
+    url_idx : list
+        The url_idx list with any tuples that have indices overlapping with field
+        list indices removed.
+    """
+    for _fieldl, _fieldu in field_idx:
+        for _key, _value in enumerate(url_idx):
+            if (
+                _value[0] == _fieldl
+                or _value[0] == _fieldu
+                or _value[1] == _fieldl
+                or _value[1] == _fieldu
+            ):
+                url_idx.pop(_key)
+
+    return url_idx

@@ -1,11 +1,17 @@
 # This workflow runs when a version tag is pushed.
 #
 # - Get new tag.
-# - If release tag:
-#   - Get next semantic version.
-#   - Close old milestones.
-#   - Create new minor version milestone.
-#   - Create new major version milestone.
+# - If version tag:
+#   - If release condidate tag:
+#      - Build the pre-release.
+#      - Cut GitHub pre-release.
+#      - Upload wheel to pre-release.
+#   - If release tag:
+#      - Generate new CHANGELOG.
+#      - Get next semantic version.
+#      - Close old milestones.
+#      - Create new minor version milestone.
+#      - Create new major version milestone.
 name: Version Tag Workflow
 
 on:
@@ -28,15 +34,43 @@ jobs:
         id: newversion
         run: |
           tag=${GITHUB_REF/refs\/tags\//}
-          version=$(echo $tag | sed 's/-rc[0-9]*//')
+          if [[ $tag == *"-rc"* ]]; then
+            echo "do_prerelease=1" >> $GItHUB_ENV
+          fi
           if [[ $tag != *"-rc"* ]]; then
             echo "do_changelog=1" >> $GITHUB_ENV
-            echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
-            echo "version=$(echo $version)" >> $GITHUB_OUTPUT
           fi
+          echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
           echo "New tag is: $tag"
-          echo "New version is: $version"
           echo "GitHub ref: ${{ github.ref }}"
+
+      - name: Build pre-release
+        id: build
+        if: ${{ env.do_prerelease == 1 }}
+        run: |
+          pip install -U pip poetry twine
+          poetry build && twine check dist/* && echo "build_ok=1" >> $GITHUB_ENV
+
+      - name: Cut pre-release
+        id: cutprerelease
+        if: ${{ env.build_ok == 1 }}
+        uses: release-drafter/release-drafter@v5
+        with:
+          name: $env.tag
+          tag: $env.tag
+          version: $env.tag
+          prerelease: true
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload wheel to GitHub pre-release
+        id: upload-wheel
+        if: ${{ env.build_ok == 1 }}
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.cutprerelease.outputs.upload_url }}
+          asset_path: ./dist/*.whl
 
       - name: Generate release changelog
         uses: heinrichreimer/github-changelog-generator-action@master
