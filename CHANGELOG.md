@@ -1,16 +1,42 @@
 # Changelog
 
+## [v1.7.3](https://github.com/PyCQA/docformatter/tree/v1.7.3) (2023-06-23)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.2...v1.7.3)
+
+Bug Fixes
+
+- fix: removing newline between Sphinx field lists [\#237](https://github.com/PyCQA/docformatter/pull/237) ([weibullguy](https://github.com/weibullguy))
+
+**Merged pull requests:**
+
+- chore: move changelog to tag workflow [\#233](https://github.com/PyCQA/docformatter/pull/233) ([weibullguy](https://github.com/weibullguy))
+
+## [v1.7.2](https://github.com/PyCQA/docformatter/tree/v1.7.2) (2023-06-07)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.1...v1.7.2)
+
+Bug Fixes
+
+- fix: wrapping issues with reST directives, quoted URLs, and Sphinx field lists [\#219](https://github.com/PyCQA/docformatter/pull/219) ([weibullguy](https://github.com/weibullguy))
+
 ## [v1.7.1](https://github.com/PyCQA/docformatter/tree/v1.7.1) (2023-05-19)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.0...v1.7.1)
 
 Features
 
+- feat: support epytext style [\#211](https://github.com/PyCQA/docformatter/pull/211) ([weibullguy](https://github.com/weibullguy))
 - feat: use tomllib for Python 3.11+ [\#208](https://github.com/PyCQA/docformatter/pull/208) ([weibullguy](https://github.com/weibullguy))
 - feat: wrap Sphinx style long parameter descriptions [\#201](https://github.com/PyCQA/docformatter/pull/201) ([weibullguy](https://github.com/weibullguy))
 
+Bug Fixes
+
+- fix: improper wrapping of short anonymous hyperlnks [\#213](https://github.com/PyCQA/docformatter/pull/213) ([weibullguy](https://github.com/weibullguy))
+
 **Merged pull requests:**
 
+- chore: update version strings [\#214](https://github.com/PyCQA/docformatter/pull/214) ([weibullguy](https://github.com/weibullguy))
 - chore: update pre-commit-config [\#209](https://github.com/PyCQA/docformatter/pull/209) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.7.0](https://github.com/PyCQA/docformatter/tree/v1.7.0) (2023-05-15)
@@ -36,6 +62,7 @@ Bug Fixes
 
 **Merged pull requests:**
 
+- chore: add GH release badge [\#200](https://github.com/PyCQA/docformatter/pull/200) ([weibullguy](https://github.com/weibullguy))
 - chore: update workflows to create release [\#198](https://github.com/PyCQA/docformatter/pull/198) ([weibullguy](https://github.com/weibullguy))
 - chore: update GH actions to generate CHANGELOG [\#194](https://github.com/PyCQA/docformatter/pull/194) ([weibullguy](https://github.com/weibullguy))
 
@@ -107,16 +134,6 @@ Bug Fixes
 ## [v1.5.1](https://github.com/PyCQA/docformatter/tree/v1.5.1) (2022-12-16)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.5.0...v1.5.1)
-
-Bug Fixes
-
-- Fix incorrect pyproject.toml parsing of boolean values [\#133](https://github.com/PyCQA/docformatter/pull/133) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- chore: update CI workflow so 3.6 still runs [\#132](https://github.com/PyCQA/docformatter/pull/132) ([weibullguy](https://github.com/weibullguy))
-- No empty lines before class and method docstrings [\#131](https://github.com/PyCQA/docformatter/pull/131) ([mcflugen](https://github.com/mcflugen))
-- Allow showing the diff when using --in-place or --check with --diff [\#128](https://github.com/PyCQA/docformatter/pull/128) ([BenjaminSchubert](https://github.com/BenjaminSchubert))
 
 ## [v1.5.0](https://github.com/PyCQA/docformatter/tree/v1.5.0) (2022-08-19)
 
