@@ -1,0 +1,31 @@
+[quote.no_space]
+instring='''"""   This one-line docstring will not have a leading space."""'''
+outstring='''"""This one-line docstring will not have a leading space."""'''
+
+[quote.space]
+instring='''""""This" quote starting one-line docstring will have a leading space."""'''
+outstring='''""" "This" quote starting one-line docstring will have a leading space."""'''
+
+[quote.space_2]
+instring='''""""This" quote starting one-line docstring will have a leading space.
+
+This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
+"""'''
+outstring='''""" "This" quote starting one-line docstring will have a leading space.
+
+    This long description will be wrapped at 88 characters because we
+    passed the --black option and 88 characters is the default wrap
+    length.
+    """'''
+
+[issue_176]
+instring='''class C:
+    """Class.""" #noqa
+
+    attr: int
+    """Attr."""'''
+outstring='''class C:
+    """Class.""" #noqa
+
+    attr: int
+    """Attr."""'''
