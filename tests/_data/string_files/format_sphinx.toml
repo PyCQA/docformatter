@@ -212,3 +212,14 @@ outstring='''"""Summary.
 
     :param param: asdf
     """'''
+
+[issue_245]
+instring='''"""Some f.
+    :param a: Some param.
+    :raises my.package.MyReallySrsError: Bad things happened.
+    """'''
+outstring='''"""Some f.
+
+    :param a: Some param.
+    :raises my.package.MyReallySrsError: Bad things happened.
+    """'''
