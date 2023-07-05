@@ -51,7 +51,7 @@ INDENTATION = "    "
 class TestFormatDocstring:
     """Class for testing _do_format_docstring() with no arguments."""
 
-    with open("tests/_data/string_files/format_docstrings.toml", "rb") as f:
+    with open("tests/_data/string_files/do_format_docstrings.toml", "rb") as f:
         TEST_STRINGS = tomllib.load(f)
 
     @pytest.mark.unit

@@ -81,27 +81,57 @@ class TestFormatWrapBlack:
             sys.stdout,
         )
 
-        instring = self.TEST_STRINGS["quote"]["no_space"]["instring"]
-        outstring = self.TEST_STRINGS["quote"]["no_space"]["outstring"]
+        instring = self.TEST_STRINGS["quote_no_space"]["instring"]
+        outstring = self.TEST_STRINGS["quote_no_space"]["outstring"]
 
         assert outstring == uut._do_format_docstring(
             INDENTATION,
             instring,
         )
 
-        instring = self.TEST_STRINGS["quote"]["space"]["instring"]
-        outstring = self.TEST_STRINGS["quote"]["space"]["outstring"]
+        instring = self.TEST_STRINGS["quote_space"]["instring"]
+        outstring = self.TEST_STRINGS["quote_space"]["outstring"]
 
         assert outstring == uut._do_format_docstring(
             INDENTATION,
             instring,
         )
 
-        instring = self.TEST_STRINGS["quote"]["space_2"]["instring"]
-        outstring = self.TEST_STRINGS["quote"]["space_2"]["outstring"]
+        instring = self.TEST_STRINGS["quote_space_2"]["instring"]
+        outstring = self.TEST_STRINGS["quote_space_2"]["outstring"]
 
         assert outstring == uut._do_format_docstring(
             INDENTATION,
+            instring,
+        )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--black",
+                "",
+            ]
+        ],
+    )
+    def test_format_code_strip_blank_lines(
+        self,
+        test_args,
+        args,
+    ):
+        """Blank lines are stripped in black mode."""
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["strip_blank_lines"]["instring"]
+        outstring = self.TEST_STRINGS["strip_blank_lines"]["outstring"]
+
+        assert outstring == uut._do_format_code(
             instring,
         )
 
