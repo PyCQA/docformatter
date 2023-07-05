@@ -1,12 +1,12 @@
-[quote.no_space]
+[quote_no_space]
 instring='''"""   This one-line docstring will not have a leading space."""'''
 outstring='''"""This one-line docstring will not have a leading space."""'''
 
-[quote.space]
+[quote_space]
 instring='''""""This" quote starting one-line docstring will have a leading space."""'''
 outstring='''""" "This" quote starting one-line docstring will have a leading space."""'''
 
-[quote.space_2]
+[quote_space_2]
 instring='''""""This" quote starting one-line docstring will have a leading space.
 
 This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
@@ -17,6 +17,50 @@ outstring='''""" "This" quote starting one-line docstring will have a leading sp
     passed the --black option and 88 characters is the default wrap
     length.
     """'''
+
+[strip_blank_lines]
+instring='''
+    class TestClass:
+
+        """This is a class docstring."""
+
+        class_attribute = 1
+
+        def test_method_1(self):
+            """This is a method docstring.
+
+            With no blank line after it.
+            """
+            pass
+
+        def test_method_2(self):
+
+            """This is a method docstring.
+
+            With a long description followed by multiple blank lines.
+            """
+
+
+            pass'''
+outstring='''
+    class TestClass:
+        """This is a class docstring."""
+
+        class_attribute = 1
+
+        def test_method_1(self):
+            """This is a method docstring.
+
+            With no blank line after it.
+            """
+            pass
+
+        def test_method_2(self):
+            """This is a method docstring.
+
+            With a long description followed by multiple blank lines.
+            """
+            pass'''
 
 [issue_176]
 instring='''class C:
