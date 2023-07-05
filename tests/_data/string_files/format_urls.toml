@@ -227,8 +227,8 @@ instring='''"""Locate and call the ``mpm`` CLI.
     """'''
 outstring='''"""Locate and call the ``mpm`` CLI.
 
-    The output must supports both `Xbar dialect
-    <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    The output must supports both
+    `Xbar dialect <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
     and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
     """'''
 
@@ -288,8 +288,7 @@ def sub_func_test():
 
 [issue_157_8]
 instring='''def mixed_links():
-    """Implements the minimal code necessary to locate and call the ``mpm`` CLI on the
-    system.
+    """Implements the minimal code necessary to locate and call the ``mpm`` CLI on the system.
 
     Once ``mpm`` is located, we can rely on it to produce the main output of the plugin.
 
@@ -331,8 +330,8 @@ By default we choose to exclude:
   options set.
 """'''
 outstring='''def mixed_links():
-    """Implements the minimal code necessary to locate and call the ``mpm`` CLI on the
-    system.
+    """Implements the minimal code necessary to locate and call the ``mpm`` CLI
+    on the system.
 
     Once ``mpm`` is located, we can rely on it to produce the main output of the plugin.
 

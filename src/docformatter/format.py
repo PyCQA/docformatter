@@ -479,7 +479,6 @@ class Formatter:
                 self.args.rest_section_adorns,
                 self.args.style,
             )
-            or _syntax.do_find_directives(summary)
             or _syntax.do_find_links(summary)
         ):
             # Something is probably not right with the splitting.
