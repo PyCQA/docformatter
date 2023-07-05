@@ -1,0 +1,215 @@
+[one_line]
+instring='''"""
+
+Hello.
+"""'''
+outstring='''"""Hello."""'''
+
+[summary_end_quote]
+instring='''"""
+
+"Hello"
+"""'''
+outstring='''""""Hello"."""'''
+
+[bad_indentation]
+instring='''"""Hello.
+
+ This should be indented but it is not. The
+ next line should be indented too. And
+ this too.
+"""'''
+outstring='''"""Hello.
+
+    This should be indented but it is not.
+    The next line should be indented too.
+    And this too.
+    """'''
+
+[too_much_indentation]
+instring='''"""Hello.
+
+        This should be dedented.
+
+        1. This too.
+        2. And this.
+        3. And this.
+
+    """'''
+outstring='''"""Hello.
+
+    This should be dedented.
+
+    1. This too.
+    2. And this.
+    3. And this.
+    """'''
+
+[trailing_whitespace]
+instring='''"""Hello.	
+	
+    This should be not have trailing whitespace. The			
+    next line should not have trailing whitespace either.	
+	
+    """'''
+outstring='''"""Hello.
+
+    This should be not have trailing whitespace. The
+    next line should not have trailing whitespace
+    either.
+    """'''
+
+[empty_docstring]
+instring='''""""""'''
+outstring='''""""""'''
+
+[no_summary_period]
+instring='''"""
+
+Hello
+"""'''
+outstring='''"""Hello."""'''
+
+[single_quotes]
+instring="""'''
+
+Hello.
+'''"""
+outstring='''"""Hello."""'''
+
+[single_quotes_multiline]
+instring="""'''
+    Return x factorial.
+
+    This uses math.factorial.
+    '''"""
+outstring='''"""Return x factorial.
+
+    This uses math.factorial.
+    """'''
+
+[skip_underlined_summary]
+instring='''"""
+    Foo bar
+    -------
+
+    This is more.
+
+    """'''
+outstring='''"""
+    Foo bar
+    -------
+
+    This is more.
+
+    """'''
+
+[issue_156]
+instring='''class AcceptHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept"
+        schema_type = String
+        missing = drop
+        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+
+
+    class AcceptLanguageHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept-Language"
+        schema_type = String
+        missing = drop
+        default = AcceptLanguage.EN_CA
+        # FIXME: oneOf validator for supported languages (?)'''
+outstring='''class AcceptHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept"
+        schema_type = String
+        missing = drop
+        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+
+
+    class AcceptLanguageHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept-Language"
+        schema_type = String
+        missing = drop
+        default = AcceptLanguage.EN_CA
+        # FIXME: oneOf validator for supported languages (?)'''
+
+[issue_157]
+instring='''""".. code-block:: shell-session
+
+    ► apm --version
+    apm  2.6.2
+    npm  6.14.13
+    node 12.14.1 x64
+    atom 1.58.0
+    python 2.7.16
+    git 2.33.0
+    """'''
+outstring='''""".. code-block:: shell-session
+
+    ► apm --version
+    apm  2.6.2
+    npm  6.14.13
+    node 12.14.1 x64
+    atom 1.58.0
+    python 2.7.16
+    git 2.33.0
+    """'''
+
+[issue_176]
+instring='''def Class1:
+    """Class.""" #noqa
+
+    attribute
+    """Attr."""
+
+
+def Class2:
+    """Class."""
+
+    attribute
+    """Attr."""
+
+
+def Class3:
+    """Class docstring.
+
+    With long description.
+    """    #noqa
+
+    attribute
+    """Attr."""'''
+outstring='''def Class1:
+    """Class.""" #noqa
+
+    attribute
+    """Attr."""
+
+
+def Class2:
+    """Class."""
+
+    attribute
+    """Attr."""
+
+
+def Class3:
+    """Class docstring.
+
+    With long description.
+    """    #noqa
+
+    attribute
+    """Attr."""'''
+
+[issue_193]
+instring='''"""
+eBay kinda suss
+"""'''
+outstring='''"""eBay kinda suss."""'''

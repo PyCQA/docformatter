@@ -1,0 +1,133 @@
+[unwrap]
+instring='''"This
+
+	is
+
+a sentence."'''
+outstring='''"This is a sentence."'''
+
+[weird_punctuation]
+instring='''"""Creates and returns four was awakens to was created tracked
+               ammonites was the fifty, arithmetical four was pyrotechnic to
+               pyrotechnic physicists. `four' falsified x falsified ammonites
+               to awakens to. `created' to ancestor was four to x dynamo to was
+               four ancestor to physicists().
+            """'''
+outstring='''"""Creates and returns four was awakens to was created tracked ammonites
+    was the fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
+
+    `four' falsified x falsified ammonites to awakens to. `created' to
+    ancestor was four to x dynamo to was four ancestor to physicists().
+    """'''
+
+[description_wrap]
+instring='''"""Hello.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """'''
+outstring='''"""Hello.
+
+    This should be indented but it is not. The next line should be
+    indented too. But this is okay.
+    """'''
+
+[ignore_doctest]
+instring='''"""Hello.
+
+    >>> 4
+    4
+    """'''
+outstring='''"""Hello.
+
+    >>> 4
+    4
+    """'''
+
+[ignore_summary_doctest]
+instring='''"""
+    >>> 4
+    4
+
+    """'''
+outstring='''"""
+    >>> 4
+    4
+
+    """'''
+
+[same_indentation_doctest]
+instring='''"""Foo bar bing bang.
+
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
+
+    """'''
+outstring='''"""Foo bar bing bang.
+
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
+    """'''
+
+[force_wrap]
+instring='''"""
+num_iterations is the number of updates - instead of a better definition of convergence.
+"""'''
+outstring='''"""num_iterations is the number of updates -
+    instead of a better definition of
+    convergence."""'''
+
+[summary_wrap_tab]
+instring='''		"""Some summary x x x x."""'''
+outstring='''"""Some summary x x x
+		x."""'''
+
+[one_line_wrap_newline]
+instring='''"""This one-line docstring will be multi-line because it's quite long."""'''
+outstring='''"""This one-line docstring will be multi-line because it's quite
+    long.
+    """'''
+
+[one_line_no_wrap]
+instring='''"""This one-line docstring will not be wrapped and quotes will be in-line."""'''
+outstring='''"""This one-line docstring will not be wrapped and quotes will be in-line."""'''
+
+[class_attribute_wrap]
+instring='''class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""'''
+outstring='''class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be
+    reformatted nicely by docformatter."""'''
+
+[issue_79]
+instring='''def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
+    -v."""'''
+outstring='''def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
+    -v."""'''
+
+[issue_127]
+instring='''"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it is not.
+
+    It doesn't wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """'''
+outstring='''"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it
+    is not.
+
+    It doesn't wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """'''

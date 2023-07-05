@@ -1,0 +1,304 @@
+[one_line]
+instring='''def foo():
+    """
+    Hello foo.
+    """'''
+outstring='''def foo():
+    """Hello foo."""'''
+
+[module_docstring]
+instring='''#!/usr/env/bin python
+"""This is
+a module
+docstring.
+
+1. One
+2. Two
+"""
+
+"""But
+this
+is
+not."""'''
+outstring='''#!/usr/env/bin python
+"""This is a module docstring.
+
+1. One
+2. Two
+"""
+
+"""But
+this
+is
+not."""'''
+
+[newline_module_variable]
+instring='''
+    CONST = 123
+
+    """docstring for CONST."""
+    '''
+outstring='''
+    CONST = 123
+    """docstring for CONST."""
+'''
+
+[class_docstring]
+instring='''
+    class TestClass:
+        """This is a class docstring.
+        :cvar test_int: a class attribute.
+        ..py.method: big_method()
+        """
+    '''
+outstring='''
+    class TestClass:
+        """This is a class docstring.
+
+        :cvar test_int: a class attribute.
+        ..py.method: big_method()
+        """
+'''
+
+[newline_class_variable]
+instring='''
+    class TestClass:
+
+        """This is a class docstring."""
+
+        test_var = 0
+
+        """This is a class variable docstring."""
+
+        test_var2 = 1
+
+
+        """This is a second class variable docstring."""
+    '''
+outstring='''
+    class TestClass:
+        """This is a class docstring."""
+
+        test_var = 0
+        """This is a class variable docstring."""
+
+        test_var2 = 1
+        """This is a second class variable docstring."""
+'''
+
+[newline_outside_docstring]
+instring='''
+def new_function():
+    """Description of function."""
+    found = next(
+        (index for index, line in enumerate(split) if line.strip()), 0
+    )
+
+    return "\n".join(split[found:])
+'''
+outstring='''
+def new_function():
+    """Description of function."""
+    found = next(
+        (index for index, line in enumerate(split) if line.strip()), 0
+    )
+
+    return "\n".join(split[found:])
+'''
+
+[preserve_line_ending]
+instring='''
+def foo():\r
+    """\r
+    Hello\r
+    foo. This is a docstring.\r
+    """\r
+'''
+outstring='''def foo():\r
+    """\r
+    Hello\r
+    foo. This is a docstring.\r
+    """\r
+'''
+
+[issue_51]
+instring='''def my_func():
+
+"""Summary of my function."""
+pass'''
+outstring='''def my_func():
+"""Summary of my function."""
+pass'''
+
+[issue_51_2]
+instring='''
+def crash_rocket(location):    # pragma: no cover
+    """This is a docstring following an in-line comment."""
+    return location'''
+outstring='''
+def crash_rocket(location):    # pragma: no cover
+    """This is a docstring following an in-line comment."""
+    return location'''
+
+[issue_97]
+instring='''def pytest_addoption(parser: pytest.Parser) -> "
+            None:
+    register_toggle.pytest_addoption(parser)
+'''
+outstring='''def pytest_addoption(parser: pytest.Parser) -> "
+            None:
+    register_toggle.pytest_addoption(parser)
+'''
+
+[issue_97_2]
+instring='''def pytest_addoption(parser: pytest.Parser) -> 
+            None:    # pragma: no cover
+    
+            register_toggle.pytest_addoption(parser)
+'''
+outstring='''def pytest_addoption(parser: pytest.Parser) -> 
+            None:    # pragma: no cover
+    
+            register_toggle.pytest_addoption(parser)
+'''
+
+[issue_130]
+instring='''
+class TestClass:
+
+    """This is a class docstring."""
+
+    def test_method(self):
+
+        """This is a method docstring.
+
+        With a long description followed by two blank lines.
+        """
+
+
+        pass
+'''
+outstring='''
+class TestClass:
+    """This is a class docstring."""
+
+    def test_method(self):
+        """This is a method docstring.
+
+        With a long description followed by two blank lines.
+        """
+        pass
+'''
+
+[issue_139]
+instring='''
+class TestClass:
+
+    """This is a class docstring.
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+'''
+outstring='''
+class TestClass:
+    """This is a class docstring.
+
+    :cvar test_int: a class attribute.
+    ..py.method: big_method()
+    """
+'''
+
+[issue_139_2]
+instring="""
+class TestClass:
+
+    variable = 1
+"""
+outstring="""
+class TestClass:
+
+    variable = 1
+"""
+
+[issue_156]
+instring='''
+def test_wps3_process_step_io_data_or_href():
+    """Validates that \'data\' literal values and \'href\' file references are both
+    handled as input for workflow steps corresponding to a WPS-3 process."""
+
+    def mock_wps_request(method, url, *_, **kwargs):
+        nonlocal test_reached_parse_inputs
+
+        method = method.upper()
+'''
+outstring='''
+def test_wps3_process_step_io_data_or_href():
+    """Validates that \'data\' literal values and \'href\' file references are
+    both handled as input for workflow steps corresponding to a WPS-3
+    process."""
+
+    def mock_wps_request(method, url, *_, **kwargs):
+        nonlocal test_reached_parse_inputs
+
+        method = method.upper()
+'''
+
+[issue_156_173]
+instring='''
+class Foo:
+
+    @abstractmethod
+    def bar(self):
+
+        """This is a description."""
+
+    @abstractmethod
+    def baz(self):
+
+        """This is a second description."""
+
+'''
+outstring='''
+class Foo:
+
+    @abstractmethod
+    def bar(self):
+        """This is a description."""
+
+    @abstractmethod
+    def baz(self):
+        """This is a second description."""
+
+'''
+
+[issue_187]
+instring='''
+#!/usr/bin/env python
+
+"""a.py"""
+'''
+outstring='''
+#!/usr/bin/env python
+
+"""a.py."""
+'''
+
+[issue_203]
+instring='''
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+outstring='''
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''

@@ -1,0 +1,214 @@
+[sphinx]
+instring='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""'''
+outstring='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    :rtype: str
+    """'''
+
+[sphinx.numpy]
+instring='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""'''
+outstring='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+    """'''
+
+[issue_215]
+instring='''"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """'''
+outstring='''"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """'''
+
+[issue_217_222]
+instring='''"""Base for all Commands.
+
+:param logger: Logger for console and logfile.
+:param console: Facilitates console interaction and input solicitation.
+:param tools: Cache of tools populated by Commands as they are required.
+:param apps: Dictionary of project's Apps keyed by app name.
+:param base_path: Base directory for Briefcase project.
+:param data_path: Base directory for Briefcase tools, support packages, etc.
+:param is_clone: Flag that Command was triggered by the user's requested Command;
+    for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+"""'''
+outstring='''"""Base for all Commands.
+
+    :param logger: Logger for console and logfile.
+    :param console: Facilitates console interaction and input solicitation.
+    :param tools: Cache of tools populated by Commands as they are required.
+    :param apps: Dictionary of project's Apps keyed by app name.
+    :param base_path: Base directory for Briefcase project.
+    :param data_path: Base directory for Briefcase tools, support packages, etc.
+    :param is_clone: Flag that Command was triggered by the user's requested Command;
+        for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+    """'''
+
+[issue_224]
+instring='''"""
+Add trackers to a torrent.
+
+:raises NotFound404Error:
+
+:param torrent_hash: hash for torrent
+:param urls: tracker URLs to add to torrent
+:return: None
+"""'''
+outstring='''"""Add trackers to a torrent.
+
+    :raises NotFound404Error:
+
+    :param torrent_hash: hash for torrent
+    :param urls: tracker URLs to add to torrent
+    :return: None
+    """'''
+
+[issue_228]
+instring='''"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that
+        will be written.
+    """'''
+outstring='''"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that will be
+        written.
+    """'''
+
+[issue_229]
+instring='''"""CC.
+
+    :meth:`!X`
+    """'''
+outstring='''"""CC.
+
+    :meth:`!X`
+    """'''
+
+[issue_229_2]
+instring='''"""CC.
+
+    :math: `-`
+    """'''
+outstring='''"""CC.
+
+    :math:`-`
+    """'''
+
+[issue_230]
+instring='''"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """'''
+outstring= '''"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """'''
+
+[issue_232]
+instring='''def function:
+    """
+    :param x: X
+    :param y: Y
+    """'''
+outstring='''def function:
+    """
+    :param x: X
+    :param y: Y
+    """'''
+
+[issue_234]
+instring=''' """CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """'''
+outstring='''"""CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """'''
+
+[issue_235]
+instring='''"""CC.
+
+    C.
+
+    C,
+    :math:`[0, 1]`.
+"""'''
+outstring='''"""CC.
+
+    C.
+
+    C,
+    :math:`[0, 1]`.
+    """'''
+
+[issue_239]
+instring='''"""
+Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """'''
+outstring='''"""Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """'''

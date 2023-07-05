@@ -1,0 +1,38 @@
+[no_blank]
+instring='''"""
+
+Hello.
+
+    Description.
+
+
+    """'''
+outstring='''"""Hello.
+
+    Description.
+    """'''
+
+[presummary_newline]
+instring='''"""
+
+Hello.
+
+    Description.
+
+
+    """'''
+outstring='''"""
+    Hello.
+
+    Description.
+    """'''
+
+[summary_multiline]
+instring='''"""This one-line docstring will be multi-line"""'''
+outstring='''"""
+    This one-line docstring will be multi-line.
+    """'''
+
+[presummary_space]
+instring='''"""This one-line docstring will have a leading space."""'''
+outstring='''""" This one-line docstring will have a leading space."""'''
