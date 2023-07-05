@@ -10,7 +10,7 @@ license = "Expat"
 readme = "README.rst"
 homepage = "https://github.com/PyCQA/docformatter"
 repository = "https://github.com/PyCQA/docformatter"
-documentation = "https://github.com/PyCQA/docformatter"
+documentation = "https://docformatter.readthedocs.io/en/latest/"
 keywords = [
     "PEP 257", "pep257", "style", "formatter", "docstrings",
 ]
