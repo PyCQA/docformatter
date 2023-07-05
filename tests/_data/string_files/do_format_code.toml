@@ -302,3 +302,14 @@ from typing import Iterator
 """Don't remove this comment, it's cool."""
 IMPORTANT_CONSTANT = "potato"
 '''
+
+[issue_243]
+instring='''def foo(bar):
+    """Return `foo` using `bar`. Description."""
+'''
+outstring='''def foo(bar):
+    """Return `foo` using `bar`.
+
+    Description.
+    """
+'''

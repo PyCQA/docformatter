@@ -420,3 +420,28 @@ class TestDoFormatCode:
         assert outstring == uut._do_format_code(
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_format_code_with_backtick_in_summary(
+        self,
+        test_args,
+        args,
+    ):
+        """Format docstring with summary containing backticks.
+
+        See issue #243.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_243"]["instring"]
+        outstring = self.TEST_STRINGS["issue_243"]["outstring"]
+
+        assert outstring == uut._do_format_code(
+            instring,
+        )

@@ -359,3 +359,40 @@ class TestFormatWrapSphinx:
             INDENTATION,
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_field_name_has_periods(
+        self,
+        test_args,
+        args,
+    ):
+        """Should format sphinx field names containing a period.
+
+        See issue #245.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_245"]["instring"]
+        outstring = self.TEST_STRINGS["issue_245"]["outstring"]
+
+        assert outstring == uut._do_format_docstring(
+            INDENTATION,
+            instring,
+        )
