@@ -35,7 +35,7 @@ jobs:
         run: |
           tag=${GITHUB_REF/refs\/tags\//}
           if [[ $tag == *"-rc"* ]]; then
-            echo "do_prerelease=1" >> $GItHUB_ENV
+            echo "do_prerelease=1" >> $GITHUB_ENV
           fi
           if [[ $tag != *"-rc"* ]]; then
             echo "do_changelog=1" >> $GITHUB_ENV
