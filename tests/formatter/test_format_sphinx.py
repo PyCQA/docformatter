@@ -396,3 +396,40 @@ class TestFormatWrapSphinx:
             INDENTATION,
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_ignore_directive(
+        self,
+        test_args,
+        args,
+    ):
+        """Should not identify inline directives as sphinx field names.
+
+        See issue #250.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_250"]["instring"]
+        outstring = self.TEST_STRINGS["issue_250"]["outstring"]
+
+        assert outstring == uut._do_format_docstring(
+            INDENTATION,
+            instring,
+        )
