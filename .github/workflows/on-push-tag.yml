@@ -56,9 +56,9 @@ jobs:
         if: ${{ env.build_ok == 1 }}
         uses: release-drafter/release-drafter@v5
         with:
-          name: $env.tag
-          tag: $env.tag
-          version: $env.tag
+          name: ${{ env.tag }}
+          tag: ${{ env.tag }}
+          version: ${{ env.tag }}
           prerelease: true
           publish: true
         env:
