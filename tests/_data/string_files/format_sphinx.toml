@@ -139,7 +139,7 @@ instring='''"""CC.
     """'''
 outstring='''"""CC.
 
-    :math:`-`
+    :math: `-`
     """'''
 
 [issue_230]
@@ -190,8 +190,7 @@ outstring='''"""CC.
 
     C.
 
-    C,
-    :math:`[0, 1]`.
+    C, :math:`[0, 1]`.
     """'''
 
 [issue_239]
@@ -222,4 +221,18 @@ outstring='''"""Some f.
 
     :param a: Some param.
     :raises my.package.MyReallySrsError: Bad things happened.
+    """'''
+
+[issue_250]
+instring=''' """CC.
+
+    c.
+
+    c c :math:`[0, 1]`.
+    """'''
+outstring='''"""CC.
+
+    c.
+
+    c c :math:`[0, 1]`.
     """'''

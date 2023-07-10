@@ -59,7 +59,7 @@ OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
 REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
 """Regular expression to use for finding reST directives."""
 
-SPHINX_REGEX = r":[a-zA-Z0-9_\-(). ]*:"
+SPHINX_REGEX = r":(param|raises|return|rtype|type)[a-zA-Z0-9_\-.() ]*:"
 """Regular expression to use for finding Sphinx-style field lists."""
 
 URL_PATTERNS = (
@@ -276,7 +276,10 @@ def do_find_directives(text: str) -> bool:
     return bool([(_rest.start(0), _rest.end(0)) for _rest in _rest_iter])
 
 
-def do_find_field_lists(text: str, style: str):
+def do_find_field_lists(
+    text: str,
+    style: str,
+):
     r"""Determine if docstring contains any field lists.
 
     Parameters
