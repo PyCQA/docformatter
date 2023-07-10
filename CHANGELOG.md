@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.7.4](https://github.com/PyCQA/docformatter/tree/v1.7.4) (2023-07-10)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.3...v1.7.4)
+
+Bug Fixes
+
+- fix: summary with back ticks and sphinx field names with periods [\#248](https://github.com/PyCQA/docformatter/pull/248) ([weibullguy](https://github.com/weibullguy))
+
+**Merged pull requests:**
+
+- test: split format tests into multiple files [\#246](https://github.com/PyCQA/docformatter/pull/246) ([weibullguy](https://github.com/weibullguy))
+- chore: update documentation link for metadata [\#247](https://github.com/PyCQA/docformatter/pull/247) ([icp1994](https://github.com/icp1994))
+
 ## [v1.7.3](https://github.com/PyCQA/docformatter/tree/v1.7.3) (2023-06-23)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.2...v1.7.3)
