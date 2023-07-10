@@ -1,18 +1,11 @@
 # This workflow runs when a version tag is pushed.
 #
 # - Get new tag.
-# - If version tag:
-#   - If release condidate tag:
-#      - Build the pre-release.
-#      - Cut GitHub pre-release.
-#      - Upload wheel to pre-release.
-#   - If release tag:
-#      - Generate new CHANGELOG.
-#      - Get next semantic version.
-#      - Close old milestones.
-#      - Create new minor version milestone.
-#      - Create new major version milestone.
-name: Version Tag Workflow
+# - If release condidate tag:
+#   - Build the pre-release.
+#   - Cut GitHub pre-release.
+#   - Upload wheel to pre-release.
+name: Prerelease Tag Workflow
 
 on:
   push:
@@ -20,8 +13,8 @@ on:
       - 'v*'
 
 jobs:
-  update_changelog:
-    name: Update Changelog
+  cut_prerelease:
+    name: Cut Pre-Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,9 +29,6 @@ jobs:
           tag=${GITHUB_REF/refs\/tags\//}
           if [[ $tag == *"-rc"* ]]; then
             echo "do_prerelease=1" >> $GITHUB_ENV
-          fi
-          if [[ $tag != *"-rc"* ]]; then
-            echo "do_changelog=1" >> $GITHUB_ENV
           fi
           echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
           echo "New tag is: $tag"
@@ -71,100 +61,3 @@ jobs:
         with:
           upload_url: ${{ steps.cutprerelease.outputs.upload_url }}
           asset_path: ./dist/*.whl
-
-      - name: Generate release changelog
-        uses: heinrichreimer/github-changelog-generator-action@master
-        if: ${{ env.do_changelog == 1 }}
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sinceTag: "v1.3.1"
-          excludeTagsRegex: "-rc[0-9]"
-          breakingLabel: "Breaking Changes"
-          breakingLabels: "V: major"
-          enhancementLabel: "Features"
-          enhancementLabels: "P: enhancement"
-          bugsLabel: "Bug Fixes"
-          bugLabels: "P: bug"
-          excludeLabels: "release"
-          issues: false
-          issuesWoLabels: false
-          maxIssues: 100
-          pullRequests: true
-          prWoLabels: false
-          author: true
-          unreleased: true
-          compareLink: true
-          stripGeneratorNotice: true
-          verbose: true
-
-      - name: Check if diff
-        if: ${{ env.do_changelog == 1 }}
-        continue-on-error: true
-        run: >
-          git diff --exit-code CHANGELOG.md &&
-          (echo "### No update" && exit 1) || (echo "### Commit update")
-
-      - uses: EndBug/add-and-commit@v9
-        name: Commit and push if diff
-        if: ${{ env.do_changelog == 1 }}
-        with:
-          add: CHANGELOG.md
-          message: 'chore: update CHANGELOG.md for new release'
-          author_name: GitHub Actions
-          author_email: action@github.com
-          committer_name: GitHub Actions
-          committer_email: actions@github.com
-          push: true
-
-  manage_milestones:
-    name: Manage Milestones
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: master
-
-      - name: Get new tag
-        id: newversion
-        run: |
-          tag=${GITHUB_REF/refs\/tags\//}
-          version=$(echo $tag | sed 's/-rc[0-9]*//')
-          if [[ $tag != *"-rc"* ]]; then
-            echo "do_milestones=1" >> $GITHUB_ENV
-            echo "tag=$(echo $tag)" >> $GITHUB_OUTPUT
-            echo "version=$(echo $version)" >> $GITHUB_OUTPUT
-          fi
-          echo "New tag is: $tag"
-          echo "New version is: $version"
-          echo "GitHub ref: ${{ github.ref }}"
-
-      - name: Get next semantic version
-        id: nextversion
-        if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-next-semvers@v1.2.1
-        with:
-          version: ${{ steps.newversion.outputs.version }}
-
-      - name: Close old milestone
-        if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-close-milestone@master
-        with:
-          number: ${{ steps.newversion.outputs.version }}
-
-      - name: Create new minor release milestone
-        if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-create-milestone@v1.2.0
-        with:
-          title: "${{ steps.nextversion.outputs.v_minor }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create new major release milestone
-        if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-create-milestone@v1.2.0
-        with:
-          title: "${{ steps.nextversion.outputs.v_major }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
