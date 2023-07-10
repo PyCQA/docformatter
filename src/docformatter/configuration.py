@@ -87,9 +87,18 @@ class Configurater:
             self.config_file = self.args_lst[self.args_lst.index("--config") + 1]
         except ValueError:
             for _configuration_file in self.configuration_file_lst:
-                if os.path.isfile(_configuration_file):
-                    self.config_file = f"./{_configuration_file}"
-                    break
+                _config_section: str = (
+                    "[tool.docformatter]"
+                    if _configuration_file == "pyproject.toml"
+                    else "[docformatter]"
+                )
+                _config_file_path: str = f"./{_configuration_file}"
+                if os.path.isfile(_config_file_path):
+                    with open(_config_file_path, "r") as _config_file:
+                        _config = _config_file.read()
+                    if _config_section in _config:
+                        self.config_file = _config_file_path
+                        break
 
         if os.path.isfile(self.config_file):
             self._do_read_configuration_file()
