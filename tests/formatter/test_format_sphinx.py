@@ -433,3 +433,42 @@ class TestFormatWrapSphinx:
             INDENTATION,
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "120",
+                "--wrap-summaries",
+                "120",
+                "--pre-summary-newline",
+                "--black",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_recognize_yield(
+        self,
+        test_args,
+        args,
+    ):
+        """Should identify `yield` as sphinx field name.
+
+        See issue #253.
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_253"]["instring"]
+        outstring = self.TEST_STRINGS["issue_253"]["outstring"]
+
+        assert outstring == uut._do_format_docstring(
+            INDENTATION,
+            instring,
+        )

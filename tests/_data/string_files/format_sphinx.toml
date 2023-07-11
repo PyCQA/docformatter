@@ -236,3 +236,17 @@ outstring='''"""CC.
 
     c c :math:`[0, 1]`.
     """'''
+
+[issue_253]
+instring='''"""
+    My test fixture.
+
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
+outstring='''"""
+    My test fixture.
+
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
