@@ -17,6 +17,7 @@ Additional contributions by (sorted by name)
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
+- Casey Korver <84342833+korverdev@users.noreply.github.com>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
