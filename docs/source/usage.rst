@@ -127,7 +127,7 @@ with the following ``.pre-commit-config.yaml`` configuration:
 .. code-block:: yaml
 
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.6.1
+    rev: v1.7.5
     hooks:
       - id: docformatter
         additional_dependencies: [tomli]
