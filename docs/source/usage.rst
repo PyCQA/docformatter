@@ -131,7 +131,7 @@ with the following ``.pre-commit-config.yaml`` configuration:
     hooks:
       - id: docformatter
         additional_dependencies: [tomli]
-        args: [--in-place --config ./pyproject.toml]
+        args: [--in-place, --config, ./pyproject.toml]
 
 You will need to install ``pre-commit`` and run ``pre-commit install``.
 
