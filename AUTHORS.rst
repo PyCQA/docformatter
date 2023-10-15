@@ -22,6 +22,7 @@ Additional contributions by (sorted by name)
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
+- Jonas Haag <jonas@lophus.org>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Kian-Meng Ang <kianmeng.ang@gmail.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
