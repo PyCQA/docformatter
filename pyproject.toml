@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.7.4"
+version = "1.7.5"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -275,4 +275,11 @@ commands =
     pydocstyle {toxinidir}/src/docformatter
     ruff check --select "PL" --select "F" {toxinidir}/src/docformatter
     rstcheck --report-level=1 {toxinidir}/README.rst
+
+[testenv:docs]
+description = build docformatter documentation
+allowlist_externals = make
+changedir = docs
+commands =
+    make html
 """

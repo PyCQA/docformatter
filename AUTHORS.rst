@@ -17,9 +17,12 @@ Additional contributions by (sorted by name)
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
+- Casey Korver <84342833+korverdev@users.noreply.github.com>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
+- Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
+- Jonas Haag <jonas@lophus.org>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Kian-Meng Ang <kianmeng.ang@gmail.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>

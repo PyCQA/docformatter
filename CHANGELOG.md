@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.7.5](https://github.com/PyCQA/docformatter/tree/v1.7.5) (2023-07-12)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.4...v1.7.5)
+
+Features
+
+- fix: not recognizing `yield` as a sphinx field name [\#254](https://github.com/PyCQA/docformatter/pull/254) ([weibullguy](https://github.com/weibullguy))
+
 ## [v1.7.4](https://github.com/PyCQA/docformatter/tree/v1.7.4) (2023-07-10)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.3...v1.7.4)
@@ -10,8 +18,8 @@ Bug Fixes
 
 **Merged pull requests:**
 
-- test: split format tests into multiple files [\#246](https://github.com/PyCQA/docformatter/pull/246) ([weibullguy](https://github.com/weibullguy))
 - chore: update documentation link for metadata [\#247](https://github.com/PyCQA/docformatter/pull/247) ([icp1994](https://github.com/icp1994))
+- test: split format tests into multiple files [\#246](https://github.com/PyCQA/docformatter/pull/246) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.7.3](https://github.com/PyCQA/docformatter/tree/v1.7.3) (2023-06-23)
 
@@ -125,24 +133,15 @@ Bug Fixes
 Features
 
 - \(🎁\) Support python 3.11 [\#164](https://github.com/PyCQA/docformatter/pull/164) ([KotlinIsland](https://github.com/KotlinIsland))
-- feat: add file config options [\#137](https://github.com/PyCQA/docformatter/pull/137) ([weibullguy](https://github.com/weibullguy))
 
 Bug Fixes
 
 - fix: update URL handling functions [\#152](https://github.com/PyCQA/docformatter/pull/152) ([weibullguy](https://github.com/weibullguy))
-- fix: add additional URL patterns [\#148](https://github.com/PyCQA/docformatter/pull/148) ([weibullguy](https://github.com/weibullguy))
-- fix: wrap multi-paragraph long descriptions [\#143](https://github.com/PyCQA/docformatter/pull/143) ([weibullguy](https://github.com/weibullguy))
-- fix: handle blank lines after class definition properly [\#142](https://github.com/PyCQA/docformatter/pull/142) ([weibullguy](https://github.com/weibullguy))
-- fix: handle index error in link wrapping [\#141](https://github.com/PyCQA/docformatter/pull/141) ([weibullguy](https://github.com/weibullguy))
-- fix: remove blank line after method docstring [\#138](https://github.com/PyCQA/docformatter/pull/138) ([weibullguy](https://github.com/weibullguy))
 
 **Merged pull requests:**
 
 - docs: clarify future arguments [\#168](https://github.com/PyCQA/docformatter/pull/168) ([weibullguy](https://github.com/weibullguy))
 - chore: update GitHub action workflows [\#153](https://github.com/PyCQA/docformatter/pull/153) ([weibullguy](https://github.com/weibullguy))
-- chore: drop support for Python3.6 [\#149](https://github.com/PyCQA/docformatter/pull/149) ([weibullguy](https://github.com/weibullguy))
-- docs: fix typos [\#147](https://github.com/PyCQA/docformatter/pull/147) ([kianmeng](https://github.com/kianmeng))
-- chore: create do-release workflow [\#135](https://github.com/PyCQA/docformatter/pull/135) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.5.1](https://github.com/PyCQA/docformatter/tree/v1.5.1) (2022-12-16)
 
