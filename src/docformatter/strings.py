@@ -183,7 +183,7 @@ def split_first_sentence(text):
 
         sentence += previous_delimiter + word
 
-        if sentence.endswith(("e.g.", "i.e.", "Dr.", "Mr.", "Mrs.", "Ms.")):
+        if sentence.endswith(("e.g.", "i.e.", "etc.", "Dr.", "Mr.", "Mrs.", "Ms.")):
             # Ignore false end of sentence.
             pass
         elif sentence.endswith((".", "?", "!")):
