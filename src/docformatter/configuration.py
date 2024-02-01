@@ -367,6 +367,6 @@ class Configurater:
         ]:
             if _section in config.sections():
                 self.flargs_dct = {
-                    k: v if isinstance(v, list) else str(v)
+                    k: v if isinstance(v, list) else v.split() if len(v.split()) > 1 else str(v)
                     for k, v in config[_section].items()
                 }
