@@ -215,6 +215,7 @@ eBay kinda suss
 outstring='''"""eBay kinda suss."""'''
 
 [issue_263]
+[issue_263.sphinx]
 # the `xx.\n\n` ensures there are a summary and a description sections
 # the `:param a:` creates a field
 # the `b`s create text that is long enough to trigger a line wrap without being so long that they count as code
@@ -226,5 +227,15 @@ instring='''"""xx.
 outstring='''"""xx.
 
     :param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+        s3://cccc.
+    """'''
+[issue_263.epytext]
+instring='''"""xx.
+
+    @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb s3://cccc.
+    """'''
+outstring='''"""xx.
+
+    @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         s3://cccc.
     """'''
