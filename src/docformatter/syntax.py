@@ -950,7 +950,7 @@ def _field_over_url(
     field_idx: List[Tuple[int, int]],
     url_idx: List[Tuple[int, int]],
 ):
-    """Remove URL indices that overlap with filed list indices.
+    """Remove URL indices that overlap with field list indices.
 
     Parameters
     ----------
@@ -965,14 +965,12 @@ def _field_over_url(
         The url_idx list with any tuples that have indices overlapping with field
         list indices removed.
     """
-    for _fieldl, _fieldu in field_idx:
-        for _key, _value in enumerate(url_idx):
-            if (
-                _value[0] == _fieldl
-                or _value[0] == _fieldu
-                or _value[1] == _fieldl
-                or _value[1] == _fieldu
-            ):
-                url_idx.pop(_key)
+    if not field_idx:
+        return url_idx
 
+    any_param_start = min(e[0] for e in field_idx)
+    for _key, _value in enumerate(url_idx):
+        if _value[0] > any_param_start:
+            url_idx.pop(_key)
     return url_idx
+
