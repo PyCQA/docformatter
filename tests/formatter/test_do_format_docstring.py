@@ -337,3 +337,25 @@ class TestFormatDocstring:
             INDENTATION,
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("args", [[""]])
+    def test_idk(self, test_args, args):
+        """Do not double-process urls in fields
+
+        See issue #263
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_263"]["instring"]
+        outstring = self.TEST_STRINGS["issue_263"]["outstring"]
+
+        assert outstring == uut._do_format_docstring(
+            INDENTATION,
+            instring,
+        )
