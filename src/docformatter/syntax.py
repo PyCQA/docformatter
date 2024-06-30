@@ -968,9 +968,11 @@ def _field_over_url(
     if not field_idx:
         return url_idx
 
+    nonoverlapping_urls = []
+
     any_param_start = min(e[0] for e in field_idx)
     for _key, _value in enumerate(url_idx):
-        if _value[0] > any_param_start:
-            url_idx.pop(_key)
-    return url_idx
+        if _value[1] < any_param_start:
+            nonoverlapping_urls.append(_value)
+    return nonoverlapping_urls
 
