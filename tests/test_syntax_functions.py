@@ -34,12 +34,14 @@ those:
     do_find_links()
     do_skip_link()
 """
+import textwrap
 
 # Third Party Imports
 import pytest
 
 # docformatter Package Imports
 import docformatter
+from docformatter import do_split_description
 
 
 class TestURLHandlers:
@@ -159,3 +161,76 @@ class TestreSTHandlers:
             "    Since a mail could be ``Cc``'d to two lists with different ``Reply-To`` munging"
             "options set."
         )
+
+
+class TestSplitDescription:
+    """Class for testing the function to process the description
+
+    Includes tests for:
+        - do_split_description()
+
+    """
+    med_str = "m"*40  # long enough that 2 won't fit on a line
+    indent = "    "
+
+    def do_test(self, text):
+        return do_split_description(textwrap.dedent(text), self.indent, 72, "sphinx")
+
+    def indent_all(self, strs):
+        return [self.indent + s for s in strs]
+
+    @pytest.mark.unit
+    def test_split_description_url_outside_param(self):
+        assert self.do_test(
+            f"""\
+            {self.med_str} https://{self.med_str}
+            :param a: {self.med_str}
+            """
+        ) == self.indent_all([
+            self.med_str,
+            f"https://{self.med_str}",
+            f":param a: {self.med_str}",
+        ])
+
+    @pytest.mark.unit
+    def test_split_description_single_url_in_param(self):
+        assert self.do_test(
+            f"""\
+            {self.med_str}
+            :param a: {self.med_str} https://{self.med_str}a
+            """
+        ) == self.indent_all([
+            self.med_str,
+            f":param a: {self.med_str}",
+            self.indent + f"https://{self.med_str}a",
+        ])
+
+    @pytest.mark.unit
+    def test_split_description_single_url_in_multiple_params(self):
+        assert self.do_test(
+            f"""\
+            {self.med_str}
+            :param a: {self.med_str} https://{self.med_str}a
+            :param b: {self.med_str} https://{self.med_str}b
+            """
+        ) == self.indent_all([
+            self.med_str,
+            f":param a: {self.med_str}",
+            self.indent + f"https://{self.med_str}a",
+            f":param b: {self.med_str}",
+            self.indent + f"https://{self.med_str}b",
+        ])
+
+    @pytest.mark.unit
+    def test_split_description_multiple_urls_in_param(self):
+        assert self.do_test(
+            f"""\
+            {self.med_str}
+            :param a: {self.med_str} https://{self.med_str}0 https://{self.med_str}1
+            """
+        ) == self.indent_all([
+            self.med_str,
+            f":param a: {self.med_str}",
+            self.indent + f"https://{self.med_str}0",
+            self.indent + f"https://{self.med_str}1",
+        ])
