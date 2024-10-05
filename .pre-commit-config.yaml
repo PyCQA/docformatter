@@ -9,6 +9,10 @@ repos:
           - id: end-of-file-fixer
           - id: no-commit-to-branch
           - id: trailing-whitespace
+    - repo: https://github.com/pre-commit/pre-commit
+      rev: v4.0.0
+      hooks:
+          - id: validate_manifest
     - repo: https://github.com/psf/black
       rev: '23.3.0'
       hooks:
