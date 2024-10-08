@@ -10,5 +10,5 @@
     description: 'Formats docstrings to follow PEP 257. Uses python3 -m venv.'
     entry: docformatter
     args: [-i]
-    language: python_venv
+    language: python
     types: [python]
