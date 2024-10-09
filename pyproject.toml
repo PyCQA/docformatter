@@ -263,7 +263,7 @@ deps =
     charset_normalizer
     pycodestyle
     pydocstyle
-    ruff
+    ruff==0.0.269
     rstcheck
     toml
     untokenize
