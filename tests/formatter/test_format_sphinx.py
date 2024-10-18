@@ -472,3 +472,41 @@ class TestFormatWrapSphinx:
             INDENTATION,
             instring,
         )
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args",
+        [
+            [
+                "--wrap-descriptions",
+                "88",
+                "--wrap-summaries",
+                "88",
+                "--pre-summary-newline",
+                "",
+            ]
+        ],
+    )
+    def test_format_docstring_sphinx_style_recognize_more_sphinx_fields(
+        self,
+        test_args,
+        args,
+    ):
+        """Should identify more sphinx field.
+
+        See issue #271
+        """
+        uut = Formatter(
+            test_args,
+            sys.stderr,
+            sys.stdin,
+            sys.stdout,
+        )
+
+        instring = self.TEST_STRINGS["issue_271"]["instring"]
+        outstring = self.TEST_STRINGS["issue_271"]["outstring"]
+
+        assert outstring == uut._do_format_docstring(
+            INDENTATION,
+            instring,
+        )
