@@ -29,7 +29,6 @@ classifiers=[
           'License :: OSI Approved :: MIT License',
       ]
 packages = [{include = "docformatter", from = "src"}]
-include = ["LICENSE"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
