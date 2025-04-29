@@ -42,9 +42,12 @@ class Encoder:
     LF = "\n"
     CRLF = "\r\n"
 
+    # Default encoding to use if the file encoding cannot be detected
+    DEFAULT_ENCODING = "latin-1"
+
     def __init__(self):
         """Initialize an Encoder instance."""
-        self.encoding = "latin-1"
+        self.encoding = self.DEFAULT_ENCODING
         self.system_encoding = locale.getpreferredencoding() or sys.getdefaultencoding()
 
     def do_detect_encoding(self, filename) -> None:
@@ -62,7 +65,7 @@ class Encoder:
             with self.do_open_with_encoding(filename) as check_file:
                 check_file.read()
         except (SyntaxError, LookupError, UnicodeDecodeError):
-            self.encoding = "latin-1"
+            self.encoding = self.DEFAULT_ENCODING
 
     def do_find_newline(self, source: List[str]) -> str:
         """Return type of newline used in source.
