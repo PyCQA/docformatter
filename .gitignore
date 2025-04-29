@@ -17,3 +17,4 @@ poetry.lock
 .idea/
 .vscode/
 .tox/
+.venv/
