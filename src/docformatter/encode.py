@@ -59,7 +59,8 @@ class Encoder:
             The full path name of the file whose encoding is to be detected.
         """
         try:
-            self.encoding = from_path(filename).best().encoding
+            detection_result = from_path(filename).best()
+            self.encoding = detection_result.encoding if detection_result else self.DEFAULT_ENCODING
 
             # Check for correctness of encoding.
             with self.do_open_with_encoding(filename) as check_file:
