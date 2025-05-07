@@ -14,11 +14,10 @@ jobs:
       matrix:
         python-version:
           - "pypy-3.8-v7.3.10"
+          - "3.12"
           - "3.11"
           - "3.10"
           - "3.9"
-          - "3.8"
-          - "3.7"
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
@@ -26,7 +25,7 @@ jobs:
       - name: Setup Python for tox
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install tox
         run: python -m pip install tox tox-gh-actions
       - uses: actions/checkout@v3
