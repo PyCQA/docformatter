@@ -1,5 +1,24 @@
 # Changelog
 
+## [v1.7.6](https://github.com/PyCQA/docformatter/tree/v1.7.6) (2025-05-07)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.5...v1.7.6)
+
+Features
+
+- prefer new unittest.mock from the standard library [\#280](https://github.com/PyCQA/docformatter/pull/280) ([a-detiste](https://github.com/a-detiste))
+- Handle abbreviation 'etc.' \(et cetera\) [\#273](https://github.com/PyCQA/docformatter/pull/273) ([knedlsepp](https://github.com/knedlsepp))
+
+Bug Fixes
+
+- Do not double-process urls [\#284](https://github.com/PyCQA/docformatter/pull/284) ([lilatomic](https://github.com/lilatomic))
+
+**Merged pull requests:**
+
+- Fix pre-commit syntax [\#266](https://github.com/PyCQA/docformatter/pull/266) ([jonashaag](https://github.com/jonashaag))
+- Update version listed in documentation's Pre-Commit example [\#262](https://github.com/PyCQA/docformatter/pull/262) ([korverdev](https://github.com/korverdev))
+- Add missing comma in requirements table [\#261](https://github.com/PyCQA/docformatter/pull/261) ([EFord36](https://github.com/EFord36))
+
 ## [v1.7.5](https://github.com/PyCQA/docformatter/tree/v1.7.5) (2023-07-12)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.4...v1.7.5)
@@ -122,26 +141,9 @@ Bug Fixes
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.0...v1.6.1)
 
-Bug Fixes
-
-- fix: remove blank lines after line beginning with 'def' [\#171](https://github.com/PyCQA/docformatter/pull/171) ([weibullguy](https://github.com/weibullguy))
-
 ## [v1.6.0](https://github.com/PyCQA/docformatter/tree/v1.6.0) (2023-04-04)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.5.1...v1.6.0)
-
-Features
-
-- \(🎁\) Support python 3.11 [\#164](https://github.com/PyCQA/docformatter/pull/164) ([KotlinIsland](https://github.com/KotlinIsland))
-
-Bug Fixes
-
-- fix: update URL handling functions [\#152](https://github.com/PyCQA/docformatter/pull/152) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- docs: clarify future arguments [\#168](https://github.com/PyCQA/docformatter/pull/168) ([weibullguy](https://github.com/weibullguy))
-- chore: update GitHub action workflows [\#153](https://github.com/PyCQA/docformatter/pull/153) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.5.1](https://github.com/PyCQA/docformatter/tree/v1.5.1) (2022-12-16)
 
