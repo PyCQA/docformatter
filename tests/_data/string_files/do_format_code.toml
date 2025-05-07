@@ -151,14 +151,14 @@ outstring='''def pytest_addoption(parser: pytest.Parser) -> "
 '''
 
 [issue_97_2]
-instring='''def pytest_addoption(parser: pytest.Parser) -> 
+instring='''def pytest_addoption(parser: pytest.Parser) ->
             None:    # pragma: no cover
-    
+
             register_toggle.pytest_addoption(parser)
 '''
-outstring='''def pytest_addoption(parser: pytest.Parser) -> 
+outstring='''def pytest_addoption(parser: pytest.Parser) ->
             None:    # pragma: no cover
-    
+
             register_toggle.pytest_addoption(parser)
 '''
 
