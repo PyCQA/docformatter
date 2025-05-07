@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.7.5"
+version = "1.7.6"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -18,11 +18,10 @@ classifiers=[
           'Intended Audience :: Developers',
           'Environment :: Console',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.7',
-          'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
           'Programming Language :: Python :: 3.11',
+          'Programming Language :: Python :: 3.12',
           'Programming Language :: Python :: Implementation',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Programming Language :: Python :: Implementation :: CPython',
@@ -36,7 +35,7 @@ charset_normalizer = "^3.0.0"
 tomli = {version = "^2.0.0", python = "<3.11", optional = true}
 untokenize = "^0.1.1"
 
-[tool.poetry.dev-dependencies]
+[poetry.group.dev-dependencies]
 autopep8 = "^2.0.0"
 black = "^22.0.0"
 coverage = {extras = ["toml"], version = "^6.4.0"}
@@ -144,7 +143,7 @@ output = 'coverage.xml'
 
 [tool.black]
 line-length = 88
-target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+target-version = ['py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -190,11 +189,10 @@ ignore_roles = [
 legacy_tox_ini = """
 [tox]
 envlist =
-    py37
-    py38
     py39
     py310
     py311
+    py312
     pypy3
     coverage
     style
@@ -204,12 +202,11 @@ skipsdist = true
 
 [gh-actions]
 python =
-    3.7: py37
-    3.8: py38
     3.9: py39
     3.10: py310
     3.11: py311
-    pypy-3.8: pypy3
+    3.12: py312
+    pypy-3.10: pypy3
 
 [testenv]
 description = run the test suite using pytest under {basepython}
@@ -254,7 +251,7 @@ commands =
     coverage combine
     coverage report -m
     coverage xml -o {toxworkdir}/coverage.xml
-depends = py37, py38, py39, py310, py311, pypy3
+depends = py39, py310, py311, py312, pypy3
 
 [testenv:style]
 description = run autoformatters and style checkers
