@@ -334,7 +334,7 @@ class Formatter:
 
             return _strings.normalize_line_endings(
                 _code.splitlines(True), _original_newline
-            )
+            ).rstrip(" ")
         except (tokenize.TokenError, IndentationError):
             return source
 
