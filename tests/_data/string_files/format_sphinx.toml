@@ -250,3 +250,36 @@ outstring='''"""
     :param caplog: Pytest caplog fixture.
     :yield: Until test complete, then run cleanup.
     """'''
+
+[issue_271]
+instring='''"""
+    My test fixture.
+
+    :ivar id: A unique identifier for the element, automatically generated upon instantiation.
+    :vartype id: str
+    :ivar created: Timestamp when the element was created, defaults to the current time.
+    :vartype created: datetime
+    :cvar modified: Timestamp when the element was last modified, can be None if not modified.
+    :vartype modified: Optional[datetime]
+    :cvar in_project: List of projects this element is part of. Direct modification is restricted.
+    :vartype in_project: list[Project]
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
+outstring='''"""
+    My test fixture.
+
+    :ivar id: A unique identifier for the element, automatically generated upon
+        instantiation.
+    :vartype id: str
+    :ivar created: Timestamp when the element was created, defaults to the current time.
+    :vartype created: datetime
+    :cvar modified: Timestamp when the element was last modified, can be None if not
+        modified.
+    :vartype modified: Optional[datetime]
+    :cvar in_project: List of projects this element is part of. Direct modification is
+        restricted.
+    :vartype in_project: list[Project]
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
