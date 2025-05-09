@@ -37,7 +37,7 @@ instring='''
     CONST = 123
 
     """docstring for CONST."""
-    '''
+'''
 outstring='''
     CONST = 123
     """docstring for CONST."""
@@ -50,7 +50,7 @@ instring='''
         :cvar test_int: a class attribute.
         ..py.method: big_method()
         """
-    '''
+'''
 outstring='''
     class TestClass:
         """This is a class docstring.
@@ -74,7 +74,7 @@ instring='''
 
 
         """This is a second class variable docstring."""
-    '''
+'''
 outstring='''
     class TestClass:
         """This is a class docstring."""

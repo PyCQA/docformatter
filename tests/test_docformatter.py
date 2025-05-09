@@ -688,9 +688,9 @@ class TestEndToEndPyproject:
         "contents",
         [
             '''\
-            class TestFoo():
-                """Docstring that should not have a pre-summary space."""
-            '''
+class TestFoo():
+    """ Docstring that should not have a pre-summary space."""
+'''
         ],
     )
     @pytest.mark.parametrize(
@@ -725,10 +725,10 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,2 @@
-             class TestFoo():
-                 """Docstring that should not have a pre-summary space."""
--            
+@@ -1,2 +1,2 @@
+ class TestFoo():
+-    """ Docstring that should not have a pre-summary space."""
++    """Docstring that should not have a pre-summary space."""
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
