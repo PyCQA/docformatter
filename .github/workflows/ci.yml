@@ -13,7 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - "pypy-3.8-v7.3.10"
+          - "pypy3.9"
+          - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
