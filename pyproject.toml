@@ -48,7 +48,7 @@ pytest-cov = "^4.0.0"
 
 [tool.poetry.group.linting.dependencies]
 autopep8 = "^2.0.0"
-black = "^22.0.0"
+black = ">=22,<25"
 isort = "^5.10.0"
 mypy = "0.991"
 pycodestyle = "^2.8.0"
