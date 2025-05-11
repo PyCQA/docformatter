@@ -36,6 +36,7 @@ those:
     normalize_summary()
     remove_section_headers()
     split_first_sentence()
+    split_summary()
     split_summary_and_description()
     strip_leading_blank_lines()
     strip_quotes()
@@ -262,6 +263,40 @@ class TestSplitters:
         ) == docformatter.split_first_sentence("This is the first:\none\ntwo")
 
     @pytest.mark.unit
+    def test_split_one_sentence_summary(self):
+        """A single sentence summary should be returned as is.
+
+        See issue #283.
+        """
+        assert [
+            "This is a sentence.",
+            "",
+        ] == docformatter.split_summary(["This is a sentence.", ""])
+
+        assert [
+            "This e.g. a sentence.",
+            "",
+        ] == docformatter.split_summary(["This e.g. a sentence.", ""])
+
+    @pytest.mark.unit
+    def test_split_multi_sentence_summary(self):
+        """A multi-sentence summary should return only the first as the summary.
+
+        See issue #283.
+        """
+        assert [
+            "This is a sentence.",
+            "",
+            "This is another.",
+        ] == docformatter.split_summary(["This is a sentence. This is another.", ""])
+
+        assert [
+            "This e.g. a sentence.",
+            "",
+            "This is another.",
+        ] == docformatter.split_summary(["This e.g. a sentence. This is another.", ""])
+
+    @pytest.mark.unit
     def test_split_summary_and_description(self):
         """"""
         assert (
@@ -317,9 +352,7 @@ class TestSplitters:
         assert (
             "This is the first\nWashington",
             "",
-        ) == docformatter.split_summary_and_description(
-            "This is the first\nWashington"
-        )
+        ) == docformatter.split_summary_and_description("This is the first\nWashington")
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_list_on_other_line(self):
@@ -351,9 +384,7 @@ class TestSplitters:
         assert (
             "This is the first:",
             "one\ntwo",
-        ) == docformatter.split_summary_and_description(
-            "This is the first:\none\ntwo"
-        )
+        ) == docformatter.split_summary_and_description("This is the first:\none\ntwo")
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_exclamation(self):
@@ -361,9 +392,7 @@ class TestSplitters:
         assert (
             "This is the first!",
             "one\ntwo",
-        ) == docformatter.split_summary_and_description(
-            "This is the first!\none\ntwo"
-        )
+        ) == docformatter.split_summary_and_description("This is the first!\none\ntwo")
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_question_mark(self):
@@ -371,9 +400,7 @@ class TestSplitters:
         assert (
             "This is the first?",
             "one\ntwo",
-        ) == docformatter.split_summary_and_description(
-            "This is the first?\none\ntwo"
-        )
+        ) == docformatter.split_summary_and_description("This is the first?\none\ntwo")
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_quote(self):
@@ -381,23 +408,17 @@ class TestSplitters:
         assert (
             'This is the first\n"one".',
             "",
-        ) == docformatter.split_summary_and_description(
-            'This is the first\n"one".'
-        )
+        ) == docformatter.split_summary_and_description('This is the first\n"one".')
 
         assert (
             "This is the first\n'one'.",
             "",
-        ) == docformatter.split_summary_and_description(
-            "This is the first\n'one'."
-        )
+        ) == docformatter.split_summary_and_description("This is the first\n'one'.")
 
         assert (
             "This is the first\n``one``.",
             "",
-        ) == docformatter.split_summary_and_description(
-            "This is the first\n``one``."
-        )
+        ) == docformatter.split_summary_and_description("This is the first\n``one``.")
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_punctuation(self):
@@ -461,9 +482,7 @@ Try this and this and this and this and this and this and this at
             "Test Mrs. now",
             "Test Ms. now",
         ]:
-            assert (text, "") == docformatter.split_summary_and_description(
-                text
-            )
+            assert (text, "") == docformatter.split_summary_and_description(text)
 
     @pytest.mark.unit
     def test_split_summary_and_description_with_url(self):
@@ -497,9 +516,7 @@ class TestStrippers:
     @pytest.mark.unit
     def test_remove_section_header(self):
         """Remove section header directives."""
-        assert "foo\nbar\n" == docformatter.remove_section_header(
-            "----\nfoo\nbar\n"
-        )
+        assert "foo\nbar\n" == docformatter.remove_section_header("----\nfoo\nbar\n")
 
         line = "foo\nbar\n"
         assert line == docformatter.remove_section_header(line)
