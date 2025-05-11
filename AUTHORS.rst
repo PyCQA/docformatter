@@ -11,6 +11,7 @@ Additional contributions by (sorted by name)
 - Alec Merdler <alecmerdler@gmail.com>
 - Alexander Biggs <akbiggs@users.noreply.github.com>
 - Alexander Kapshuna <kapsh@kap.sh>
+- Alexander Puck Neuwirth <APN-Pucky@users.noreply.github.com>
 - Alexandre Detiste <alexandre.detiste@gmail.com>
 - Andrew Howe <howeaj@users.noreply.github.com>
 - Andy Hayden <andyhayden1@gmail.com>
