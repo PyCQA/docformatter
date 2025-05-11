@@ -453,7 +453,9 @@ Try this and this and this and this and this and this and this at
     def test_split_summary_and_description_with_abbreviation(self):
         """"""
         for text in [
-            "Test e.g. now" "Test i.e. now",
+            "Test e.g. now",
+            "Test foo, bar, etc. now",
+            "Test i.e. now",
             "Test Dr. now",
             "Test Mr. now",
             "Test Mrs. now",

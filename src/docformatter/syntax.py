@@ -59,7 +59,25 @@ OPTION_REGEX = r"^-{1,2}[\S ]+ {2}\S+"
 REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
 """Regular expression to use for finding reST directives."""
 
-SPHINX_REGEX = r":(param|raises|return|rtype|type|yield)[a-zA-Z0-9_\-.() ]*:"
+# Complete list:
+# https://www.sphinx-doc.org/en/master/usage/domains/python.html#info-field-lists
+SPHINX_FIELD_PATTERNS = (
+    "arg|"
+    "cvar|"
+    "except|"
+    "ivar|"
+    "key|"
+    "meta|"
+    "param|"
+    "raise|"
+    "return|"
+    "rtype|"
+    "type|"
+    "var|"
+    "yield"
+)
+
+SPHINX_REGEX = rf":({SPHINX_FIELD_PATTERNS})[a-zA-Z0-9_\-.() ]*:"
 """Regular expression to use for finding Sphinx-style field lists."""
 
 URL_PATTERNS = (
@@ -975,4 +993,3 @@ def _field_over_url(
         if _value[1] < any_param_start:
             nonoverlapping_urls.append(_value)
     return nonoverlapping_urls
-

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docformatter"
-version = "1.7.5"
+version = "1.7.6"
 description = "Formats docstrings to follow PEP 257"
 authors = ["Steven Myint"]
 maintainers = [
@@ -18,48 +18,44 @@ classifiers=[
           'Intended Audience :: Developers',
           'Environment :: Console',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.7',
-          'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
           'Programming Language :: Python :: 3.11',
+          'Programming Language :: Python :: 3.12',
           'Programming Language :: Python :: Implementation',
           'Programming Language :: Python :: Implementation :: PyPy',
           'Programming Language :: Python :: Implementation :: CPython',
           'License :: OSI Approved :: MIT License',
       ]
 packages = [{include = "docformatter", from = "src"}]
-include = ["LICENSE"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 charset_normalizer = "^3.0.0"
 tomli = {version = "^2.0.0", python = "<3.11", optional = true}
 untokenize = "^0.1.1"
 
-[tool.poetry.dev-dependencies]
-autopep8 = "^2.0.0"
-black = "^22.0.0"
+[tool.poetry.group.dev.dependencies]
+Sphinx = "^6.0.0"
+tox = "<4.0.0"
+twine = "^4.0.0"
+
+[tool.poetry.group.testing.dependencies]
 coverage = {extras = ["toml"], version = "^6.4.0"}
-isort = "^5.10.0"
 mock = "^4.0.0"
+pytest = "^7.1.0"
+pytest-cov = "^4.0.0"
+
+[tool.poetry.group.linting.dependencies]
+autopep8 = "^2.0.0"
+black = ">=22,<25"
+isort = "^5.10.0"
 mypy = "0.991"
 pycodestyle = "^2.8.0"
 pydocstyle = "^6.1.1"
-pylint = [
-    {version = "^2.12.0", python = "<3.7.2"},
-    {version = "^2.14.0", python = ">=3.7.2"},
-]
-pytest = "^7.1.0"
-pytest-cov = "^4.0.0"
-ruff = "^0.0.267"
+pylint = "^2.14.0"
 rstcheck = "^6.1.0"
-tox = "<4.0.0"
-Sphinx = [
-    {version = "5.3.0", python = "<3.8"},
-    {version = "^6.0.0", python = ">=3.8"},
-]
-twine = "^4.0.0"
+ruff = "^0.0.267"
 
 [tool.poetry.extras]
 tomli = ["tomli"]
@@ -145,7 +141,7 @@ output = 'coverage.xml'
 
 [tool.black]
 line-length = 88
-target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -191,11 +187,11 @@ ignore_roles = [
 legacy_tox_ini = """
 [tox]
 envlist =
-    py37
-    py38
     py39
     py310
     py311
+    py312
+    py313
     pypy3
     coverage
     style
@@ -205,12 +201,12 @@ skipsdist = true
 
 [gh-actions]
 python =
-    3.7: py37
-    3.8: py38
     3.9: py39
     3.10: py310
     3.11: py311
-    pypy-3.8: pypy3
+    3.12: py312
+    3.13: py313
+    pypy-3.9: pypy3
 
 [testenv]
 description = run the test suite using pytest under {basepython}
@@ -255,7 +251,7 @@ commands =
     coverage combine
     coverage report -m
     coverage xml -o {toxworkdir}/coverage.xml
-depends = py37, py38, py39, py310, py311, pypy3
+depends = py39, py310, py311, py312, py313, pypy3
 
 [testenv:style]
 description = run autoformatters and style checkers
@@ -263,7 +259,7 @@ deps =
     charset_normalizer
     pycodestyle
     pydocstyle
-    ruff
+    ruff==0.0.269
     rstcheck
     toml
     untokenize

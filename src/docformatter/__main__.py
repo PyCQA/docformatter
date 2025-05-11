@@ -113,7 +113,7 @@ def _main(argv, standard_out, standard_error, standard_in):
     """Run internal main entry point."""
     configurator = _configuration.Configurater(argv)
 
-    if "--help" in configurator.args_lst:
+    if "--help" in configurator.args_lst or "-h" in configurator.args_lst:
         _help()
         return 0
     else:

@@ -36,9 +36,13 @@ This module contains tests for utility functions.  Utility functions are:
     - is_some_sort_of_code()
 """
 
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 # Third Party Imports
 import pytest
-from mock import patch
 
 # docformatter Package Imports
 import docformatter

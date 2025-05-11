@@ -5,10 +5,3 @@
     args: [-i]
     language: python
     types: [python]
--   id: docformatter-venv
-    name: docformatter-venv
-    description: 'Formats docstrings to follow PEP 257. Uses python3 -m venv.'
-    entry: docformatter
-    args: [-i]
-    language: python_venv
-    types: [python]

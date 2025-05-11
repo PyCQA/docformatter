@@ -83,6 +83,21 @@ class TestDetectEncoding:
 
         assert "ascii" == uut.encoding
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("contents", [""])
+    def test_detect_encoding_with_undetectable_encoding(self, temporary_file):
+        """Default to latin-1 when encoding detection fails."""
+        uut = Encoder()
+
+        # Simulate a file with undetectable encoding
+        with open(temporary_file, "wb") as file:
+            # Binary content unlikely to have a detectable encoding
+            file.write(b"\xFF\xFE\xFD\xFC\x00\x00\x00\x00")
+
+        uut.do_detect_encoding(temporary_file)
+
+        assert uut.encoding == uut.DEFAULT_ENCODING
+
 
 class TestFindNewline:
     """Class for testing the find_newline() function."""

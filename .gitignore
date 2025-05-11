@@ -13,7 +13,7 @@ dist/
 htmlcov/
 *coverage*
 .python-version
-poetry.lock
 .idea/
 .vscode/
 .tox/
+.venv/
