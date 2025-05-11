@@ -19,6 +19,7 @@ Additional contributions by (sorted by name)
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
+- Björn Holtvogt <bjoern.holtvogt@gmail.com>
 - Casey Korver <84342833+korverdev@users.noreply.github.com>
 - Daniel Goldman <danielgoldman4@gmail.com>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
