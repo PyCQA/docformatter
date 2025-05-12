@@ -180,6 +180,7 @@ be treated like simple text. This will ignore URLs like ``http://`` or 'ftp:`.
 """
 
 HEURISTIC_MIN_LIST_ASPECT_RATIO = 0.4
+"""The minimum aspect ratio to consider a list."""
 
 
 def description_to_list(
@@ -649,7 +650,8 @@ def is_some_sort_of_list(
     """
     split_lines = text.rstrip().splitlines()
 
-    # TODO: Find a better way of doing this.
+    # TODO: Find a better way of doing this.  Conversely, create a logger and log
+    #  potential lists for the user to decide if they are lists or not.
     # Very large number of lines but short columns probably means a list of
     # items.
     if (
