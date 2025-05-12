@@ -29,6 +29,18 @@ import contextlib
 import re
 from typing import List, Match, Optional, Union
 
+# TODO: Read this from the configuration file or command line.
+ABBREVIATIONS = (
+    "e.g.",
+    "i.e.",
+    "et. al.",
+    "etc.",
+    "Dr.",
+    "Mr.",
+    "Mrs.",
+    "Ms.",
+)
+
 
 def find_shortest_indentation(lines: List[str]) -> str:
     """Determine the shortest indentation in a list of lines.
@@ -184,14 +196,14 @@ def split_first_sentence(text):
 
         sentence += previous_delimiter + word
 
-        if sentence.endswith(("e.g.", "i.e.", "etc.", "Dr.", "Mr.", "Mrs.", "Ms.")):
+        if sentence.endswith(ABBREVIATIONS):
             # Ignore false end of sentence.
             pass
         elif sentence.endswith((".", "?", "!")):
             break
         elif sentence.endswith(":") and delimiter == "\n":
             # Break on colon if it ends the line. This is a heuristic to detect
-            # the beginning of some parameter list afterwards.
+            # the beginning of some parameter list after wards.
             break
 
         previous_delimiter = delimiter
@@ -200,12 +212,48 @@ def split_first_sentence(text):
     return sentence, delimiter + rest
 
 
+def split_summary(lines) -> List[str]:
+    """Split multi-sentence summary into the first sentence and the rest."""
+    if not lines or not lines[0].strip():
+        return lines
+
+    text = lines[0].strip()
+
+    tokens = re.split(r"(\s+)", text)  # Keep whitespace for accurate rejoining
+    sentence = []
+    rest = []
+    i = 0
+
+    while i < len(tokens):
+        token = tokens[i]
+        sentence.append(token)
+
+        if token.endswith(".") and not any(
+            "".join(sentence).strip().endswith(abbr) for abbr in ABBREVIATIONS
+        ):
+            i += 1
+            break
+
+        i += 1
+
+    rest = tokens[i:]
+    first_sentence = "".join(sentence).strip()
+    rest_text = "".join(rest).strip()
+
+    lines[0] = first_sentence
+    if rest_text:
+        lines.insert(2, rest_text)
+
+    return lines
+
+
 def split_summary_and_description(contents):
     """Split docstring into summary and description.
 
     Return tuple (summary, description).
     """
     split_lines = contents.rstrip().splitlines()
+    split_lines = split_summary(split_lines)
 
     for index in range(1, len(split_lines)):
         # Empty line separation would indicate the rest is the description or

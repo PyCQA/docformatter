@@ -152,7 +152,7 @@ class Configurater:
 
         self.args = self.parser.parse_known_args(self.args_lst[1:])[0]
 
-        # Default black line length is 88 so use this when not specified
+        # Default black line length is 88, so use this when not specified
         # otherwise use PEP-8 defaults
         if self.args.black:
             _default_wrap_summaries = 88

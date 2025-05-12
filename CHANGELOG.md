@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.7.7](https://github.com/PyCQA/docformatter/tree/v1.7.7) (2025-05-11)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.6...v1.7.7)
+
+**Merged pull requests:**
+
+- chore\(deps-dev\): bump black from 22.12.0 to 24.3.0 [\#311](https://github.com/PyCQA/docformatter/pull/311) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump jinja2 from 3.1.4 to 3.1.6 [\#310](https://github.com/PyCQA/docformatter/pull/310) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump requests from 2.31.0 to 2.32.2 [\#309](https://github.com/PyCQA/docformatter/pull/309) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump virtualenv from 20.21.1 to 20.26.6 [\#308](https://github.com/PyCQA/docformatter/pull/308) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump zipp from 3.15.0 to 3.19.1 [\#307](https://github.com/PyCQA/docformatter/pull/307) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump urllib3 from 2.0.7 to 2.2.2 [\#306](https://github.com/PyCQA/docformatter/pull/306) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.7.6](https://github.com/PyCQA/docformatter/tree/v1.7.6) (2025-05-07)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.5...v1.7.6)
@@ -110,32 +123,13 @@ Bug Fixes
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.3...v1.6.4)
 
-Bug Fixes
-
-- fix: IndexError when only URL in long description [\#190](https://github.com/PyCQA/docformatter/pull/190) ([weibullguy](https://github.com/weibullguy))
-- fix: removing newline after shebang [\#188](https://github.com/PyCQA/docformatter/pull/188) ([weibullguy](https://github.com/weibullguy))
-- fix: not capitalizing first word when summary ends in period [\#185](https://github.com/PyCQA/docformatter/pull/185) ([weibullguy](https://github.com/weibullguy))
-
 ## [v1.6.3](https://github.com/PyCQA/docformatter/tree/v1.6.3) (2023-04-23)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.2...v1.6.3)
 
-Bug Fixes
-
-- fix: adding newlines around wrapped URL [\#182](https://github.com/PyCQA/docformatter/pull/182) ([weibullguy](https://github.com/weibullguy))
-- fix: adding blank line in summary with symbol [\#179](https://github.com/PyCQA/docformatter/pull/179) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- ci: split test suite run into unit and system [\#181](https://github.com/PyCQA/docformatter/pull/181) ([weibullguy](https://github.com/weibullguy))
-
 ## [v1.6.2](https://github.com/PyCQA/docformatter/tree/v1.6.2) (2023-04-22)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.1...v1.6.2)
-
-Bug Fixes
-
-- fix: remove blank after comment [\#177](https://github.com/PyCQA/docformatter/pull/177) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.6.1](https://github.com/PyCQA/docformatter/tree/v1.6.1) (2023-04-21)
 
