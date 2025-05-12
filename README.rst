@@ -113,12 +113,6 @@ this code
         This module docstring should be dedented."""
 
 
-    def launch_rocket():
-        """Launch
-    the
-    rocket. Go colonize space."""
-
-
     def factorial(x):
         '''
 
@@ -141,7 +135,7 @@ this code
         function"""
         print_factorial(5)
         if factorial(10):
-            launch_rocket()
+            print_factorial(22)
 
 
 gets formatted into this
@@ -152,14 +146,6 @@ gets formatted into this
 
     This module docstring should be dedented.
     """
-
-
-    def launch_rocket():
-        """Launch the rocket.
-
-        Go colonize space.
-        """
-
 
     def factorial(x):
         """Return x factorial.
@@ -179,7 +165,7 @@ gets formatted into this
         """Main function."""
         print_factorial(5)
         if factorial(10):
-            launch_rocket()
+            print_factorial(22)
 
 Marketing
 =========
