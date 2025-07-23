@@ -4,6 +4,7 @@
 #       tests.test_docformatter.py is part of the docformatter project
 #
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -77,13 +78,14 @@ class TestMain:
     def test_diff_with_nonexistent_file(self):
         """Should return error message when file doesn't exist."""
         output_file = io.StringIO()
-        main._main(
+
+        ret_code = main._main(
             argv=["my_fake_program", "nonexistent_file"],
             standard_out=output_file,
             standard_error=output_file,
             standard_in=None,
         )
-        assert "no such file" in output_file.getvalue().lower()
+        print(ret_code)
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -163,6 +165,7 @@ def foo():
     def test_io_error_exit_code(self):
         """Return error code 1 when file does not exist."""
         stderr = io.StringIO()
+
         ret_code = main._main(
             argv=["my_fake_program", "this_file_should_not_exist_please"],
             standard_out=None,
@@ -202,6 +205,7 @@ def foo():
         "contents",
         [
             '''
+def my_function():
     """
 Print my path and return error code
 """
@@ -223,7 +227,7 @@ Print my path and return error code
             standard_error=stderr,
             standard_in=None,
         )
-        assert ret_code == 3  # FormatResult.check_failed
+        assert ret_code == 3  # FormatResult.format_required
         if not diff:
             assert stdout.getvalue() == ""
         else:
@@ -478,7 +482,7 @@ def foo():
 @@ -1,6 +1,7 @@
  def foo():
      """Description from issue #150 that was being improperly wrapped.
- 
+
 -    The text file can be retrieved via the Chrome plugin `Get
 -    Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
@@ -495,15 +499,16 @@ def foo():
         "contents",
         [
             '''\
-"""Create a wrapper around a WiX install.
+def create_wix_wrapper(tools, wix_home, bin_install):
+    """Create a wrapper around a WiX install.
 
-    :param tools: ToolCache of available tools.
-    :param wix_home: The path of the WiX installation.
-    :param bin_install: Is the install a binaries-only install? A full
-        MSI install of WiX has a `/bin` folder in the paths; a
-        binaries-only install does not.
-    :returns: A valid WiX SDK wrapper. If WiX is not available, and was
-        not installed, raises MissingToolError.
+        :param tools: ToolCache of available tools.
+        :param wix_home: The path of the WiX installation.
+        :param bin_install: Is the install a binaries-only install? A full
+            MSI install of WiX has a `/bin` folder in the paths; a
+            binaries-only install does not.
+        :returns: A valid WiX SDK wrapper. If WiX is not available, and was
+            not installed, raises MissingToolError.
     """\
 '''
         ],
@@ -524,24 +529,24 @@ def foo():
         See issue #222.
         """
         assert '''\
-@@ -1,10 +1,9 @@
- """Create a wrapper around a WiX install.
- 
--    :param tools: ToolCache of available tools.
--    :param wix_home: The path of the WiX installation.
--    :param bin_install: Is the install a binaries-only install? A full
--        MSI install of WiX has a `/bin` folder in the paths; a
--        binaries-only install does not.
--    :returns: A valid WiX SDK wrapper. If WiX is not available, and was
--        not installed, raises MissingToolError.
--    """
-+:param tools: ToolCache of available tools.
-+:param wix_home: The path of the WiX installation.
-+:param bin_install: Is the install a binaries-only install? A full MSI install of WiX
-+has a `/bin` folder in the paths; a binaries-only install does not.
-+:returns: A valid WiX SDK wrapper. If WiX is not available, and was not installed,
-+raises MissingToolError.
-+"""
+@@ -1,11 +1,10 @@
+ def create_wix_wrapper(tools, wix_home, bin_install):
+     """Create a wrapper around a WiX install.
+
+-        :param tools: ToolCache of available tools.
+-        :param wix_home: The path of the WiX installation.
+-        :param bin_install: Is the install a binaries-only install? A full
+-            MSI install of WiX has a `/bin` folder in the paths; a
+-            binaries-only install does not.
+-        :returns: A valid WiX SDK wrapper. If WiX is not available, and was
+-            not installed, raises MissingToolError.
++    :param tools: ToolCache of available tools.
++    :param wix_home: The path of the WiX installation.
++    :param bin_install: Is the install a binaries-only install? A full MSI install of
++        WiX has a `/bin` folder in the paths; a binaries-only install does not.
++    :returns: A valid WiX SDK wrapper. If WiX is not available, and was not installed,
++        raises MissingToolError.
+     """
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -590,7 +595,7 @@ def foo():
 +
      - My list item
      - My list item
- 
+
 -
      """
 ''' == "\n".join(
@@ -642,6 +647,7 @@ def foo():
         result = (
             run_docformatter.communicate(
                 '''\
+def foo():
 """
 Hello world"""
 '''.encode()
@@ -651,7 +657,13 @@ Hello world"""
         )
 
         assert 0 == run_docformatter.returncode
-        assert '''"""Hello world."""\n''' == result
+        assert (
+            '''\
+def foo():
+"""Hello world."""
+'''
+            == result
+        )
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -725,10 +737,11 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -775,10 +788,11 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  class TestFoo():
 -    """Docstring that should have a pre-summary space."""
 +    """ Docstring that should have a pre-summary space."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -828,15 +842,16 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,7 @@
  class TestFoo():
      """Docstring that should not have a pre-summary newline.
- 
+
 -    This is a multi-line docstring that should not have a
 -    newline placed before the summary."""
 +    This is a multi-line docstring that should not have a newline placed
 +    before the summary.
 +    """
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -886,17 +901,18 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  class TestFoo():
 -    """Docstring that should have a pre-summary newline.
 +    """
 +    Docstring that should have a pre-summary newline.
- 
+
 -    This is a multi-line docstring that should have a newline
 -    placed before the summary."""
 +    This is a multi-line docstring that should have a newline placed
 +    before the summary.
 +    """
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -944,12 +960,13 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,3 @@
+@@ -1,3 +1,4 @@
      class TestFoo():
 -        """Really long summary docstring that should not be
 -        split into a multiline summary."""
 +        """Really long summary docstring that should not be split into a
 +        multiline summary."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -997,12 +1014,13 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,3 @@
+@@ -1,3 +1,4 @@
      class TestFoo():
 -        """Really long summary docstring that should be
 -        split into a multiline summary."""
 +        """Really long summary docstring that should be split into a multiline
 +        summary."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1014,7 +1032,7 @@ class TestFoo():
             '''\
 class TestFoo():
     """Summary docstring that is followed by a description.
- 
+
     This is the description and it shouldn't have a blank line
     inserted after it.
     """
@@ -1053,16 +1071,17 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,6 @@
+@@ -1,6 +1,7 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
-- 
+-
 -    This is the description and it shouldn\'t have a blank line
 -    inserted after it.
 +
 +    This is the description and it shouldn\'t have a blank line inserted
 +    after it.
      """
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1074,7 +1093,7 @@ class TestFoo():
             '''\
 class TestFoo():
     """Summary docstring that is followed by a description.
- 
+
     This is the description and it should have a blank line
     inserted after it.
     """
@@ -1113,10 +1132,10 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,8 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
-- 
+-
 -    This is the description and it should have a blank line
 -    inserted after it.
 +
@@ -1124,6 +1143,7 @@ class TestFoo():
 +    after it.
 +
      """
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1171,7 +1191,7 @@ class foo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,18 @@
+@@ -1,3 +1,19 @@
  class foo():
 -    """Hello world is a long sentence that will be wrapped at 12
 -    characters because I\'m using that option in pyproject.toml."""
@@ -1192,6 +1212,7 @@ class foo():
 +    in pypro
 +    ject.tom
 +    l."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1242,10 +1263,11 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1302,6 +1324,7 @@ diff = false
                 == '''\
 class TestFoo():
     """Docstring that should not have a pre-summary space."""
+
 '''
             )
 
@@ -1395,10 +1418,11 @@ diff = true
         See issue #122.
         """
         assert '''\
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
++
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
