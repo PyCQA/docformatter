@@ -1,13 +1,14 @@
 [one_line]
-instring='''def foo():
+source='''def foo():
     """
     Hello foo.
     """'''
-outstring='''def foo():
-    """Hello foo."""'''
+expected='''def foo():
+    """Hello foo."""
+'''
 
 [module_docstring]
-instring='''#!/usr/env/bin python
+source='''#!/usr/env/bin python
 """This is
 a module
 docstring.
@@ -20,7 +21,7 @@ docstring.
 this
 is
 not."""'''
-outstring='''#!/usr/env/bin python
+expected='''#!/usr/env/bin python
 """This is a module docstring.
 
 1. One
@@ -33,35 +34,37 @@ is
 not."""'''
 
 [newline_module_variable]
-instring='''
+source='''
     CONST = 123
 
     """docstring for CONST."""
 '''
-outstring='''
+expected='''
     CONST = 123
-    """docstring for CONST."""
+    """Docstring for CONST."""
+
 '''
 
 [class_docstring]
-instring='''
+source='''
     class TestClass:
         """This is a class docstring.
         :cvar test_int: a class attribute.
         ..py.method: big_method()
         """
 '''
-outstring='''
+expected='''
     class TestClass:
         """This is a class docstring.
 
         :cvar test_int: a class attribute.
         ..py.method: big_method()
         """
+
 '''
 
 [newline_class_variable]
-instring='''
+source='''
     class TestClass:
 
         """This is a class docstring."""
@@ -75,7 +78,7 @@ instring='''
 
         """This is a second class variable docstring."""
 '''
-outstring='''
+expected='''
     class TestClass:
         """This is a class docstring."""
 
@@ -84,10 +87,26 @@ outstring='''
 
         test_var2 = 1
         """This is a second class variable docstring."""
+
+'''
+
+[class_attribute_wrap]
+source='''class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""'''
+expected='''class TestClass:
+    """This is a class docstring."""
+
+    test_int = 1
+    """This is a very, very, very long docstring that should really be
+    reformatted nicely by docformatter."""
+
 '''
 
 [newline_outside_docstring]
-instring='''
+source='''
 def new_function():
     """Description of function."""
     found = next(
@@ -96,7 +115,7 @@ def new_function():
 
     return "\n".join(split[found:])
 '''
-outstring='''
+expected='''
 def new_function():
     """Description of function."""
     found = next(
@@ -107,63 +126,525 @@ def new_function():
 '''
 
 [preserve_line_ending]
-instring='''
+source='''
 def foo():\r
     """\r
-    Hello\r
-    foo. This is a docstring.\r
+    Hello foo. This is a docstring.\r
     """\r
 '''
-outstring='''def foo():\r
+expected='''def foo():\r
     """\r
-    Hello\r
-    foo. This is a docstring.\r
+    Hello foo.
+
+    This is a docstring.\r
     """\r
 '''
+[non_docstring]
+source='''x = """This
+is
+not a
+docstring."""'''
+expected='''x = """This
+is
+not a
+docstring."""'''
+
+[tabbed_indentation]
+source='''def foo():
+	"""
+	Hello foo.
+	"""
+	if True:
+		x = 1'''
+expected='''def foo():
+	"""Hello foo."""
+	if True:
+		x = 1'''
+
+[mixed_indentation]
+source='''def foo():
+	"""
+	Hello foo.
+	"""
+	if True:
+	    x = 1'''
+expected='''def foo():
+	"""Hello foo."""
+	if True:
+	    x = 1'''
+
+[escaped_newlines]
+source='''def foo():
+    """
+    Hello foo.
+    """
+    x = \
+            1'''
+expected='''def foo():
+    """Hello foo."""
+    x =\
+            1'''
+# Python 3.13+ seems to handle this differently.
+expected313='''def foo():
+    """Hello foo."""
+    x = \
+            1'''
+
+[code_comments]
+source='''def foo():
+    """
+    Hello foo.
+    """
+    # My comment
+    # My comment with escape \
+    123'''
+expected='''def foo():
+    """Hello foo."""
+    # My comment
+    # My comment with escape \
+    123'''
+
+[inline_comment]
+source='''def foo():
+    """
+    Hello foo.
+    """
+    def test_method_no_chr_92(): the501(92) # \'''
+expected='''def foo():
+    """Hello foo."""
+
+    def test_method_no_chr_92(): the501(92) # \'''
+
+[raw_lowercase]
+source='''def foo():
+    r"""
+    Hello raw foo.
+    """'''
+expected='''def foo():
+    r"""Hello raw foo."""
+'''
+
+[raw_uppercase]
+source='''def foo():
+    R"""
+    Hello Raw foo.
+    """'''
+expected='''def foo():
+    R"""Hello Raw foo."""
+'''
+
+[raw_lowercase_single]
+source="""def foo():
+    r'''
+    Hello raw foo.
+    '''"""
+expected='''def foo():
+    r"""Hello raw foo."""
+'''
+
+[raw_uppercase_single]
+source="""def foo():
+    R'''
+    Hello Raw foo.
+    '''"""
+expected='''def foo():
+    R"""Hello Raw foo."""
+'''
+
+[unicode_lowercase]
+source='''def foo():
+    u"""
+    Hello unicode foo.
+    """'''
+expected='''def foo():
+    u"""Hello unicode foo."""
+'''
+
+
+[unicode_uppercase]
+source='''def foo():
+    U"""
+    Hello Unicode foo.
+    """'''
+expected='''def foo():
+    U"""Hello Unicode foo."""
+'''
+
+[unicode_lowercase_single]
+source="""def foo():
+    u'''
+    Hello unicode foo.
+    '''"""
+expected='''def foo():
+    u"""Hello unicode foo."""
+'''
+
+[unicode_uppercase_single]
+source="""def foo():
+    U'''
+    Hello Unicode foo.
+    '''"""
+expected='''def foo():
+    U"""Hello Unicode foo."""
+'''
+
+[nested_triple]
+source="""def foo():
+    '''Hello foo. \"\"\"abc\"\"\"
+    '''"""
+expected="""def foo():
+    '''Hello foo. \"\"\"abc\"\"\"
+    '''
+"""
+
+[multiple_sentences]
+source='''def foo():
+    """
+    Hello foo.
+    This is a docstring.
+    """'''
+expected='''def foo():
+    """Hello foo.
+
+    This is a docstring.
+    """
+'''
+
+[multiple_sentences_same_line]
+source='''def foo():
+    """
+    Hello foo. This is a docstring.
+    """'''
+expected='''def foo():
+    """Hello foo.
+
+    This is a docstring.
+    """
+'''
+
+[multiline_summary]
+source='''def foo():
+    """
+    Hello
+    foo. This is a docstring.
+    """'''
+expected='''def foo():
+    """Hello foo.
+
+    This is a docstring.
+    """
+'''
+
+[empty_lines]
+source='''def foo():
+    """
+    Hello
+    foo and this is a docstring.
+
+    More stuff.
+    """'''
+expected='''def foo():
+    """Hello foo and this is a docstring.
+
+    More stuff.
+    """
+'''
+
+[class_empty_lines]
+source='''class Foo:
+    """
+    Hello
+    foo and this is a docstring.
+
+    More stuff.
+    """'''
+expected='''class Foo:
+    """Hello foo and this is a docstring.
+
+    More stuff.
+    """
+
+'''
+
+[class_empty_lines_2]
+source='''def foo():
+    class Foo:
+
+        """Summary."""
+        pass'''
+expected='''def foo():
+    class Foo:
+        """Summary."""
+
+        pass'''
+
+[method_empty_lines]
+source='''class Foo:
+    def foo(self):
+
+
+        """Summary."""
+        pass'''
+expected='''class Foo:
+    def foo(self):
+        """Summary."""
+        pass'''
+
+[trailing_whitespace]
+source='''def foo():
+    """
+    Hello
+    foo and this is a docstring.
+
+    More stuff.
+    """'''
+expected='''def foo():
+    """Hello foo and this is a docstring.
+
+    More stuff.
+    """
+'''
+
+[parameter_list]
+source='''def foo():
+    """Test
+    one - first
+    two - second
+    """'''
+expected='''def foo():
+    """Test.
+
+    one - first
+    two - second
+    """
+'''
+
+[single_quote]
+source="""def foo():
+    'Just a regular string'
+"""
+expected="""def foo():
+    'Just a regular string'
+"""
+
+[double_quote]
+source="""def foo():
+    "Just a regular string"
+"""
+expected="""def foo():
+    "Just a regular string"
+"""
+
+[nested_triple_quote]
+source='''def foo():
+    'Just a """foo""" string'
+'''
+expected='''def foo():
+    'Just a """foo""" string'
+'''
+
+[first_line_assignment]
+source='''def foo():
+    x = """Just a regular string. Alpha."""
+'''
+expected='''def foo():
+    x = """Just a regular string. Alpha."""
+'''
+
+[regular_strings]
+source='''def foo():
+    """
+    Hello
+    foo and this is a docstring.
+
+    More stuff.
+    """
+    x = """My non-docstring
+    This should not be touched."""
+
+    """More stuff
+    that should not be
+    touched	"""'''
+expected='''def foo():
+    """Hello foo and this is a docstring.
+
+    More stuff.
+    """
+    x = """My non-docstring
+    This should not be touched."""
+
+    """More stuff
+    that should not be
+    touched	"""'''
+
+[syntax_error]
+source='''"""
+'''
+expected='''"""
+'''
+
+[slash_r]
+source='''"""\r'''
+expected='''"""\r'''
+
+[slash_r_slash_n]
+source='''"""\r\n'''
+expected='''"""\r\n'''
+
+[strip_blank_lines]
+source='''
+    class TestClass:
+
+        """This is a class docstring."""
+
+        class_attribute = 1
+
+        def test_method_1(self):
+            """This is a method docstring.
+
+            With no blank line after it.
+            """
+            pass
+
+        def test_method_2(self):
+
+            """This is a method docstring.
+
+            With a long description followed by multiple blank lines.
+            """
+
+
+            pass'''
+expected='''
+    class TestClass:
+        """This is a class docstring."""
+
+        class_attribute = 1
+
+        def test_method_1(self):
+            """This is a method docstring.
+
+            With no blank line after it.
+            """
+            pass
+
+        def test_method_2(self):
+            """This is a method docstring.
+
+            With a long description followed by multiple blank lines.
+            """
+            pass'''
+
+[range_miss]
+source='''
+    def f(x):
+        """  This is a docstring. That should be on more lines"""
+        pass
+    def g(x):
+        """  Badly indented docstring"""
+        pass'''
+expected='''
+    def f(x):
+        """  This is a docstring. That should be on more lines"""
+        pass
+    def g(x):
+        """  Badly indented docstring"""
+        pass'''
+
+[range_hit]
+source='''
+def f(x):
+    """  This is a docstring. That should be on more lines"""
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass'''
+expected='''
+def f(x):
+    """This is a docstring.
+
+    That should be on more lines
+    """
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass'''
+
+[length_ignore]
+source='''
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """  Badly indented docstring"""
+    pass'''
+expected='''
+def f(x):
+    """This is a docstring.
+
+
+    That should be on less lines
+    """
+    pass
+def g(x):
+    """Badly indented docstring."""
+    pass'''
 
 [issue_51]
-instring='''def my_func():
+source='''def my_func():
 
-"""Summary of my function."""
-pass'''
-outstring='''def my_func():
-"""Summary of my function."""
-pass'''
+    """Summary of my function."""
+    pass'''
+expected='''def my_func():
+    """Summary of my function."""
+    pass'''
 
 [issue_51_2]
-instring='''
+source='''
 def crash_rocket(location):    # pragma: no cover
     """This is a docstring following an in-line comment."""
     return location'''
-outstring='''
+expected='''
 def crash_rocket(location):    # pragma: no cover
     """This is a docstring following an in-line comment."""
     return location'''
 
+[issue_79]
+source='''def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet -v."""'''
+expected='''def function2():
+    """Hello yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet
+    -v."""
+'''
+
 [issue_97]
-instring='''def pytest_addoption(parser: pytest.Parser) -> "
+source='''def pytest_addoption(parser: pytest.Parser) -> "
             None:
     register_toggle.pytest_addoption(parser)
 '''
-outstring='''def pytest_addoption(parser: pytest.Parser) -> "
+expected='''def pytest_addoption(parser: pytest.Parser) -> "
             None:
     register_toggle.pytest_addoption(parser)
 '''
 
 [issue_97_2]
-instring='''def pytest_addoption(parser: pytest.Parser) ->
+source='''def pytest_addoption(parser: pytest.Parser) ->
             None:    # pragma: no cover
 
             register_toggle.pytest_addoption(parser)
 '''
-outstring='''def pytest_addoption(parser: pytest.Parser) ->
+expected='''def pytest_addoption(parser: pytest.Parser) ->
             None:    # pragma: no cover
 
             register_toggle.pytest_addoption(parser)
 '''
 
 [issue_130]
-instring='''
+source='''
 class TestClass:
 
     """This is a class docstring."""
@@ -178,7 +659,7 @@ class TestClass:
 
         pass
 '''
-outstring='''
+expected='''
 class TestClass:
     """This is a class docstring."""
 
@@ -191,7 +672,7 @@ class TestClass:
 '''
 
 [issue_139]
-instring='''
+source='''
 class TestClass:
 
     """This is a class docstring.
@@ -199,29 +680,30 @@ class TestClass:
     ..py.method: big_method()
     """
 '''
-outstring='''
+expected='''
 class TestClass:
     """This is a class docstring.
 
     :cvar test_int: a class attribute.
     ..py.method: big_method()
     """
+
 '''
 
 [issue_139_2]
-instring="""
+source="""
 class TestClass:
 
     variable = 1
 """
-outstring="""
+expected="""
 class TestClass:
 
     variable = 1
 """
 
 [issue_156]
-instring='''
+source='''
 def test_wps3_process_step_io_data_or_href():
     """Validates that \'data\' literal values and \'href\' file references are both
     handled as input for workflow steps corresponding to a WPS-3 process."""
@@ -231,7 +713,7 @@ def test_wps3_process_step_io_data_or_href():
 
         method = method.upper()
 '''
-outstring='''
+expected='''
 def test_wps3_process_step_io_data_or_href():
     """Validates that \'data\' literal values and \'href\' file references are
     both handled as input for workflow steps corresponding to a WPS-3
@@ -243,8 +725,44 @@ def test_wps3_process_step_io_data_or_href():
         method = method.upper()
 '''
 
+[issue_156_2]
+source='''class AcceptHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept"
+        schema_type = String
+        missing = drop
+        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+
+
+    class AcceptLanguageHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept-Language"
+        schema_type = String
+        missing = drop
+        default = AcceptLanguage.EN_CA
+        # FIXME: oneOf validator for supported languages (?)'''
+expected='''class AcceptHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept"
+        schema_type = String
+        missing = drop
+        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+
+
+    class AcceptLanguageHeader(ExtendedSchemaNode):
+        # ok to use name in this case because target key in the mapping must
+        # be that specific value but cannot have a field named with this format
+        name = "Accept-Language"
+        schema_type = String
+        missing = drop
+        default = AcceptLanguage.EN_CA
+        # FIXME: oneOf validator for supported languages (?)'''
+
 [issue_156_173]
-instring='''
+source='''
 class Foo:
 
     @abstractmethod
@@ -258,7 +776,7 @@ class Foo:
         """This is a second description."""
 
 '''
-outstring='''
+expected='''
 class Foo:
 
     @abstractmethod
@@ -268,23 +786,358 @@ class Foo:
     @abstractmethod
     def baz(self):
         """This is a second description."""
-
 '''
+
+[issue_157_7]
+source='''def hanging_rest_link():
+    """
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """
+
+def sub_func_test():
+
+    def long_line_link():
+        """Get the Python type of a Click parameter.
+
+        See the list of `custom types provided by Click
+        <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+        """'''
+expected='''def hanging_rest_link():
+    """
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """
+
+
+def sub_func_test():
+
+    def long_line_link():
+        """Get the Python type of a Click parameter.
+
+        See the list of
+        `custom types provided by Click <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+        """
+'''
+
+[issue_157_8]
+source='''def mixed_links():
+    """Implements the minimal code necessary to locate and call the ``mpm`` CLI on the system.
+
+    Once ``mpm`` is located, we can rely on it to produce the main output of the plugin.
+
+    The output must supports both `Xbar dialect
+    <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
+    """
+
+XKCD_MANAGER_ORDER = ("pip", "brew", "npm", "dnf", "apt", "steamcmd")
+"""Sequence of package managers as defined by `XKCD #1654: Universal Install Script
+<https://xkcd.com/1654/>`_.
+
+See the corresponding :issue:`implementation rationale in issue #10 <10>`.
+"""
+
+HASH_HEADERS = (
+    "Date",
+    "From",
+    "To",
+)
+"""
+Default ordered list of headers to use to compute the unique hash of a mail.
+
+By default we choose to exclude:
+
+``Cc``
+  Since ``mailman`` apparently `sometimes trims list members
+  <https://mail.python.org/pipermail/mailman-developers/2002-September/013233.html>`_
+  from the ``Cc`` header to avoid sending duplicates. Which means that copies of mail
+  reflected back from the list server will have a different ``Cc`` to the copy saved by
+  the MUA at send-time.
+
+``Bcc``
+  Because copies of the mail saved by the MUA at send-time will have ``Bcc``, but copies
+  reflected back from the list server won't.
+
+``Reply-To``
+  Since a mail could be ``Cc``'d to two lists with different ``Reply-To`` munging
+  options set.
+"""'''
+expected='''def mixed_links():
+    """Implements the minimal code necessary to locate and call the ``mpm`` CLI
+    on the system.
+
+    Once ``mpm`` is located, we can rely on it to produce the main output of the plugin.
+
+    The output must supports both `Xbar dialect
+    <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
+    """
+
+XKCD_MANAGER_ORDER = ("pip", "brew", "npm", "dnf", "apt", "steamcmd")
+"""Sequence of package managers as defined by `XKCD #1654: Universal Install Script
+<https://xkcd.com/1654/>`_.
+
+See the corresponding :issue:`implementation rationale in issue #10 <10>`.
+"""
+
+HASH_HEADERS = (
+    "Date",
+    "From",
+    "To",
+)
+"""Default ordered list of headers to use to compute the unique hash of a mail.
+
+By default we choose to exclude:
+
+``Cc``
+  Since ``mailman`` apparently `sometimes trims list members
+  <https://mail.python.org/pipermail/mailman-developers/2002-September/013233.html>`_
+  from the ``Cc`` header to avoid sending duplicates. Which means that copies of mail
+  reflected back from the list server will have a different ``Cc`` to the copy saved by
+  the MUA at send-time.
+
+``Bcc``
+  Because copies of the mail saved by the MUA at send-time will have ``Bcc``, but copies
+  reflected back from the list server won't.
+
+``Reply-To``
+  Since a mail could be ``Cc``'d to two lists with different ``Reply-To`` munging
+  options set.
+"""
+'''
+
+[issue_157_9]
+source='''def load_conf():
+    """Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """
+
+
+strict_selection_match = False
+"""
+Install sub-command try each user-selected manager until it find one providing
+the package we seek to install, after which the process stop. This mean not all
+managers will be called, so we allow the CLI output checks to partially match.
+"""
+
+
+platforms = {"LINUX", "MACOS", "WSL2"}
+"""Homebrew core is now compatible with `Linux and Windows Subsystem for Linux
+(WSL) 2 <https://docs.brew.sh/Homebrew-on-Linux>`_.
+"""'''
+expected='''def load_conf():
+    """Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """
+
+strict_selection_match = False
+"""Install sub-command try each user-selected manager until it find one
+providing the package we seek to install, after which the process stop.
+
+This mean not all managers will be called, so we allow the CLI output checks to
+partially match.
+"""
+
+platforms = {"LINUX", "MACOS", "WSL2"}
+"""Homebrew core is now compatible with `Linux and Windows Subsystem for Linux
+(WSL) 2 <https://docs.brew.sh/Homebrew-on-Linux>`_.
+"""
+'''
+
+[issue_157_10]
+source='''"""Patch and tweak `Python's standard library mail box constructors.
+
+<https://docs.python.org/3.11/library/mailbox.html>`_ to set sane defaults.
+
+Also forces out our own message factories to add deduplication tools and utilities.
+"""
+
+
+"""Patch and tweak `Python's standard library mail box constructors
+<https://docs.python.org/3.11/library/mailbox.html>`_ to set sane defaults.
+
+Also forces out our own message factories to add deduplication tools and utilities.
+"""
+
+
+def generate_platforms_graph(
+    graph_id: str, description: str, groups: frozenset
+) -> str:
+    """Generates an `Euler diagram <https://xkcd.com/2721/>`_ of platform and their
+    grouping.
+
+    Euler diagrams are
+    `not supported by mermaid yet <https://github.com/mermaid-js/mermaid/issues/2583>`_
+    so we fallback on a flowchart
+    without arrows.
+
+    Returns a ready to use and properly indented MyST block.
+    """
+
+
+def load_conf(self, ctx, param, path_pattern):
+    """Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """
+
+
+def pytest_addoption(parser):
+    """Add custom command line options.
+
+    Based on `Pytest's documentation examples
+    <https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option>`_.
+
+    By default, runs non-destructive tests and skips destructive ones.
+    """'''
+expected='''"""Patch and tweak `Python's standard library mail box constructors.
+
+<https://docs.python.org/3.11/library/mailbox.html>`_ to set sane defaults.
+
+Also forces out our own message factories to add deduplication tools and utilities.
+"""
+
+"""Patch and tweak `Python's standard library mail box constructors
+<https://docs.python.org/3.11/library/mailbox.html>`_ to set sane defaults.
+
+Also forces out our own message factories to add deduplication tools and utilities.
+"""
+
+
+def generate_platforms_graph(
+    graph_id: str, description: str, groups: frozenset
+) -> str:
+    """Generates an `Euler diagram <https://xkcd.com/2721/>`_ of platform and their
+    grouping.
+
+    Euler diagrams are
+    `not supported by mermaid yet <https://github.com/mermaid-js/mermaid/issues/2583>`_
+    so we fallback on a flowchart
+    without arrows.
+
+    Returns a ready to use and properly indented MyST block.
+    """
+
+
+def load_conf(self, ctx, param, path_pattern):
+    """Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """
+
+
+def pytest_addoption(parser):
+    """Add custom command line options.
+
+    Based on `Pytest's documentation examples
+    <https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option>`_.
+
+    By default, runs non-destructive tests and skips destructive ones.
+    """
+'''
+
+[issue_176]
+source='''def Class1:
+    """Class.""" #noqa
+
+    attribute = a
+    """Attr."""
+
+
+def Class2:
+    """Class."""
+
+    attribute = a
+    """Attr."""
+
+
+def Class3:
+    """Class docstring.
+
+    With long description.
+    """    #noqa
+
+    attribute = a
+    """Attr."""'''
+expected='''def Class1:
+    """Class.""" #noqa
+
+    attribute = a
+    """Attr."""
+
+
+def Class2:
+    """Class."""
+    attribute = a
+    """Attr."""
+
+
+def Class3:
+    """Class docstring.
+
+    With long description.
+    """    #noqa
+
+    attribute = a
+    """Attr."""
+'''
+
+[issue_176_black]
+source='''class C:
+    """Class.""" #noqa
+
+    attr: int
+    """Attr."""'''
+expected='''class C:
+    """Class.""" #noqa
+
+    attr: int
+    """Attr."""'''
 
 [issue_187]
-instring='''
+source='''
 #!/usr/bin/env python
 
 """a.py"""
 '''
-outstring='''
+expected='''
 #!/usr/bin/env python
 
 """a.py."""
+
 '''
 
 [issue_203]
-instring='''
+source='''
 #!/usr/bin/env python
 
 import os
@@ -293,7 +1146,7 @@ from typing import Iterator
 """Don't remove this comment, it's cool."""
 IMPORTANT_CONSTANT = "potato"
 '''
-outstring='''
+expected='''
 #!/usr/bin/env python
 
 import os
@@ -304,10 +1157,10 @@ IMPORTANT_CONSTANT = "potato"
 '''
 
 [issue_243]
-instring='''def foo(bar):
+source='''def foo(bar):
     """Return `foo` using `bar`. Description."""
 '''
-outstring='''def foo(bar):
+expected='''def foo(bar):
     """Return `foo` using `bar`.
 
     Description.

@@ -1,9 +1,10 @@
 # pylint: skip-file
 # type: ignore
 #
-#       tests.test_format_docstring.py is part of the docformatter project
+#       tests.formatter.test_do_format_docstring.py is part of the docformatter project
 #
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -24,11 +25,13 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for testing the Formatter class."""
+"""Module for testing the Formatter _do_format_docstring method."""
 
 
 # Standard Library Imports
 import contextlib
+import itertools
+import random
 import sys
 
 with contextlib.suppress(ImportError):
@@ -43,318 +46,185 @@ with contextlib.suppress(ImportError):
 import pytest
 
 # docformatter Package Imports
-from docformatter import Formatter
+from docformatter.format import Formatter
 
-INDENTATION = "    "
+# docformatter Local Imports
+from .. import generate_random_docstring
+
+NO_ARGS = [""]
+WRAP_DESC_72 = ["--wrap-descriptions", "72", ""]
+WRAP_DESC_88 = ["--wrap-descriptions", "88", ""]
+WRAP_BOTH_88 = ["--wrap-descriptions", "88", "--wrap-summaries", "88", ""]
+
+with open("tests/_data/string_files/do_format_docstrings.toml", "rb") as f:
+    TEST_STRINGS = tomllib.load(f)
 
 
-class TestFormatDocstring:
-    """Class for testing _do_format_docstring() with no arguments."""
-
-    with open("tests/_data/string_files/do_format_docstrings.toml", "rb") as f:
-        TEST_STRINGS = tomllib.load(f)
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_one_line_docstring(self, test_args, args):
-        """Return one-line docstring."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["one_line"]["instring"]
-        outstring = self.TEST_STRINGS["one_line"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_summary_that_ends_in_quote(self, test_args, args):
-        """Return one-line docstring with period after quote."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["summary_end_quote"]["instring"]
-        outstring = self.TEST_STRINGS["summary_end_quote"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--wrap-descriptions", "44", ""]])
-    def test_format_docstring_with_bad_indentation(self, test_args, args):
-        """Add spaces to indentation when too few."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["bad_indentation"]["instring"]
-        outstring = self.TEST_STRINGS["bad_indentation"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_too_much_indentation(self, test_args, args):
-        """Remove spaces from indentation when too many."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["too_much_indentation"]["instring"]
-        outstring = self.TEST_STRINGS["too_much_indentation"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--wrap-descriptions", "52", ""]])
-    def test_format_docstring_with_trailing_whitespace(self, test_args, args):
-        """Remove trailing white space."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["trailing_whitespace"]["instring"]
-        outstring = self.TEST_STRINGS["trailing_whitespace"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_empty_docstring(self, test_args, args):
-        """Do nothing with empty docstring."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["empty_docstring"]["instring"]
-        outstring = self.TEST_STRINGS["empty_docstring"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_no_period(self, test_args, args):
-        """Add period to end of one-line and summary line."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["no_summary_period"]["instring"]
-        outstring = self.TEST_STRINGS["no_summary_period"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_single_quotes(self, test_args, args):
-        """Replace single triple quotes with triple double quotes."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["single_quotes"]["instring"]
-        outstring = self.TEST_STRINGS["single_quotes"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_with_single_quotes_multi_line(self, test_args, args):
-        """Replace single triple quotes with triple double quotes."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["single_quotes_multiline"]["instring"]
-        outstring = self.TEST_STRINGS["single_quotes_multiline"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_underlined_summaries_alone(self, test_args, args):
-        """Leave underlined summary lines as is."""
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["skip_underlined_summary"]["instring"]
-        outstring = self.TEST_STRINGS["skip_underlined_summary"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_blank_line_after_variable_def(
-        self,
+@pytest.mark.integration
+@pytest.mark.order(4)
+@pytest.mark.parametrize(
+    "test_key, args",
+    [
+        ("one_line", NO_ARGS),
+        ("summary_end_quote", NO_ARGS),
+        ("bad_indentation", ["--wrap-descriptions", "44", ""]),
+        ("too_much_indentation", NO_ARGS),
+        ("trailing_whitespace", ["--wrap-descriptions", "52", ""]),
+        ("empty_docstring", NO_ARGS),
+        ("no_summary_period", NO_ARGS),
+        ("single_quotes", NO_ARGS),
+        ("single_quotes_multiline", NO_ARGS),
+        pytest.param(
+            "skip_underlined_summary",
+            NO_ARGS,
+            marks=pytest.mark.skip(
+                reason="LEGACY: Underlined summaries should now be processed as "
+                "section headers."
+            ),
+        ),
+        ("no_blank", NO_ARGS),
+        ("presummary_newline", ["--pre-summary-newline", ""]),
+        ("summary_multiline", ["--make-summary-multi-line", ""]),
+        ("presummary_space", ["--pre-summary-space", ""]),
+        ("quote_no_space_black", ["--black", ""]),
+        ("quote_space_black", ["--black", ""]),
+        ("quote_space_multiline_black", ["--black", ""]),
+        ("epytext", ["--style", "epytext"] + WRAP_BOTH_88),
+        ("epytext_numpy", ["--style", "numpy"] + WRAP_BOTH_88),
+        ("sphinx", ["--style", "sphinx"] + WRAP_BOTH_88),
+        ("sphinx_numpy", ["--style", "numpy"] + WRAP_BOTH_88),
+        ("numbered_list", WRAP_DESC_72),
+        ("parameter_dash", WRAP_DESC_72),
+        ("parameter_colon", ["--style", "numpy"] + WRAP_DESC_72),
+        ("many_short_columns", NO_ARGS),
+        ("inline", WRAP_DESC_72),
+        ("inline_short", WRAP_DESC_72),
+        ("inline_long", WRAP_DESC_72),
+        ("only_link", WRAP_DESC_72),
+        ("weird_punctuation", ["--wrap-summaries", "79", ""]),
+        ("description_wrap", WRAP_DESC_72),
+        ("ignore_doctest", WRAP_DESC_72),
+        ("ignore_summary_doctest", WRAP_DESC_72),
+        ("same_indentation_doctest", WRAP_DESC_72),
+        (
+            "force_wrap",
+            ["--wrap-descriptions", "72", "--wrap-summaries", "50", "--force-wrap", ""],
+        ),
+        ("summary_wrap_tab", ["--wrap-summaries", "30", "--tab-width", "4", ""]),
+        (
+            "one_line_wrap_newline",
+            ["--wrap-summaries", "69", "--close-quotes-on-newline", ""],
+        ),
+        (
+            "one_line_no_wrap",
+            ["--wrap-summaries", "88", "--close-quotes-on-newline", ""],
+        ),
+        ("issue_75", WRAP_DESC_72),
+        ("issue_75_2", WRAP_DESC_72),
+        ("issue_75_3", WRAP_DESC_72),
+        ("issue_127", ["--wrap-descriptions", "120", "--wrap-summaries", "120", ""]),
+        ("issue_140", WRAP_DESC_72),
+        ("issue_140_2", WRAP_DESC_72),
+        ("issue_140_3", WRAP_DESC_72),
+        ("issue_145", WRAP_DESC_72),
+        ("issue_150", WRAP_DESC_72),
+        ("issue_157", NO_ARGS),
+        ("issue_157_url", WRAP_DESC_88),
+        ("issue_157_2", WRAP_DESC_88),
+        ("issue_157_3", WRAP_DESC_88),
+        ("issue_157_4", WRAP_DESC_88),
+        ("issue_157_5", WRAP_DESC_88),
+        ("issue_157_6", WRAP_DESC_88),
+        ("issue_157_11", WRAP_DESC_88),
+        ("issue_159", WRAP_BOTH_88),
+        ("issue_159", WRAP_BOTH_88),
+        ("issue_180", WRAP_BOTH_88),
+        ("issue_189", WRAP_DESC_72),
+        ("issue_193", ["--non-cap", "eBay", "iPad", "-c", ""]),
+        ("issue_199", NO_ARGS),
+        ("issue_210", NO_ARGS),
+        ("issue_218", NO_ARGS),
+        ("issue_230", ["--style", "sphinx"] + WRAP_BOTH_88),
+        ("issue_215", WRAP_BOTH_88),
+        ("issue_217_222", WRAP_BOTH_88),
+        ("issue_224", WRAP_BOTH_88),
+        ("issue_228", WRAP_BOTH_88),
+        ("issue_229", WRAP_BOTH_88),
+        ("issue_229_2", WRAP_BOTH_88),
+        ("issue_234", WRAP_BOTH_88),
+        ("issue_235", WRAP_BOTH_88),
+        ("issue_239", [""]),
+        ("issue_239_sphinx", WRAP_BOTH_88),
+        ("issue_245", WRAP_BOTH_88),
+        ("issue_250", WRAP_BOTH_88),
+        (
+            "issue_253",
+            [
+                "--wrap-descriptions",
+                "120",
+                "--wrap-summaries",
+                "120",
+                "--pre-summary-newline",
+                "--black",
+                "",
+            ],
+        ),
+        ("issue_263_sphinx", NO_ARGS),
+        ("issue_263_epytext", ["-s", "epytext"] + NO_ARGS),
+        ("issue_271", ["--pre-summary-newline"] + WRAP_BOTH_88),
+    ],
+)
+def test_do_format_docstring(test_key, test_args, args):
+    uut = Formatter(
         test_args,
-        args,
-    ):
-        """Leave blank lines after any variable beginning with 'def'.
+        sys.stderr,
+        sys.stdin,
+        sys.stdout,
+    )
 
-        See issue #156.
-        """
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
+    source = TEST_STRINGS[test_key]["source"]
+    expected = TEST_STRINGS[test_key]["expected"]
 
-        instring = self.TEST_STRINGS["issue_156"]["instring"]
-        outstring = self.TEST_STRINGS["issue_156"]["outstring"]
+    if test_key == "summary_wrap_tab":
+        _indentation = "\t\t"
+    else:
+        _indentation = "    "
+    result = uut._do_format_docstring(
+        _indentation,
+        source,
+    )
+    assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
 
-        assert outstring == uut._do_format_code(
-            instring,
-        )
 
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_directive_alone(self, test_args, args):
-        """Leave docstrings that have a reST directive in the summary alone.
-
-        See issue #157.
-        """
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["issue_157"]["instring"]
-        outstring = self.TEST_STRINGS["issue_157"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [[""]])
-    def test_format_docstring_leave_blank_line_after_comment(
-        self,
+@pytest.mark.integration
+@pytest.mark.parametrize("args", [[""]])
+def test_do_format_docstring_random_with_wrap(
+    test_args,
+    args,
+):
+    uut = Formatter(
         test_args,
-        args,
+        sys.stderr,
+        sys.stdin,
+        sys.stdout,
+    )
+
+    # This function uses `random` so make sure each run of this test is
+    # repeatable.
+    random.seed(0)
+
+    min_line_length = 50
+    for max_length, num_indents in itertools.product(
+        range(min_line_length, 100), range(20)
     ):
-        """Leave blank lines after docstring followed by a comment.
-
-        See issue #176.
-        """
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
+        indentation = " " * num_indents
+        uut.args.wrap_summaries = max_length
+        formatted_text = indentation + uut._do_format_docstring(
+            indentation=indentation,
+            docstring=generate_random_docstring(max_word_length=min_line_length // 2),
         )
-
-        instring = self.TEST_STRINGS["issue_176"]["instring"]
-        outstring = self.TEST_STRINGS["issue_176"]["outstring"]
-
-        assert outstring == uut._do_format_code(
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--non-cap", "eBay", "iPad", "-c", ""]])
-    def test_format_docstring_with_non_cap_words(self, test_args, args):
-        """Capitalize words not found in the non_cap list.
-
-        See issue #193.
-        """
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["issue_193"]["instring"]
-        outstring = self.TEST_STRINGS["issue_193"]["outstring"]
-
-        assert outstring == uut._do_format_docstring(
-            INDENTATION,
-            instring,
-        )
-
-    @pytest.mark.unit
-    @pytest.mark.parametrize("args", [["--style", "sphinx", ""], ["--style", "epytext", ""]])
-    def test_do_not_double_process_urls(self, test_args, args):
-        """Do not double-process urls in fields
-
-        See issue #263
-        """
-        style = args[1]
-
-        uut = Formatter(
-            test_args,
-            sys.stderr,
-            sys.stdin,
-            sys.stdout,
-        )
-
-        instring = self.TEST_STRINGS["issue_263"][style]["instring"]
-        outstring = self.TEST_STRINGS["issue_263"][style]["outstring"]
-
-        assert outstring == uut._do_format_docstring(INDENTATION, instring, )
+        for line in formatted_text.split("\n"):
+            # It is not the formatter's fault if a word is too long to
+            # wrap.
+            if len(line.split()) > 1:
+                assert len(line) <= max_length
