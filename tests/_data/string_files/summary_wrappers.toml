@@ -1,0 +1,56 @@
+[do_unwrap_summary]
+instring = """This is a summary that has been wrapped\n
+                and needs to be unwrapped."""
+expected = "This is a summary that has been wrapped and needs to be unwrapped."
+
+[do_unwrap_summary_empty]
+instring = ""
+expected = ""
+
+[do_unwrap_summary_only_newlines]
+instring = "\n\n\n"
+expected = " "
+
+[do_unwrap_summary_double_newlines]
+instring = "This is a summary that has been wrapped\n\nand needs to be unwrapped."
+expected = "This is a summary that has been wrapped and needs to be unwrapped."
+
+[do_unwrap_summary_leading_trailing]
+instring = "\nThis is a summary that has been wrapped\n                and needs to be unwrapped.\n"
+expected = " This is a summary that has been wrapped and needs to be unwrapped. "
+
+[do_wrap_summary_no_wrap]
+instring = "This is a summary that should not be wrapped."
+expected = "This is a summary that should not be wrapped."
+
+[do_wrap_summary_disabled]
+instring = "This is a summary that should be wrapped because it is way too long to fit on a single line."
+expected = "This is a summary that should be wrapped because it is way too long to fit on a single line."
+
+[do_wrap_summary_with_wrap]
+instring = "This is a summary that should be wrapped because it is way too long to fit on a single line."
+expected = "This is a summary that should be wrapped\n    because it is way too long to fit on a single\n    line."
+
+[do_wrap_summary_with_indentation]
+instring = "This is a summary that should be wrapped because it is way too long to fit on a single line."
+expected = "This is a summary that should be wrapped\n                because it is way too long to fit on a\n                single line."
+
+[do_wrap_summary_long_word]
+instring = "supercalifragilisticexpialidocious"
+expected = "supercalifragilisticexpialidocious"
+
+[do_wrap_summary_empty]
+instring = ""
+expected = ""
+
+[do_wrap_summary_exact_length]
+instring = "This summary is exactly fifty characters long."
+expected = "This summary is exactly fifty characters long."
+
+[do_wrap_summary_tabs_spaces]
+instring = "word1 \t word2\nword3"
+expected = "word1    word2 word3"
+
+[do_wrap_summary_wrap_length_1]
+instring = "abc def"
+expected = ">a\n-b\n-c\n-d\n-e\n-f"

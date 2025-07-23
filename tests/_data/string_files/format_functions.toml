@@ -1,0 +1,333 @@
+# In this file, token lists have the following information:
+# [type, string, start, end, line]
+# for creating a TokenInfo() object.
+
+[module_docstring_followed_by_string]
+expected = 1
+
+[module_docstring_followed_by_code]
+expected = 1
+
+[module_docstring_followed_by_comment_then_code]
+expected = 1
+
+[module_docstring_followed_by_comment_then_string]
+expected = 1
+
+[module_docstring_in_black]
+expected = 2
+
+[class_docstring_followed_by_statement]
+source = '''
+class MyClass:
+    """Class docstring."""
+    x = 42
+'''
+expected = 1
+
+[class_docstring_followed_by_def]
+source = '''
+class MyClass:
+    """Class docstring."""
+
+    def method(self):
+        pass
+'''
+expected = 1
+
+[class_docstring_with_decorator]
+source = '''
+class A:
+    """Docstring."""
+
+    @classmethod
+    def foo(cls): pass
+'''
+expected = 1
+
+[class_docstring_with_class_variable]
+source = '''
+class A:
+    """Docstring."""
+    version = "1.0"
+'''
+expected = 1
+
+[function_with_expr]
+source = '''
+def foo():
+    """Docstring."""
+    return 42
+'''
+expected = 0
+
+[function_with_inner_def]
+source = '''
+def foo():
+    """Docstring."""
+
+    def inner(): pass
+'''
+expected = 1
+
+[function_with_inner_async_def]
+source='''def foo():
+    """
+    Hello foo.
+    This is a docstring.
+    """
+
+    async def inner(): pass
+'''
+expected = 1
+
+[function_with_decorator_and_def]
+source = '''
+def foo():
+    """Docstring."""
+
+    @staticmethod
+    def inner(): pass
+'''
+expected = 1
+
+[function_with_decorator_and_async_def]
+source = '''
+def foo():
+    """Docstring."""
+
+    @log
+    async def inner(): pass
+'''
+expected = 1
+
+[function_docstring_with_inner_class]
+source = '''
+def foo():
+    """Function docstring."""
+
+    class Bar:
+        pass
+'''
+expected = 1
+
+[attribute_docstring_single_line]
+source = '''class MyClass:
+    x = 1
+    """"This is an attribute."""
+'''
+expected = 1
+
+[attribute_docstring_multi_line]
+source = '''class MyClass:
+    x = 1
+    """"This is an attribute.
+
+    It has a multi-line docstring.
+    """
+'''
+expected = 1
+
+[attribute_docstring_outside_class]
+source = '''x = 1
+"""This is an attribute outside a class."""
+
+class MyClass:
+    pass
+'''
+expected = 2
+
+[attribute_docstring_inside_method]
+source = '''class MyClass:
+    def method(self):
+        x = 1
+        """This is an attribute inside a method."""
+'''
+expected = 1
+
+[attribute_docstring_with_comment]
+source = '''class MyClass:
+    x = 1
+    """This is an attribute."""  # This is a comment.
+'''
+expected = 1
+
+[attribute_docstring_multiple_assignments]
+source = '''class MyClass:
+    x = y = 2
+    """This is an attribute with multiple assignments."""
+'''
+expected = 1
+
+[attribute_docstring_equiv_expr]
+source = '''class MyClass:
+    x = 1
+    """This is an attribute."""
+    y = x + 1
+'''
+expected = 1
+
+[get_newlines_by_type_module_docstring]
+source = '"""Module docstring."""'
+expected = 1
+
+[get_newlines_by_type_module_docstring_black]
+source = '"""Module docstring."""'
+expected = 2
+
+[get_newlines_by_type_class_docstring]
+source = '''
+class MyClass:
+    """Class docstring."""
+    x = 42
+'''
+expected = 1
+
+[get_newlines_by_type_function_docstring]
+source = '''
+def foo():
+    """Docstring."""
+    return 42
+'''
+expected = 0
+
+[get_newlines_by_type_attribute_docstring]
+source = '''x = 1
+"""Docstring for x."""
+'''
+expected = 1
+
+[get_num_rows_columns]
+token = [5, "    ", [3, 10], [3, 40], '''    This is
+the last line in
+the docstring."""
+''']
+expected = [3, 17]
+
+[get_start_end_indices]
+prev_token = [
+    3, '''"""Hello foo and this is a docstring.\n\n    More stuff.\n    """''',
+    [2, 4], [2, 7],
+    '''    """Hello foo and this is a docstring.\n\n    More stuff.\n    """\n''']
+token = [
+    4, "\n", [7, 7], [7, 8],
+    '''    """Hello foo and this is a docstring.\n\n    More stuff.\n    """\n''']
+expected = [[2, 7], [2, 8]]
+
+[do_remove_preceding_blank_lines_module]
+source = '''#!/usr/bin/env python
+
+
+"""This is a module docstring."""
+'''
+expected = ["#!/usr/bin/env python",
+    "\n",
+    "\n",
+    '"""This is a module docstring."""',
+    "\n",
+    "",
+]
+
+[do_remove_preceding_blank_lines_class]
+source = '''
+    class TestClass:
+        """This is a class docstring.
+
+        :cvar test_int: a class attribute.
+        ..py.method: big_method()
+        """
+
+'''
+expected = ["    ",
+    "class",
+    "TestClass",
+    ":",
+    "\n",
+    "        ",
+    '''"""This is a class docstring.
+
+        :cvar test_int: a class attribute.
+        ..py.method: big_method()
+        """''',
+    "\n",
+    "\n",
+    "",
+    "",
+    "",
+]
+
+[do_remove_preceding_blank_lines_function]
+source = '''
+def test_function():
+
+
+
+"""This is a function docstring."""
+pass
+'''
+expected = ["def",
+    "test_function",
+    "(",
+    ")",
+    ":",
+    "\n",
+    '"""This is a function docstring."""',
+    "\n",
+    "pass",
+    "\n",
+    ""
+]
+
+[do_remove_preceding_blank_lines_attribute]
+source = '''
+    CONST = 123
+
+    """Docstring for CONST."""
+'''
+expected = [
+    "    ",
+    "CONST",
+    "=",
+    "123",
+    "\n",
+    '"""Docstring for CONST."""',
+    "\n",
+    "",
+    "",
+]
+
+[get_unmatched_start_end_indices]
+prev_token = [5, "    ", [2, 0], [2, 4], '''    """This is a docstring.\n''']
+token = [
+    3, '''"""This is a docstring.\n\n\n    That should be on less lines\n"""''',
+    [3, 4], [6, 7],
+    '''    """This is a docstring.\n\n\n    That should be on less lines\n    """''']
+expected = [[2, 4], [6, 7]]
+
+[do_update_token_indices]
+tokens = [
+    [1, 'def', [1, 0], [1, 3], 'def foo():\n'],
+    [1, 'foo', [1, 4], [1, 7], 'def foo():\n'],
+    [55, '(', [1, 7], [1, 8], 'def foo():\n'],
+    [55, ')', [1, 8], [1, 9], 'def foo():\n'],
+    [55, ':', [1, 9], [1, 10], 'def foo():\n'],
+    [4, '\n', [1, 10], [1, 11], 'def foo():\n'],
+    [5, '    ', [3, 0], [3, 4], '    """Hello foo."""\n'],
+    [3, '"""Hello foo."""', [3, 4], [5, 7], '    """Hello foo."""\n'],
+    [4, '\n', [5, 7], [5, 8], '    """Hello foo."""\n'],
+    [6, '', [6, 0], [6, 0], ''],
+    [0, '', [6, 0], [6, 0], '']
+]
+expected = [
+    [[1, 0], [1, 3]],
+    [[1, 4], [1, 7]],
+    [[1, 7], [1, 8]],
+    [[1, 8], [1, 9]],
+    [[1, 9], [1, 10]],
+    [[1, 10], [1, 11]],
+    [[2, 0], [2, 4]],
+    [[2, 4], [2, 7]],
+    [[2, 7], [2, 8]],
+    [[3, 0], [3, 0]],
+    [[3, 0], [3, 0]]
+]

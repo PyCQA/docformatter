@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #
+#       docformatter.util.py is part of the docformatter project
+#
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,10 +26,12 @@
 # SOFTWARE.
 """This module provides docformatter utility functions."""
 
+
 # Standard Library Imports
 import os
 import re
 import sysconfig
+from typing import List, Tuple
 
 unicode = str
 
@@ -37,57 +42,58 @@ def find_py_files(sources, recursive, exclude=None):
     """Find Python source files.
 
     Parameters
-        - sources: iterable with paths as strings.
-        - recursive: drill down directories if True.
-        - exclude: string based on which directories and files are excluded.
+    ----------
+    sources : list
+        Paths to files and/or directories to search.
+    recursive : bool
+        Drill down directories if True.
+    exclude : list
+        Which directories and files are excluded.
 
-    Return: yields paths to found files.
+    Returns
+    -------
+        list of files found.
     """
 
-    def not_hidden(name):
-        """Return True if file 'name' isn't .hidden."""
-        return not name.startswith(".")
+    def is_hidden(name):
+        """Return True if file 'name' is .hidden."""
+        return os.path.basename(os.path.abspath(name)).startswith(".")
 
-    def is_excluded(name, exclude):
+    def is_excluded(name, excluded):
         """Return True if file 'name' is excluded."""
         return (
-            any(
-                re.search(re.escape(str(e)), name, re.IGNORECASE)
-                for e in exclude
-            )
-            if exclude
+            any(re.search(re.escape(str(e)), name, re.IGNORECASE) for e in excluded)
+            if excluded
             else False
         )
 
-    for name in sorted(sources):
-        if recursive and os.path.isdir(name):
-            for root, dirs, children in os.walk(unicode(name)):
-                dirs[:] = [
-                    d
-                    for d in dirs
-                    if not_hidden(d) and not is_excluded(d, _PYTHON_LIBS)
-                ]
-                dirs[:] = sorted(
-                    [d for d in dirs if not is_excluded(d, exclude)]
-                )
+    for _name in sorted(sources):
+        if recursive and os.path.isdir(_name):
+            for root, dirs, children in os.walk(unicode(_name)):
+                if is_excluded(root, exclude):
+                    break
+
                 files = sorted(
                     [
-                        f
-                        for f in children
-                        if not_hidden(f) and not is_excluded(f, exclude)
+                        _file
+                        for _file in children
+                        if not is_hidden(_file)
+                        and not is_excluded(_file, exclude)
+                        and _file.endswith(".py")
                     ]
                 )
                 for filename in files:
-                    if filename.endswith(".py") and not is_excluded(
-                        root, exclude
-                    ):
-                        yield os.path.join(root, filename)
-        else:
-            yield name
+                    yield os.path.join(root, filename)
+        elif (
+            _name.endswith(".py")
+            and not is_hidden(_name)
+            and not is_excluded(_name, exclude)
+        ):
+            yield _name
 
 
 def has_correct_length(length_range, start, end):
-    """Determine if the line under test is within desired docstring length.
+    """Determine if the line under test is within the desired docstring length.
 
     This function is used with the --docstring-length min_rows max_rows
     argument.
@@ -104,7 +110,8 @@ def has_correct_length(length_range, start, end):
     Returns
     -------
     correct_length: bool
-        True if is correct length or length range is None, else False
+        True if the docstring has the correct length or length range is None,
+        otherwise False
     """
     if length_range is None:
         return True
@@ -136,6 +143,36 @@ def is_in_range(line_range, start, end):
     if line_range is None:
         return True
     return any(
-        line_range[0] <= line_no <= line_range[1]
-        for line_no in range(start, end + 1)
+        line_range[0] <= line_no <= line_range[1] for line_no in range(start, end + 1)
     )
+
+
+def prefer_field_over_url(
+    field_idx: List[Tuple[int, int]],
+    url_idx: List[Tuple[int, int]],
+):
+    """Remove URL indices that overlap with field list indices.
+
+    Parameters
+    ----------
+    field_idx : list
+        The list of field list index tuples.
+    url_idx : list
+        The list of URL index tuples.
+
+    Returns
+    -------
+    url_idx : list
+        The url_idx list with any tuples that have indices overlapping with field
+        list indices removed.
+    """
+    if not field_idx:
+        return url_idx
+
+    nonoverlapping_urls = []
+
+    any_param_start = min(e[0] for e in field_idx)
+    for _key, _value in enumerate(url_idx):
+        if _value[1] < any_param_start:
+            nonoverlapping_urls.append(_value)
+    return nonoverlapping_urls

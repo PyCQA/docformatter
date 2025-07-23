@@ -1,0 +1,192 @@
+[is_bullet_list]
+instring = """* parameter\n
+            - parameter\n
+            + parameter\n"""
+strict = false
+style = "sphinx"
+expected = true
+
+[is_enum_list]
+instring = """1. parameter\n
+            2. parameter\n
+            3. parameter\n"""
+strict = false
+style = "sphinx"
+expected = true
+
+[is_option_list]
+instring = """
+-a include all the stuff\n
+--config the path to the configuration file\n
+-h, --help show this help\n"""
+strict = false
+style = "sphinx"
+expected = true
+
+[is_option_list_indented]
+instring = """
+    -a include all the stuff\n
+    --config the path to the configuration file\n
+    -h, --help show this help\n"""
+strict = false
+style = "sphinx"
+expected = true
+
+[is_list_with_single_hyphen]
+instring = """\
+        Keyword arguments:
+        real - the real part (default 0.0)
+        imag - the imaginary part (default 0.0)
+    """
+strict = false
+style = "sphinx"
+expected = true
+
+[is_list_with_double_hyphen]
+instring = """\
+        Keyword arguments:
+        real -- the real part (default 0.0)
+        imag -- the imaginary part (default 0.0)
+    """
+strict = false
+style = "sphinx"
+expected = true
+
+[is_list_with_at_sign]
+instring = """\
+        Keyword arguments:
+        @real the real part (default 0.0)
+        @imag the imaginary part (default 0.0)
+    """
+strict = false
+style = "sphinx"
+expected = true
+
+[is_heuristic_list]
+instring = "Example:\nrelease-1.1/\nrelease-1.2/\nrelease-1.3/\nrelease-1.4/\nrelease-1.4.1/\nrelease-1.5/\n"
+strict = false
+style = "sphinx"
+expected = true
+
+[is_type_of_list_strict_wrap]
+instring = "Launch\nthe\nrocket."
+strict = true
+style = "numpy"
+expected = false
+
+[is_type_of_list_non_strict_wrap]   # See issue #67.
+instring = "Launch\nthe\nrocket."
+strict = false
+style = "numpy"
+expected = true
+
+[is_type_of_list_alembic_header]    # See issue #242.
+instring = """Add some column.
+
+    Revision ID: <some id>>
+    Revises: <some other id>
+    Create Date: 2023-01-06 10:13:28.156709
+    """
+strict = false
+style = "numpy"
+expected = true
+
+[is_not_list_sphinx_style]  # See requirement docformatter_10.4
+instring = """\
+Using Sphinx parameter list
+
+:param str arg1: the first argument.
+:param int arg2: the second argument.
+"""
+strict = false
+style = "sphinx"
+expected = false
+
+[is_sphinx_list_numpy_style]   # See requirements docformatter_10.2.1 and docformatter_10.3.1
+instring = """\
+Using Sphinx parameter list
+
+:param str arg1: the first argument.
+:param int arg2: the second argument.
+"""
+strict = false
+style = "numpy"
+expected = true
+
+[is_numpy_list_sphinx_style]    # See requirement docformatter_10.4.1
+instring = """\
+Using Numpy parameter list
+
+Parameters
+----------
+    arg1 : str
+        The first argument.
+    arg2 : int
+        The second argument.
+"""
+strict = false
+style = "sphinx"
+expected = true
+
+[is_google_list_numpy_style]
+instring = """\
+    Args:
+        stream (BinaryIO): Binary stream (usually a file object).
+    """
+strict = true
+style = "numpy"
+expected = true
+
+[is_literal_block]
+instring = """\
+This is a description.
+
+Example code::
+
+    config(par=value)
+
+Example code2::
+
+    with config(par=value) as f:
+        pass
+"""
+strict = false
+style = "numpy"
+expected = true
+
+[is_reST_header]
+instring = """\
+===============================
+Example of creating an example.
+===============================
+
+.. currentmodule:: my_project
+
+In this example, we illustrate how to create
+an example.
+"""
+strict = false
+style = "numpy"
+expected = true
+
+[is_sphinx_field_list]
+instring = """\
+This is a description.
+
+    :parameter arg1: the first argument.
+    :parameter arg2: the second argument.
+"""
+strict = false
+style = "sphinx"
+expected = false
+
+[is_epytext_field_list]
+instring = """\
+This is a description.
+
+    @param arg1: the first argument.
+    @param arg2: the second argument.
+"""
+strict = false
+style = "epytext"
+expected = false

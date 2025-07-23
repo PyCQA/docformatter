@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #
+#       docformatter.encode.py is part of the docformatter project
+#
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,6 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides docformatter's Encoder class."""
+
 
 # Standard Library Imports
 import collections
