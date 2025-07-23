@@ -146,10 +146,7 @@ def test_do_format_code(test_key, test_args, args):
     )
 
     source = TEST_STRINGS[test_key]["source"]
-    if test_key == "escaped_newlines" and sys.version_info >= (3, 13):
-        expected = TEST_STRINGS[test_key]["expected313"]
-    else:
-        expected = TEST_STRINGS[test_key]["expected"]
+    expected = TEST_STRINGS[test_key]["expected"]
 
     result = uut._do_format_code(source)
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"

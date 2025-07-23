@@ -178,7 +178,7 @@ source='''def foo():
     """
     Hello foo.
     """
-    x = \
+    x =\
             1'''
 expected='''def foo():
     """Hello foo."""
@@ -187,7 +187,7 @@ expected='''def foo():
 # Python 3.13+ seems to handle this differently.
 expected313='''def foo():
     """Hello foo."""
-    x = \
+    x =\
             1'''
 
 [code_comments]
