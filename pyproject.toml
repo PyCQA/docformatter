@@ -178,6 +178,7 @@ line_length = 88
 report = "warning"
 ignore_directives = [
 	"automodule",
+    "literalinclude",
 	"tabularcolumns",
 	"toctree",
 ]
