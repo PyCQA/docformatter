@@ -1,0 +1,95 @@
+[do_close_description]
+instring = """
+http://www.google.com.  This is the part of the long description that follows a URL or
+something like that.  This stuff should get wrapped according to the rules in place
+at the time."""
+expected = ['    This is the part of the long description that follows a URL or',
+'    something like that.  This stuff should get wrapped according to the rules in place',
+'    at the time.']
+
+[do_wrap_description]
+instring = """
+\nThis is the long description from a docstring.  It follows the summary and will be wrapped at X characters, where X is the wrap_length argument to docformatter.
+"""
+expected = """
+    This is the long description from a docstring.  It follows the
+    summary and will be wrapped at X characters, where X is the
+    wrap_length argument to docformatter."""
+
+[do_wrap_description_with_doctest]
+instring = """
+This is a long description from a docstring that contains a simple little doctest.  The description shouldn't get wrapped at all.
+
+    >>> print(x)
+    >>> 42
+"""
+expected = """
+This is a long description from a docstring that contains a simple little doctest.  The description shouldn't get wrapped at all.
+
+    >>> print(x)
+    >>> 42"""
+
+[do_wrap_description_with_list]
+instring = """
+This is a long description from a docstring that will contain a list.  The description shouldn't get wrapped at all.
+
+    1. Item one
+    2. Item two
+    3. Item 3
+"""
+expected = """
+    This is a long description from a docstring that will contain a list.  The description shouldn't get wrapped at all.
+
+        1. Item one
+        2. Item two
+        3. Item 3"""
+
+[do_wrap_description_with_heuristic_list]
+instring = """
+This is a long description from a docstring that will contain an heuristic list.  The description shouldn't get wrapped at all.
+
+    Example:
+        Item one
+        Item two
+        Item 3
+"""
+expected = """
+    This is a long description from a docstring that will contain an heuristic list.  The description shouldn't get wrapped at all.
+
+        Example:
+            Item one
+            Item two
+            Item 3"""
+
+[do_wrap_description_with_heuristic_list_force_wrap]
+instring = """
+This is a long description from a docstring that will contain an heuristic list and is passed force_wrap = True.  The list portion of the description should also get wrapped.
+
+    Example:
+        Item one
+        Item two
+        Item 3
+        Item 4
+        Item 5
+        Item 6
+"""
+expected = """
+    This is a long description from a docstring that will contain an
+    heuristic list and is passed force_wrap = True.  The list portion of
+    the description should also get wrapped.
+
+    Example:     Item one     Item two     Item 3     Item 4     Item 5
+    Item 6"""
+
+[do_wrap_description_with_directive]
+instring = """
+This is a long docstring containing some reST directives.
+
+.. note
+This is a note in the reST dialog.
+"""
+expected = """
+    This is a long docstring containing some reST directives.
+
+    .. note
+    This is a note in the reST dialog."""

@@ -1,0 +1,289 @@
+[do_reindent]
+instring = '''"""
+    This should be dedented.
+
+    1. This too.
+    2. And this.
+"""'''
+expected = '''    """
+        This should be dedented.
+
+        1. This too.
+        2. And this.
+    """
+'''
+
+[do_reindent_should_expand_tabs_to_indentation]
+instring = "\tThis should be dedented.\n\t1. This too.\n\t2. And this."
+expected = "    This should be dedented.\n    1. This too.\n    2. And this.\n"
+
+[do_reindent_with_no_indentation_expand_tabs]
+instring = "The below should be indented with spaces:\n\n\t1. This too.\n\t2. And this."
+expected = "The below should be indented with spaces:\n\n        1. This too.\n        2. And this.\n"
+
+[do_reindent_should_maintain_indentation]
+instring = '''    """
+        This should maintain its indentation.
+
+        1. This too.
+        2. And this.
+    """'''
+expected = '''    """
+        This should maintain its indentation.
+
+        1. This too.
+        2. And this.
+    """
+'''
+
+[do_reindent_tab_indentation]
+instring = "\tThis should be indented with a tab.\n\n\tSo should this."
+expected = "\tThis should be indented with a tab.\n\n\tSo should this.\n"
+
+[do_normalize_summary]
+instring = "This is a sentence "
+expected = "This is a sentence."
+
+[do_normalize_summary_multiline]
+instring = "This \n\t is\na sentence "
+expected = "This \n\t is\na sentence."
+
+[do_normalize_summary_question_mark]
+instring = "This is a question?  "
+expected = "This is a question?"
+
+[do_normalize_summary_exclamation_point]
+instring = "This is a bold statement!  "
+expected = "This is a bold statement!"
+
+[do_normalize_summary_with_title]   # See issue #56.
+instring = "# This is a markup title     "
+expected = "# This is a markup title"
+
+[do_normalize_summary_capitalize_first_letter] # See issue #76
+instring = "this is a summary that needs to be capped"
+expected = "This is a summary that needs to be capped."
+
+[do_normalize_summary_with_proprer_noun]
+instring = "don't lower case I'm"
+expected = "Don't lower case I'm."
+
+[do_normalize_summary_capitalize_first_letter_with_period] # See issue #184. See requirement docformatter_4.5.1.
+instring = "this is a summary that needs to be capped."
+expected = "This is a summary that needs to be capped."
+
+[do_normalize_summary_dont_capitalize_first_letter_if_variable]
+instring = "num_iterations should not be capitalized in this summary"
+expected = "num_iterations should not be capitalized in this summary."
+
+[do_normalize_line]
+instring = "This is a line with carriage return\r"
+expected = "This is a line with carriage return\n"
+
+[do_normalize_line_endings]
+instring = ["This is a line with carriage return\r\n", "This is another line with carriage return\r"]
+expected = "This is a line with carriage return\nThis is another line with carriage return\n"
+
+[description_to_list]
+instring = "This is a long description that is going to be converted to a list.\n\nThere's lots of reasons one might want to turn a text block into a list.\nThis is just one of those reasons.\n"
+expected = [
+            "    This is a long description that is going to be converted to a list.",
+            "",
+            "    There's lots of reasons one might want to turn a text block into a",
+            "    list. This is just one of those reasons.",
+            "",
+        ]
+
+[do_split_first_sentence]
+instring = "This is a sentence. More stuff. And more stuff.   .!@#$%"
+expected = ["This is a sentence.", " More stuff. And more stuff.   .!@#$%"]
+
+[do_split_first_sentence_2]
+instring = "This e.g. sentence. More stuff. And more stuff.   .!@#$%"
+expected = ["This e.g. sentence.", " More stuff. And more stuff.   .!@#$%",]
+
+[do_split_first_sentence_3]
+instring = "This is the first:\none\ntwo"
+expected = ["This is the first:", "\none\ntwo"]
+
+[do_split_summary]  # See issue #283.
+instring = ["This is a sentence.", ""]
+expected = ["This is a sentence.", ""]
+
+[do_split_summary_2]    # See issue #283.
+instring = ["This e.g. a sentence.", ""]
+expected = ["This e.g. a sentence.", ""]
+
+[do_split_multi_sentence_summary]   # See issue #283.
+instring = ["This is a sentence. This is another.", ""]
+expected = ["This is a sentence.","","This is another."]
+
+[do_split_multi_sentence_summary_2]   # See issue #283.
+instring = ["This e.g. a sentence. This is another.", ""]
+expected = ["This e.g. a sentence.", "", "This is another."]
+
+[do_split_description_url_outside_param]
+instring = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n:param a:mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+expected = ["    mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "    :param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"]
+
+[do_split_description_single_url_in_param]
+instring = ":param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmma"
+expected = ["    :param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "        https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmma"]
+
+[do_split_description_single_url_in_multiple_params]
+instring = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n\n:param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmma\n:param b: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmb"
+expected = ["    mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "",
+    "    :param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "        https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmma",
+    "    :param b: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "        https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmb"]
+
+[do_split_description_multiple_urls_in_param]
+instring = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n:param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm0\n    https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm1"
+expected = ['    mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', '    :param a: mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', '        https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm0', '        https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm1']
+
+[do_split_summary_and_description]
+instring = "This is the first. This is the second. This is the third."
+expected = ["This is the first.",
+            "This is the second. This is the third.",]
+
+[do_split_summary_and_description_complex]
+instring = "This is the first\n\nThis is the second. This is the third."
+expected = ["This is the first",
+            "\nThis is the second. This is the third."]
+
+[do_split_summary_and_description_more_complex]
+instring = "This is the first.\nThis is the second. This is the third."
+expected = ["This is the first.",
+            "This is the second. This is the third."]
+
+[do_split_summary_and_description_with_list]
+instring = "This is the first\n- one\n- two"
+expected = ["This is the first",
+            "- one\n- two"]
+
+[do_split_summary_and_description_with_list_of_parameters]
+instring = "This is the first\none - one\ntwo - two"
+expected = ["This is the first",
+            "one - one\ntwo - two"]
+
+[do_split_summary_and_description_with_capital]
+instring = "This is the first\nWashington"
+expected = ["This is the first\nWashington",
+            ""]
+
+[do_split_summary_and_description_with_list_on_other_line]
+instring = "    Test\n    test\n    @blah"
+expected = ["Test",
+            "    test\n    @blah"]
+
+[do_split_summary_and_description_with_other_symbol]
+instring = "This is the first\n@ one\n@ two"
+expected = ["This is the first",
+            "@ one\n@ two"]
+
+[do_split_summary_and_description_with_colon]
+instring = "This is the first:\none\ntwo"
+expected = ["This is the first:",
+            "one\ntwo"]
+
+[do_split_summary_and_description_with_exclamation]
+instring = "This is the first!\none\ntwo"
+expected = ["This is the first!",
+            "one\ntwo"]
+
+[do_split_summary_and_description_with_question_mark]
+instring = "This is the first?\none\ntwo"
+expected = ["This is the first?",
+            "one\ntwo"]
+
+[do_split_summary_and_description_with_double_quote]
+instring = 'This is the first\n"one".'
+expected = ['This is the first\n"one".',
+            ""]
+
+[do_split_summary_and_description_with_single_quote]
+instring = "This is the first\n'one'."
+expected = ["This is the first\n'one'.",
+            ""]
+
+[do_split_summary_and_description_with_double_backtick]
+instring = "This is the first\n``one``."
+expected = ["This is the first\n``one``.",
+            ""]
+
+[do_split_summary_and_description_with_punctuation]
+instring = "    Try this and this and this and this and this and this and this at\n    https://example.com/\n\n    Parameters\n    ----------\n    email : string"
+expected = ["Try this and this and this and this and this and this and this at\n    https://example.com/",
+    "\n    Parameters\n    ----------\n    email : string"]
+
+[do_split_summary_and_description_without_punctuation]
+instring = "Try this and this and this and this and this and this and this at this other line\n\n    Parameters\n    ----------\n    email : string"
+expected = ["Try this and this and this and this and this and this and this at this other line",
+                "\n    Parameters\n    ----------\n    email : string"]
+
+[do_split_summary_and_description_with_abbreviation]
+instring = "Test e.g. now, Test foo, bar, etc. now, Test i.e. now, Test Dr. now, Test Mr. now, Test Mrs. now, Test Ms. now"
+expected = ["Test e.g. now, Test foo, bar, etc. now, Test i.e. now, Test Dr. now, Test Mr. now, Test Mrs. now, Test Ms. now", ""]
+
+[do_split_summary_and_description_with_url]
+instring ="Sequence of package managers as defined by `XKCD #1654: Universal Install Script <https://xkcd.com/1654/>`_.\n\nSee the corresponding :issue:`implementation rationale in issue #10 <10>`."
+expected = ["Sequence of package managers as defined by `XKCD #1654: Universal Install Script <https://xkcd.com/1654/>`_.", "\nSee the corresponding :issue:`implementation rationale in issue #10 <10>`."]
+
+[do_strip_docstring]
+instring = '''"""This is a docstring.
+
+        With some indentation.
+"""'''
+expected = ["This is a docstring.\n\n        With some indentation.", '"""']
+
+[do_strip_docstring_triple_single_quotes]
+instring = """'''This is a docstring.
+
+        With some indentation.
+'''"""
+expected = ["This is a docstring.\n\n        With some indentation.", '"""']
+
+[do_strip_docstring_empty_string]
+instring = '''""""""'''
+expected = ["", '"""']
+
+[do_strip_docstring_raw_string]
+instring = '''r"""    foo"""'''
+expected = ["foo", 'r"""']
+
+[do_strip_docstring_raw_string_2]
+instring = '''R""" foo  """'''
+expected = ["foo", 'R"""']
+
+[do_strip_docstring_unicode_string]
+instring = '''u"""bar    """'''
+expected = ["bar", 'u"""']
+
+[do_strip_docstring_unicode_string_2]
+instring = '''U"""    bar  """'''
+expected = ["bar", 'U"""']
+
+[do_strip_docstring_with_unknown]
+instring = "foo"
+expected = []
+raises = "ValueError"
+
+[do_strip_docstring_with_single_quotes] # See issue #66
+instring = "'hello\\''"
+expected = []
+raises = "ValueError"
+
+[do_strip_docstring_with_double_quotes] # See issue #66
+instring = '"hello\\""'
+expected = []
+raises = "ValueError"
+
+[do_strip_leading_blank_lines]
+instring = "\n\n\nThis is a line with leading blank lines"
+expected = "This is a line with leading blank lines"
+
+[do_clean_excess_whitespace]
+instring = "`Get\n     Cookies.txt <https://chrome.google.com/webstore/detail/get-"
+expected = "    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-"

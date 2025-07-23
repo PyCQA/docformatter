@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #
+#       docformatter.__init__.py is part of the docformatter project
+#
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,15 +26,19 @@
 # SOFTWARE.
 """This is the docformatter package."""
 
+
 __all__ = ["__version__"]
 
 # docformatter Local Imports
 from .__pkginfo__ import __version__
+from .classify import *  # noqa F403
+from .format import FormatResult  # noqa F403
+from .format import Formatter  # noqa F401
+from .patterns import *  # noqa F403
 from .strings import *  # noqa F403
-from .syntax import *  # noqa F403
 from .util import *  # noqa F403
+from .wrappers import *  # noqa F403
 
 # Have isort skip these they require the functions above.
 from .configuration import Configurater  # isort: skip # noqa F401
 from .encode import Encoder  # isort: skip # noqa F401
-from .format import Formatter, FormatResult  # isort: skip # noqa F401

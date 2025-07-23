@@ -1,0 +1,127 @@
+[is_alembic_header]
+instring = "Revision ID: <some id>>"
+expected = "Revision ID: "
+
+[is_not_alembic_header_epytext]
+instring = "@not alembic header: some non-alembic stuff"
+expected = "None"
+
+[is_not_alembic_header_google]
+instring = "not alembic header: some non-alembic stuff"
+expected = "None"
+
+[is_not_alembic_header_numpy]
+instring = "not alembic header : some non-alembic stuff"
+expected = "None"
+
+[is_numpy_section_header_parameters]
+instring = "Parameters\n----------\nsome parameters"
+expected = "Parameters\n----------"
+
+[is_numpy_section_header_returns]
+instring = "Returns\n----------\nsome return values"
+expected = "Returns\n----------"
+
+[is_numpy_section_header_yields]
+instring = "Yields\n----------\nsome yield value"
+expected = "Yields\n----------"
+
+[is_numpy_section_header_raises]
+instring = "Raises\n----------\nsome errors raised"
+expected = "Raises\n----------"
+
+[is_numpy_section_header_receives]
+instring = "Receives\n----------\nsome values to receive"
+expected = "Receives\n----------"
+
+[is_numpy_section_header_other_parameters]
+instring = "Other Parameters\n----------\nsome other parameters"
+expected = "Other Parameters\n----------"
+
+[is_numpy_section_header_warns]
+instring = "Warns\n----------\nthe little used Warns section"
+expected = "Warns\n----------"
+
+[is_numpy_section_header_warnings]
+instring = "Warnings\n----------\nthe little used Warnings section"
+expected = "Warnings\n----------"
+
+[is_numpy_section_header_see_also]
+instring = "See Also\n----------\nother stuff you should look at"
+expected = "See Also\n----------"
+
+[is_numpy_section_header_examples]
+instring = "Examples\n----------\nsome examples"
+expected = "Examples\n----------"
+
+[is_numpy_section_header_notes]
+instring = "Notes\n----------\nsome notes"
+expected = "Notes\n----------"
+
+[is_not_numpy_section_header]
+instring = "Section\n----------\na section that is not standard"
+expected = "None"
+
+[is_not_numpy_section_header_wrong_dashes]
+instring = "Parameters\n**********\na section with standard name but wrong dashes"
+expected = "None"
+
+[is_rest_section_header_pound]
+instring = "######\nPart 1\n######\nsome part"
+expected = "######\nPart 1\n######"
+
+[is_rest_section_header_star]
+instring = "*********\nChapter 1\n*********\nsome chapter"
+expected = "*********\nChapter 1\n*********"
+
+[is_rest_section_header_equal]
+instring = "Section 1\n=========\nsome section"
+expected = "Section 1\n========="
+
+[is_rest_section_header_dash]
+instring = "Subsection 1\n------------\nsome subsection"
+expected = "Subsection 1\n------------"
+
+[is_rest_section_header_circumflex]
+instring = "Subsubsection 1\n^^^^^^^^^^^^^^^\nsome subsubsection"
+expected = "Subsubsection 1\n^^^^^^^^^^^^^^^"
+
+[is_rest_section_header_single_quote]
+instring = "Section 2\n'''''''''\nanother section"
+expected = "Section 2\n'''''''''"
+
+[is_rest_section_header_double_quote]
+instring = '''Subsection 2
+""""""""""""
+another subsection
+'''
+expected = '''Subsection 2
+""""""""""""'''
+
+[is_rest_section_header_plus]
+instring = "Subsubsection 2\n+++++++++++++++\nanother subsubsection"
+expected = "Subsubsection 2\n+++++++++++++++"
+
+[is_rest_section_header_underscore]
+instring = "______\nPart 3\n______\nyet another part"
+expected = "______\nPart 3\n______"
+
+[is_rest_section_header_tilde]
+instring = "Section 3\n~~~~~~~~~\nyet another section"
+expected = "Section 3\n~~~~~~~~~"
+
+[is_rest_section_header_colon]
+instring = "Subsection 3\n::::::::::::\nyet another subsection"
+expected = "Subsection 3\n::::::::::::"
+
+[is_rest_section_header_backtick]
+instring = "Subsubsection 3\n```````````````\nyet another subsubsection"
+expected = "Subsubsection 3\n```````````````"
+
+[is_rest_section_header_period]
+instring = "Part 4\n......\nthe fourth part"
+expected = "Part 4\n......"
+
+[is_not_rest_section_header_unknown_adornments]
+instring = "??????\nPart 5\n??????\na part with unknown adornments"
+expected = "None"
