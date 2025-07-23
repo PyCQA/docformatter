@@ -185,107 +185,46 @@ ignore_roles = [
 	"numref",
 ]
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist =
-    py39
-    py310
-    py311
-    py312
-    py313
-    pypy3
-    coverage
-    style
-isolated_build = true
-skip_missing_interpreters = true
-skipsdist = true
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "tests/",
+]
+line-length = 88
+indent-width = 4
+target-version = "py39"
 
-[gh-actions]
-python =
-    3.9: py39
-    3.10: py310
-    3.11: py311
-    3.12: py312
-    3.13: py313
-    pypy-3.9: pypy3
+[tool.ruff.lint]
+select = ["E", "F", "PL"]
+ignore = []
 
-[testenv]
-description = run the test suite using pytest under {basepython}
-deps =
-    charset_normalizer
-    coverage[toml]
-    mock
-    pytest
-    pytest-cov
-    pytest-order
-    tomli
-    untokenize
-setenv =
-    COVERAGE_FILE = {toxworkdir}/.coverage.{envname}
-commands =
-    pip install -U pip
-    pip install --prefix={toxworkdir}/{envname} -e .[tomli]
-    pytest -s -x -c {toxinidir}/pyproject.toml \
-        -m unit \
-        --cache-clear \
-        --cov=docformatter \
-        --cov-config={toxinidir}/pyproject.toml \
-        --cov-branch \
-        {toxinidir}/tests/
-    pytest -s -x -c {toxinidir}/pyproject.toml \
-        -m integration \
-        --cache-clear \
-        --cov=docformatter \
-        --cov-config={toxinidir}/pyproject.toml \
-        --cov-branch \
-        {toxinidir}/tests/
-    pytest -s -x -c {toxinidir}/pyproject.toml \
-        -m system \
-        --cache-clear \
-        --cov=docformatter \
-        --cov-config={toxinidir}/pyproject.toml \
-        --cov-branch \
-        --cov-append \
-        {toxinidir}/tests/
-
-[testenv:coverage]
-description = combine coverage data and create report
-setenv =
-    COVERAGE_FILE = {toxworkdir}/.coverage
-skip_install = true
-deps =
-    coverage[toml]
-parallel_show_output = true
-commands =
-    coverage combine
-    coverage report -m
-    coverage xml -o {toxworkdir}/coverage.xml
-depends = py39, py310, py311, py312, py313, pypy3
-
-[testenv:style]
-description = run autoformatters and style checkers
-deps =
-    charset_normalizer
-    pycodestyle
-    pydocstyle
-    ruff==0.0.269
-    rstcheck
-    toml
-    untokenize
-commands =
-    pip install -U pip
-    pip install .
-    docformatter --black --recursive {toxinidir}/src/docformatter
-    pycodestyle --exclude=.git,.tox,*.pyc,*.pyo,build,dist,*.egg-info,config,docs,locale,tests,tools --ignore=C326,C330,E121,E123,E126,E133,E203,E242,E265,E402,W503,W504 --format=pylint --max-line-length=88 {toxinidir}/src/docformatter
-    pydocstyle {toxinidir}/src/docformatter
-    ruff check --select "PL" --select "F" {toxinidir}/src/docformatter
-    rstcheck --report-level=1 {toxinidir}/README.rst
-
-[testenv:docs]
-description = build docformatter documentation
-allowlist_externals = make
-changedir = docs
-commands =
-    make html
-"""
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
