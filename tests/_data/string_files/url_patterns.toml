@@ -1,0 +1,187 @@
+[apple_filing_protocol]
+instring = "This is an Apple Filing Protocol URL pattern: afp://[<user@]<host>[:<port>][/[<path>]]"
+expected = [46, 86]
+
+[network_filing_system]
+instring = "This is an Network File System URL pattern: nfs://server<:port>/<path>"
+expected = [44, 70]
+
+[samba_filing_system]
+instring = "This is an Samba URL pattern: smb://[<user>@]<host>[:<port>][/[<path>]][?<param1>=<value1>[;<param2>=<value2>]]"
+expected = [30, 111]
+
+[local_file_system]
+instring = "This is a URL pattern for addressing a file: file://[host]/path"
+expected = [45, 63]
+
+[apt]
+instring = "This is an apt URL pattern: apt:docformatter"
+expected = [28, 44]
+
+[bitcoin]
+instring = "This is a bitcoin URL pattern: bitcoin:<address>[?[amount=<size>][&][label=<label>][&][message=<message>]]"
+expected = [31, 106]
+
+[chrome]
+instring = "This is a chrome URL pattern: chrome://<package>/<section>/<path>"
+expected = [30, 65]
+
+[java_compressed_archive]
+instring = "This is a Java compressed archive URL pattern: jar:<url>!/[<entry>]"
+expected = [47, 67]
+
+[concurrent_version_system]
+instring = "This is a Concurrent Versions System URL pattern: cvs://<method:logindetails>@<repository>/<modulepath>;[date=date to retrieve | tag=tag to retrieve]"
+expected = [50, 114]
+
+[git]
+instring = "This is a Git URL pattern: git://github.com/PyCQA/docformatter.git"
+expected = [27, 66]
+
+[subversion]
+instring = "This is a Subversion URL pattern: svn://<logindetails>@<repository><:port>/<modulepath>"
+expected = [34, 87]
+
+[domain_name_system]
+instring = "This is a Domain Name System URL pattern: dns:example?TYPE=A;CLASS=IN"
+expected = [42, 69]
+
+[file_transfer_protocol]
+instring = "This is a File Transfer Protocol URL pattern: ftp://[user[:password]@]host[:port]/url-path"
+expected = [46, 90]
+
+[secure_file_transfer_protocol]
+instring = "This is a Secure File Transfer Protocol URL pattern: ftps://[user[:password]@]host[:port]/url-path"
+expected = [53, 98]
+
+[ssh_file_transfer_protocol]
+instring = "This is a SSH File Transfer Protocol URL pattern: sftp://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>]/<path>/<file>"
+expected = [50, 87]
+
+[finger]
+instring = "This is a finger protocol URL pattern: finger://host[:port][/<request>]"
+expected = [39, 71]
+
+[rsync]
+instring = "This is a remote synchronization URL pattern: rsync://<host>[:<port>]/<path>"
+expected = [46, 76]
+
+[telnet]
+instring = "This is a telnet URL pattern: telnet://<user>:<password>@<host>[:<port>/]"
+expected = [30, 73]
+
+[virtual_network_computing]
+instring = "This is a Virtual Network Computing URL pattern: vnc://[<host>[:<port>]][?<params>]"
+expected = [49, 83]
+
+[extensible_resource_identifier]
+instring = "This is an eXtensible Resource Identifier URL pattern: xri://<authority>[/[<path>]][?<query>][#fragment]"
+expected = [55, 104]
+
+[fish]
+instring = "This is a fish URL pattern: fish://[<username>[:<password>]@]<hostname>[:<port>]"
+expected = [28, 80]
+
+[ssh]
+instring = "This is a Secure Shell URL pattern: ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>]"
+expected = [36, 72]
+
+[webdav_transfer_protocol]
+instring = "This is a WebDAV Transfer Protocol URL pattern: dav://example.com/directory/subdirectory"
+expected = [48, 88]
+
+[hypertext_transfer_protocol]
+instring = "This is a Hypertext Transfer Protocol URL pattern: http://github.com/PyCQA/docformatter"
+expected = [51, 87]
+
+[secure_hypertext_transfer_protocol]
+instring = "This is a Secure Hypertext Transfer Protocol URL pattern: https://github.com/PyCQA/docformatter"
+expected = [58, 95]
+
+[obsolete_secure_hypertext_transfer_protocol]
+instring = "This is an obsolete Secure Hypertext Transfer Protocol URL pattern: shttp://github.com/PyCQA/docformatter"
+expected = [68, 105]
+
+[imap]
+instring = "This is a Internet Message Access Protocol URL pattern: imap://[<user>[;AUTH=<type>]@]<host>[:<port>]/<command>"
+expected = [56, 111]
+
+[smtp]
+instring = "This is a Simple Mail Transfer Protocol URL pattern: mailto:<address>[?<header1>=<value1>[&<header2>=<value2>]]"
+expected = [53, 111]
+
+[pop]
+instring = "This is a Post Office Protocol URL pattern: pop://[<user>[;AUTH=<auth>]@]<host>[:<port>]"
+expected = [44, 88]
+
+[internet_printing_protocol]
+instring = "This is a Internet Printing Protocol URL pattern: ipp://printer.example.com/ipp/print"
+expected = [50, 85]
+
+[secure_internet_printing_protocol]
+instring = "This is a Secure Internet Printing Protocol URL pattern: ipps://printer2.example.com:443/ipp/print"
+expected = [57, 98]
+
+[internet_relay_chat]
+instring = "This is a Internet Relay Chat URL pattern: irc://<host>[:<port>]/[<channel>[?<password>]]"
+expected = [43, 89]
+
+[internet_relay_chat_v6]
+instring = "This is a Internet Relay Chat v6 URL pattern: irc6://<host>[:<port>]/[<channel>[?<password>]]"
+expected = [46, 93]
+
+[secure_internet_relay_chat]
+instring = "This is a Secure Internet Relay Chat URL pattern: ircs://<host>[:<port>]/[<channel>[?<password>]]"
+expected = [50, 97]
+
+[short_message_service]
+instring = "This is a Short Message Service URL pattern: sms:+15558675309?body=hello%20there"
+expected = [45, 80]
+
+[extensible_messaging_and_presence_protocol]
+instring = "This is a Extensible Messaging and Presence Protocol URL pattern: xmpp:[<user>]@<host>[:<port>]/[<resource>][?<query>]"
+expected = [66, 118]
+
+[ldap]
+instring = "This is a Lightweight Directory Access Protocol URL pattern: ldap://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?[<filter>][?<extensions>]]]]]"
+expected = [61, 91]
+
+[secure_ldap]
+instring = "This is a Secure Lightweight Directory Access Protocol URL pattern: ldaps://[<host>[:<port>]][/<dn> [?[<attributes>][?[<scope>][?[<filter>][?<extensions>]]]]]"
+expected = [68, 99]
+
+[amazon_s3]
+instring = "This is an Amazon S3 bucket URL pattern: s3://mybucket/puppy.jpg"
+expected = [41, 64]
+
+[usenet]
+instring = "This is a Usenet newsgroup URL pattern: news:<newsgroupname>"
+expected = [40, 60]
+
+[nntp]
+instring = "This is a Network News Transfer Protocol URL pattern: nntp://<host>:<port>/<newsgroup-name>/<article-number>"
+expected = [54, 108]
+
+[session_initiation_protocol]
+instring = "This is a Session Initiation Protocol URL pattern: sip:<user>[:<password>]@<host>[:<port>][;<uri-parameters>][?<headers>]"
+expected = [51, 121]
+
+[secure_session_initiation_protocol]
+instring = "This is a Secure Session Initiation Protocol URL pattern: sips:<user>[:<password>]@<host>[:<port>][;<uri-parameters>][?<headers>]"
+expected = [58, 129]
+
+[simple_network_management_protocol]
+instring = "This is a Simple Network Management Protocol URL pattern: snmp://[user@]host[:port][/[<context>[;<contextEngineID>]][/<oid>]]"
+expected = [58, 125]
+
+[only_link_patterns]
+instring = """Directories are implicitly created.  The accepted URL can start with
+'s3://' to refer to files on s3.  Local files can be prefixed with 'file://' (but it is
+not needed!)"""
+expected = true
+
+[already_wrapped_url]
+instring = """The text file can be retrieved via the Chrome plugin `Get
+Cookies.txt <https://chrome.google.com/webstore/detail/get-
+cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
+expected = true

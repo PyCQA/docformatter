@@ -1,0 +1,29 @@
+[is_some_sort_of_code]
+instring = """
+                __________=__________(__________,__________,__________,
+                __________[
+                          '___'],__________,__________,__________,
+                          __________,______________=__________)
+    """
+expected = true
+
+[is_some_sort_of_code_python]
+instring = """
+    def is_some_sort_of_code():
+        x = 1
+        y = 42
+        return x + y
+"""
+expected = true
+
+[is_probably_beginning_of_sentence]
+instring = "- This is part of a list."
+expected = true
+
+[is_not_probably_beginning_of_sentence]
+instring = "(this just continues an existing sentence)."
+expected = "None"
+
+[is_probably_beginning_of_sentence_pydoc_ref]
+instring = ":see:MyClass This is not the start of a sentence."
+expected = "None"

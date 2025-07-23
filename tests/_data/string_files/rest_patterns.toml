@@ -1,0 +1,50 @@
+[is_inline_directive]
+instring = """
+These are some reST directives that need  to be retained even if it means not wrapping the line they are found on.
+Constructs and returns a :class:`QuadraticCurveTo <QuadraticCurveTo>`.
+Register ``..click:example::`` and ``.. click:run::`` directives, augmented with ANSI coloring.
+"""
+expected = true
+
+[is_double_dot_directive]
+instring = """
+.. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+.. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+.. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+"""
+expected = true
+
+[is_double_dot_directive_2]
+instring = """
+``pattern`` is considered as an URL only if it is parseable as such and starts with
+``http://`` or ``https://``.
+
+    .. important::
+
+       This is a straight `copy of the functools.cache implementation
+       <https://github.com/python/cpython/blob/55a26de6ba938962dc23f2495723cf0f4f3ab7c6/Lib/functools.py#L647-L653>`_,
+       which is only `available in the standard library starting with Python v3.9
+       <https://docs.python.org/3/library/functools.html?highlight=caching#functools.cache>`.
+"""
+expected = true
+
+[is_double_backtick_directive]
+instring = """
+By default we choose to exclude:
+
+    ``Cc``
+        Since ``mailman`` apparently `sometimes trims list members
+        <https://mail.python.org/pipermail/mailman-developers/2002-September/013233.html>`_
+        from the ``Cc`` header to avoid sending duplicates. Which means that copies of mail
+        reflected back from the list server will have a different ``Cc`` to the copy saved by
+        the MUA at send-time.
+
+    ``Bcc``
+        Because copies of the mail saved by the MUA at send-time will have ``Bcc``, but
+        copies reflected back from the list server won't.
+
+    ``Reply-To``
+        Since a mail could be ``Cc``'d to two lists with different ``Reply-To`` munging
+        options set.
+"""
+expected = true
