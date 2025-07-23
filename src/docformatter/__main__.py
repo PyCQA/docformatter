@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #
+#       docformatter.__main__.py is part of the docformatter project
+#
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -135,7 +138,7 @@ def _main(argv, standard_out, standard_error, standard_in):
 
 
 def main():
-    """Run main entry point."""
+    """Run the main entry point."""
     # SIGPIPE is not available on Windows.
     with contextlib.suppress(AttributeError):
         # Exit on broken pipe.
