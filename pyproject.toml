@@ -182,8 +182,12 @@ ignore_directives = [
 	"tabularcolumns",
 	"toctree",
 ]
+ignore_messages = [
+    "Possible title underline"
+]
 ignore_roles = [
 	"numref",
+    "ref",
 ]
 
 [tool.ruff]

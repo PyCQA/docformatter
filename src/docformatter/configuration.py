@@ -33,7 +33,7 @@ import contextlib
 import os
 import sys
 from configparser import ConfigParser
-from typing import Dict, List, Union
+from typing import Dict, Sequence, Union
 
 with contextlib.suppress(ImportError):
     if sys.version_info >= (3, 11):
@@ -65,7 +65,7 @@ class Configurater:
 
     args: argparse.Namespace = argparse.Namespace()
 
-    def __init__(self, args: List[Union[bool, int, str]]) -> None:
+    def __init__(self, args: Union[Sequence[str], None]) -> None:
         """Initialize a Configurater class instance.
 
         Parameters
@@ -73,7 +73,7 @@ class Configurater:
         args : list
             Any command line arguments passed during invocation.
         """
-        self.args_lst = args
+        self.args_lst: Union[Sequence[str], None] = args
         self.config_file = ""
         self.parser = argparse.ArgumentParser(
             description=__doc__,
@@ -81,7 +81,10 @@ class Configurater:
         )
 
         try:
-            self.config_file = self.args_lst[self.args_lst.index("--config") + 1]
+            if self.args_lst is not None:
+                self.config_file = str(
+                    self.args_lst[self.args_lst.index("--config") + 1]
+                )
         except ValueError:
             for _configuration_file in self.configuration_file_lst:
                 if os.path.isfile(_configuration_file):
@@ -98,21 +101,21 @@ class Configurater:
             "-i",
             "--in-place",
             action="store_true",
-            default=self.flargs.get("in-place", "false").lower() == "true",
+            default=str(self.flargs.get("in-place", "false")).lower() == "true",
             help="make changes to files instead of printing diffs",
         )
         changes.add_argument(
             "-c",
             "--check",
             action="store_true",
-            default=self.flargs.get("check", "false").lower() == "true",
+            default=str(self.flargs.get("check", "false")).lower() == "true",
             help="only check and report incorrectly formatted files",
         )
         self.parser.add_argument(
             "-d",
             "--diff",
             action="store_true",
-            default=self.flargs.get("diff", "false").lower() == "true",
+            default=str(self.flargs.get("diff", "false")).lower() == "true",
             help="when used with `--check` or `--in-place`, also what changes "
             "would be made",
         )
@@ -120,7 +123,7 @@ class Configurater:
             "-r",
             "--recursive",
             action="store_true",
-            default=self.flargs.get("recursive", "false").lower() == "true",
+            default=str(self.flargs.get("recursive", "false")).lower() == "true",
             help="drill down directories recursively",
         )
         self.parser.add_argument(
@@ -142,12 +145,13 @@ class Configurater:
         self.parser.add_argument(
             "--black",
             action="store_true",
-            default=self.flargs.get("black", "false").lower() == "true",
+            default=str(self.flargs.get("black", "false")).lower() == "true",
             help="make formatting compatible with standard black options "
             "(default: False)",
         )
 
-        self.args = self.parser.parse_known_args(self.args_lst[1:])[0]
+        if self.args_lst is not None:
+            self.args = self.parser.parse_known_args(self.args_lst[1:])[0]
 
         # Default black line length is 88, so use this when not specified
         # otherwise use PEP-8 defaults
@@ -199,7 +203,7 @@ class Configurater:
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
-            default=self.flargs.get("force-wrap", "false").lower() == "true",
+            default=str(self.flargs.get("force-wrap", "false")).lower() == "true",
             help="force descriptions to be wrapped even if it may "
             "result in a mess (default: False)",
         )
@@ -216,21 +220,22 @@ class Configurater:
             "--blank",
             dest="post_description_blank",
             action="store_true",
-            default=self.flargs.get("blank", "false").lower() == "true",
+            default=str(self.flargs.get("blank", "false")).lower() == "true",
             help="add blank line after description (default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-newline",
             action="store_true",
-            default=self.flargs.get("pre-summary-newline", "false").lower() == "true",
+            default=str(self.flargs.get("pre-summary-newline", "false")).lower()
+            == "true",
             help="add a newline before the summary of a multi-line docstring "
             "(default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
-            default=self.flargs.get(
-                "pre-summary-space", _default_pre_summary_space
+            default=str(
+                self.flargs.get("pre-summary-space", _default_pre_summary_space)
             ).lower()
             == "true",
             help="add a space after the opening triple quotes (default: False)",
@@ -238,7 +243,7 @@ class Configurater:
         self.parser.add_argument(
             "--make-summary-multi-line",
             action="store_true",
-            default=self.flargs.get("make-summary-multi-line", "false").lower()
+            default=str(self.flargs.get("make-summary-multi-line", "false")).lower()
             == "true",
             help="add a newline before and after the summary of a one-line "
             "docstring (default: False)",
@@ -246,7 +251,7 @@ class Configurater:
         self.parser.add_argument(
             "--close-quotes-on-newline",
             action="store_true",
-            default=self.flargs.get("close-quotes-on-newline", "false").lower()
+            default=str(self.flargs.get("close-quotes-on-newline", "false")).lower()
             == "true",
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
@@ -275,7 +280,7 @@ class Configurater:
         self.parser.add_argument(
             "--non-strict",
             action="store_true",
-            default=self.flargs.get("non-strict", "false").lower() == "true",
+            default=str(self.flargs.get("non-strict", "false")).lower() == "true",
             help="don't strictly follow reST syntax to identify lists (see "
             "issue #67) (default: False)",
         )
@@ -295,7 +300,8 @@ class Configurater:
             help="files to format or '-' for standard in",
         )
 
-        self.args = self.parser.parse_args(self.args_lst[1:])
+        if self.args_lst is not None:
+            self.args = self.parser.parse_args(self.args_lst[1:])
 
         if self.args.line_range:
             if self.args.line_range[0] <= 0:
@@ -341,7 +347,7 @@ class Configurater:
         result = config.get("tool", {}).get("docformatter", None)
         if result is not None:
             self.flargs = {
-                k: v if isinstance(v, list) else str(v) for k, v in result.items()
+                k: v if isinstance(v, list) else str(v) for k, v in result.items()  # type: ignore
             }
 
     def _do_read_parser_configuration(self) -> None:

@@ -31,6 +31,7 @@
 import argparse
 import collections
 import contextlib
+import difflib
 import io
 import tokenize
 from typing import TextIO, Union
@@ -755,9 +756,6 @@ class Formatter:
                 show_diff = True
 
             if show_diff:
-                # Standard Library Imports
-                import difflib
-
                 diff = difflib.unified_diff(
                     source.splitlines(),
                     formatted_source.splitlines(),
