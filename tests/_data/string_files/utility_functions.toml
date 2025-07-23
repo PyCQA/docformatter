@@ -1,0 +1,129 @@
+[has_correct_length_none]
+length_range = "None"
+start = 1
+end = 9
+expected = true
+
+[has_correct_length_start_in_range]
+length_range = [1, 3]
+start = 3
+end = 5
+expected = true
+
+[has_correct_length_end_in_range]
+length_range = [1, 10]
+start = 5
+end = 10
+expected = true
+
+[has_correct_length_both_in_range]
+length_range = [1, 10]
+start = 3
+end = 7
+expected = true
+
+[has_correct_length_start_out_of_range]
+length_range = [5, 16]
+start = 3
+end = 5
+expected = false
+
+[has_correct_length_end_out_of_range]
+length_range = [1, 10]
+start = 5
+end = 20
+expected = false
+
+[has_correct_length_both_out_of_range]
+length_range = [1, 10]
+start = 11
+end = 27
+expected = false
+
+[is_in_range_none]
+line_range = "None"
+start = 1
+end = 9
+expected = true
+
+[is_in_range_start_in_range]
+line_range = [1, 4]
+start = 3
+end = 5
+expected = true
+
+[is_in_range_end_in_range]
+line_range = [1, 4]
+start = 4
+end = 10
+expected = true
+
+[is_in_range_both_in_range]
+line_range = [2, 10]
+start = 1
+end = 2
+expected = true
+
+[is_in_range_out_of_range]
+line_range = [10, 20]
+start = 1
+end = 9
+expected = false
+
+[find_py_file]
+sources = ["test_python_file.py"]
+exclude = []
+expected = ["test_python_file.py"]
+
+[find_py_file_recursive]
+sources = [
+    "/root/folder_one/one.py",
+    "/root/folder_one/folder_three/three.py",
+    "/root/folder_two/two.py",
+]
+exclude = []
+expected = [
+    "/root/folder_one/folder_three/three.py",
+    "/root/folder_one/one.py",
+    "/root/folder_two/two.py",
+]
+
+[skip_hidden_py_file]
+sources = ["not_hidden.py", ".hidden_file.py"]
+exclude = [".hidden_file.py"]
+expected = ["not_hidden.py"]
+
+[skip_hidden_py_file_recursive]
+sources = ["/root/not_hidden.py", "/root/.hidden_file.py"]
+exclude = [".hidden_file.py"]
+expected = ["/root/not_hidden.py"]
+
+[ignore_non_py_file]
+sources = ["one.py", "two.py", "three.toml"]
+exclude = []
+expected = ["one.py", "two.py"]
+
+[ignore_non_py_file_recursive]
+sources = ["one.py", "two.py", "three.toml", "subdir/four.py", "subdir/five.txt"]
+exclude = []
+expected = ["one.py", "subdir/four.py", "two.py"]
+
+[exclude_py_file]
+sources = ["one.py", "two.py", "three.py", "four.py"]
+exclude = ["three.py"]
+expected = ["four.py", "one.py", "two.py"]
+
+[exclude_py_file_recursive]
+sources = ["/root/one.py", "/root/two.py", "/root/folder_three/three.py", "/root/four.py"]
+exclude = ["three.py"]
+expected = ["/root/four.py", "/root/one.py", "/root/two.py"]
+
+[exclude_multiple_files]
+sources = ["one.py", "two.py", "three.py", "four.py"]
+exclude = ["three.py", "four.py"]
+expected = ["one.py", "two.py"]
+
+[exclude_multiple_files_recursive]
+sources = ["/root/one.py", "/root/two.py", "/root/folder_three/three.py", "/root/four.py"]
+exclude = ["three.py", "four.py"]
+expected = ["/root/one.py", "/root/two.py"]

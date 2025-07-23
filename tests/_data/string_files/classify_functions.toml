@@ -1,0 +1,236 @@
+[is_module_docstring]
+instring = '''
+"""This is a module docstring."""
+'''
+expected = true
+
+[is_class_docstring]
+instring = '''
+class A:
+    """Class-level docstring."""
+'''
+expected = true
+
+[is_method_docstring]
+instring = '''
+    def foo():
+        """Method docstring."""
+'''
+expected = true
+
+[is_function_docstring]
+instring = '''
+def foo():
+    """Function docstring."""
+'''
+expected = true
+
+[is_attribute_docstring]
+instring = '''
+class A:
+    x = 1
+    """Attribute docstring."""
+'''
+expected = true
+
+[is_not_attribute_docstring]
+instring = '''
+#!/usr/bin/env python
+
+import os
+from typing import Iterator
+
+"""Don't remove this comment, it's cool."""
+IMPORTANT_CONSTANT = "potato"
+'''
+expected = false
+
+[is_code_line]
+type=1
+string='x = 42\n'
+start='(3,10)'
+end='(3,20)'
+line='x = 42\n'
+expected = true
+
+[is_closing_quotes]
+prev_type=5
+prev_string='    '
+prev_start='(3,10)'
+prev_end='(3,40)'
+prev_line='    """\n'
+type=4
+string='"""\n'
+start='(3,10)'
+end='(3,40)'
+line='    """\n'
+expected = true
+
+[is_definition_line_class]
+type = 1
+string = 'class foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = 'class foo():\n'
+expected = true
+
+[is_definition_line_function]
+type = 1
+string = 'def foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = 'def foo():\n'
+expected = true
+
+[is_definition_line_async_function]
+type = 1
+string = 'async def foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = 'async def foo():\n'
+expected = true
+
+[is_not_definition_line_function]
+type = 1
+string = 'definitely\n'
+start = "(3,10)"
+end = "(3,20)"
+line = 'definitely\n'
+expected = false
+
+[is_nested_definition_line_class]
+type = 1
+string = '    class foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = '    class foo():\n'
+expected = true
+
+[is_nested_definition_line_function]
+type = 1
+string = '    def foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = '    def foo():\n'
+expected = true
+
+[is_nested_definition_line_async_function]
+type = 1
+string = '    async def foo():\n'
+start = "(3,10)"
+end = "(3,25)"
+line = '    async def foo():\n'
+expected = true
+
+[is_not_nested_definition_line_function]
+type = 1
+string = '    definitely\n'
+start = "(3,10)"
+end = "(3,20)"
+line = '    definitely\n'
+expected = false
+
+[is_inline_comment]
+type = 64
+string = "# This is an inline comment"
+start = "(3,10)"
+end = "(3,30)"
+line = '"""This is a docstring with an inline comment"""  # This is an inline comment'
+expected = true
+
+[is_string_variable]
+prev_type = 55
+prev_string = 'x = """This is a string variable"""'
+prev_start = "(3,10)"
+prev_end = "(3,40)"
+prev_line = 'x = """This is a string variable"""'
+type = 3
+string = 'x = """This is a string variable"""'
+start = "(3,10)"
+end = "(3,40)"
+line = 'x = """This is a string variable"""'
+expected = true
+
+[is_newline_continuation]
+prev_type = 3
+prev_string = '"""\n'
+prev_start = "(3,10)"
+prev_end = "(3,40)"
+prev_line = '"""\n'
+type = 4
+string = '\n'
+start = "(3,10)"
+end = "(3,40)"
+line = '"""\n'
+expected = true
+
+[is_line_following_indent]
+prev_type = 5
+prev_string = '    '
+prev_start = "(3,10)"
+prev_end = "(3,40)"
+prev_line = '    """\n'
+type = 4
+string = '"""\n'
+start = "(3,10)"
+end = "(3,40)"
+line = '    """\n'
+expected = true
+
+[is_f_string]
+prev_type = 61
+prev_string = 'f"""'
+prev_start = "(3,4)"
+prev_end = "(3,7)"
+prev_line = 'f"""This is an f-string with a {variable} inside."""'
+type = 62
+string = 'This is an f-string with a {variable} inside."""'
+start = "(3,7)"
+end = "(3,55)"
+line = 'f"""This is an f-string with a {variable} inside."""'
+expected = true
+expected313 = false
+
+[find_module_docstring]
+instring = '''"""Module docstring."""
+import os'''
+
+[find_class_docstring]
+instring = '''
+class A:
+    """Class docstring."""
+    pass
+'''
+
+[find_function_docstring]
+instring = '''
+def foo():
+    """Function docstring."""
+    pass
+'''
+
+[find_function_docstring_with_decorator]
+instring = '''
+@decorator
+def f():
+    """Docstring."""
+    pass
+'''
+
+[find_attribute_docstring]
+instring = '''
+x = 1
+"""Doc for x."""
+'''
+
+[find_multiple_docstrings]
+instring = '''
+"""Module."""
+
+class A:
+    """Class."""
+
+    def f(self):
+        """Method."""
+        pass
+'''

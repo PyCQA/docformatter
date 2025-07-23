@@ -1,0 +1,31 @@
+[find_newline_only_cr]
+instring = ["print 1\r", "print 2\r", "print3\r"]
+expected = "\r"
+
+[find_newline_only_lf]
+instring = ["print 1\n", "print 2\n", "print3\n"]
+expected = "\n"
+
+[find_newline_only_crlf]
+instring = ["print 1\r\n", "print 2\r\n", "print3\r\n"]
+expected = "\r\n"
+
+[find_newline_cr1_and_lf2]
+instring = ["print 1\n", "print 2\r", "print3\n"]
+expected = "\n"
+
+[find_newline_cr1_and_crlf2]
+instring = ["print 1\r\n", "print 2\r", "print3\r\n"]
+expected = "\r\n"
+
+[find_newline_should_default_to_lf_empty]
+instring = []
+expected = "\n"
+
+[find_newline_should_default_to_lf_blank]
+instring = ["", ""]
+expected = "\n"
+
+[find_dominant_newline]
+instring = ['def foo():\r\n', '    """\r\n', '    Hello\r\n', '    foo. This is a docstring.\r\n', '    """\r\n']
+expected = "\n"
