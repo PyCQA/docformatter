@@ -79,13 +79,12 @@ class TestMain:
         """Should return error message when file doesn't exist."""
         output_file = io.StringIO()
 
-        ret_code = main._main(
+        main._main(
             argv=["my_fake_program", "nonexistent_file"],
             standard_out=output_file,
             standard_error=output_file,
             standard_in=None,
         )
-        print(ret_code)
 
     @pytest.mark.system
     @pytest.mark.parametrize(
@@ -482,7 +481,7 @@ def foo():
 @@ -1,6 +1,7 @@
  def foo():
      """Description from issue #150 that was being improperly wrapped.
-
+ 
 -    The text file can be retrieved via the Chrome plugin `Get
 -    Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
@@ -532,7 +531,7 @@ def create_wix_wrapper(tools, wix_home, bin_install):
 @@ -1,11 +1,10 @@
  def create_wix_wrapper(tools, wix_home, bin_install):
      """Create a wrapper around a WiX install.
-
+ 
 -        :param tools: ToolCache of available tools.
 -        :param wix_home: The path of the WiX installation.
 -        :param bin_install: Is the install a binaries-only install? A full
@@ -587,15 +586,15 @@ def foo():
         assert '''\
 @@ -1,7 +1,10 @@
  def foo():
--    """Hello world is a long sentence that will be wrapped at 40 characters because I'm using that option
+-    """Hello world is a long sentence that will be wrapped at 40 characters because I\'m using that option
 +    """
 +    Hello world is a long sentence that
 +    will be wrapped at 40 characters
-+    because I'm using that option.
++    because I\'m using that option.
 +
      - My list item
      - My list item
-
+ 
 -
      """
 ''' == "\n".join(
@@ -845,7 +844,7 @@ class TestFoo():
 @@ -1,5 +1,7 @@
  class TestFoo():
      """Docstring that should not have a pre-summary newline.
-
+ 
 -    This is a multi-line docstring that should not have a
 -    newline placed before the summary."""
 +    This is a multi-line docstring that should not have a newline placed
@@ -906,7 +905,7 @@ class TestFoo():
 -    """Docstring that should have a pre-summary newline.
 +    """
 +    Docstring that should have a pre-summary newline.
-
+ 
 -    This is a multi-line docstring that should have a newline
 -    placed before the summary."""
 +    This is a multi-line docstring that should have a newline placed
@@ -1074,10 +1073,9 @@ class TestFoo():
 @@ -1,6 +1,7 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
--
+ 
 -    This is the description and it shouldn\'t have a blank line
 -    inserted after it.
-+
 +    This is the description and it shouldn\'t have a blank line inserted
 +    after it.
      """
@@ -1135,10 +1133,9 @@ class TestFoo():
 @@ -1,6 +1,8 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
--
+ 
 -    This is the description and it should have a blank line
 -    inserted after it.
-+
 +    This is the description and it should have a blank line inserted
 +    after it.
 +
