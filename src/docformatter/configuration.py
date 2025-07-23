@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #
+#       docformatter.configuration.py is part of the docformatter project
+#
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -32,19 +35,13 @@ import sys
 from configparser import ConfigParser
 from typing import Dict, List, Union
 
-TOMLLIB_INSTALLED = False
-TOMLI_INSTALLED = False
 with contextlib.suppress(ImportError):
     if sys.version_info >= (3, 11):
         # Standard Library Imports
         import tomllib
-
-        TOMLLIB_INSTALLED = True
     else:
         # Third Party Imports
-        import tomli
-
-        TOMLI_INSTALLED = True
+        import tomli as tomllib
 
 # docformatter Package Imports
 from docformatter import __pkginfo__
@@ -56,7 +53,7 @@ class Configurater:
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
     """Parser object."""
 
-    flargs_dct: Dict[str, Union[bool, float, int, str]] = {}
+    flargs: Dict[str, Union[bool, float, int, str]] = {}
     """Dictionary of configuration file arguments."""
 
     configuration_file_lst = [
@@ -101,21 +98,21 @@ class Configurater:
             "-i",
             "--in-place",
             action="store_true",
-            default=self.flargs_dct.get("in-place", "false").lower() == "true",
+            default=self.flargs.get("in-place", "false").lower() == "true",
             help="make changes to files instead of printing diffs",
         )
         changes.add_argument(
             "-c",
             "--check",
             action="store_true",
-            default=self.flargs_dct.get("check", "false").lower() == "true",
+            default=self.flargs.get("check", "false").lower() == "true",
             help="only check and report incorrectly formatted files",
         )
         self.parser.add_argument(
             "-d",
             "--diff",
             action="store_true",
-            default=self.flargs_dct.get("diff", "false").lower() == "true",
+            default=self.flargs.get("diff", "false").lower() == "true",
             help="when used with `--check` or `--in-place`, also what changes "
             "would be made",
         )
@@ -123,14 +120,14 @@ class Configurater:
             "-r",
             "--recursive",
             action="store_true",
-            default=self.flargs_dct.get("recursive", "false").lower() == "true",
+            default=self.flargs.get("recursive", "false").lower() == "true",
             help="drill down directories recursively",
         )
         self.parser.add_argument(
             "-e",
             "--exclude",
             nargs="*",
-            default=self.flargs_dct.get("exclude", None),
+            default=self.flargs.get("exclude", None),
             help="in recursive mode, exclude directories and files by names",
         )
         self.parser.add_argument(
@@ -138,14 +135,14 @@ class Configurater:
             "--non-cap",
             action="store",
             nargs="*",
-            default=self.flargs_dct.get("non-cap", None),
+            default=self.flargs.get("non-cap", None),
             help="list of words not to capitalize when they appear as the first word "
             "in the summary",
         )
         self.parser.add_argument(
             "--black",
             action="store_true",
-            default=self.flargs_dct.get("black", "false").lower() == "true",
+            default=self.flargs.get("black", "false").lower() == "true",
             help="make formatting compatible with standard black options "
             "(default: False)",
         )
@@ -166,7 +163,7 @@ class Configurater:
         self.parser.add_argument(
             "-s",
             "--style",
-            default=self.flargs_dct.get("style", "sphinx"),
+            default=self.flargs.get("style", "sphinx"),
             help="name of the docstring style to use when formatting "
             "parameter lists (default: sphinx)",
         )
@@ -174,14 +171,14 @@ class Configurater:
             "--rest-section-adorns",
             type=str,
             dest="rest_section_adorns",
-            default=self.flargs_dct.get(
+            default=self.flargs.get(
                 "rest_section_adorns", r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}"
             ),
             help="regex for identifying reST section header adornments",
         )
         self.parser.add_argument(
             "--wrap-summaries",
-            default=int(self.flargs_dct.get("wrap-summaries", _default_wrap_summaries)),
+            default=int(self.flargs.get("wrap-summaries", _default_wrap_summaries)),
             type=int,
             metavar="length",
             help="wrap long summary lines at this length; "
@@ -191,7 +188,7 @@ class Configurater:
         self.parser.add_argument(
             "--wrap-descriptions",
             default=int(
-                self.flargs_dct.get("wrap-descriptions", _default_wrap_descriptions)
+                self.flargs.get("wrap-descriptions", _default_wrap_descriptions)
             ),
             type=int,
             metavar="length",
@@ -202,7 +199,7 @@ class Configurater:
         self.parser.add_argument(
             "--force-wrap",
             action="store_true",
-            default=self.flargs_dct.get("force-wrap", "false").lower() == "true",
+            default=self.flargs.get("force-wrap", "false").lower() == "true",
             help="force descriptions to be wrapped even if it may "
             "result in a mess (default: False)",
         )
@@ -211,7 +208,7 @@ class Configurater:
             type=int,
             dest="tab_width",
             metavar="width",
-            default=int(self.flargs_dct.get("tab-width", 1)),
+            default=int(self.flargs.get("tab-width", 1)),
             help="tabs in indentation are this many characters when "
             "wrapping lines (default: 1)",
         )
@@ -219,21 +216,20 @@ class Configurater:
             "--blank",
             dest="post_description_blank",
             action="store_true",
-            default=self.flargs_dct.get("blank", "false").lower() == "true",
+            default=self.flargs.get("blank", "false").lower() == "true",
             help="add blank line after description (default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-newline",
             action="store_true",
-            default=self.flargs_dct.get("pre-summary-newline", "false").lower()
-            == "true",
+            default=self.flargs.get("pre-summary-newline", "false").lower() == "true",
             help="add a newline before the summary of a multi-line docstring "
             "(default: False)",
         )
         self.parser.add_argument(
             "--pre-summary-space",
             action="store_true",
-            default=self.flargs_dct.get(
+            default=self.flargs.get(
                 "pre-summary-space", _default_pre_summary_space
             ).lower()
             == "true",
@@ -242,7 +238,7 @@ class Configurater:
         self.parser.add_argument(
             "--make-summary-multi-line",
             action="store_true",
-            default=self.flargs_dct.get("make-summary-multi-line", "false").lower()
+            default=self.flargs.get("make-summary-multi-line", "false").lower()
             == "true",
             help="add a newline before and after the summary of a one-line "
             "docstring (default: False)",
@@ -250,7 +246,7 @@ class Configurater:
         self.parser.add_argument(
             "--close-quotes-on-newline",
             action="store_true",
-            default=self.flargs_dct.get("close-quotes-on-newline", "false").lower()
+            default=self.flargs.get("close-quotes-on-newline", "false").lower()
             == "true",
             help="place closing triple quotes on a new-line when a "
             "one-line docstring wraps to two or more lines "
@@ -260,7 +256,7 @@ class Configurater:
             "--range",
             metavar="line",
             dest="line_range",
-            default=self.flargs_dct.get("range", None),
+            default=self.flargs.get("range", None),
             type=int,
             nargs=2,
             help="apply docformatter to docstrings between these "
@@ -270,7 +266,7 @@ class Configurater:
             "--docstring-length",
             metavar="length",
             dest="length_range",
-            default=self.flargs_dct.get("docstring-length", None),
+            default=self.flargs.get("docstring-length", None),
             type=int,
             nargs=2,
             help="apply docformatter to docstrings of given length range "
@@ -279,7 +275,7 @@ class Configurater:
         self.parser.add_argument(
             "--non-strict",
             action="store_true",
-            default=self.flargs_dct.get("non-strict", "false").lower() == "true",
+            default=self.flargs.get("non-strict", "false").lower() == "true",
             help="don't strictly follow reST syntax to identify lists (see "
             "issue #67) (default: False)",
         )
@@ -329,11 +325,7 @@ class Configurater:
         fullpath, ext = os.path.splitext(self.config_file)
         filename = os.path.basename(fullpath)
 
-        if (
-            ext == ".toml"
-            and (TOMLI_INSTALLED or TOMLLIB_INSTALLED)
-            and filename == "pyproject"
-        ):
+        if ext == ".toml" and filename == "pyproject":
             self._do_read_toml_configuration()
 
         if (ext == ".cfg" and filename == "setup") or (
@@ -344,14 +336,11 @@ class Configurater:
     def _do_read_toml_configuration(self) -> None:
         """Load configuration information from a *.toml file."""
         with open(self.config_file, "rb") as f:
-            if TOMLI_INSTALLED:
-                config = tomli.load(f)
-            elif TOMLLIB_INSTALLED:
-                config = tomllib.load(f)
+            config = tomllib.load(f)
 
         result = config.get("tool", {}).get("docformatter", None)
         if result is not None:
-            self.flargs_dct = {
+            self.flargs = {
                 k: v if isinstance(v, list) else str(v) for k, v in result.items()
             }
 
@@ -366,7 +355,7 @@ class Configurater:
             "docformatter",
         ]:
             if _section in config.sections():
-                self.flargs_dct = {
+                self.flargs = {
                     k: v if isinstance(v, list) else str(v)
                     for k, v in config[_section].items()
                 }

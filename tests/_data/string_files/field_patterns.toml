@@ -1,0 +1,35 @@
+[is_epytext_field_list]
+instring = """@param param1: Description of param1\n
+@return: Description of return value\n"""
+style = "epytext"
+expected = true
+
+[is_sphinx_field_list_epytext_style]
+instring = """:param param1: Description of param1\n
+:return: Description of return value\n"""
+style = "epytext"
+expected = false
+
+[is_sphinx_field_list]
+instring = """:param param1: Description of param1\n
+:return: Description of return value\n"""
+style = "sphinx"
+expected = true
+
+[is_epytext_field_list_sphinx_style]
+instring = """@param param1: Description of param1\n
+@return: Description of return value\n"""
+style = "sphinx"
+expected = false
+
+[is_numpy_field_list]
+instring = """Parameters\n
+----------\n
+param1 : type\n
+    Description of param1\n
+Returns\n
+-------\n
+type\n
+    Description of return value\n"""
+style = "numpy"
+expected = false

@@ -1,25 +1,25 @@
 [one_line]
-instring='''"""
+source='''"""
 
 Hello.
 """'''
-outstring='''"""Hello."""'''
+expected='''"""Hello."""'''
 
 [summary_end_quote]
-instring='''"""
+source='''"""
 
 "Hello"
 """'''
-outstring='''""""Hello"."""'''
+expected='''""""Hello"."""'''
 
 [bad_indentation]
-instring='''"""Hello.
+source='''"""Hello.
 
  This should be indented but it is not. The
  next line should be indented too. And
  this too.
 """'''
-outstring='''"""Hello.
+expected='''"""Hello.
 
     This should be indented but it is not.
     The next line should be indented too.
@@ -27,7 +27,7 @@ outstring='''"""Hello.
     """'''
 
 [too_much_indentation]
-instring='''"""Hello.
+source='''"""Hello.
 
         This should be dedented.
 
@@ -36,7 +36,7 @@ instring='''"""Hello.
         3. And this.
 
     """'''
-outstring='''"""Hello.
+expected='''"""Hello.
 
     This should be dedented.
 
@@ -46,13 +46,13 @@ outstring='''"""Hello.
     """'''
 
 [trailing_whitespace]
-instring='''"""Hello.	
-	
-    This should be not have trailing whitespace. The			
-    next line should not have trailing whitespace either.	
-	
+source='''"""Hello.
+
+    This should be not have trailing whitespace. The
+    next line should not have trailing whitespace either.
+
     """'''
-outstring='''"""Hello.
+expected='''"""Hello.
 
     This should be not have trailing whitespace. The
     next line should not have trailing whitespace
@@ -60,88 +60,537 @@ outstring='''"""Hello.
     """'''
 
 [empty_docstring]
-instring='''""""""'''
-outstring='''""""""'''
+source='''""""""'''
+expected='''""""""'''
 
 [no_summary_period]
-instring='''"""
+source='''"""
 
 Hello
 """'''
-outstring='''"""Hello."""'''
+expected='''"""Hello."""'''
 
 [single_quotes]
-instring="""'''
+source="""'''
 
 Hello.
 '''"""
-outstring='''"""Hello."""'''
+expected='''"""Hello."""'''
 
 [single_quotes_multiline]
-instring="""'''
+source="""'''
     Return x factorial.
 
     This uses math.factorial.
     '''"""
-outstring='''"""Return x factorial.
+expected='''"""Return x factorial.
 
     This uses math.factorial.
     """'''
 
 [skip_underlined_summary]
-instring='''"""
+source='''"""
     Foo bar
     -------
 
     This is more.
 
     """'''
-outstring='''"""
+expected='''"""
     Foo bar
     -------
 
     This is more.
+    """'''
+
+[no_blank]
+source='''"""
+
+Hello.
+
+    Description.
+
+
+    """'''
+expected='''"""Hello.
+
+    Description.
+    """'''
+
+[presummary_newline]
+source='''"""
+
+Hello.
+
+    Description.
+
+
+    """'''
+expected='''"""
+    Hello.
+
+    Description.
+    """'''
+
+[summary_multiline]
+source='''"""This one-line docstring will be multi-line"""'''
+expected='''"""
+    This one-line docstring will be multi-line.
+    """'''
+
+[presummary_space]
+source='''"""This one-line docstring will have a leading space."""'''
+expected='''""" This one-line docstring will have a leading space."""'''
+
+# Examples to test when passing --black to docformatter.
+[quote_no_space_black]
+source='''"""   This one-line docstring will not have a leading space."""'''
+expected='''"""This one-line docstring will not have a leading space."""'''
+
+[quote_space_black]
+source='''""""This" quote starting one-line docstring will have a leading space."""'''
+expected='''""" "This" quote starting one-line docstring will have a leading space."""'''
+
+[quote_space_multiline_black]
+source='''""""This" quote starting one-line docstring will have a leading space.
+
+This long description will be wrapped at 88 characters because we passed the --black option and 88 characters is the default wrap length.
+"""'''
+expected='''""" "This" quote starting one-line docstring will have a leading space.
+
+    This long description will be wrapped at 88 characters because we
+    passed the --black option and 88 characters is the default wrap
+    length.
+    """'''
+
+# Examples to test with Epytext style docstrings.
+[epytext]
+source='''"""Return line-wrapped description text.
+
+We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+and bulleted lists alone.  See http://www.docformatter.com/.
+
+@param text: the text argument.
+@param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+@param wrap_length: the wrap_length argument
+@param force_wrap: the force_warp argument.
+@return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+"""'''
+expected='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    """'''
+
+[epytext_numpy]
+source='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text,
+    and bulleted lists alone.  See http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+"""'''
+expected='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    @param text: the text argument.
+    @param indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    @param wrap_length: the wrap_length argument
+    @param force_wrap: the force_warp argument.
+    @return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    """'''
+
+# Examples to test with Sphinx style docstrings.
+[sphinx]
+source='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""'''
+expected='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that
+        will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long
+        description of the return value so we can wrap this line abcd efgh ijkl mnop
+        qrst uvwx yz.
+    :rtype: str
+    """'''
+
+[sphinx_numpy]
+source='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""'''
+expected='''"""Return line-wrapped description text.
+
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and
+    bulleted lists alone.  See
+    http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+    """'''
+
+# Examples to test when formatting lists.
+[numbered_list]
+source='''"""Hello.
+
+    1. This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+    """'''
+expected='''"""Hello.
+
+    1. This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+    """'''
+
+[parameter_dash]
+source='''"""Hello.
+
+    foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
+    """'''
+expected='''"""Hello.
+
+    foo - This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar - This is a bar. This is a bar. This is a bar. This is a bar. This is.
+    """'''
+
+[parameter_colon]
+source='''"""Hello.
+
+    foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
+    """'''
+expected='''"""Hello.
+
+    foo: This is a foo. This is a foo. This is a foo. This is a foo. This is.
+    bar: This is a bar. This is a bar. This is a bar. This is a bar. This is.
+    """'''
+
+[many_short_columns]
+source='''"""
+    one
+    two
+    three
+    four
+    five
+    six
+    seven
+    eight
+    nine
+    ten
+    eleven
+    """'''
+expected='''"""
+    one
+    two
+    three
+    four
+    five
+    six
+    seven
+    eight
+    nine
+    ten
+    eleven
+    """'''
+
+# Examples to test when formatter URLs.
+[inline]
+source='''"""This is a docstring with a link.
+
+    Here is an elaborate description containing a link.
+    `Area Under the Receiver Operating Characteristic Curve (ROC AUC)
+        <https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Further_interpretations>`_.
+    """'''
+expected='''"""This is a docstring with a link.
+
+    Here is an elaborate description containing a link. `Area Under the
+    Receiver Operating Characteristic Curve (ROC AUC)
+    <https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Further_interpretations>`_.
+    """'''
+
+[inline_short]
+source='''"""This is yanf with a short link.
+
+    See `the link <https://www.link.com>`_ for more details.
+    """'''
+expected='''"""This is yanf with a short link.
+
+    See `the link <https://www.link.com>`_ for more details.
+    """'''
+
+[inline_long]
+source='''"""Helpful docstring.
+
+    A larger description that starts here.  https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """'''
+expected='''"""Helpful docstring.
+
+    A larger description that starts here.
+    https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """'''
+
+[only_link]
+source='''"""
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """'''
+expected='''"""
+    `Source of this snippet
+    <https://www.freecodecamp.org/news/how-to-flatten-a-dictionary-in-python-in-4-different-ways/>`_.
+    """'''
+
+# Examples to test when wrapping.
+[weird_punctuation]
+source='''"""Creates and returns four was awakens to was created tracked
+               ammonites was the fifty, arithmetical four was pyrotechnic to
+               pyrotechnic physicists. `four' falsified x falsified ammonites
+               to awakens to. `created' to ancestor was four to x dynamo to was
+               four ancestor to physicists().
+            """'''
+expected='''"""Creates and returns four was awakens to was created tracked ammonites
+    was the fifty, arithmetical four was pyrotechnic to pyrotechnic physicists.
+
+    `four' falsified x falsified ammonites to awakens to. `created' to
+    ancestor was four to x dynamo to was four ancestor to physicists().
+    """'''
+
+[description_wrap]
+source='''"""Hello.
+
+    This should be indented but it is not. The
+    next line should be indented too. But
+    this is okay.
+
+    """'''
+expected='''"""Hello.
+
+    This should be indented but it is not. The next line should be
+    indented too. But this is okay.
+    """'''
+
+[ignore_doctest]
+source='''"""Hello.
+
+    >>> 4
+    4
+    """'''
+expected='''"""Hello.
+
+    >>> 4
+    4
+    """'''
+
+[ignore_summary_doctest]
+source='''"""
+    >>> 4
+    4
+
+    """'''
+expected='''"""
+    >>> 4
+    4
 
     """'''
 
-[issue_156]
-instring='''class AcceptHeader(ExtendedSchemaNode):
-        # ok to use name in this case because target key in the mapping must
-        # be that specific value but cannot have a field named with this format
-        name = "Accept"
-        schema_type = String
-        missing = drop
-        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+[same_indentation_doctest]
+source='''"""Foo bar bing bang.
 
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
 
-    class AcceptLanguageHeader(ExtendedSchemaNode):
-        # ok to use name in this case because target key in the mapping must
-        # be that specific value but cannot have a field named with this format
-        name = "Accept-Language"
-        schema_type = String
-        missing = drop
-        default = AcceptLanguage.EN_CA
-        # FIXME: oneOf validator for supported languages (?)'''
-outstring='''class AcceptHeader(ExtendedSchemaNode):
-        # ok to use name in this case because target key in the mapping must
-        # be that specific value but cannot have a field named with this format
-        name = "Accept"
-        schema_type = String
-        missing = drop
-        default = ContentType.APP_JSON  # defaults to JSON for easy use within browsers
+    """'''
+expected='''"""Foo bar bing bang.
 
+        >>> tests = DocTestFinder().find(_TestClass)
+        >>> runner = DocTestRunner(verbose=False)
+        >>> tests.sort(key = lambda test: test.name)
+    """'''
 
-    class AcceptLanguageHeader(ExtendedSchemaNode):
-        # ok to use name in this case because target key in the mapping must
-        # be that specific value but cannot have a field named with this format
-        name = "Accept-Language"
-        schema_type = String
-        missing = drop
-        default = AcceptLanguage.EN_CA
-        # FIXME: oneOf validator for supported languages (?)'''
+[force_wrap]
+source='''"""
+num_iterations is the number of updates - instead of a better definition of convergence.
+"""'''
+expected='''"""num_iterations is the number of updates -
+    instead of a better definition of
+    convergence."""'''
+
+[summary_wrap_tab]
+source='''		"""Some summary x x x x."""'''
+expected='''"""Some summary x x x
+		x."""'''
+
+[one_line_wrap_newline]
+source='''"""This one-line docstring will be multi-line because it's quite long."""'''
+expected='''"""This one-line docstring will be multi-line because it's quite
+    long.
+    """'''
+
+[one_line_no_wrap]
+source='''"""This one-line docstring will not be wrapped and quotes will be in-line."""'''
+expected='''"""This one-line docstring will not be wrapped and quotes will be in-line."""'''
+
+# Add examples from docformatter issues on GitHub.
+[issue_75]
+source='''"""This is another docstring with `a link`_.
+
+    .. a link: http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
+    """'''
+expected='''"""This is another docstring with `a link`_.
+
+    .. a link: http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
+    """'''
+
+[issue_75_2]
+source='''"""This is another docstring with a link.
+
+    See http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html for additional information.
+    """'''
+expected='''"""This is another docstring with a link.
+
+    See
+    http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html
+    for additional information.
+    """'''
+
+[issue_75_3]
+source='''"""This is yanf with a short link.
+
+    See http://www.reliaqual.com for examples.
+    """'''
+expected='''"""This is yanf with a short link.
+
+    See http://www.reliaqual.com for examples.
+    """'''
+
+[issue_127]
+source='''"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it is not.
+
+    It doesn't wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """'''
+expected='''"""My awesome function.
+
+    This line is quite long. In fact is it longer than one hundred and twenty characters so it should be wrapped but it
+    is not.
+
+    It doesn't wrap because of this line and the blank line in between! Delete them and it will wrap.
+    """'''
+
+[issue_140]
+source='''"""This is a docstring with a link that causes a wrap.
+
+    See `the link <https://www.link.com/a/long/link/that/causes/line/break>`_ for more details.
+    """'''
+expected='''"""This is a docstring with a link that causes a wrap.
+
+    See
+    `the link <https://www.link.com/a/long/link/that/causes/line/break>`_
+    for more details.
+    """'''
+
+[issue_140_2]
+source='''"""Helpful docstring.
+
+    A larger description that starts here.
+    https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """'''
+expected='''"""Helpful docstring.
+
+    A larger description that starts here.
+    https://github.com/apache/kafka/blob/2.5/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java
+    A larger description that ends here.
+    """'''
+
+[issue_140_3]
+source='''"""Do something.
+
+    See https://www.postgresql.org/docs/current/static/role-removal.html
+    """'''
+expected='''"""Do something.
+
+    See
+    https://www.postgresql.org/docs/current/static/role-removal.html
+    """'''
+
+[issue_145]
+source='''"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """'''
+expected='''"""<Short decription>
+
+    .. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
+    .. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+    .. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
+    """'''
+
+[issue_150]
+source='''"""
+        Translates incoming json to a processable Entity.
+
+        Stackoverflow reference: <https://stackoverflow.com/questions/69617489/can-i-get-incoming-extra-fields-from-pydantic>
+        """'''
+expected='''"""Translates incoming json to a processable Entity.
+
+    Stackoverflow reference: <https://stackoverflow.com/questions/69617489/can-i-get-incoming-extra-fields-from-pydantic>
+    """'''
 
 [issue_157]
-instring='''""".. code-block:: shell-session
+source='''""".. code-block:: shell-session
 
     ► apm --version
     apm  2.6.2
@@ -151,7 +600,7 @@ instring='''""".. code-block:: shell-session
     python 2.7.16
     git 2.33.0
     """'''
-outstring='''""".. code-block:: shell-session
+expected='''""".. code-block:: shell-session
 
     ► apm --version
     apm  2.6.2
@@ -162,80 +611,515 @@ outstring='''""".. code-block:: shell-session
     git 2.33.0
     """'''
 
-[issue_176]
-instring='''def Class1:
-    """Class.""" #noqa
+[issue_157_url]
+source='''"""Get the Python type of a Click parameter.
 
-    attribute
-    """Attr."""
+    See the list of `custom types provided by Click
+    <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """'''
+expected='''"""Get the Python type of a Click parameter.
 
+    See the list of
+    `custom types provided by Click <https://click.palletsprojects.com/en/8.1.x/api/?highlight=intrange#types>`_.
+    """'''
 
-def Class2:
-    """Class."""
+[issue_157_2]
+source='''"""Fetch parameters values from configuration file and merge them with the
+    defaults.
 
-    attribute
-    """Attr."""
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
 
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+"""'''
+expected='''"""Fetch parameters values from configuration file and merge them with the
+    defaults.
 
-def Class3:
-    """Class docstring.
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
 
-    With long description.
-    """    #noqa
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """'''
 
-    attribute
-    """Attr."""'''
-outstring='''def Class1:
-    """Class.""" #noqa
+[issue_157_3]
+source='''"""Introspects current CLI and list its parameters and metadata.
 
-    attribute
-    """Attr."""
+    .. important::
+        Click doesn't keep a list of all parsed arguments and their origin.
+        So we need to emulate here what's happening during CLI invokation.
+        But can't even to that because the raw, pre-parsed arguments are
+        not available anywhere.
+    """'''
+expected='''"""Introspects current CLI and list its parameters and metadata.
 
+    .. important::
+        Click doesn't keep a list of all parsed arguments and their origin.
+        So we need to emulate here what's happening during CLI invokation.
+        But can't even to that because the raw, pre-parsed arguments are
+        not available anywhere.
+    """'''
 
-def Class2:
-    """Class."""
+[issue_157_4]
+source='''"""Search on local file system or remote URL files matching the provided pattern.
 
-    attribute
-    """Attr."""
+    ``pattern`` is considered as an URL only if it is parseable as such
+    and starts with ``http://`` or ``https://``.
 
+    .. important::
 
-def Class3:
-    """Class docstring.
+        This is a straight `copy of the functools.cache implementation
+        <https://github.com/python/cpython/blob/55a26de6ba938962dc23f2495723cf0f4f3ab7c6/Lib/functools.py#L647-L653>`_,
+        which is only `available in the standard library starting with Python v3.9
+        <https://docs.python.org/3/library/functools.html?highlight=caching#functools.cache>`.
+    """'''
+expected='''"""Search on local file system or remote URL files matching the provided
+    pattern.
 
-    With long description.
-    """    #noqa
+    ``pattern`` is considered as an URL only if it is parseable as such
+    and starts with ``http://`` or ``https://``.
 
-    attribute
-    """Attr."""'''
+    .. important::
+
+        This is a straight `copy of the functools.cache implementation
+        <https://github.com/python/cpython/blob/55a26de6ba938962dc23f2495723cf0f4f3ab7c6/Lib/functools.py#L647-L653>`_,
+        which is only `available in the standard library starting with Python v3.9
+        <https://docs.python.org/3/library/functools.html?highlight=caching#functools.cache>`.
+    """'''
+
+[issue_157_5]
+source='''"""Locate and call the ``mpm`` CLI.
+
+    The output must supports both `Xbar dialect
+    <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
+    """'''
+expected='''"""Locate and call the ``mpm`` CLI.
+
+    The output must supports both
+    `Xbar dialect <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
+    """'''
+
+[issue_157_6]
+source='''"""Install one or more packages.
+
+    Installation will proceed first with packages unambiguously tied to a manager. You can have an
+    influence on that with more precise package specifiers (like purl) and/or tighter selection of managers.
+
+    For other untied packages, mpm will try to find the best manager to install it with. Their installation
+    will be attempted with each manager, in the order they were selected. If we have the certainty, by the way
+    of a search operation, that this package is not available from this manager, we'll skip the installation
+    and try the next available manager.
+    """'''
+expected='''"""Install one or more packages.
+
+    Installation will proceed first with packages unambiguously tied to a manager. You
+    can have an influence on that with more precise package specifiers (like purl)
+    and/or tighter selection of managers.
+
+    For other untied packages, mpm will try to find the best manager to install it with.
+    Their installation will be attempted with each manager, in the order they were
+    selected. If we have the certainty, by the way of a search operation, that this
+    package is not available from this manager, we'll skip the installation and try the
+    next available manager.
+    """'''
+
+[issue_157_11]
+source='''"""Fetch parameters values from configuration file and merge them with the defaults.
+
+    User configuration is `merged to the context default_map as Click does
+    <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """'''
+expected='''"""Fetch parameters values from configuration file and merge them with the
+    defaults.
+
+    User configuration is
+    `merged to the context default_map as Click does <https://click.palletsprojects.com/en/8.1.x/commands/#context-defaults>`_.
+
+    This allow user's config to only overrides defaults. Values sets from direct
+    command line parameters, environment variables or interactive prompts, takes
+    precedence over any values from the config file.
+    """'''
+
+[issue_159]
+source='''"""Blah blah.
+
+    This will normally be used with https://aaaaaaaa.bbb.ccccccccc.com/xxxxx/xxx_xxxxxxxxxxx to generate the xxx
+    """'''
+expected='''"""Blah blah.
+
+    This will normally be used with
+    https://aaaaaaaa.bbb.ccccccccc.com/xxxxx/xxx_xxxxxxxxxxx
+    to generate the xxx
+    """'''
+
+[issue_180]
+source='''"""Django settings for webapp project.
+
+    Generated by 'django-admin startproject' using Django 4.1.1.
+
+    For more information on this file, see
+    https://docs.djangoproject.com/en/4.1/topics/settings/
+
+    For the full list of settings and their values, see
+    https://docs.djangoproject.com/en/4.1/ref/settings/
+    """'''
+expected='''"""Django settings for webapp project.
+
+    Generated by 'django-admin startproject' using Django 4.1.1.
+
+    For more information on this file, see
+    https://docs.djangoproject.com/en/4.1/topics/settings/
+
+    For the full list of settings and their values, see
+    https://docs.djangoproject.com/en/4.1/ref/settings/
+    """'''
+
+[issue_189]
+source='''"""This method doesn't do anything.
+
+    https://example.com/this-is-just-a-long-url/designed-to-trigger/the-wrapping-of-the-description
+    """'''
+expected='''"""This method doesn't do anything.
+
+    https://example.com/this-is-just-a-long-url/designed-to-trigger/the-wrapping-of-the-description
+    """'''
 
 [issue_193]
-instring='''"""
+source='''"""
 eBay kinda suss
 """'''
-outstring='''"""eBay kinda suss."""'''
+expected='''"""eBay kinda suss."""'''
 
-[issue_263]
-[issue_263.sphinx]
+[issue_199]
+source='''"""
+    This is a short desription.
+
+    Here is a link to the github issue
+    https://github.com/PyCQA/docformatter/issues/199
+
+    This is a long description.
+    """'''
+expected='''"""This is a short desription.
+
+    Here is a link to the github issue
+    https://github.com/PyCQA/docformatter/issues/199
+
+    This is a long description.
+    """'''
+
+[issue_210]
+source='''"""Short description.
+
+This graphics format generates terminal escape codes that transfer
+PNG data to a TTY using the `kitty graphics protocol`__.
+
+__ https://sw.kovidgoyal.net/kitty/graphics-protocol/
+"""'''
+expected='''"""Short description.
+
+    This graphics format generates terminal escape codes that transfer
+    PNG data to a TTY using the `kitty graphics protocol`__.
+
+    __ https://sw.kovidgoyal.net/kitty/graphics-protocol/
+    """'''
+
+[issue_215]
+source='''"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """'''
+expected='''"""Create or return existing HTTP session.
+
+    :return: Requests :class:`~requests.Session` object
+    """'''
+
+[issue_217_222]
+source='''"""Base for all Commands.
+
+:param logger: Logger for console and logfile.
+:param console: Facilitates console interaction and input solicitation.
+:param tools: Cache of tools populated by Commands as they are required.
+:param apps: Dictionary of project's Apps keyed by app name.
+:param base_path: Base directory for Briefcase project.
+:param data_path: Base directory for Briefcase tools, support packages, etc.
+:param is_clone: Flag that Command was triggered by the user's requested Command;
+    for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+"""'''
+expected='''"""Base for all Commands.
+
+    :param logger: Logger for console and logfile.
+    :param console: Facilitates console interaction and input solicitation.
+    :param tools: Cache of tools populated by Commands as they are required.
+    :param apps: Dictionary of project's Apps keyed by app name.
+    :param base_path: Base directory for Briefcase project.
+    :param data_path: Base directory for Briefcase tools, support packages, etc.
+    :param is_clone: Flag that Command was triggered by the user's requested Command;
+        for instance, RunCommand can invoke UpdateCommand and/or BuildCommand.
+    """'''
+
+[issue_218]
+source='''"""Construct a candidate project URL from the bundle and app name.
+
+It's not a perfect guess, but it's better than having "https://example.com".
+
+:param bundle: The bundle identifier.
+:param app_name: The app name.
+:returns: The candidate project URL
+"""'''
+expected='''"""Construct a candidate project URL from the bundle and app name.
+
+    It's not a perfect guess, but it's better than having
+    "https://example.com".
+
+    :param bundle: The bundle identifier.
+    :param app_name: The app name.
+    :returns: The candidate project URL
+    """'''
+
+[issue_224]
+source='''"""
+Add trackers to a torrent.
+
+:raises NotFound404Error:
+
+:param torrent_hash: hash for torrent
+:param urls: tracker URLs to add to torrent
+:return: None
+"""'''
+expected='''"""Add trackers to a torrent.
+
+    :raises NotFound404Error:
+
+    :param torrent_hash: hash for torrent
+    :param urls: tracker URLs to add to torrent
+    :return: None
+    """'''
+
+[issue_228]
+source='''"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that
+        will be written.
+    """'''
+expected='''"""Configure application requirements by writing a requirements.txt file.
+
+    :param app: The app configuration
+    :param requires: The full list of requirements
+    :param requirements_path: The full path to a requirements.txt file that will be
+        written.
+    """'''
+
+[issue_229]
+source='''"""CC.
+
+    :meth:`!X`
+    """'''
+expected='''"""CC.
+
+    :meth:`!X`
+    """'''
+
+[issue_229_2]
+source='''"""CC.
+
+    :math: `-`
+    """'''
+expected='''"""CC.
+
+    :math: `-`
+    """'''
+
+[issue_230]
+source='''"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """'''
+expected= '''"""CC.
+
+    :math:`-`
+    :param d: blabla
+    :param list(str) l: more blabla.
+    """'''
+
+[issue_232]
+source='''def function:
+    """
+    :param x: X
+    :param y: Y
+    """'''
+expected='''def function:
+    """
+    :param x: X
+    :param y: Y
+    """'''
+
+[issue_234]
+source=''' """CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """'''
+expected='''"""CC.
+
+    :math:`f(0) = 1`. XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXX
+    """'''
+
+[issue_235]
+source='''"""CC.
+
+    C.
+
+    C,
+    :math:`[0, 1]`.
+"""'''
+expected='''"""CC.
+
+    C.
+
+    C, :math:`[0, 1]`.
+    """'''
+
+[issue_239]
+source='''"""CC.
+
+    C.
+
+    C
+    c :math:`[0, 1]`.
+    """'''
+expected='''"""CC.
+
+    C.
+
+    C
+    c :math:`[0, 1]`.
+    """'''
+
+[issue_239_sphinx]
+source='''"""
+Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """'''
+expected='''"""Summary.
+
+    :raises InvalidRequest400Error:
+    :raises NotFound404Error:
+    :raises Conflict409Error:
+
+    :param param: asdf
+    """'''
+
+[issue_245]
+source='''"""Some f.
+    :param a: Some param.
+    :raises my.package.MyReallySrsError: Bad things happened.
+    """'''
+expected='''"""Some f.
+
+    :param a: Some param.
+    :raises my.package.MyReallySrsError: Bad things happened.
+    """'''
+
+[issue_250]
+source=''' """CC.
+
+    c.
+
+    c c :math:`[0, 1]`.
+    """'''
+expected='''"""CC.
+
+    c.
+
+    c c :math:`[0, 1]`.
+    """'''
+
+[issue_253]
+source='''"""
+    My test fixture.
+
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
+expected='''"""
+    My test fixture.
+
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
+
+[issue_263_sphinx]
 # the `xx.\n\n` ensures there are a summary and a description sections
 # the `:param a:` creates a field
 # the `b`s create text that is long enough to trigger a line wrap without being so long that they count as code
 # the `s3://cccc.` is a url
-instring='''"""xx.
+source='''"""xx.
 
     :param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb s3://cccc.
 """'''
-outstring='''"""xx.
+expected='''"""xx.
 
     :param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         s3://cccc.
     """'''
-[issue_263.epytext]
-instring='''"""xx.
+
+[issue_263_epytext]
+source='''"""xx.
 
     @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb s3://cccc.
     """'''
-outstring='''"""xx.
+expected='''"""xx.
 
     @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         s3://cccc.
+    """'''
+
+[issue_271]
+source='''"""
+    My test fixture.
+
+    :ivar id: A unique identifier for the element, automatically generated upon instantiation.
+    :vartype id: str
+    :ivar created: Timestamp when the element was created, defaults to the current time.
+    :vartype created: datetime
+    :cvar modified: Timestamp when the element was last modified, can be None if not modified.
+    :vartype modified: Optional[datetime]
+    :cvar in_project: List of projects this element is part of. Direct modification is restricted.
+    :vartype in_project: list[Project]
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
+    """'''
+expected='''"""
+    My test fixture.
+
+    :ivar id: A unique identifier for the element, automatically generated upon
+        instantiation.
+    :vartype id: str
+    :ivar created: Timestamp when the element was created, defaults to the current time.
+    :vartype created: datetime
+    :cvar modified: Timestamp when the element was last modified, can be None if not
+        modified.
+    :vartype modified: Optional[datetime]
+    :cvar in_project: List of projects this element is part of. Direct modification is
+        restricted.
+    :vartype in_project: list[Project]
+    :param caplog: Pytest caplog fixture.
+    :yield: Until test complete, then run cleanup.
     """'''

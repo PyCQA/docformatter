@@ -1,0 +1,77 @@
+[do_join_field_body]
+instring = """
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument.
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""
+expected = " the text argument."
+
+[do_join_field_body_2]
+instring = """
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument.
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""
+expected = " the super long description for the indentation argument that will require docformatter to wrap this line."
+
+[do_join_field_body_3]
+instring = """
+    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument.
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""
+expected = " the wrap_length argument."
+
+[do_wrap_field]
+instring = [":param bundle:", " The bundle identifier."]
+expected = ["    :param bundle: The bundle identifier."]
+
+[do_wrap_long_field]
+instring = [":param long:", " A very long description of a parameter that is going to need to be wrapped at 72 characters or else."]
+expected = ["    :param long: A very long description of a parameter that is going to",
+    "        need to be wrapped at 72 characters or else."]
+
+[do_wrap_field_list]
+instring = """
+     We only wrap simple descriptions. We leave doctests, multi-paragraph text, and bulleted lists alone.  See http://www.docformatter.com/.
+
+    :param str text: the text argument.
+    :param str indentation: the super long description for the indentation argument that will require docformatter to wrap this line.
+    :param int wrap_length: the wrap_length argument
+    :param bool force_wrap: the force_warp argument.
+    :return: really long description text wrapped at n characters and a very long description of the return value so we can wrap this line abcd efgh ijkl mnop qrst uvwx yz.
+    :rtype: str
+"""
+lines = ["    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and",
+    "    bulleted lists alone.  See",
+    "    http://www.docformatter.com/."]
+expected = [
+    ["    We only wrap simple descriptions. We leave doctests, multi-paragraph text, and",
+        "    bulleted lists alone.  See",
+        "    http://www.docformatter.com/.",
+        "",
+        "    :param str text: the text argument.",
+        "    :param str indentation: the super long description for the",
+        "        indentation argument that will require docformatter to wrap this",
+        "        line.",
+        "    :param int wrap_length: the wrap_length argument",
+        "    :param bool force_wrap: the force_warp argument.",
+        "    :return: really long description text wrapped at n characters and a",
+        "        very long description of the return value so we can wrap this",
+        "        line abcd efgh ijkl mnop qrst uvwx yz.",
+        "    :rtype: str"], 606]

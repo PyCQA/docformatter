@@ -1,3 +1,4 @@
 [tool.docformatter]
-recursive = true
-wrap-summaries = 82
+wrap-summaries = 79
+wrap-descriptions = 72
+blank = false

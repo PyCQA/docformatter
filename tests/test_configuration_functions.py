@@ -1,10 +1,10 @@
 # pylint: skip-file
 # type: ignore
 #
-#       tests.test_configuration_functions.py is part of the docformatter
-#       project
+#       tests.test_configuration_functions.py is part of the docformatter project
 #
 # Copyright (C) 2012-2023 Steven Myint
+# Copyright (C) 2023-2025 Doyle "weibullguy" Rowland
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,21 +27,99 @@
 # SOFTWARE.
 """Module for testing docformatter's Configurater class."""
 
-# Standard Library Imports
-import io
-import sys
-
 # Third Party Imports
 import pytest
 
 # docformatter Package Imports
-from docformatter import Configurater
+from docformatter.configuration import Configurater
+
+WRAP_72 = 72
+WRAP_80 = 80
+WRAP_88 = 88
+
+
+@pytest.mark.unit
+def test_do_read_toml_configuration():
+    uut = Configurater([""])
+    uut.config_file = "./tests/_data/pyproject.toml"
+    expected = {
+        "wrap-summaries": "79",
+        "wrap-descriptions": "72",
+        "blank": "False",
+    }
+
+    uut._do_read_toml_configuration()
+    assert uut.flargs == expected, (
+        f"\nFailed _do_read_toml_configuration:\n"
+        f"Expected {expected}\n"
+        f"Got {uut.flargs}"
+    )
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        "./tests/_data/setup.cfg",
+        "./tests/_data/tox.ini",
+    ],
+)
+def test_do_read_parser_configuration(config_file):
+    uut = Configurater([""])
+    uut.config_file = config_file
+    expected = {
+        "blank": "False",
+        "wrap-summaries": "79",
+        "wrap-descriptions": "72",
+    }
+
+    uut._do_read_parser_configuration()
+    assert uut.flargs == expected, (
+        f"\nFailed _do_read_parser_configuration:\n"
+        f"Expected {expected}\n"
+        f"Got {uut.flargs}"
+    )
+
+
+@pytest.mark.integration
+@pytest.mark.order(1)
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        "./tests/_data/pyproject.toml",
+        "./tests/_data/setup.cfg",
+        "./tests/_data/tox.ini",
+    ],
+)
+def test_do_read_configuration_file(config_file):
+    uut = Configurater([""])
+    uut.config_file = config_file
+    if config_file == "./tests/_data/pyproject.toml":
+        expected = {
+            "wrap-summaries": "79",
+            "wrap-descriptions": "72",
+            "blank": "false",
+        }
+    else:
+        expected = {
+            "blank": "False",
+            "wrap-summaries": "79",
+            "wrap-descriptions": "72",
+        }
+
+    uut._do_read_parser_configuration()
+    assert uut.flargs == expected, (
+        f"\nFailed _do_read_configuration_file:\n"
+        f"Expected {expected}\n"
+        f"Got {uut.flargs}"
+    )
 
 
 class TestConfigurater:
     """Class for testing configuration functions."""
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_initialize_configurator_with_default(self):
         """Return a Configurater() instance using default pyproject.toml."""
         argb = [
@@ -55,7 +133,8 @@ class TestConfigurater:
         assert uut.args_lst == argb
         assert uut.config_file == "./pyproject.toml"
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_initialize_configurator_with_pyproject_toml(self):
         """Return a Configurater() instance loaded from a pyproject.toml."""
         argb = [
@@ -78,12 +157,14 @@ class TestConfigurater:
             "setup.cfg",
             "tox.ini",
         ]
-        assert uut.flargs_dct == {
-            "recursive": "True",
-            "wrap-summaries": "82",
+        assert uut.flargs == {
+            "wrap-summaries": "79",
+            "wrap-descriptions": "72",
+            "blank": "False",
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_initialize_configurator_with_setup_cfg(self):
         """Return docformatter configuration loaded from a setup.cfg file."""
         argb = [
@@ -98,13 +179,14 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/setup.cfg"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "blank": "False",
             "wrap-summaries": "79",
             "wrap-descriptions": "72",
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_initialize_configurator_with_tox_ini(self):
         """Return docformatter configuration loaded from a tox.ini file."""
         argb = [
@@ -119,13 +201,14 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/tox.ini"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "blank": "False",
             "wrap-summaries": "79",
             "wrap-descriptions": "72",
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_unsupported_config_file(self):
         """Return empty configuration dict when file is unsupported."""
         argb = [
@@ -140,9 +223,10 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/conf.py"
-        assert uut.flargs_dct == {}
+        assert uut.flargs == {}
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_cli_override_config_file(self):
         """Command line arguments override configuration file options."""
         argb = [
@@ -161,17 +245,17 @@ class TestConfigurater:
         uut.do_parse_arguments()
 
         assert uut.config_file == "./tests/_data/tox.ini"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "blank": "False",
-            "wrap-descriptions": "72",
             "wrap-summaries": "79",
+            "wrap-descriptions": "72",
         }
         assert not uut.args.in_place
         assert uut.args.check
         assert not uut.args.recursive
         assert uut.args.exclude is None
-        assert uut.args.wrap_summaries == 88
-        assert uut.args.wrap_descriptions == 72
+        assert uut.args.wrap_summaries == WRAP_88
+        assert uut.args.wrap_descriptions == WRAP_72
         assert not uut.args.black
         assert uut.args.post_description_blank
         assert not uut.args.pre_summary_newline
@@ -182,7 +266,8 @@ class TestConfigurater:
         assert uut.args.length_range is None
         assert not uut.args.non_strict
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_only_format_in_line_range(self, capsys):
         """Only format docstrings in line range."""
         argb = [
@@ -199,7 +284,8 @@ class TestConfigurater:
 
         assert uut.args.line_range == [1, 3]
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_low_line_range_is_zero(self, capsys):
         """Raise parser error if the first value for the range is zero."""
         argb = [
@@ -219,7 +305,8 @@ class TestConfigurater:
         assert out == ""
         assert "--range must be positive numbers" in err
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_low_line_range_greater_than_high_line_range(self, capsys):
         """Raise parser error if first value for range > than second."""
         argb = [
@@ -238,11 +325,11 @@ class TestConfigurater:
         out, err = capsys.readouterr()
         assert out == ""
         assert (
-            "First value of --range should be less than or equal to the second"
-            in err
+            "First value of --range should be less than or equal to the second" in err
         )
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_only_format_in_length_range(self, capsys):
         """Only format docstrings in length range."""
         argb = [
@@ -259,7 +346,8 @@ class TestConfigurater:
 
         assert uut.args.length_range == [25, 55]
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_low_length_range_is_zero(self, capsys):
         """Raise parser error if the first value for the length range = 0."""
         argb = [
@@ -279,7 +367,8 @@ class TestConfigurater:
         assert out == ""
         assert "--docstring-length must be positive numbers" in err
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     def test_low_length_range_greater_than_high_length_range(self, capsys):
         """Raise parser error if first value for range > second value."""
         argb = [
@@ -302,7 +391,8 @@ class TestConfigurater:
             "to the second" in err
         )
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(1)
     @pytest.mark.parametrize(
         "config",
         [
@@ -329,10 +419,11 @@ class TestConfigurater:
         uut.do_parse_arguments()
         assert uut.args.black
         assert uut.args.pre_summary_space
-        assert uut.args.wrap_summaries == 88
-        assert uut.args.wrap_descriptions == 88
+        assert uut.args.wrap_summaries == WRAP_88
+        assert uut.args.wrap_descriptions == WRAP_88
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(2)
     @pytest.mark.parametrize(
         "config",
         [
@@ -362,14 +453,15 @@ wrap-summaries = 80
 
         assert uut.args.black
         assert uut.args.pre_summary_space
-        assert uut.args.wrap_summaries == 80
-        assert uut.args.wrap_descriptions == 88
-        assert uut.flargs_dct == {
+        assert uut.args.wrap_summaries == WRAP_80
+        assert uut.args.wrap_descriptions == WRAP_88
+        assert uut.flargs == {
             "black": "True",
             "wrap-summaries": "80",
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(2)
     @pytest.mark.parametrize(
         "config",
         [
@@ -399,14 +491,15 @@ wrap-descriptions = 80
 
         assert uut.args.black
         assert uut.args.pre_summary_space
-        assert uut.args.wrap_summaries == 88
-        assert uut.args.wrap_descriptions == 80
-        assert uut.flargs_dct == {
+        assert uut.args.wrap_summaries == WRAP_88
+        assert uut.args.wrap_descriptions == WRAP_80
+        assert uut.flargs == {
             "black": "True",
             "wrap-descriptions": "80",
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(2)
     @pytest.mark.parametrize(
         "config",
         [
@@ -443,14 +536,15 @@ exclude = ["src/", "tests/"]
         assert not uut.args.in_place
         assert uut.args_lst == argb
         assert uut.config_file == "/tmp/pyproject.toml"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "recursive": "True",
             "check": "True",
             "diff": "True",
             "exclude": ["src/", "tests/"],
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(2)
     @pytest.mark.parametrize(
         "config",
         [
@@ -487,14 +581,15 @@ exclude = ["src/", "tests/"]
         assert not uut.args.in_place
         assert uut.args_lst == argb
         assert uut.config_file == "/tmp/setup.cfg"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "recursive": "true",
             "check": "true",
             "diff": "true",
             "exclude": '["src/", "tests/"]',
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     def test_non_capitalize_words(self, capsys):
         """Read list of words not to capitalize.
 
@@ -515,8 +610,8 @@ exclude = ["src/", "tests/"]
 
         assert uut.args.non_cap == ["qBittorrent", "eBay", "iPad"]
 
-
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "config",
         [
@@ -529,8 +624,11 @@ non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
 """
         ],
     )
-    def test_non_cap_from_pyproject_toml(self,temporary_pyproject_toml,
-                                         config,):
+    def test_non_cap_from_pyproject_toml(
+        self,
+        temporary_pyproject_toml,
+        config,
+    ):
         """Read list of words not to capitalize from pyproject.toml.
 
         See issue #193.
@@ -550,14 +648,15 @@ non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
         assert not uut.args.in_place
         assert uut.args_lst == argb
         assert uut.config_file == "/tmp/pyproject.toml"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "recursive": "True",
             "check": "True",
             "diff": "True",
-            "non-cap": ["qBittorrent", "iPad", "iOS", "eBay"]
+            "non-cap": ["qBittorrent", "iPad", "iOS", "eBay"],
         }
 
-    @pytest.mark.unit
+    @pytest.mark.integration
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "config",
         [
@@ -570,7 +669,11 @@ non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
 """
         ],
     )
-    def test_non_cap_from_setup_cfg(self,temporary_setup_cfg,config,):
+    def test_non_cap_from_setup_cfg(
+        self,
+        temporary_setup_cfg,
+        config,
+    ):
         """Read list of words not to capitalize from setup.cfg.
 
         See issue #193.
@@ -590,9 +693,9 @@ non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
         assert not uut.args.in_place
         assert uut.args_lst == argb
         assert uut.config_file == "/tmp/setup.cfg"
-        assert uut.flargs_dct == {
+        assert uut.flargs == {
             "recursive": "true",
             "check": "true",
             "diff": "true",
-            "non-cap": '["qBittorrent", "iPad", "iOS", "eBay"]'
+            "non-cap": '["qBittorrent", "iPad", "iOS", "eBay"]',
         }
