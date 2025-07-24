@@ -172,6 +172,10 @@ with open("tests/_data/string_files/do_format_docstrings.toml", "rb") as f:
         ("issue_263_sphinx", NO_ARGS),
         ("issue_263_epytext", ["-s", "epytext"] + NO_ARGS),
         ("issue_271", ["--pre-summary-newline"] + WRAP_BOTH_88),
+        ("issue_259", NO_ARGS),
+        ("issue_259_black", ["--black"] + NO_ARGS),
+        ("issue_259_pre_summary_space", ["--pre-summary-space"] + NO_ARGS),
+        ("issue_259_pre_summary_newline", ["--pre-summary-newline"] + NO_ARGS),
     ],
 )
 def test_do_format_docstring(test_key, test_args, args):

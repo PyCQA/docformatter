@@ -1065,6 +1065,51 @@ expected='''"""
     :yield: Until test complete, then run cleanup.
     """'''
 
+[issue_259]
+source = '''"""
+    "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+expected = '''""""xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+
+[issue_259_black]
+source = '''"""
+    "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+expected = '''""" "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+
+[issue_259_pre_summary_space]
+source = '''"""
+    "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+expected = '''""" "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+
+[issue_259_pre_summary_newline]
+source = '''"""
+    "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+expected = '''"""
+    "xxxxxxxxxxxxx".
+
+    blah.
+    """'''
+
 [issue_263_sphinx]
 # the `xx.\n\n` ensures there are a summary and a description sections
 # the `:param a:` creates a field
