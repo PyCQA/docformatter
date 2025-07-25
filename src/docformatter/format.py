@@ -243,12 +243,13 @@ def _get_class_docstring_newlines(
 def _get_function_docstring_newlines(  # noqa: PLR0911
     tokens: list[tokenize.TokenInfo],
     index: int,
+    black: bool = False,
 ) -> int:
     """Return number of newlines after a function or method docstring.
 
-    docformatter_9.5: No blank lines after a function or method docstring.
+    PEP_257_9.5: No blank lines after a function or method docstring.
     docformatter_9.6: One blank line after a function or method docstring if there is
-    an inner function definition.
+    an inner function definition when in black mode.
     docformatter_9.7: Two blank lines after a function docstring if the stub function
     has no code.
     docformatter_9.8: One blank line after a method docstring if the stub method has
@@ -282,7 +283,7 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
             continue
 
         # The docstring is followed by an attribute assignment.
-        if tokens[j].type == tokenize.OP:
+        if tokens[j].type == tokenize.OP and tokens[j].string == "=":
             return 0
 
         # There is a line of code following the docstring.
@@ -293,7 +294,7 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
             return 0
 
         # There is a method definition or nested function or class definition following
-        # the docstring.
+        # the docstring and docformatter is running in black mode.
         if _classify.is_nested_definition_line(tokens[j]):
             return 1
 
@@ -343,6 +344,8 @@ def _get_newlines_by_type(
         A list of tokens from the source code.
     index : int
         The index of the docstring token in the list of tokens.
+    black : bool
+        Whether docformatter is running in black mode.
 
     Returns
     -------
@@ -350,12 +353,16 @@ def _get_newlines_by_type(
         The number of newlines to insert after the docstring.
     """
     if _classify.is_module_docstring(tokens, index):
+        # print("Module")
         return _get_module_docstring_newlines(black)
     elif _classify.is_class_docstring(tokens, index):
+        # print("Class")
         return _get_class_docstring_newlines(tokens, index)
     elif _classify.is_function_or_method_docstring(tokens, index):
-        return _get_function_docstring_newlines(tokens, index)
+        # print("Function or method")
+        return _get_function_docstring_newlines(tokens, index, black)
     elif _classify.is_attribute_docstring(tokens, index):
+        # print("Attribute")
         return _get_attribute_docstring_newlines(tokens, index)
 
     return 0  # Default: probably a string literal
@@ -1029,9 +1036,7 @@ class Formatter:
                 _docstring_token = tokens[d]
                 _indent = " " * _docstring_token.start[1] if typ != "module" else ""
                 _blank_line_count = _get_newlines_by_type(
-                    tokens,
-                    d,
-                    black=self.args.black,
+                    tokens, d, black=self.args.black
                 )
 
                 if _util.is_in_range(

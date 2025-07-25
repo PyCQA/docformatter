@@ -28,6 +28,7 @@
 
 
 # Standard Library Imports
+import re
 import sys
 import tokenize
 from tokenize import TokenInfo
@@ -289,9 +290,9 @@ def is_definition_line(token: tokenize.TokenInfo) -> bool:
         True if the token is a definition line, False otherwise.
     """
     if token.type == tokenize.NAME and (
-        token.line.strip().startswith("def ")
-        or token.line.strip().startswith("async ")
-        or token.line.strip().startswith("class ")
+        token.line.startswith("def ")
+        or token.line.startswith("async ")
+        or token.line.startswith("class ")
     ):
         return True
 
@@ -407,14 +408,7 @@ def is_nested_definition_line(token: tokenize.TokenInfo) -> bool:
     bool
         True if the token is a nested definition line, False otherwise.
     """
-    if token.type == tokenize.NAME and (
-        token.line.startswith("    def ")
-        or token.line.startswith("    async ")
-        or token.line.startswith("    class ")
-    ):
-        return True
-
-    return False
+    return re.match(r"^ {4,}(async|class|def) ", token.line) is not None
 
 
 def is_newline_continuation(

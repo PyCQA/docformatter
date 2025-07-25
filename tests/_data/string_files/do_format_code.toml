@@ -139,6 +139,7 @@ expected='''def foo():\r
     This is a docstring.\r
     """\r
 '''
+
 [non_docstring]
 source='''x = """This
 is
@@ -209,11 +210,11 @@ source='''def foo():
     """
     Hello foo.
     """
-    def test_method_no_chr_92(): the501(92) # \'''
+    def test_method_no_chr_92(): the501(92) # Comment'''
 expected='''def foo():
     """Hello foo."""
 
-    def test_method_no_chr_92(): the501(92) # \'''
+    def test_method_no_chr_92(): the501(92) # Comment'''
 
 [raw_lowercase]
 source='''def foo():
