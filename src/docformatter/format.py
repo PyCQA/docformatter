@@ -92,7 +92,7 @@ def _do_remove_preceding_blank_lines(
                 elif (
                     tokens[j].type in (tokenize.NEWLINE, tokenize.NL)
                     and tokens[j].line == "\n"
-                    and not tokens[j - 1].line.startswith("#!/")
+                    and not tokens[j - 1].line.startswith("#")
                 ):
                     _indices_to_remove.append(j)
 
