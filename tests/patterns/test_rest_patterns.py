@@ -43,7 +43,7 @@ with contextlib.suppress(ImportError):
 import pytest
 
 # docformatter Package Imports
-from docformatter.patterns import do_find_directives
+from docformatter.patterns import do_find_rest_directives, do_find_inline_rest_markup
 
 with open("tests/_data/string_files/rest_patterns.toml", "rb") as f:
     TEST_STRINGS = tomllib.load(f)
@@ -53,15 +53,40 @@ with open("tests/_data/string_files/rest_patterns.toml", "rb") as f:
 @pytest.mark.parametrize(
     "test_key",
     [
-        "is_inline_directive",
         "is_double_dot_directive",
-        "is_double_dot_directive_2",
-        "is_double_backtick_directive",
+        "is_double_dot_directive_indented",
     ],
 )
-def test_rest_directive_patterns(test_key):
+def test_do_find_rest_directives(test_key):
     source = TEST_STRINGS[test_key]["instring"]
     expected = TEST_STRINGS[test_key]["expected"]
 
-    result = do_find_directives(source)
-    assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+    result = do_find_rest_directives(source)
+    assert (
+        result[0][0] == expected[0]
+    ), f"\nFailed {test_key}\nExpected {expected[0]}\nGot {result[0][0]}"
+    assert (
+        result[0][1] == expected[1]
+    ), f"\nFailed {test_key}\nExpected {expected[0]}\nGot {result[0][1]}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "test_key",
+    [
+        "is_inline_directive",
+        "is_double_backtick_directive",
+    ],
+)
+def test_do_find_inline_rest_markup(test_key):
+    source = TEST_STRINGS[test_key]["instring"]
+    expected = TEST_STRINGS[test_key]["expected"]
+
+    result = do_find_inline_rest_markup(source)
+    print(result)
+    assert (
+        result[0][0] == expected[0]
+    ), f"\nFailed {test_key}\nExpected {expected[0]}\nGot {result[0][0]}"
+    assert (
+        result[0][1] == expected[1]
+    ), f"\nFailed {test_key}\nExpected {expected[0]}\nGot {result[0][1]}"

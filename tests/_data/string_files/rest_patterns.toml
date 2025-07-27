@@ -1,20 +1,17 @@
-[is_inline_directive]
-instring = """
-These are some reST directives that need  to be retained even if it means not wrapping the line they are found on.
-Constructs and returns a :class:`QuadraticCurveTo <QuadraticCurveTo>`.
-Register ``..click:example::`` and ``.. click:run::`` directives, augmented with ANSI coloring.
-"""
-expected = true
-
 [is_double_dot_directive]
 instring = """
-.. _linspace API: https://numpy.org/doc/stable/reference/generated/numpy.linspace.html
-.. _arange API: https://numpy.org/doc/stable/reference/generated/numpy.arange.html
-.. _logspace API: https://numpy.org/doc/stable/reference/generated/numpy.logspace.html
-"""
-expected = true
+This is a docstring that contains a reST directive.
 
-[is_double_dot_directive_2]
+.. directive type:: directive
+    :modifier:
+
+    The directive type description.
+
+This is the part of the docstring that follows the reST directive.
+"""
+expected = [53, 136]
+
+[is_double_dot_directive_indented]
 instring = """
 ``pattern`` is considered as an URL only if it is parseable as such and starts with
 ``http://`` or ``https://``.
@@ -26,7 +23,15 @@ instring = """
        which is only `available in the standard library starting with Python v3.9
        <https://docs.python.org/3/library/functools.html?highlight=caching#functools.cache>`.
 """
-expected = true
+expected = [114, 499]
+
+[is_inline_directive]
+instring = """
+These are some reST directives that need to be retained even if it means not wrapping the line they are found on.
+Constructs and returns a :class:`QuadraticCurveTo <QuadraticCurveTo>`.
+Register ``..click:example::`` and ``.. click:run::`` directives, augmented with ANSI coloring.
+"""
+expected = [145, 183]
 
 [is_double_backtick_directive]
 instring = """
@@ -47,4 +52,4 @@ By default we choose to exclude:
         Since a mail could be ``Cc``'d to two lists with different ``Reply-To`` munging
         options set.
 """
-expected = true
+expected = [38, 44]
