@@ -111,6 +111,11 @@ def is_bullet_list(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for bullet list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches a bullet list pattern, None otherwise.
+
     Notes
     -----
     Bullet list items have the following pattern:
@@ -119,11 +124,6 @@ def is_bullet_list(line: str) -> Union[Match[str], None]:
         + item
 
     See <https://docutils.sourceforge.io/docs/user/rst/quickref.html#bullet-lists>`_
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches a bullet list pattern, None otherwise.
     """
     return re.match(BULLET_REGEX, line)
 
@@ -136,17 +136,17 @@ def is_definition_list(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for definition list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches a definition list pattern, None otherwise.
+
     Notes
     -----
     Definition list items have the following pattern:
         term: definition
 
     See <https://docutils.sourceforge.io/docs/user/rst/quickref.html#definition-lists>`_
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches a definition list pattern, None otherwise.
     """
     return re.match(ENUM_REGEX, line)
 
@@ -159,6 +159,11 @@ def is_enumerated_list(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for enumerated list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches an enumerated list pattern, None otherwise.
+
     Notes
     -----
     Enumerated list items have the following pattern:
@@ -166,11 +171,6 @@ def is_enumerated_list(line: str) -> Union[Match[str], None]:
         2. item
 
     See <https://docutils.sourceforge.io/docs/user/rst/quickref.html#enumerated-lists>`_
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches an enumerated list pattern, None otherwise.
     """
     return re.match(ENUM_REGEX, line)
 
@@ -217,6 +217,11 @@ def is_option_list(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for option list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches an option list pattern, None otherwise.
+
     Notes
     -----
     Option list items have the following pattern:
@@ -224,10 +229,5 @@ def is_option_list(line: str) -> Union[Match[str], None]:
         -h, --help: Show help message.
 
     See <https://docutils.sourceforge.io/docs/user/rst/quickref.html#option-lists>`_
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches an option list pattern, None otherwise.
     """
     return re.match(OPTION_REGEX, line)

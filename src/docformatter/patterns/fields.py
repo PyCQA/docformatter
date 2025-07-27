@@ -56,10 +56,11 @@ def do_find_field_lists(
 
     Returns
     -------
-    _field_idx, _wrap_parameters : tuple
-        A list of tuples with each tuple containing the starting and ending
-        position of each field list found in the passed description.
-        A boolean indicating whether long field list lines should be wrapped.
+    tuple[list[tuple], bool]
+        A tuple containing lists of tuples and a boolean.  Each inner tuple
+        contains the starting and ending position of each field list found in the
+        description.  The boolean indicates whether long field list lines should
+        be wrapped.
     """
     _field_idx = []
     _wrap_parameters = False
@@ -116,17 +117,17 @@ def is_epytext_field_list(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for Epytext field list patterns.
 
-    Notes
-    -----
-    Epytext field lists have the following pattern:
-        @param x:
-        @type x:
-
     Returns
     -------
     Match[str] | None
         A match object if the line matches an Epytext field list pattern, None
         otherwise.
+
+    Notes
+    -----
+    Epytext field lists have the following pattern:
+        @param x:
+        @type x:
     """
     return re.match(EPYTEXT_REGEX, line)
 
@@ -139,15 +140,15 @@ def is_google_field_list(line: str) -> Union[Match[str], None]:
     line: str
         The line to check for Google field list patterns.
 
-    Notes
-    -----
-    Google field lists have the following pattern:
-        x (int): Description of x.
-
     Returns
     -------
     Match[str] | None
         A match object if the line matches a Google field list pattern, None otherwise.
+
+    Notes
+    -----
+    Google field lists have the following pattern:
+        x (int): Description of x.
     """
     return re.match(GOOGLE_REGEX, line)
 
@@ -160,16 +161,18 @@ def is_numpy_field_list(line: str) -> Union[Match[str], None]:
     line: str
         The line to check for NumPy field list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches a NumPy field list pattern, None otherwise.
+
     Notes
     -----
     NumPy field lists have the following pattern:
         x : int
             Description of x.
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches a NumPy field list pattern, None otherwise.
+        x
+            Description of x.
     """
     return re.match(NUMPY_REGEX, line)
 
@@ -182,15 +185,15 @@ def is_sphinx_field_list(line: str) -> Union[Match[str], None]:
     line: str
         The line to check for Sphinx field list patterns.
 
-    Notes
-    -----
-    Sphinx field lists have the following pattern:
-        :parameter: description
-
     Returns
     -------
     Match[str] | None
         A match object if the line matches a Sphinx field list pattern, None otherwise.
+
+    Notes
+    -----
+    Sphinx field lists have the following pattern:
+        :parameter: description
     """
     return re.match(SPHINX_REGEX, line)
 
@@ -205,6 +208,12 @@ def is_user_defined_field_list(line: str) -> Union[Match[str], None]:
     line: str
         The line to check for user-defined field list patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches a user-defined field list pattern, None
+        otherwise.
+
     Notes
     -----
     User-defined field lists have the following pattern:
@@ -215,12 +224,6 @@ def is_user_defined_field_list(line: str) -> Union[Match[str], None]:
     These patterns were in the original docformatter code.  These patterns do not
     conform to any common docstring styles.  There is no documented reason they were
     included and are retained for historical purposes.
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches a user-defined field list pattern, None
-        otherwise.
     """
     return (
         re.match(r"[\S ]+ - \S+", line)

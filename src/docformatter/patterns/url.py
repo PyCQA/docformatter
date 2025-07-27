@@ -46,9 +46,9 @@ def do_find_links(text: str) -> List[Tuple[int, int]]:
 
     Returns
     -------
-    url_index : list
+    list
         A list of tuples with each tuple containing the starting and ending
-        position of each URL found in the passed description.
+        position of each URL found in the description.
     """
     _url_iter = re.finditer(URL_REGEX, text)
     return [(_url.start(0), _url.end(0)) for _url in _url_iter]
@@ -65,16 +65,16 @@ def do_skip_link(text: str, index: Tuple[int, int]) -> bool:
         The index in the text of the starting and ending position of the
         identified link.
 
+    Returns
+    -------
+    _do_skip : bool
+        Whether to skip this link and simpley treat it as a standard text word.
+
     Notes
     -----
     Is the identified link simply:
         1. The URL scheme pattern such as 's3://' or 'file://' or 'dns:'.
         2. The beginning of a URL link that has been wrapped by the user.
-
-    Returns
-    -------
-    _do_skip : bool
-        Whether to skip this link and simpley treat it as a standard text word.
     """
     _do_skip = re.search(URL_SKIP_REGEX, text[index[0] : index[1]]) is not None
 

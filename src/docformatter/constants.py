@@ -76,9 +76,6 @@ NUMPY_SECTION_REGEX = (
 OPTION_REGEX = r"^ {0,}-{1,2}[\S ]+ \w+"
 """Regular expression to use for finding option lists."""
 
-REST_REGEX = r"((\.{2}|`{2}) ?[\w.~-]+(:{2}|`{2})?[\w ]*?|`[\w.~]+`)"
-"""Regular expression to use for finding reST directives."""
-
 REST_SECTION_REGEX = (
     r"(^ *[#\*=\-^\'\"\+_\~`\.\:]+\n)?[\w ]+\n *[#\*=\-^\'\"\+_\~`\.\:]+"
 )
@@ -153,7 +150,8 @@ URL_PATTERNS = (
 )
 """The URL patterns to look for when finding links.
 
-Based on the table at <https://en.wikipedia.org/wiki/List_of_URI_schemes>
+Based on the table at
+<https://en.wikipedia.org/wiki/List_of_URI_schemes>
 """
 
 # This is the regex used to find URL links:
