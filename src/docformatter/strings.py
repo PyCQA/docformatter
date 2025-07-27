@@ -397,8 +397,18 @@ def do_split_summary(lines) -> List[str]:
     rest_text = "".join(rest).strip()
 
     lines[0] = first_sentence
+
+    # If there is remaining text, it should become the beginning of the description
+    # in a multiline docstring.  Thus, insert a newline and then the remaining text to
+    # the list of lines.
     if rest_text:
-        lines.insert(2, rest_text)
+        _pos = 1 if len(lines) >= 2 else 0  # noqa: PLR2004
+        _leading_spaces = " " * (len(lines[_pos]) - len(lines[_pos].lstrip()))
+        _internal_spaces = " " * (_pos)
+        lines.insert(1, "")
+        lines[_pos + 1] = (
+            f"{_leading_spaces}{rest_text}{_internal_spaces}{lines[_pos + 1].strip()}"
+        )
 
     return lines
 
