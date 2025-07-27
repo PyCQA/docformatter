@@ -31,18 +31,36 @@
 import re
 
 # docformatter Package Imports
-from docformatter.constants import REST_REGEX
+from docformatter.constants import REST_INLINE_REGEX
 
 
-def do_find_directives(text: str) -> bool:
+def do_find_rest_directives(
+    text: str,
+    indent: int = 0,
+) -> list[tuple[int, int]]:
     """Determine if docstring contains any reST directives.
 
-    .. todo::
+    Parameters
+    ----------
+    text : str
+        The docstring text to test.
+    indent : int
+        The number of spaces the reST directive line is indented.
 
-        Currently this function only returns True/False to indicate whether a
-        reST directive was found.  Should return a list of tuples containing
-        the start and end position of each reST directive found similar to the
-        function do_find_links().
+    Returns
+    -------
+    bool
+        True if the docstring is a reST directive, False otherwise.
+    """
+    _rest_directive_regex = (
+        r"^( {0,}\.\. .+?::.*\n(?:[ \t]{" + str(indent + 1) + r",}.*\n|\n)*)"
+    )
+    _rest_iter = re.finditer(_rest_directive_regex, text, flags=re.MULTILINE)
+    return [(_rest.start(0), _rest.end(0)) for _rest in _rest_iter]
+
+
+def do_find_inline_rest_markup(text: str) -> list[tuple[int, int]]:
+    """Determine if docstring contains any inline reST markup.
 
     Parameters
     ----------
@@ -51,8 +69,8 @@ def do_find_directives(text: str) -> bool:
 
     Returns
     -------
-    is_directive : bool
-        Whether the docstring is a reST directive.
+    bool
+        True if the docstring is a reST directive, False otherwise.
     """
-    _rest_iter = re.finditer(REST_REGEX, text)
-    return bool([(_rest.start(0), _rest.end(0)) for _rest in _rest_iter])
+    _rest_iter = re.finditer(REST_INLINE_REGEX, text, flags=re.MULTILINE)
+    return [(_rest.start(0), _rest.end(0)) for _rest in _rest_iter]

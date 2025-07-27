@@ -76,6 +76,12 @@ NUMPY_SECTION_REGEX = (
 OPTION_REGEX = r"^ {0,}-{1,2}[\S ]+ \w+"
 """Regular expression to use for finding option lists."""
 
+REST_INLINE_REGEX = (
+    r"(?<!^\.{2} )(:)*([*]{1,2}|_?[`]{1,2}|[|\[])[\w <>:.-]+([*]{1,"
+    r"2}|[`]{1,2}_?|[|]|[\]]_?)"
+)
+"""Regular expression to use for finding inline reST markup."""
+
 REST_SECTION_REGEX = (
     r"(^ *[#\*=\-^\'\"\+_\~`\.\:]+\n)?[\w ]+\n *[#\*=\-^\'\"\+_\~`\.\:]+"
 )
