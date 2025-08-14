@@ -116,11 +116,11 @@ expected = ["This e.g. a sentence.", ""]
 
 [do_split_multi_sentence_summary]   # See issue #283.
 instring = ["This is a sentence. This is another.", ""]
-expected = ["This is a sentence.","","This is another."]
+expected = ["This is a sentence.", "This is another.", ""]
 
 [do_split_multi_sentence_summary_2]   # See issue #283.
 instring = ["This e.g. a sentence. This is another.", ""]
-expected = ["This e.g. a sentence.", "", "This is another."]
+expected = ["This e.g. a sentence.", "This is another.", ""]
 
 [do_split_description_url_outside_param]
 instring = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm https://mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm\n:param a:mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"

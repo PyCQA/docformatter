@@ -50,7 +50,7 @@ source='''
     class TestClass:
         """This is a class docstring.
         :cvar test_int: a class attribute.
-        ..py.method: big_method()
+        .. py:method:: big_method()
         """
 '''
 expected='''
@@ -58,7 +58,7 @@ expected='''
         """This is a class docstring.
 
         :cvar test_int: a class attribute.
-        ..py.method: big_method()
+        .. py:method:: big_method()
         """
 
 '''
@@ -678,7 +678,7 @@ class TestClass:
 
     """This is a class docstring.
     :cvar test_int: a class attribute.
-    ..py.method: big_method()
+    ..py:method:: big_method()
     """
 '''
 expected='''
@@ -686,7 +686,7 @@ class TestClass:
     """This is a class docstring.
 
     :cvar test_int: a class attribute.
-    ..py.method: big_method()
+    ..py:method:: big_method()
     """
 
 '''
@@ -870,8 +870,8 @@ expected='''def mixed_links():
 
     Once ``mpm`` is located, we can rely on it to produce the main output of the plugin.
 
-    The output must supports both `Xbar dialect
-    <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
+    The output must supports both
+    `Xbar dialect <https://github.com/matryer/xbar-plugins/blob/main/CONTRIBUTING.md#plugin-api>`_
     and `SwiftBar dialect <https://github.com/swiftbar/SwiftBar#plugin-api>`_.
     """
 

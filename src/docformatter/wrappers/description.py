@@ -89,7 +89,7 @@ def do_wrap_description(  # noqa: PLR0913
         not force_wrap
         and (
             _patterns.is_some_sort_of_code(text)
-            or _patterns.do_find_rest_directives(text, len(indentation))
+            or _patterns.do_find_rest_directives(text)
             or _patterns.is_type_of_list(text, strict, style)
         )
     ):

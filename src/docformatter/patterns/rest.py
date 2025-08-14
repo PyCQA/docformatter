@@ -31,12 +31,11 @@
 import re
 
 # docformatter Package Imports
-from docformatter.constants import REST_INLINE_REGEX
+from docformatter.constants import REST_DIRECTIVE_REGEX, REST_INLINE_REGEX
 
 
 def do_find_rest_directives(
     text: str,
-    indent: int = 0,
 ) -> list[tuple[int, int]]:
     """Determine if docstring contains any reST directives.
 
@@ -52,10 +51,7 @@ def do_find_rest_directives(
     bool
         True if the docstring is a reST directive, False otherwise.
     """
-    _rest_directive_regex = (
-        r"^( {0,}\.\. .+?::.*\n(?:[ \t]{" + str(indent + 1) + r",}.*\n|\n)*)"
-    )
-    _rest_iter = re.finditer(_rest_directive_regex, text, flags=re.MULTILINE)
+    _rest_iter = re.finditer(REST_DIRECTIVE_REGEX, text, flags=re.MULTILINE)
     return [(_rest.start(0), _rest.end(0)) for _rest in _rest_iter]
 
 

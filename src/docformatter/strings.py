@@ -402,7 +402,7 @@ def do_split_summary(lines) -> List[str]:
     # in a multiline docstring.  Thus, insert a newline and then the remaining text to
     # the list of lines.
     if rest_text:
-        _pos = 1 if len(lines) >= 2 else 0  # noqa: PLR2004
+        _pos = 1 if len(lines) >= 3 else 0  # noqa: PLR2004
         _leading_spaces = " " * (len(lines[_pos]) - len(lines[_pos].lstrip()))
         _internal_spaces = " " * (_pos)
         lines.insert(1, "")

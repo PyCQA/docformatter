@@ -199,6 +199,12 @@ Do you use *docformatter*?  What style docstrings do you use?  Add some badges t
     .. image:: https://img.shields.io/badge/%20style-google-3666d6.svg
         :target: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 
+Assistance
+==========
+``docformatter`` has an IRC channel on `Libera.Chat`_ in the `#docformatter`_ room.
+ .. _`Libera.Chat`: https://libera.chat
+ .. _`#docformatter`: https://web.libera.chat/#docformatter
+
 Issues
 ======
 
