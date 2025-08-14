@@ -47,7 +47,7 @@ class Encoder:
     CRLF = "\r\n"
 
     # Default encoding to use if the file encoding cannot be detected
-    DEFAULT_ENCODING = "latin-1"
+    DEFAULT_ENCODING = sys.getdefaultencoding()
 
     def __init__(self):
         """Initialize an Encoder instance."""

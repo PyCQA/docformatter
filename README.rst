@@ -207,6 +207,7 @@ Assistance
 
 There is no ``docformatter`` channel on the Python Code Quality Discord server, but
 you can ask for help in the `# general`_ channel.
+
  .. _`# general`: https://discord.com/channels/825463413634891776/934197425357336596
 
 Issues
