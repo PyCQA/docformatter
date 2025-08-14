@@ -70,7 +70,7 @@ def _do_remove_preceding_blank_lines(
 
     Returns
     -------
-    tokens : list
+    list
         A list of tokens with blank lines preceding docstrings removed.
     """
     _num_tokens = len(tokens)
@@ -92,7 +92,7 @@ def _do_remove_preceding_blank_lines(
                 elif (
                     tokens[j].type in (tokenize.NEWLINE, tokenize.NL)
                     and tokens[j].line == "\n"
-                    and not tokens[j - 1].line.startswith("#!/")
+                    and not tokens[j - 1].line.startswith("#")
                 ):
                     _indices_to_remove.append(j)
 
@@ -108,6 +108,34 @@ def _do_remove_preceding_blank_lines(
         tokens.pop(i)
 
     return tokens
+
+
+def _do_skip_newlines(
+    tokens: list[tokenize.TokenInfo],
+    docstring_idx: int,
+) -> int:
+    """Skip newline tokens between anchor and docstring indices.
+
+    Parameters
+    ----------
+    tokens : list
+        The list of tokens representing the docstring text.
+    docstring_idx : int
+        The index in the list of tokens where the docstring begins.
+
+    Returns
+    -------
+    int
+        The index of the last newline token.
+    """
+    j = docstring_idx + 1
+    while j < len(tokens) and tokens[j].type in (
+        tokenize.NL,
+        tokenize.NEWLINE,
+    ):
+        j += 1
+
+    return j
 
 
 def _do_update_token_indices(
@@ -246,9 +274,9 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
 ) -> int:
     """Return number of newlines after a function or method docstring.
 
-    docformatter_9.5: No blank lines after a function or method docstring.
+    PEP_257_9.5: No blank lines after a function or method docstring.
     docformatter_9.6: One blank line after a function or method docstring if there is
-    an inner function definition.
+    an inner function definition when in black mode.
     docformatter_9.7: Two blank lines after a function docstring if the stub function
     has no code.
     docformatter_9.8: One blank line after a method docstring if the stub method has
@@ -282,7 +310,7 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
             continue
 
         # The docstring is followed by an attribute assignment.
-        if tokens[j].type == tokenize.OP:
+        if tokens[j].type == tokenize.OP and tokens[j].string == "=":
             return 0
 
         # There is a line of code following the docstring.
@@ -293,7 +321,7 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
             return 0
 
         # There is a method definition or nested function or class definition following
-        # the docstring.
+        # the docstring and docformatter is running in black mode.
         if _classify.is_nested_definition_line(tokens[j]):
             return 1
 
@@ -343,6 +371,8 @@ def _get_newlines_by_type(
         A list of tokens from the source code.
     index : int
         The index of the docstring token in the list of tokens.
+    black : bool
+        Whether docformatter is running in black mode.
 
     Returns
     -------
@@ -350,12 +380,16 @@ def _get_newlines_by_type(
         The number of newlines to insert after the docstring.
     """
     if _classify.is_module_docstring(tokens, index):
+        # print("Module")
         return _get_module_docstring_newlines(black)
     elif _classify.is_class_docstring(tokens, index):
+        # print("Class")
         return _get_class_docstring_newlines(tokens, index)
     elif _classify.is_function_or_method_docstring(tokens, index):
+        # print("Function or method")
         return _get_function_docstring_newlines(tokens, index)
     elif _classify.is_attribute_docstring(tokens, index):
+        # print("Attribute")
         return _get_attribute_docstring_newlines(tokens, index)
 
     return 0  # Default: probably a string literal
@@ -729,7 +763,7 @@ class Formatter:
 
         Return
         ------
-        result_code : int
+        int
             One of the FormatResult codes.
         """
         self.encodor.do_detect_encoding(filename)
@@ -777,7 +811,7 @@ class Formatter:
 
         Returns
         -------
-        formatted : str
+        str
             The source file text with docstrings formatted.
         """
         if not source:
@@ -821,7 +855,7 @@ class Formatter:
 
         Returns
         -------
-        docstring_formatted : str
+        str
             The docstring formatted according the various options.
         """
         contents, open_quote = _strings.do_strip_docstring(docstring)
@@ -908,7 +942,7 @@ class Formatter:
 
         Returns
         -------
-        formatted_docstring : str
+        str
             The formatted docstring.
         """
         if self.args.make_summary_multi_line:
@@ -961,7 +995,7 @@ class Formatter:
 
         Returns
         -------
-        formatted_docstring : str
+        str
             The formatted docstring.
         """
         # Compensate for triple quotes by temporarily prepending 3 spaces.
@@ -1001,84 +1035,78 @@ class Formatter:
 
         Parameters
         ----------
-        tokens : list[TokenInfo]
+        tokens : list
             The tokenized Python source code.
         """
-        blocks = _classify.do_find_docstring_blocks(tokens)
+        # print(tokens)
+        _blocks = _classify.do_find_docstring_blocks(tokens)
+        _skip_indices: set[int] = set()
         self.new_tokens = []
-        skip_indices: set[int] = set()
 
-        for i, tok in enumerate(tokens):
-            if i in skip_indices:
+        for _idx, _token in enumerate(tokens):
+            if _idx in _skip_indices:
                 continue
 
-            match = next(((s, d, t) for (s, d, t) in blocks if d == i), None)
-            if match:
-                s, d, typ = match
+            _match = next(((s, d, t) for (s, d, t) in _blocks if d == _idx), None)
+            if _match:
+                _anchor_idx, _docstr_idx, _type = _match
+                _last_idx = _do_skip_newlines(tokens, _docstr_idx)
+                _skip_indices.update(range(_anchor_idx + 1, _last_idx))
 
-                # Skip tokens from anchor (s) up to and including the docstring (d),
-                # plus trailing blank lines
-                j = d + 1
-                while j < len(tokens) and tokens[j].type in (
-                    tokenize.NL,
-                    tokenize.NEWLINE,
-                ):
-                    j += 1
-                skip_indices.update(range(s + 1, j))
-
-                _docstring_token = tokens[d]
-                _indent = " " * _docstring_token.start[1] if typ != "module" else ""
+                _docstring_token = tokens[_docstr_idx]
                 _blank_line_count = _get_newlines_by_type(
-                    tokens,
-                    d,
-                    black=self.args.black,
+                    tokens, _docstr_idx, black=self.args.black
                 )
 
-                if _util.is_in_range(
-                    self.args.line_range,
-                    _docstring_token.start[0],
-                    _docstring_token.end[0],
-                ) and _util.has_correct_length(
-                    self.args.length_range,
-                    _docstring_token.start[0],
-                    _docstring_token.end[0],
+                if (
+                    _util.is_in_range(
+                        self.args.line_range,
+                        _docstring_token.start[0],
+                        _docstring_token.end[0],
+                    )
+                    and _util.has_correct_length(
+                        self.args.length_range,
+                        _docstring_token.start[0],
+                        _docstring_token.end[0],
+                    )
+                    and not _patterns.is_string_constant(tokens[_docstr_idx - 1])
                 ):
                     self._do_add_formatted_docstring(
                         _docstring_token,
-                        tokens[i + 1],
-                        typ,
+                        tokens[_idx + 1],
+                        _type,
                         _blank_line_count,
                     )
                 else:
-                    self._do_add_unformatted_docstring(_docstring_token, typ)
+                    self._do_add_unformatted_docstring(_docstring_token, _type)
 
                 if (
                     (
-                        self.new_tokens[-2].string == tokens[i + 1].string
-                        and _docstring_token.line == tokens[i + 1].line
+                        self.new_tokens[-2].string == tokens[_idx + 1].string
+                        and _docstring_token.line == tokens[_idx + 1].line
                     )
-                    or tokens[i + 1].string == "\n"
-                    or tokens[i + 1].type in (tokenize.NEWLINE, tokenize.NL)
+                    or tokens[_idx + 1].string == "\n"
+                    or tokens[_idx + 1].type in (tokenize.NEWLINE, tokenize.NL)
                 ):
-                    skip_indices.add(i + 1)
+                    _skip_indices.add(_idx + 1)
                     continue
             else:
-                _new_tok = tok
+                _new_tok = _token
                 # If it's a standalone STRING (not identified as a docstring block),
                 # ensure .line ends with newline
-                if tok.type == tokenize.STRING:
-                    _line = tok.line
+                if _token.type == tokenize.STRING:
+                    _line = _token.line
                     if not _line.endswith("\n"):
                         _line += "\n"
                     _new_tok = tokenize.TokenInfo(
-                        type=tok.type,
-                        string=tok.string,
-                        start=tok.start,
-                        end=tok.end,
+                        type=_token.type,
+                        string=_token.string,
+                        start=_token.start,
+                        end=_token.end,
                         line=_line,
                     )
 
                 self.new_tokens.append(_new_tok)
 
-        self.new_tokens = _do_remove_preceding_blank_lines(self.new_tokens, blocks)
+        self.new_tokens = _do_remove_preceding_blank_lines(self.new_tokens, _blocks)
         self.new_tokens = _do_update_token_indices(self.new_tokens)

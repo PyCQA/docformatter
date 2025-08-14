@@ -487,7 +487,8 @@ source='''"""This is another docstring with `a link`_.
     """'''
 expected='''"""This is another docstring with `a link`_.
 
-    .. a link: http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
+    .. a link:
+    http://www.reliqual.com/wiki/how_to_use_ramstk/verification_and_validation_module/index.html.
     """'''
 
 [issue_75_2]

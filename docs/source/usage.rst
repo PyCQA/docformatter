@@ -151,3 +151,52 @@ Use with GitHub Actions
 action.
 
 .. _`python-lint-plus`: https://github.com/marketplace/actions/python-code-style-quality-and-lint
+
+Dostring Text Patterns
+======================
+
+``docformatter`` began as a simple tool to format docstrings to follow PEP257.  It
+was originally a single Python script of 118 lines containing seven functions.
+That's no longer the case as an inspection of the codebase will show.  Over time,
+``docformatter`` has grown to include a number of features that have been requested
+by its most fantastic user base.
+
+In the early days, ``docformatter`` only formatted simple docstrings.  "Complex" text
+patterns like lists, parameter descriptions, and reStructuredText (reST) sections
+caused ``docformatter`` to simply skip formatting the docstring.  As feature requests
+have been and will be incorporated, ``docformatter`` has gained the ability to
+recognize and format more complex text patterns.
+
+As a result, it is necessary for the user to properly format their docstrings to
+follow the patterns documented in the various specifications.  These specifications
+would include:
+
+- PEP 257 - Docstring Conventions
+    https://www.python.org/dev/peps/pep-0257/
+- reStructuredText (reST) Markup Specification
+    https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html
+- Sphinx Documentation Style
+    https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+- Epydoc Documentation Style
+    http://epydoc.sourceforge.net/manual-fields.html
+
+Any docstring that does not follow these specifications may not be formatted properly
+as these patterns may be recognized by ``docformatter`` as simple text that needs to
+formatted.  For example, if a user writes a docstring that contains a list but does not
+format the list according to reST specifications, ``docformatter`` may not recognize
+the list and may format the list items as simple text.  This could result in a
+list that is not properly indented or wrapped.
+
+The user is encouraged to read and follow these specifications when writing
+docstrings to ensure that ``docformatter`` can properly format them.  Issues reported
+to the ``docformatter`` project that are the result of docstrings not following these
+specifications will be closed as ``S:wontfix`` with a request for the user to update
+their docstrings to follow the specifications.
+
+Additionally, as ``docformatter`` continues to add support for more text patterns (e.g.,
+Numpy or Google style docstrings), new releases may result in significant docstring
+formatting changes in your code base.  While we hate to see this happen to our users,
+it is the result of our desire to make ``docformatter`` the best tool it can be for
+formatting docstrings and the best way to achieve that is to strigently comply with
+the various specifications.  We appreciate your understanding and patience as we
+continue to improve ``docformatter``.

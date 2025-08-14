@@ -32,13 +32,49 @@ import re
 import textwrap
 
 
-def do_unwrap_summary(summary):
-    """Return summary with newlines removed in preparation for wrapping."""
+def do_unwrap_summary(summary: str) -> str:
+    r"""Return summary with newlines removed in preparation for wrapping.
+
+    Parameters
+    ----------
+    summary : str
+        The summary text from the docstring.
+
+    Returns
+    -------
+    str
+        The summary text with newline (\n) characters replaced by a single space.
+    """
     return re.sub(r"\s*\n\s*", " ", summary)
 
 
-def do_wrap_summary(summary, initial_indent, subsequent_indent, wrap_length):
-    """Return line-wrapped summary text."""
+def do_wrap_summary(
+    summary: str,
+    initial_indent: str,
+    subsequent_indent: str,
+    wrap_length: int,
+) -> str:
+    """Return line-wrapped summary text.
+
+    If the wrap_length is any value less than or equal to zero, the raw, unwrapped
+    summary text will be returned.
+
+    Parameters
+    ----------
+    summary : str
+        The summary text from the docstring.
+    initial_indent : str
+        The indentation string for the first line of the summary.
+    subsequent_indent : str
+        The indentation string for all the other lines of the summary.
+    wrap_length : int
+        The column position to wrap the summary lines.
+
+    Returns
+    -------
+    str
+        The summary text from the docstring wrapped at wrap_length columns.
+    """
     if wrap_length > 0:
         return textwrap.fill(
             do_unwrap_summary(summary),

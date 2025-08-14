@@ -29,6 +29,7 @@
 
 # Standard Library Imports
 import re
+import tokenize
 from re import Match
 from typing import Union
 
@@ -45,15 +46,15 @@ def is_inline_math(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for inline math patterns.
 
-    Notes
-    -----
-    Inline math expressions have the following pattern:
-        c :math:`[0, `]`
-
     Returns
     -------
     Match[str] | None
         A match object if the line matches an inline math pattern, None otherwise.
+
+    Notes
+    -----
+    Inline math expressions have the following pattern:
+        c :math:`[0, `]`
     """
     return re.match(r" *\w *:[a-zA-Z0-9_\- ]*:", line)
 
@@ -66,16 +67,16 @@ def is_literal_block(line: str) -> Union[Match[str], None]:
     line : str
         The line to check for literal block patterns.
 
+    Returns
+    -------
+    Match[str] | None
+        A match object if the line matches a literal block pattern, None otherwise.
+
     Notes
     -----
     Literal blocks have the following pattern:
         ::
             code
-
-    Returns
-    -------
-    Match[str] | None
-        A match object if the line matches a literal block pattern, None otherwise.
     """
     return re.match(LITERAL_REGEX, line)
 
@@ -90,7 +91,7 @@ def is_probably_beginning_of_sentence(line: str) -> Union[Match[str], None, bool
 
     Returns
     -------
-    is_beginning : bool
+    bool
         True if this token is the beginning of a sentence, False otherwise.
     """
     # Check heuristically for a parameter list.
@@ -115,10 +116,29 @@ def is_some_sort_of_code(text: str) -> bool:
 
     Returns
     -------
-    is_code : bool
+    bool
         True if the text contains and code patterns, False otherwise.
     """
     return any(
         len(word) > 50 and not re.match(URL_REGEX, word)  # noqa: PLR2004
         for word in text.split()
     )
+
+
+def is_string_constant(token: tokenize.TokenInfo) -> bool:
+    """Determine if docstring token is actually a string constant.
+
+    Parameters
+    ----------
+    token : TokenInfo
+        The token immediately preceding the docstring token.
+
+    Returns
+    -------
+    bool
+        True if the doctring token is actually string constant, False otherwise.
+    """
+    if token.type == tokenize.OP and token.string == "=":
+        return True
+
+    return False

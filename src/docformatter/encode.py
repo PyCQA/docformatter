@@ -47,7 +47,7 @@ class Encoder:
     CRLF = "\r\n"
 
     # Default encoding to use if the file encoding cannot be detected
-    DEFAULT_ENCODING = "latin-1"
+    DEFAULT_ENCODING = sys.getdefaultencoding()
 
     def __init__(self):
         """Initialize an Encoder instance."""
@@ -64,9 +64,15 @@ class Encoder:
         """
         try:
             detection_result = from_path(filename).best()
-            self.encoding = (
-                detection_result.encoding if detection_result else self.DEFAULT_ENCODING
-            )
+            if detection_result and detection_result.encoding in ["utf_16", "utf_32"]:
+                # Treat undetectable/binary encodings as failure
+                self.encoding = self.DEFAULT_ENCODING
+            else:
+                self.encoding = (
+                    detection_result.encoding
+                    if detection_result
+                    else self.DEFAULT_ENCODING
+                )
 
             # Check for correctness of encoding.
             with self.do_open_with_encoding(filename) as check_file:

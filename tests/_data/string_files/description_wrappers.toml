@@ -85,11 +85,11 @@ expected = """
 instring = """
 This is a long docstring containing some reST directives.
 
-.. note
+.. note::
 This is a note in the reST dialog.
 """
 expected = """
     This is a long docstring containing some reST directives.
 
-    .. note
+    .. note::
     This is a note in the reST dialog."""
