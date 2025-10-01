@@ -83,24 +83,48 @@ def is_type_of_list(
     if is_field_list(text, style):
         return False
 
-    return any(
-        (
+    # Check for various list patterns
+    for line in split_lines:
+        # Always check for non-field-list patterns
+        if (
             is_bullet_list(line)
             or is_enumerated_list(line)
             or is_rest_section_header(line)
             or is_option_list(line)
-            or is_epytext_field_list(line)
-            or is_sphinx_field_list(line)
-            or is_numpy_field_list(line)
-            or is_numpy_section_header(line)
-            or is_google_field_list(line)
-            or is_user_defined_field_list(line)
             or is_literal_block(line)
             or is_inline_math(line)
             or is_alembic_header(line)
-        )
-        for line in split_lines
-    )
+            or is_user_defined_field_list(line)
+        ):
+            return True
+        
+        # For field list patterns from other styles:
+        # - When using epytext or sphinx (field-based styles), do NOT treat
+        #   section-based styles (Google/NumPy) as lists to skip. Instead, return
+        #   False so that do_split_description can wrap the description while
+        #   preserving the field sections.
+        # - When using numpy or google (section-based styles), check for all field
+        #   list patterns to maintain backward compatibility.
+        if style in ("numpy", "google"):
+            # For numpy and google styles, check all field list patterns
+            if (
+                is_epytext_field_list(line)
+                or is_sphinx_field_list(line)
+                or is_numpy_field_list(line)
+                or is_numpy_section_header(line)
+                or is_google_field_list(line)
+            ):
+                return True
+        elif style in ("epytext", "sphinx"):
+            # For field-based styles, only check for OTHER field-based styles
+            if style != "epytext" and is_epytext_field_list(line):
+                return True
+            if style != "sphinx" and is_sphinx_field_list(line):
+                return True
+            # Do NOT check for Google/NumPy patterns - they'll be preserved by
+            # do_split_description
+    
+    return False
 
 
 def is_bullet_list(line: str) -> Union[Match[str], None]:
