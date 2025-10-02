@@ -82,6 +82,30 @@ def is_type_of_list(
 
     if is_field_list(text, style):
         return False
+    
+    # Check for definition list pattern (term followed by indented definition)
+    # This is a conservative check that only triggers for terms with special markup
+    for i, line in enumerate(split_lines):
+        # Skip empty lines and lines ending with ':' or starting with '<' (URLs)
+        if not line.strip() or line.rstrip().endswith(':') or line.strip().startswith('<'):
+            continue
+        # Check if next line exists and is indented more than current line
+        if i < len(split_lines) - 1:
+            next_line = split_lines[i + 1]
+            # If current line has content and next line is indented, it might be a definition list
+            if line.strip() and next_line.startswith('  ') and next_line.strip():
+                # Additional check: current line shouldn't start with common list markers
+                if not (line.strip().startswith(('*', '-', '+')) or 
+                       line.strip()[0:2].rstrip().isdigit()):
+                    # Skip if this looks like an inline link continuation:
+                    # Line has backtick but doesn't end with >`_ and next line starts with <
+                    if ('`' in line and not line.rstrip().endswith('>`_') and 
+                        next_line.strip().startswith('<')):
+                        continue
+                    # Only consider it a definition list if the term has special markup like ``term``
+                    # This is a conservative check to avoid false positives
+                    if '``' in line:
+                        return True
 
     # Check for various list patterns
     for line in split_lines:

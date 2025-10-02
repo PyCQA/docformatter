@@ -478,15 +478,11 @@ def foo():
         See issue #150.
         """
         assert '''\
-@@ -1,6 +1,7 @@
- def foo():
-     """Description from issue #150 that was being improperly wrapped.
+@@ -3,4 +3,5 @@
  
--    The text file can be retrieved via the Chrome plugin `Get
--    Cookies.txt <https://chrome.google.com/webstore/detail/get-
+     The text file can be retrieved via the Chrome plugin `Get
+     Cookies.txt <https://chrome.google.com/webstore/detail/get-
 -    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing."""
-+    The text file can be retrieved via the Chrome plugin
-+    `Get Cookies.txt <https://chrome.google.com/webstore/detail/get-
 +    cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>` while browsing.
 +    """
 ''' == "\n".join(

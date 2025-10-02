@@ -109,7 +109,7 @@ def do_find_field_lists(
             if numpy_matches:
                 _field_idx = [(_field.start(0), _field.end(0)) for _field in numpy_matches]
                 _wrap_parameters = False
-                
+
     return _field_idx, _wrap_parameters
 
 
