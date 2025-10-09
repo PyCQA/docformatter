@@ -33,7 +33,6 @@ packages = [{include = "docformatter", from = "src"}]
 python = "^3.9"
 charset_normalizer = "^3.0.0"
 tomli = {version = "^2.0.0", python = "<3.11", optional = true}
-untokenize = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 Sphinx = "^6.0.0"
