@@ -41,6 +41,7 @@ Additional contributions by (sorted by name)
 - Sebastian Weigand <s.weigand.phy@gmail.com>
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
+- Thomas Denewiler <tdenewiler@gmail.com>
 - finswimmer <finswimmer77@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
