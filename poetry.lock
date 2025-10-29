@@ -2027,17 +2027,6 @@ files = [
 typing-extensions = ">=4.12.0"
 
 [[package]]
-name = "untokenize"
-version = "0.1.1"
-description = "Transforms tokens into original source code (while preserving whitespace)."
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "untokenize-0.1.1.tar.gz", hash = "sha256:3865dbbbb8efb4bb5eaa72f1be7f3e0be00ea8b7f125c69cbd1f5fda926f37a2"},
-]
-
-[[package]]
 name = "urllib3"
 version = "2.5.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
