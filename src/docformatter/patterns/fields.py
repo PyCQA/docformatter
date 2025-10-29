@@ -77,6 +77,38 @@ def do_find_field_lists(
             for _field in re.finditer(SPHINX_REGEX, text)
         ]
         _wrap_parameters = True
+    elif style == "google":
+        _field_idx = [
+            (_field.start(0), _field.end(0))
+            for _field in re.finditer(GOOGLE_REGEX, text, re.MULTILINE)
+        ]
+        _wrap_parameters = False  # Don't wrap Google-style field lists
+    elif style == "numpy":
+        _field_idx = [
+            (_field.start(0), _field.end(0))
+            for _field in re.finditer(NUMPY_REGEX, text, re.MULTILINE)
+        ]
+        _wrap_parameters = False  # Don't wrap NumPy-style field lists
+    
+    # If no field lists were found for the current style, check for field lists
+    # from other styles and preserve them as-is (don't wrap).
+    if not _field_idx:
+        # Check for Google-style field lists (e.g., "Args:", "Returns:").
+        # Use a more specific pattern that only matches known Google section names.
+        google_sections = r'^ *(Args|Arguments|Attributes|Example|Examples|Note|Notes|' \
+                         r'See Also|References|Returns|Return|Raises|Raise|Yields|Yield|' \
+                         r'Warns|Warning|Warnings|Receives|Receive|Other Parameters):$'
+        google_matches = list(re.finditer(google_sections, text, re.MULTILINE))
+        if google_matches:
+            _field_idx = [(_field.start(0), _field.end(0)) for _field in google_matches]
+            _wrap_parameters = False
+        
+        # If still nothing, check for NumPy-style field lists
+        if not _field_idx:
+            numpy_matches = list(re.finditer(NUMPY_REGEX, text, re.MULTILINE))
+            if numpy_matches:
+                _field_idx = [(_field.start(0), _field.end(0)) for _field in numpy_matches]
+                _wrap_parameters = False
 
     return _field_idx, _wrap_parameters
 

@@ -126,7 +126,7 @@ Parameters
 """
 strict = false
 style = "sphinx"
-expected = true
+expected = false  # Changed from true: NumPy sections in Sphinx docs should be preserved, not skip wrapping
 
 [is_google_list_numpy_style]
 instring = """\

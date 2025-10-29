@@ -95,6 +95,13 @@ def do_wrap_description(  # noqa: PLR0913
     ):
         return text
 
+    # When force_wrap is True, wrap everything as regular text without special
+    # handling for field lists.
+    if force_wrap:
+        return indentation + "\n".join(
+            _strings.description_to_list(text, indentation, wrap_length)
+        ).strip()
+    
     lines = _strings.do_split_description(text, indentation, wrap_length, style)
 
     return indentation + "\n".join(lines).strip()
