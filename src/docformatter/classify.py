@@ -463,7 +463,7 @@ def is_string_variable(
     try:
         _token_types = (tokenize.AWAIT, tokenize.OP)
     except AttributeError:
-        _token_types = (tokenize.OP,)  # type: ignore
+        _token_types = (tokenize.OP,)
 
     if prev_token.type in _token_types and (
         '= """' in token.line or token.line in prev_token.line

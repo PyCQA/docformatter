@@ -135,6 +135,8 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("issue_187", NO_ARGS),
         ("issue_203", NO_ARGS),
         ("issue_243", NO_ARGS),
+        ("two_lines_between_stub_classes", NO_ARGS),
+        ("two_lines_between_stub_classes_with_preceding_comment", NO_ARGS),
     ],
 )
 def test_do_format_code(test_key, test_args, args):

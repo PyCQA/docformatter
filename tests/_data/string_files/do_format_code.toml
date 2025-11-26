@@ -1160,3 +1160,34 @@ expected='''def foo(bar):
     Description.
     """
 '''
+
+[two_lines_between_stub_classes]
+source='''class Foo:
+    """Foo class."""
+class Bar:
+    """Bar class."""
+'''
+expected='''class Foo:
+    """Foo class."""
+
+
+class Bar:
+    """Bar class."""
+'''
+
+[two_lines_between_stub_classes_with_preceding_comment]
+source='''class Foo:
+    """Foo class."""
+
+# A comment for class Bar
+class Bar:
+    """Bar class."""
+'''
+expected='''class Foo:
+    """Foo class."""
+
+
+# A comment for class Bar
+class Bar:
+    """Bar class."""
+'''

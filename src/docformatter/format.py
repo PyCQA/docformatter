@@ -260,10 +260,21 @@ def _get_class_docstring_newlines(
         The number of newlines to insert after the docstring.
     """
     j = index + 1
+    indention_level = tokens[index].start[1]
 
     # The docstring is followed by a comment.
     if tokens[j].string.startswith("#"):
         return 0
+
+    while j < len(tokens):
+        if tokens[j].type in (tokenize.NL, tokenize.NEWLINE):
+            j += 1
+            continue
+
+        if tokens[j].start[1] < indention_level:
+            return 2
+
+        break
 
     return 1
 
