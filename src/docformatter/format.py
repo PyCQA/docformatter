@@ -379,7 +379,10 @@ def _get_newlines_by_type(
     int
         The number of newlines to insert after the docstring.
     """
-    if _classify.is_module_docstring(tokens, index):
+    if _classify.is_docstring_at_end_of_file(tokens, index):
+        # print("End of file")
+        return 0
+    elif _classify.is_module_docstring(tokens, index):
         # print("Module")
         return _get_module_docstring_newlines(black)
     elif _classify.is_class_docstring(tokens, index):

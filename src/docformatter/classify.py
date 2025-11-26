@@ -471,3 +471,18 @@ def is_string_variable(
         return True
 
     return False
+
+
+def is_docstring_at_end_of_file(tokens: list[tokenize.TokenInfo], index: int) -> bool:
+    """Determine if the docstring is at the end of the file."""
+    for i in range(index + 1, len(tokens)):
+        tok = tokens[i]
+        if tok.type not in (
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.DEDENT,
+            tokenize.ENDMARKER,
+        ):
+            return False
+
+    return True

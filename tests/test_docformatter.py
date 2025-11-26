@@ -736,11 +736,10 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,2 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -787,11 +786,10 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,2 @@
  class TestFoo():
 -    """Docstring that should have a pre-summary space."""
 +    """ Docstring that should have a pre-summary space."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -841,7 +839,7 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,6 @@
  class TestFoo():
      """Docstring that should not have a pre-summary newline.
  
@@ -850,7 +848,6 @@ class TestFoo():
 +    This is a multi-line docstring that should not have a newline placed
 +    before the summary.
 +    """
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -900,7 +897,7 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,7 @@
  class TestFoo():
 -    """Docstring that should have a pre-summary newline.
 +    """
@@ -911,7 +908,6 @@ class TestFoo():
 +    This is a multi-line docstring that should have a newline placed
 +    before the summary.
 +    """
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -959,13 +955,12 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,4 @@
+@@ -1,3 +1,3 @@
      class TestFoo():
 -        """Really long summary docstring that should not be
 -        split into a multiline summary."""
 +        """Really long summary docstring that should not be split into a
 +        multiline summary."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1013,13 +1008,12 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,4 @@
+@@ -1,3 +1,3 @@
      class TestFoo():
 -        """Really long summary docstring that should be
 -        split into a multiline summary."""
 +        """Really long summary docstring that should be split into a multiline
 +        summary."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1070,7 +1064,7 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,6 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
  
@@ -1079,7 +1073,6 @@ class TestFoo():
 +    This is the description and it shouldn\'t have a blank line inserted
 +    after it.
      """
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1130,7 +1123,7 @@ class TestFoo():
         See issue #119.
         """
         assert '''\
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,7 @@
  class TestFoo():
      """Summary docstring that is followed by a description.
  
@@ -1140,7 +1133,6 @@ class TestFoo():
 +    after it.
 +
      """
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1188,7 +1180,7 @@ class foo():
         See issue #119.
         """
         assert '''\
-@@ -1,3 +1,19 @@
+@@ -1,3 +1,18 @@
  class foo():
 -    """Hello world is a long sentence that will be wrapped at 12
 -    characters because I\'m using that option in pyproject.toml."""
@@ -1209,7 +1201,6 @@ class foo():
 +    in pypro
 +    ject.tom
 +    l."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1260,11 +1251,10 @@ pre-summary-space = false
         See issue #119.
         """
         assert '''\
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,2 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )
@@ -1321,7 +1311,6 @@ diff = false
                 == '''\
 class TestFoo():
     """Docstring that should not have a pre-summary space."""
-
 '''
             )
 
@@ -1415,11 +1404,10 @@ diff = true
         See issue #122.
         """
         assert '''\
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,2 @@
  class TestFoo():
 -    """ Docstring that should not have a pre-summary space."""
 +    """Docstring that should not have a pre-summary space."""
-+
 ''' == "\n".join(
             run_docformatter.communicate()[0].decode().replace("\r", "").split("\n")[2:]
         )

@@ -42,7 +42,6 @@ source='''
 expected='''
     CONST = 123
     """Docstring for CONST."""
-
 '''
 
 [class_docstring]
@@ -60,7 +59,6 @@ expected='''
         :cvar test_int: a class attribute.
         .. py:method:: big_method()
         """
-
 '''
 
 [newline_class_variable]
@@ -87,7 +85,6 @@ expected='''
 
         test_var2 = 1
         """This is a second class variable docstring."""
-
 '''
 
 [class_attribute_wrap]
@@ -102,7 +99,6 @@ expected='''class TestClass:
     test_int = 1
     """This is a very, very, very long docstring that should really be
     reformatted nicely by docformatter."""
-
 '''
 
 [newline_outside_docstring]
@@ -364,7 +360,6 @@ expected='''class Foo:
 
     More stuff.
     """
-
 '''
 
 [class_empty_lines_2]
@@ -688,7 +683,6 @@ class TestClass:
     :cvar test_int: a class attribute.
     ..py:method:: big_method()
     """
-
 '''
 
 [issue_139_2]
@@ -1134,7 +1128,6 @@ expected='''
 #!/usr/bin/env python
 
 """a.py."""
-
 '''
 
 [issue_203]
