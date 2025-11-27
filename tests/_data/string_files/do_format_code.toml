@@ -1213,3 +1213,23 @@ expected='''class Foo:
         """Baz."""
         ...
 '''
+
+[do_not_break_f_string_double_quotes]
+source='''foo = f"""
+  bar
+"""
+'''
+expected='''foo = f"""
+  bar
+"""
+'''
+
+[do_not_break_f_string_single_quotes]
+source="""foo = f'''
+  bar
+'''
+"""
+expected="""foo = f'''
+  bar
+'''
+"""

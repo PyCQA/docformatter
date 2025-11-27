@@ -317,6 +317,15 @@ def is_f_string(token: tokenize.TokenInfo, prev_token: tokenize.TokenInfo) -> bo
     if PY312:
         if tokenize.FSTRING_MIDDLE in [token.type, prev_token.type]:
             return True
+    elif any(
+        [
+            token.string.startswith('f"""'),
+            prev_token.string.startswith('f"""'),
+            token.string.startswith("f'''"),
+            prev_token.string.startswith("f'''"),
+        ]
+    ):
+        return True
 
     return False
 
