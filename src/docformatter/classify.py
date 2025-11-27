@@ -266,7 +266,7 @@ def is_code_line(token: tokenize.TokenInfo) -> bool:
     bool
         True if the token is a code line, False otherwise.
     """
-    if token.type == tokenize.NAME and not (
+    if (token.type == tokenize.NAME or token.string == "...") and not (
         token.line.strip().startswith("def ")
         or token.line.strip().startswith("async ")
         or token.line.strip().startswith("class ")

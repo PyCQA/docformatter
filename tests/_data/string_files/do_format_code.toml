@@ -1191,3 +1191,25 @@ expected='''class Foo:
 class Bar:
     """Bar class."""
 '''
+
+[ellipses_is_code_line]
+source='''class Foo:
+    def bar() -> str:
+        """Bar."""
+
+        ...
+
+    def baz() -> None:
+        """Baz."""
+
+        ...
+'''
+expected='''class Foo:
+    def bar() -> str:
+        """Bar."""
+        ...
+
+    def baz() -> None:
+        """Baz."""
+        ...
+'''
