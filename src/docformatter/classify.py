@@ -441,7 +441,7 @@ def is_newline_continuation(
     if (
         token.type in (tokenize.NEWLINE, tokenize.NL)
         and token.line.strip() in prev_token.line.strip()
-        and token.line != "\n"
+        and token.line not in {"\n", "\r\n"}
     ):
         return True
 
