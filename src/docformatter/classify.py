@@ -460,9 +460,9 @@ def is_string_variable(
     # TODO: The AWAIT token is removed in Python 3.13 and later.  Only Python 3.9
     # seems to generate the AWAIT token, so we can safely remove the check for it when
     # support for Python 3.9 is dropped in April 2026.
-    try:
+    if sys.version_info <= (3, 12):
         _token_types = (tokenize.AWAIT, tokenize.OP)
-    except AttributeError:
+    else:
         _token_types = (tokenize.OP,)
 
     if prev_token.type in _token_types and (
