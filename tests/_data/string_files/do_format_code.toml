@@ -42,7 +42,6 @@ source='''
 expected='''
     CONST = 123
     """Docstring for CONST."""
-
 '''
 
 [class_docstring]
@@ -60,7 +59,6 @@ expected='''
         :cvar test_int: a class attribute.
         .. py:method:: big_method()
         """
-
 '''
 
 [newline_class_variable]
@@ -87,7 +85,6 @@ expected='''
 
         test_var2 = 1
         """This is a second class variable docstring."""
-
 '''
 
 [class_attribute_wrap]
@@ -102,7 +99,6 @@ expected='''class TestClass:
     test_int = 1
     """This is a very, very, very long docstring that should really be
     reformatted nicely by docformatter."""
-
 '''
 
 [newline_outside_docstring]
@@ -364,7 +360,6 @@ expected='''class Foo:
 
     More stuff.
     """
-
 '''
 
 [class_empty_lines_2]
@@ -688,7 +683,6 @@ class TestClass:
     :cvar test_int: a class attribute.
     ..py:method:: big_method()
     """
-
 '''
 
 [issue_139_2]
@@ -1134,7 +1128,6 @@ expected='''
 #!/usr/bin/env python
 
 """a.py."""
-
 '''
 
 [issue_203]
@@ -1167,3 +1160,76 @@ expected='''def foo(bar):
     Description.
     """
 '''
+
+[two_lines_between_stub_classes]
+source='''class Foo:
+    """Foo class."""
+class Bar:
+    """Bar class."""
+'''
+expected='''class Foo:
+    """Foo class."""
+
+
+class Bar:
+    """Bar class."""
+'''
+
+[two_lines_between_stub_classes_with_preceding_comment]
+source='''class Foo:
+    """Foo class."""
+
+# A comment for class Bar
+class Bar:
+    """Bar class."""
+'''
+expected='''class Foo:
+    """Foo class."""
+
+
+# A comment for class Bar
+class Bar:
+    """Bar class."""
+'''
+
+[ellipses_is_code_line]
+source='''class Foo:
+    def bar() -> str:
+        """Bar."""
+
+        ...
+
+    def baz() -> None:
+        """Baz."""
+
+        ...
+'''
+expected='''class Foo:
+    def bar() -> str:
+        """Bar."""
+        ...
+
+    def baz() -> None:
+        """Baz."""
+        ...
+'''
+
+[do_not_break_f_string_double_quotes]
+source='''foo = f"""
+  bar
+"""
+'''
+expected='''foo = f"""
+  bar
+"""
+'''
+
+[do_not_break_f_string_single_quotes]
+source="""foo = f'''
+  bar
+'''
+"""
+expected="""foo = f'''
+  bar
+'''
+"""
