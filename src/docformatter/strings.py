@@ -298,7 +298,7 @@ def do_split_description(
         _url_idx,
     )
 
-    if not _url_idx and not (_field_idx and _wrap_fields):
+    if not _url_idx and not _field_idx:
         return description_to_list(
             text,
             indentation,
@@ -314,7 +314,7 @@ def do_split_description(
             wrap_length,
         )
 
-    if _field_idx:
+    if _field_idx and _wrap_fields:
         _lines, _text_idx = _wrappers.do_wrap_field_lists(
             text,
             _field_idx,
@@ -323,6 +323,24 @@ def do_split_description(
             indentation,
             wrap_length,
         )
+    elif _field_idx and not _wrap_fields:
+        # Field lists were found but should not be wrapped (e.g., Google/NumPy style
+        # when using a different style). Wrap the text before the first field list,
+        # then preserve the rest as-is.
+        _lines.extend(
+            description_to_list(
+                text[_text_idx : _field_idx[0][0]],
+                indentation,
+                wrap_length,
+            )
+        )
+        # Add the field list section as-is, preserving original formatting.
+        # The text has already been reindented by do_wrap_description, so we
+        # just preserve the lines as they are.
+        _field_section = text[_field_idx[0][0]:].splitlines()
+        for line in _field_section:
+            _lines.append(line if line.strip() else "")
+        _text_idx = len(text)
     else:
         # Finally, add everything after the last URL or field list directive.
         _lines += _wrappers.do_close_description(text, _text_idx, indentation)

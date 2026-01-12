@@ -54,7 +54,8 @@ This is a long description from a docstring that will contain an heuristic list.
         Item 3
 """
 expected = """
-    This is a long description from a docstring that will contain an heuristic list.  The description shouldn't get wrapped at all.
+    This is a long description from a docstring that will contain an
+    heuristic list.  The description shouldn't get wrapped at all.
 
         Example:
             Item one

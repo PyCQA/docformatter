@@ -193,7 +193,7 @@ Based on the table at
 #   (\S*) matches any non-whitespace character between zero and infinity times.
 #   >? matches the character > between zero and one times.
 URL_REGEX = (
-    rf"(__ |`{{2}}|`\w[\w :#\n]*[.|\.\. _?[\w. :]+|')?<?"
+    rf"(__ |`{{2}}|`\w[\w :#\n]*|\.\. _[\w. :]+|')?<?"
     rf"({URL_PATTERNS}):(\//)?(\S*)>?"
 )
 
