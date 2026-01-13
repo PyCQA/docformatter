@@ -138,6 +138,32 @@ def _do_skip_newlines(
     return j
 
 
+def _is_multiline_parameter(tokens: list[tokenize.TokenInfo], index: int) -> bool:
+    """Determine if a token is a multiline string parameter.
+
+    A multiline string token spans multiple physical lines in the source code.
+    This is determined by checking if the token's start and end line numbers
+    are different.
+
+    Parameters
+    ----------
+    tokens : list[tokenize.TokenInfo]
+        The list of tokens.
+    index : int
+        The index of the token to check.
+
+    Returns
+    -------
+    bool
+        True if the token is a multiline string parameter, False otherwise.
+    """
+    if index >= len(tokens):
+        return False
+
+    token = tokens[index]
+    return token.type == tokenize.STRING and token.start[0] != token.end[0]
+
+
 def _do_update_token_indices(
     tokens: list[tokenize.TokenInfo],
 ) -> list[tokenize.TokenInfo]:
@@ -166,9 +192,19 @@ def _do_update_token_indices(
         # If the current token line is the same as the preceding token line,
         # the starting row for the current token should be the same as the ending
         # line for the previous token unless both lines are NEWLINES.
-        if tokens[i].line == tokens[i - 1].line and tokens[i - 1].type not in (
-            tokenize.NEWLINE,
-            tokenize.NL,
+        # Also check if tokens are at the same position (handles multiline strings).
+        is_multiline = _is_multiline_parameter(tokens, i - 1)
+        is_same_line = tokens[i].line == tokens[i - 1].line
+        is_same_position = tokens[i].start[0] == tokens[i - 1].end[0]
+
+        if (
+            is_multiline
+            or (is_same_line or is_same_position)
+            and tokens[i - 1].type
+            not in (
+                tokenize.NEWLINE,
+                tokenize.NL,
+            )
         ):
             _start_idx, _end_idx = _get_start_end_indices(
                 tokens[i],
@@ -461,7 +497,12 @@ def _get_start_end_indices(
     _end_row = _start_row
     _end_col = token.end[1]
 
-    if num_rows > 1 and _end_row != prev_token.end[0]:
+    # For multiline STRING tokens, update the end row but keep the original end column.
+    # The num_cols calculation from the line is incorrect for multiline strings because
+    # the line attribute contains more than just the string content.
+    if num_rows > 1 and token.type == tokenize.STRING:
+        _end_row = _start_row + num_rows - 1
+    elif num_rows > 1 and _end_row != prev_token.end[0]:
         _end_row = _start_row + num_rows - 1
         _end_col = num_cols
 
