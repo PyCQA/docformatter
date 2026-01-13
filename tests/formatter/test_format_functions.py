@@ -63,23 +63,11 @@ def _get_docstring_token_and_index(tokens):
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize(
-    "test_key, black",
-    [
-        ("module_docstring_followed_by_string", False),
-        ("module_docstring_followed_by_code", False),
-        ("module_docstring_followed_by_comment_then_code", False),
-        ("module_docstring_followed_by_comment_then_string", False),
-        ("module_docstring_in_black", True),
-    ],
-)
-def test_module_docstring_newlines(test_key, black):
-    expected = TEST_STRINGS[test_key]["expected"]
+def test_module_docstring_newlines():
+    expected = TEST_STRINGS["module_docstring"]["expected"]
 
-    result = _format._get_module_docstring_newlines(black)
-    assert (
-        result == expected
-    ), f"\nFailed {test_key}:\nExpected {expected}\nGot {result}"
+    result = _format._get_module_docstring_newlines()
+    assert result == expected, f"\nExpected {expected}\nGot {result}"
 
 
 @pytest.mark.unit

@@ -345,25 +345,14 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
     return 0
 
 
-def _get_module_docstring_newlines(black: bool = False) -> int:
+def _get_module_docstring_newlines() -> int:
     """Return number of newlines after a module docstring.
-
-    docformatter_8.2: One blank line after a module docstring.
-    docformatter_8.2.1: Two blank lines after a module docstring when in black mode.
-
-    Parameters
-    ----------
-    black : bool
-        Indicates whether we're using black formatting rules.
 
     Returns
     -------
     newlines : int
         The number of newlines to insert after the docstring.
     """
-    if black:
-        return 2
-
     return 1
 
 
@@ -395,7 +384,7 @@ def _get_newlines_by_type(
         return 0
     elif _classify.is_module_docstring(tokens, index):
         # print("Module")
-        return _get_module_docstring_newlines(black)
+        return _get_module_docstring_newlines()
     elif _classify.is_class_docstring(tokens, index):
         # print("Class")
         return _get_class_docstring_newlines(tokens, index)
