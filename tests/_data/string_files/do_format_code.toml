@@ -1233,3 +1233,15 @@ expected="""foo = f'''
   bar
 '''
 """
+
+[issue_331_black_module_docstring]
+source='''"""
+A
+"""
+
+pass
+'''
+expected='''"""A."""
+
+pass
+'''
