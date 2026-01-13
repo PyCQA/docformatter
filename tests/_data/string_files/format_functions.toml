@@ -2,7 +2,19 @@
 # [type, string, start, end, line]
 # for creating a TokenInfo() object.
 
-[module_docstring]
+[module_docstring_followed_by_string]
+expected = 1
+
+[module_docstring_followed_by_code]
+expected = 1
+
+[module_docstring_followed_by_comment_then_code]
+expected = 1
+
+[module_docstring_followed_by_comment_then_string]
+expected = 1
+
+[module_docstring_in_black]
 expected = 1
 
 [class_docstring_followed_by_statement]
