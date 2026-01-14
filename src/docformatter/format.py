@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's Formattor class."""
 
-
 # Standard Library Imports
 import argparse
 import collections
@@ -359,7 +358,6 @@ def _get_module_docstring_newlines() -> int:
 def _get_newlines_by_type(
     tokens: list[tokenize.TokenInfo],
     index: int,
-    black: bool = False,
 ) -> int:
     """Dispatch to the correct docstring formatter based on context.
 
@@ -969,9 +967,7 @@ class Formatter:
             ).strip()
             if self.args.close_quotes_on_newline and "\n" in summary_wrapped:
                 summary_wrapped = (
-                    f"{summary_wrapped[:-3]}"
-                    f"\n{indentation}"
-                    f"{summary_wrapped[-3:]}"
+                    f"{summary_wrapped[:-3]}\n{indentation}{summary_wrapped[-3:]}"
                 )
             return summary_wrapped
 
@@ -1058,7 +1054,8 @@ class Formatter:
 
                 _docstring_token = tokens[_docstr_idx]
                 _blank_line_count = _get_newlines_by_type(
-                    tokens, _docstr_idx, black=self.args.black
+                    tokens,
+                    _docstr_idx,
                 )
 
                 if (
