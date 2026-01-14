@@ -64,19 +64,19 @@ def _get_docstring_token_and_index(tokens):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "test_key, black",
+    "test_key",
     [
-        ("module_docstring_followed_by_string", False),
-        ("module_docstring_followed_by_code", False),
-        ("module_docstring_followed_by_comment_then_code", False),
-        ("module_docstring_followed_by_comment_then_string", False),
-        ("module_docstring_in_black", True),
+        "module_docstring_followed_by_string",
+        "module_docstring_followed_by_code",
+        "module_docstring_followed_by_comment_then_code",
+        "module_docstring_followed_by_comment_then_string",
+        "module_docstring_in_black",
     ],
 )
-def test_module_docstring_newlines(test_key, black):
+def test_module_docstring_newlines(test_key):
     expected = TEST_STRINGS[test_key]["expected"]
 
-    result = _format._get_module_docstring_newlines(black)
+    result = _format._get_module_docstring_newlines()
     assert (
         result == expected
     ), f"\nFailed {test_key}:\nExpected {expected}\nGot {result}"
@@ -221,23 +221,23 @@ def test_do_remove_preceding_blank_lines(test_key, block):
 @pytest.mark.integration
 @pytest.mark.order(5)
 @pytest.mark.parametrize(
-    "test_key, black",
+    "test_key",
     [
-        ("get_newlines_by_type_module_docstring", False),
-        ("get_newlines_by_type_module_docstring_black", True),
-        ("get_newlines_by_type_class_docstring", False),
-        ("get_newlines_by_type_function_docstring", False),
-        ("get_newlines_by_type_attribute_docstring", False),
+        "get_newlines_by_type_module_docstring",
+        "get_newlines_by_type_module_docstring_black",
+        "get_newlines_by_type_class_docstring",
+        "get_newlines_by_type_function_docstring",
+        "get_newlines_by_type_attribute_docstring",
     ],
 )
-def test_get_newlines_by_type(test_key, black):
+def test_get_newlines_by_type(test_key):
     source = TEST_STRINGS[test_key]["source"]
     expected = TEST_STRINGS[test_key]["expected"]
 
     tokens = _get_tokens(source)
     index = _get_docstring_token_and_index(tokens)
 
-    result = _format._get_newlines_by_type(tokens, index, black)
+    result = _format._get_newlines_by_type(tokens, index)
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
 
 

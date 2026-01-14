@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's Formattor class."""
 
-
 # Standard Library Imports
 import argparse
 import collections
@@ -345,32 +344,20 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
     return 0
 
 
-def _get_module_docstring_newlines(black: bool = False) -> int:
+def _get_module_docstring_newlines() -> int:
     """Return number of newlines after a module docstring.
-
-    docformatter_8.2: One blank line after a module docstring.
-    docformatter_8.2.1: Two blank lines after a module docstring when in black mode.
-
-    Parameters
-    ----------
-    black : bool
-        Indicates whether we're using black formatting rules.
 
     Returns
     -------
     newlines : int
         The number of newlines to insert after the docstring.
     """
-    if black:
-        return 2
-
     return 1
 
 
 def _get_newlines_by_type(
     tokens: list[tokenize.TokenInfo],
     index: int,
-    black: bool = False,
 ) -> int:
     """Dispatch to the correct docstring formatter based on context.
 
@@ -395,7 +382,7 @@ def _get_newlines_by_type(
         return 0
     elif _classify.is_module_docstring(tokens, index):
         # print("Module")
-        return _get_module_docstring_newlines(black)
+        return _get_module_docstring_newlines()
     elif _classify.is_class_docstring(tokens, index):
         # print("Class")
         return _get_class_docstring_newlines(tokens, index)
@@ -980,9 +967,7 @@ class Formatter:
             ).strip()
             if self.args.close_quotes_on_newline and "\n" in summary_wrapped:
                 summary_wrapped = (
-                    f"{summary_wrapped[:-3]}"
-                    f"\n{indentation}"
-                    f"{summary_wrapped[-3:]}"
+                    f"{summary_wrapped[:-3]}\n{indentation}{summary_wrapped[-3:]}"
                 )
             return summary_wrapped
 
@@ -1069,7 +1054,8 @@ class Formatter:
 
                 _docstring_token = tokens[_docstr_idx]
                 _blank_line_count = _get_newlines_by_type(
-                    tokens, _docstr_idx, black=self.args.black
+                    tokens,
+                    _docstr_idx,
                 )
 
                 if (

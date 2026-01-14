@@ -15,7 +15,7 @@ expected = 1
 expected = 1
 
 [module_docstring_in_black]
-expected = 2
+expected = 1
 
 [class_docstring_followed_by_statement]
 source = '''
