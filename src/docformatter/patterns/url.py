@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's URL pattern recognition functions."""
 
-
 # Standard Library Imports
 import contextlib
 import re

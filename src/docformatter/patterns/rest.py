@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's reST directive pattern recognition functions."""
 
-
 # Standard Library Imports
 import re
 

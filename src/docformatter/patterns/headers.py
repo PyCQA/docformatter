@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's header pattern recognition functions."""
 
-
 # Standard Library Imports
 import re
 from re import Match

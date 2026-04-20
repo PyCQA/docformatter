@@ -7,7 +7,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 """Configuration file for the Sphinx documentation builder."""
 
-
 project = "docformatter"
 copyright = "2022-2023, Steven Myint"
 author = "Steven Myint"
