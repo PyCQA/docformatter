@@ -383,6 +383,8 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
 def _get_module_docstring_newlines() -> int:
     """Return number of newlines after a module docstring.
 
+    docformatter_8.2: One blank line after a module docstring.
+
     Returns
     -------
     newlines : int
@@ -405,8 +407,6 @@ def _get_newlines_by_type(
         A list of tokens from the source code.
     index : int
         The index of the docstring token in the list of tokens.
-    black : bool
-        Whether docformatter is running in black mode.
 
     Returns
     -------
