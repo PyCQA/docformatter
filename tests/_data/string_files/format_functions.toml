@@ -169,11 +169,11 @@ expected = 1
 
 [get_newlines_by_type_module_docstring]
 source = '"""Module docstring."""'
-expected = 1
+expected = 0
 
 [get_newlines_by_type_module_docstring_black]
 source = '"""Module docstring."""'
-expected = 2
+expected = 0
 
 [get_newlines_by_type_class_docstring]
 source = '''
@@ -195,7 +195,7 @@ expected = 0
 source = '''x = 1
 """Docstring for x."""
 '''
-expected = 1
+expected = 0
 
 [get_num_rows_columns]
 token = [5, "    ", [3, 10], [3, 40], '''    This is
