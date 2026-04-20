@@ -8,6 +8,7 @@ Steven Myint <git@stevenmyint.com>
 
 Additional contributions by (sorted by name)
 --------------------------------------------
+- Adam Dangoor <adamdangoor@gmail.com>
 - Alec Merdler <alecmerdler@gmail.com>
 - Alexander Biggs <akbiggs@users.noreply.github.com>
 - Alexander Kapshuna <kapsh@kap.sh>
