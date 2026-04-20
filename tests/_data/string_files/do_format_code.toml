@@ -1234,15 +1234,13 @@ expected="""foo = f'''
 '''
 """
 
+[issue_331_black_module_docstring]
+source='''"""A."""
 
-[do_not_break_multiline_parameter]
-source='''foo = textwrap.dedent("""\
-   bar
-   baz
-""")
+
+pass
 '''
-expected='''foo = textwrap.dedent("""\
-   bar
-   baz
-""")
+expected='''"""A."""
+
+pass
 '''
