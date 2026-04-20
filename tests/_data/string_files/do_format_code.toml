@@ -1233,3 +1233,16 @@ expected="""foo = f'''
   bar
 '''
 """
+
+
+[do_not_break_multiline_parameter]
+source='''foo = textwrap.dedent("""\
+   bar
+   baz
+""")
+'''
+expected='''foo = textwrap.dedent("""\
+   bar
+   baz
+""")
+'''

@@ -140,6 +140,7 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("ellipses_is_code_line", NO_ARGS),
         ("do_not_break_f_string_double_quotes", NO_ARGS),
         ("do_not_break_f_string_single_quotes", NO_ARGS),
+        ("do_not_break_multiline_parameter", NO_ARGS),
     ],
 )
 def test_do_format_code(test_key, test_args, args):
