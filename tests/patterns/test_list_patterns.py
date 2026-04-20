@@ -73,6 +73,8 @@ with open("tests/_data/string_files/list_patterns.toml", "rb") as f:
         "is_type_of_list_alembic_header",
         "is_epytext_field_list",
         "is_sphinx_field_list",
+        "is_numpy_section_in_docstring_issue_338",
+        "is_rest_section_in_docstring",
     ],
 )
 def test_is_type_of_list(test_key):
