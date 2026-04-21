@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's classification functions."""
 
-
 # Standard Library Imports
 import re
 import sys

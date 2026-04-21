@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This is the docformatter patterns package."""
 
-
 # docformatter Local Imports
 from .fields import *  # noqa F403
 from .headers import *  # noqa F403

@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's miscellaneous pattern recognition functions."""
 
-
 # Standard Library Imports
 import re
 import tokenize

@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's Configurater class."""
 
-
 # Standard Library Imports
 import argparse
 import contextlib

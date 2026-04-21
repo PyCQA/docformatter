@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's summary wrapper functions."""
 
-
 # Standard Library Imports
 import re
 import textwrap

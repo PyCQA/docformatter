@@ -7,11 +7,10 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 """Configuration file for the Sphinx documentation builder."""
 
-
 project = "docformatter"
 copyright = "2022-2023, Steven Myint"
 author = "Steven Myint"
-release = "1.7.7"
+release = "1.7.8"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's description wrapper functions."""
 
-
 # Standard Library Imports
 import contextlib
 from typing import List

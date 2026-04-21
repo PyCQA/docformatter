@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter string manipulation functions."""
 
-
 # Standard Library Imports
 import contextlib
 import re

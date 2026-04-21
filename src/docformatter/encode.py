@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's Encoder class."""
 
-
 # Standard Library Imports
 import collections
 import locale
