@@ -18,6 +18,7 @@ Additional contributions by (sorted by name)
 - Andy Hayden <andyhayden1@gmail.com>
 - Anthony Sottile <asottile@umich.edu>
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
+- Apoorv Darshan <ad13dtu@gmail.com>
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
 - Björn Holtvogt <bjoern.holtvogt@gmail.com>
