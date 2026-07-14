@@ -1402,21 +1402,21 @@ testing = ["covdefaults (>=2.3)", "pytest (>=8.3.5)", "pytest-cov (>=6.1.1)", "p
 
 [[package]]
 name = "pytest"
-version = "8.4.1"
+version = "9.0.3"
 description = "pytest: simple powerful testing with Python"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["testing"]
 files = [
-    {file = "pytest-8.4.1-py3-none-any.whl", hash = "sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7"},
-    {file = "pytest-8.4.1.tar.gz", hash = "sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c"},
+    {file = "pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9"},
+    {file = "pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c"},
 ]
 
 [package.dependencies]
 colorama = {version = ">=0.4", markers = "sys_platform == \"win32\""}
 exceptiongroup = {version = ">=1", markers = "python_version < \"3.11\""}
-iniconfig = ">=1"
-packaging = ">=20"
+iniconfig = ">=1.0.1"
+packaging = ">=22"
 pluggy = ">=1.5,<2"
 pygments = ">=2.7.2"
 tomli = {version = ">=1", markers = "python_version < \"3.11\""}
@@ -2036,4 +2036,4 @@ tomli = ["tomli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "f5cb2ff930c482497d75aa0de249f890684691fc27c18d2d3a8be5c1ee23784d"
+content-hash = "dd641418bd353b63e25924981a2537ba7c04c62894c2efd28d6b3d4b3a7092d6"
