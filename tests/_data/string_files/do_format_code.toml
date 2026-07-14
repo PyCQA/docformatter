@@ -1244,3 +1244,10 @@ expected='''"""A."""
 
 pass
 '''
+
+# A blank line with trailing whitespace must not crash the tokenizer round-trip.
+# The "\n" escapes are used so the four trailing spaces on the blank line are
+# explicit and cannot be stripped by editors or formatters.
+[issue_355]
+source="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4 spaces of trailing whitespace\n    \n    return x\n"
+expected="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4 spaces of trailing whitespace\n    \n    return x\n"

@@ -141,6 +141,7 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("do_not_break_f_string_double_quotes", NO_ARGS),
         ("do_not_break_f_string_single_quotes", NO_ARGS),
         ("issue_331_black_module_docstring", ["--black", ""]),
+        ("issue_355", NO_ARGS),
     ],
 )
 def test_do_format_code(test_key, test_args, args):
