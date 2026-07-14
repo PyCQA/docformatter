@@ -43,7 +43,7 @@ twine = "^6.1.0"
 [tool.poetry.group.testing.dependencies]
 coverage = {extras = ["toml"], version = "^7.5.0"}
 mock = "^5.2.0"
-pytest = "^8.4.0"
+pytest = ">=8.4,<10.0"
 pytest-cov = "^6.2.0"
 pytest-order = "^1.3.0"
 
