@@ -157,3 +157,24 @@ def test_do_format_code(test_key, test_args, args):
 
     result = uut._do_format_code(source)
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.integration
+@pytest.mark.order(7)
+@pytest.mark.parametrize("args", [NO_ARGS])
+def test_do_format_code_inline_comment_after_docstring(test_args, args):
+    """Docstring followed by an inline comment round-trips unchanged.
+
+    See issue #347.  The source is inlined here rather than added to
+    do_format_code.toml because the trailing comment is significant.
+    """
+    uut = Formatter(
+        test_args,
+        sys.stderr,
+        sys.stdin,
+        sys.stdout,
+    )
+
+    source = '"""This is a comment."""  # noqa: D415\n'
+
+    assert uut._do_format_code(source) == source

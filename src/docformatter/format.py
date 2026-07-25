@@ -740,17 +740,21 @@ class Formatter:
             ):
                 self.new_tokens[-2] = self.new_tokens[-2]._replace(line=_line)
 
-        # If a comment follows the docstring, skip adding a newline token for
-        # the line.
-        if not next_token.string.startswith("#"):
-            _new_tok = tokenize.TokenInfo(
-                type=tokenize.NEWLINE,
-                string="\n",
-                start=token.end,
-                end=(token.end[0], token.end[1] + 1),
-                line=_line,
-            )
-            self.new_tokens.append(_new_tok)
+        # If a comment follows the docstring, the comment and its own NEWLINE
+        # token still have to be emitted, so skip adding a newline token and
+        # any blank lines here; doing so would place them before the comment
+        # and produce tokens whose positions move backwards.
+        if next_token.string.startswith("#"):
+            return
+
+        _new_tok = tokenize.TokenInfo(
+            type=tokenize.NEWLINE,
+            string="\n",
+            start=token.end,
+            end=(token.end[0], token.end[1] + 1),
+            line=_line,
+        )
+        self.new_tokens.append(_new_tok)
 
         # Add the appropriate number of NEWLINE tokens based on the type of
         # docstring.
@@ -1123,7 +1127,8 @@ class Formatter:
 
                 if (
                     (
-                        self.new_tokens[-2].string == tokens[_idx + 1].string
+                        len(self.new_tokens) > 1
+                        and self.new_tokens[-2].string == tokens[_idx + 1].string
                         and _docstring_token.line == tokens[_idx + 1].line
                     )
                     or tokens[_idx + 1].string == "\n"
