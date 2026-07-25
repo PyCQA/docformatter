@@ -32,6 +32,7 @@ import collections
 import contextlib
 import difflib
 import io
+import os
 import tokenize
 from typing import TextIO, Union
 
@@ -653,8 +654,12 @@ class Formatter:
                 # noinspection PyTypeChecker
                 print(unicode(exception), file=self.stderror)
 
-        # There were no files to process.
-        if is_empty:
+        # There were no Python files to process.  This is only an error when a
+        # path that was explicitly passed on the command line doesn't exist;
+        # finding no Python files in an existing file or directory is a no-op.
+        if is_empty and any(
+            not os.path.exists(_file) for _file in self.args.files if _file != "-"
+        ):
             outcomes[FormatResult.error] += 1
 
         for code in return_codes:

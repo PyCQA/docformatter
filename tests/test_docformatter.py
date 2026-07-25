@@ -175,6 +175,37 @@ def foo():
         assert ret_code == 1
 
     @pytest.mark.system
+    def test_no_python_files_exit_code(self, temporary_directory):
+        """Return error code 0 when the paths hold no Python files.
+
+        Passing a non-Python file, or recursing a directory that has no
+        Python files in it, is a no-op and not an error.  See issue #348.
+        """
+        stderr = io.StringIO()
+        text_file = os.path.join(temporary_directory, "example.txt")
+        with open(text_file, "w") as f:
+            f.write("not python\n")
+
+        assert (
+            main._main(
+                argv=["my_fake_program", text_file],
+                standard_out=None,
+                standard_error=stderr,
+                standard_in=None,
+            )
+            == 0
+        )
+        assert (
+            main._main(
+                argv=["my_fake_program", "--check", "--recursive", temporary_directory],
+                standard_out=None,
+                standard_error=stderr,
+                standard_in=None,
+            )
+            == 0
+        )
+
+    @pytest.mark.system
     @pytest.mark.parametrize(
         "contents",
         ["""Totally fine docstring, do not report anything."""],
