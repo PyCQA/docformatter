@@ -199,7 +199,37 @@ def is_attribute_docstring(
     if not seen_equal_or_colon:
         return False
 
-    return True
+    # Step 3: A string nested inside brackets is an argument or a collection
+    # element, not an attribute docstring.
+    return not _is_inside_brackets(tokens, index)
+
+
+def _is_inside_brackets(
+    tokens: list[tokenize.TokenInfo],
+    index: int,
+) -> bool:
+    """Return True if the token at index sits inside an unclosed bracket.
+
+    Parameters
+    ----------
+    tokens : list[TokenInfo]
+        A list of tokenized Python source code.
+    index : int
+        Index of the token to check.
+
+    Returns
+    -------
+        True if the token is nested inside brackets, False otherwise.
+    """
+    depth = 0
+    for tok in tokens[0:index]:
+        if tok.type == tokenize.OP:
+            if tok.string in ("(", "[", "{"):
+                depth += 1
+            elif tok.string in (")", "]", "}"):
+                depth -= 1
+
+    return depth > 0
 
 
 def is_class_docstring(
