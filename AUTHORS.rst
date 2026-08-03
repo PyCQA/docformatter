@@ -40,6 +40,7 @@ Additional contributions by (sorted by name)
 - Paul Angerer <48882462+etimoz@users.noreply.github.com>
 - Peter Boothe <pboothe@pboothe2.nyc.corp.google.com>
 - Peter Cock <p.j.a.cock@googlemail.com>
+- Sanjay Santhanam <51058514+Sanjays2402@users.noreply.github.com>
 - Sebastian Weigand <s.weigand.phy@gmail.com>
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
