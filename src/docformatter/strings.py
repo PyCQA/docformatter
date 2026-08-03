@@ -383,8 +383,16 @@ def do_split_summary(lines) -> List[str]:
         token = tokens[i]
         sentence.append(token)
 
-        if token.endswith(".") and not any(
-            "".join(sentence).strip().endswith(abbr) for abbr in ABBREVIATIONS
+        _so_far = "".join(sentence)
+
+        # A period inside an unclosed inline literal (``...``) is part of the
+        # literal, not the end of the sentence.
+        _in_inline_literal = _so_far.count("``") % 2 == 1
+
+        if (
+            token.endswith(".")
+            and not _in_inline_literal
+            and not any(_so_far.strip().endswith(abbr) for abbr in ABBREVIATIONS)
         ):
             i += 1
             break
