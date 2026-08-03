@@ -1,5 +1,23 @@
 # Changelog
 
+## [v1.7.8](https://github.com/PyCQA/docformatter/tree/v1.7.8) (2026-04-21)
+
+[Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.7...v1.7.8)
+
+Bug Fixes
+
+- fix: multi sentence summary [\#313](https://github.com/PyCQA/docformatter/pull/313) ([weibullguy](https://github.com/weibullguy))
+
+**Merged pull requests:**
+
+- chore\(deps-dev\): bump pygments from 2.19.2 to 2.20.0 [\#341](https://github.com/PyCQA/docformatter/pull/341) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump virtualenv from 20.32.0 to 20.36.1 [\#337](https://github.com/PyCQA/docformatter/pull/337) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump urllib3 from 2.5.0 to 2.6.3 [\#334](https://github.com/PyCQA/docformatter/pull/334) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore: issue 288 [\#320](https://github.com/PyCQA/docformatter/pull/320) ([weibullguy](https://github.com/weibullguy))
+- chore: updating dependency and tool versions [\#319](https://github.com/PyCQA/docformatter/pull/319) ([weibullguy](https://github.com/weibullguy))
+- chore\(deps-dev\): bump urllib3 from 2.4.0 to 2.5.0 [\#317](https://github.com/PyCQA/docformatter/pull/317) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps-dev\): bump requests from 2.32.3 to 2.32.4 [\#316](https://github.com/PyCQA/docformatter/pull/316) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.7.7](https://github.com/PyCQA/docformatter/tree/v1.7.7) (2025-05-11)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.6...v1.7.7)
@@ -69,55 +87,17 @@ Bug Fixes
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.1...v1.7.2)
 
-Bug Fixes
-
-- fix: wrapping issues with reST directives, quoted URLs, and Sphinx field lists [\#219](https://github.com/PyCQA/docformatter/pull/219) ([weibullguy](https://github.com/weibullguy))
-
 ## [v1.7.1](https://github.com/PyCQA/docformatter/tree/v1.7.1) (2023-05-19)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.7.0...v1.7.1)
-
-Features
-
-- feat: support epytext style [\#211](https://github.com/PyCQA/docformatter/pull/211) ([weibullguy](https://github.com/weibullguy))
-- feat: use tomllib for Python 3.11+ [\#208](https://github.com/PyCQA/docformatter/pull/208) ([weibullguy](https://github.com/weibullguy))
-- feat: wrap Sphinx style long parameter descriptions [\#201](https://github.com/PyCQA/docformatter/pull/201) ([weibullguy](https://github.com/weibullguy))
-
-Bug Fixes
-
-- fix: improper wrapping of short anonymous hyperlnks [\#213](https://github.com/PyCQA/docformatter/pull/213) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- chore: update version strings [\#214](https://github.com/PyCQA/docformatter/pull/214) ([weibullguy](https://github.com/weibullguy))
-- chore: update pre-commit-config [\#209](https://github.com/PyCQA/docformatter/pull/209) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.7.0](https://github.com/PyCQA/docformatter/tree/v1.7.0) (2023-05-15)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.5...v1.7.0)
 
-Features
-
-- feat: add option to format compatible with black [\#196](https://github.com/PyCQA/docformatter/pull/196) ([weibullguy](https://github.com/weibullguy))
-- feat: add option for user to provide list of words not to capitalize [\#195](https://github.com/PyCQA/docformatter/pull/195) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- chore: update workflows [\#206](https://github.com/PyCQA/docformatter/pull/206) ([weibullguy](https://github.com/weibullguy))
-
 ## [v1.6.5](https://github.com/PyCQA/docformatter/tree/v1.6.5) (2023-05-03)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.6.4...v1.6.5)
-
-Bug Fixes
-
-- fix: removing blank line after import section [\#204](https://github.com/PyCQA/docformatter/pull/204) ([weibullguy](https://github.com/weibullguy))
-
-**Merged pull requests:**
-
-- chore: add GH release badge [\#200](https://github.com/PyCQA/docformatter/pull/200) ([weibullguy](https://github.com/weibullguy))
-- chore: update workflows to create release [\#198](https://github.com/PyCQA/docformatter/pull/198) ([weibullguy](https://github.com/weibullguy))
-- chore: update GH actions to generate CHANGELOG [\#194](https://github.com/PyCQA/docformatter/pull/194) ([weibullguy](https://github.com/weibullguy))
 
 ## [v1.6.4](https://github.com/PyCQA/docformatter/tree/v1.6.4) (2023-04-26)
 
@@ -150,3 +130,6 @@ Bug Fixes
 ## [v1.4](https://github.com/PyCQA/docformatter/tree/v1.4) (2020-12-27)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.3.1...v1.4)
+
+
+

@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's constants."""
 
-
 # TODO: Move these constants to the configuration file and/or command line.
 ABBREVIATIONS = (
     "e.g.",
@@ -200,8 +199,9 @@ URL_REGEX = (
 URL_SKIP_REGEX = rf"({URL_PATTERNS}):(/){{0,2}}(``|')"
 """The regex used to ignore found hyperlinks.
 
-URLs that don't actually contain a domain, but only the URL pattern should
-be treated like simple text. This will ignore URLs like ``http://`` or 'ftp:`.
+URLs that don't actually contain a domain, but only the URL pattern should be treated
+like simple text. This will ignore URLs like ``http://`` or
+'ftp:`.
 
 ({URL_PATTERNS}) matches one of the URL patterns.
 :(/){{0,2}} matches a colon followed by up to two forward slashes.

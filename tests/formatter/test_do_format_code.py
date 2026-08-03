@@ -135,6 +135,13 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("issue_187", NO_ARGS),
         ("issue_203", NO_ARGS),
         ("issue_243", NO_ARGS),
+        ("two_lines_between_stub_classes", NO_ARGS),
+        ("two_lines_between_stub_classes_with_preceding_comment", NO_ARGS),
+        ("ellipses_is_code_line", NO_ARGS),
+        ("do_not_break_f_string_double_quotes", NO_ARGS),
+        ("do_not_break_f_string_single_quotes", NO_ARGS),
+        ("issue_331_black_module_docstring", ["--black", ""]),
+        ("issue_355", NO_ARGS),
     ],
 )
 def test_do_format_code(test_key, test_args, args):
@@ -150,3 +157,24 @@ def test_do_format_code(test_key, test_args, args):
 
     result = uut._do_format_code(source)
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.integration
+@pytest.mark.order(7)
+@pytest.mark.parametrize("args", [NO_ARGS])
+def test_do_format_code_inline_comment_after_docstring(test_args, args):
+    """Docstring followed by an inline comment round-trips unchanged.
+
+    See issue #347.  The source is inlined here rather than added to
+    do_format_code.toml because the trailing comment is significant.
+    """
+    uut = Formatter(
+        test_args,
+        sys.stderr,
+        sys.stdin,
+        sys.stdout,
+    )
+
+    source = '"""This is a comment."""  # noqa: D415\n'
+
+    assert uut._do_format_code(source) == source

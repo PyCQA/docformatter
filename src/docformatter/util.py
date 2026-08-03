@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter utility functions."""
 
-
 # Standard Library Imports
 import os
 import re

@@ -190,3 +190,35 @@ This is a description.
 strict = false
 style = "epytext"
 expected = false
+
+[is_numpy_section_in_docstring_issue_338]    # See GitHub issue #338
+instring = """Do a number of things.
+
+Parameters
+----------
+n
+    How many things to do.
+colors
+    True to paint the things in bright colors, False to keep them
+    dull and grey.
+
+Returns
+-------
+int
+    How many things were actually done.
+"""
+strict = false
+style = "numpy"
+expected = true
+
+[is_rest_section_in_docstring]
+instring = """This is a description.
+
+Section Title
+=============
+
+Some content under the section.
+"""
+strict = false
+style = "numpy"
+expected = true

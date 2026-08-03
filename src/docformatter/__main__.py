@@ -26,7 +26,6 @@
 # SOFTWARE.
 """Formats docstrings to follow PEP 257."""
 
-
 # Standard Library Imports
 import contextlib
 import signal
@@ -39,8 +38,7 @@ import docformatter.format as _format
 
 def _help():
     """Print docformatter's help."""
-    print(
-        """\
+    print("""\
 usage: docformatter [-h] [-i | -c] [-d] [-r] [-e [EXCLUDE ...]]
                     [-n [NON-CAP ...]] [-s [style]] [--rest-section-adorns REGEX]
                     [--black] [--wrap-summaries length]
@@ -108,8 +106,7 @@ options:
                         (see issue #67) (default: False)
   --config CONFIG       path to file containing docformatter options
   --version             show program's version number and exit
-"""
-    )
+""")
 
 
 def _main(argv, standard_out, standard_error, standard_in):

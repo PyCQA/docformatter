@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's list pattern recognition functions."""
 
-
 # Standard Library Imports
 import re
 from re import Match
@@ -51,6 +50,42 @@ from .fields import (
 )
 from .headers import is_alembic_header, is_numpy_section_header, is_rest_section_header
 from .misc import is_inline_math, is_literal_block
+
+
+def _create_multiline_windows(lines: list[str], window_size: int = 3) -> list[str]:
+    r"""Create overlapping windows of consecutive lines.
+
+    This allows pattern matching against multi-line constructs like
+    NumPy section headers (e.g., "Parameters\\n----------") and reST
+    section headers (e.g., "Title\\n=====").
+
+    Parameters
+    ----------
+    lines : list[str]
+        The list of individual lines.
+    window_size : int
+        Number of consecutive lines to join (default 3).
+
+    Returns
+    -------
+    list[str]
+        List of multi-line strings, each containing window_size consecutive
+        lines joined with newlines.
+
+    Notes
+    -----
+    Example:
+        lines = ['A', 'B', 'C', 'D']
+        _create_multiline_windows(lines, 2)
+        # Returns: ['A\\nB', 'B\\nC', 'C\\nD']
+    """
+    if len(lines) < window_size:
+        return ["\n".join(lines)] if lines else []
+
+    return [
+        "\n".join(lines[i : i + window_size])
+        for i in range(len(lines) - window_size + 1)
+    ]
 
 
 def is_type_of_list(
@@ -82,39 +117,25 @@ def is_type_of_list(
 
     if is_field_list(text, style):
         return False
-    
-    # Check for definition list pattern (term followed by indented definition)
-    # This is a conservative check that only triggers for terms with special markup
-    for i, line in enumerate(split_lines):
-        # Skip empty lines and lines ending with ':' or starting with '<' (URLs)
-        if not line.strip() or line.rstrip().endswith(':') or line.strip().startswith('<'):
-            continue
-        # Check if next line exists and is indented more than current line
-        if i < len(split_lines) - 1:
-            next_line = split_lines[i + 1]
-            # If current line has content and next line is indented, it might be a definition list
-            if line.strip() and next_line.startswith('  ') and next_line.strip():
-                # Additional check: current line shouldn't start with common list markers
-                if not (line.strip().startswith(('*', '-', '+')) or 
-                       line.strip()[0:2].rstrip().isdigit()):
-                    # Skip if this looks like an inline link continuation:
-                    # Line has backtick but doesn't end with >`_ and next line starts with <
-                    if ('`' in line and not line.rstrip().endswith('>`_') and 
-                        next_line.strip().startswith('<')):
-                        continue
-                    # Only consider it a definition list if the term has special markup like ``term``
-                    # This is a conservative check to avoid false positives
-                    if '``' in line:
-                        return True
 
-    # Check for various list patterns
-    for line in split_lines:
-        # Always check for non-field-list patterns
-        if (
+    # Check for multi-line patterns (section headers) first.
+    # These require looking at consecutive lines together.
+    multiline_windows = _create_multiline_windows(split_lines, window_size=2)
+    for window in multiline_windows:
+        if is_rest_section_header(window) or is_numpy_section_header(window):
+            return True
+
+    # Check single-line patterns.
+    return any(
+        (
             is_bullet_list(line)
             or is_enumerated_list(line)
-            or is_rest_section_header(line)
             or is_option_list(line)
+            or is_epytext_field_list(line)
+            or is_sphinx_field_list(line)
+            or is_numpy_field_list(line)
+            or is_google_field_list(line)
+            or is_user_defined_field_list(line)
             or is_literal_block(line)
             or is_inline_math(line)
             or is_alembic_header(line)

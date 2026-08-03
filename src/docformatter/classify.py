@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This module provides docformatter's classification functions."""
 
-
 # Standard Library Imports
 import re
 import sys
@@ -200,7 +199,37 @@ def is_attribute_docstring(
     if not seen_equal_or_colon:
         return False
 
-    return True
+    # Step 3: A string nested inside brackets is an argument or a collection
+    # element, not an attribute docstring.
+    return not _is_inside_brackets(tokens, index)
+
+
+def _is_inside_brackets(
+    tokens: list[tokenize.TokenInfo],
+    index: int,
+) -> bool:
+    """Return True if the token at index sits inside an unclosed bracket.
+
+    Parameters
+    ----------
+    tokens : list[TokenInfo]
+        A list of tokenized Python source code.
+    index : int
+        Index of the token to check.
+
+    Returns
+    -------
+        True if the token is nested inside brackets, False otherwise.
+    """
+    depth = 0
+    for tok in tokens[0:index]:
+        if tok.type == tokenize.OP:
+            if tok.string in ("(", "[", "{"):
+                depth += 1
+            elif tok.string in (")", "]", "}"):
+                depth -= 1
+
+    return depth > 0
 
 
 def is_class_docstring(
@@ -266,7 +295,7 @@ def is_code_line(token: tokenize.TokenInfo) -> bool:
     bool
         True if the token is a code line, False otherwise.
     """
-    if token.type == tokenize.NAME and not (
+    if (token.type == tokenize.NAME or token.string == "...") and not (
         token.line.strip().startswith("def ")
         or token.line.strip().startswith("async ")
         or token.line.strip().startswith("class ")
@@ -317,6 +346,15 @@ def is_f_string(token: tokenize.TokenInfo, prev_token: tokenize.TokenInfo) -> bo
     if PY312:
         if tokenize.FSTRING_MIDDLE in [token.type, prev_token.type]:
             return True
+    elif any(
+        [
+            token.string.startswith('f"""'),
+            prev_token.string.startswith('f"""'),
+            token.string.startswith("f'''"),
+            prev_token.string.startswith("f'''"),
+        ]
+    ):
+        return True
 
     return False
 
@@ -431,8 +469,8 @@ def is_newline_continuation(
     """
     if (
         token.type in (tokenize.NEWLINE, tokenize.NL)
+        and token.line.strip()
         and token.line.strip() in prev_token.line.strip()
-        and token.line != "\n"
     ):
         return True
 
@@ -460,10 +498,10 @@ def is_string_variable(
     # TODO: The AWAIT token is removed in Python 3.13 and later.  Only Python 3.9
     # seems to generate the AWAIT token, so we can safely remove the check for it when
     # support for Python 3.9 is dropped in April 2026.
-    try:
+    if sys.version_info <= (3, 12):
         _token_types = (tokenize.AWAIT, tokenize.OP)
-    except AttributeError:
-        _token_types = (tokenize.OP,)  # type: ignore
+    else:
+        _token_types = (tokenize.OP,)
 
     if prev_token.type in _token_types and (
         '= """' in token.line or token.line in prev_token.line
@@ -471,3 +509,18 @@ def is_string_variable(
         return True
 
     return False
+
+
+def is_docstring_at_end_of_file(tokens: list[tokenize.TokenInfo], index: int) -> bool:
+    """Determine if the docstring is at the end of the file."""
+    for i in range(index + 1, len(tokens)):
+        tok = tokens[i]
+        if tok.type not in (
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.DEDENT,
+            tokenize.ENDMARKER,
+        ):
+            return False
+
+    return True

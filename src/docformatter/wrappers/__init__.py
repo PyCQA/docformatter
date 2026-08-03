@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This is the docformatter wrappers package."""
 
-
 # docformatter Local Imports
 from .description import *  # noqa F403
 from .fields import *  # noqa F403

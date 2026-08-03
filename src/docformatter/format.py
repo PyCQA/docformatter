@@ -26,13 +26,13 @@
 # SOFTWARE.
 """This module provides docformatter's Formattor class."""
 
-
 # Standard Library Imports
 import argparse
 import collections
 import contextlib
 import difflib
 import io
+import os
 import tokenize
 from typing import TextIO, Union
 
@@ -138,6 +138,32 @@ def _do_skip_newlines(
     return j
 
 
+def _is_multiline_parameter(tokens: list[tokenize.TokenInfo], index: int) -> bool:
+    """Determine if a token is a multiline string parameter.
+
+    A multiline string token spans multiple physical lines in the source code.
+    This is determined by checking if the token's start and end line numbers
+    are different.
+
+    Parameters
+    ----------
+    tokens : list[tokenize.TokenInfo]
+        The list of tokens.
+    index : int
+        The index of the token to check.
+
+    Returns
+    -------
+    bool
+        True if the token is a multiline string parameter, False otherwise.
+    """
+    if index >= len(tokens):
+        return False
+
+    token = tokens[index]
+    return token.type == tokenize.STRING and token.start[0] != token.end[0]
+
+
 def _do_update_token_indices(
     tokens: list[tokenize.TokenInfo],
 ) -> list[tokenize.TokenInfo]:
@@ -166,9 +192,19 @@ def _do_update_token_indices(
         # If the current token line is the same as the preceding token line,
         # the starting row for the current token should be the same as the ending
         # line for the previous token unless both lines are NEWLINES.
-        if tokens[i].line == tokens[i - 1].line and tokens[i - 1].type not in (
-            tokenize.NEWLINE,
-            tokenize.NL,
+        # Also check if tokens are at the same position (handles multiline strings).
+        is_multiline = _is_multiline_parameter(tokens, i - 1)
+        is_same_line = tokens[i].line == tokens[i - 1].line
+        is_same_position = tokens[i].start[0] == tokens[i - 1].end[0]
+
+        if (
+            is_multiline
+            or (is_same_line or is_same_position)
+            and tokens[i - 1].type
+            not in (
+                tokenize.NEWLINE,
+                tokenize.NL,
+            )
         ):
             _start_idx, _end_idx = _get_start_end_indices(
                 tokens[i],
@@ -260,10 +296,21 @@ def _get_class_docstring_newlines(
         The number of newlines to insert after the docstring.
     """
     j = index + 1
+    indention_level = tokens[index].start[1]
 
     # The docstring is followed by a comment.
     if tokens[j].string.startswith("#"):
         return 0
+
+    while j < len(tokens):
+        if tokens[j].type in (tokenize.NL, tokenize.NEWLINE):
+            j += 1
+            continue
+
+        if tokens[j].start[1] < indention_level:
+            return 2
+
+        break
 
     return 1
 
@@ -334,32 +381,22 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
     return 0
 
 
-def _get_module_docstring_newlines(black: bool = False) -> int:
+def _get_module_docstring_newlines() -> int:
     """Return number of newlines after a module docstring.
 
     docformatter_8.2: One blank line after a module docstring.
-    docformatter_8.2.1: Two blank lines after a module docstring when in black mode.
-
-    Parameters
-    ----------
-    black : bool
-        Indicates whether we're using black formatting rules.
 
     Returns
     -------
     newlines : int
         The number of newlines to insert after the docstring.
     """
-    if black:
-        return 2
-
     return 1
 
 
 def _get_newlines_by_type(
     tokens: list[tokenize.TokenInfo],
     index: int,
-    black: bool = False,
 ) -> int:
     """Dispatch to the correct docstring formatter based on context.
 
@@ -371,17 +408,18 @@ def _get_newlines_by_type(
         A list of tokens from the source code.
     index : int
         The index of the docstring token in the list of tokens.
-    black : bool
-        Whether docformatter is running in black mode.
 
     Returns
     -------
     int
         The number of newlines to insert after the docstring.
     """
-    if _classify.is_module_docstring(tokens, index):
+    if _classify.is_docstring_at_end_of_file(tokens, index):
+        # print("End of file")
+        return 0
+    elif _classify.is_module_docstring(tokens, index):
         # print("Module")
-        return _get_module_docstring_newlines(black)
+        return _get_module_docstring_newlines()
     elif _classify.is_class_docstring(tokens, index):
         # print("Class")
         return _get_class_docstring_newlines(tokens, index)
@@ -447,7 +485,12 @@ def _get_start_end_indices(
     _end_row = _start_row
     _end_col = token.end[1]
 
-    if num_rows > 1 and _end_row != prev_token.end[0]:
+    # For multiline STRING tokens, update the end row but keep the original end column.
+    # The num_cols calculation from the line is incorrect for multiline strings because
+    # the line attribute contains more than just the string content.
+    if num_rows > 1 and token.type == tokenize.STRING:
+        _end_row = _start_row + num_rows - 1
+    elif num_rows > 1 and _end_row != prev_token.end[0]:
         _end_row = _start_row + num_rows - 1
         _end_col = num_cols
 
@@ -611,8 +654,12 @@ class Formatter:
                 # noinspection PyTypeChecker
                 print(unicode(exception), file=self.stderror)
 
-        # There were no files to process.
-        if is_empty:
+        # There were no Python files to process.  This is only an error when a
+        # path that was explicitly passed on the command line doesn't exist;
+        # finding no Python files in an existing file or directory is a no-op.
+        if is_empty and any(
+            not os.path.exists(_file) for _file in self.args.files if _file != "-"
+        ):
             outcomes[FormatResult.error] += 1
 
         for code in return_codes:
@@ -698,17 +745,21 @@ class Formatter:
             ):
                 self.new_tokens[-2] = self.new_tokens[-2]._replace(line=_line)
 
-        # If a comment follows the docstring, skip adding a newline token for
-        # the line.
-        if not next_token.string.startswith("#"):
-            _new_tok = tokenize.TokenInfo(
-                type=tokenize.NEWLINE,
-                string="\n",
-                start=token.end,
-                end=(token.end[0], token.end[1] + 1),
-                line=_line,
-            )
-            self.new_tokens.append(_new_tok)
+        # If a comment follows the docstring, the comment and its own NEWLINE
+        # token still have to be emitted, so skip adding a newline token and
+        # any blank lines here; doing so would place them before the comment
+        # and produce tokens whose positions move backwards.
+        if next_token.string.startswith("#"):
+            return
+
+        _new_tok = tokenize.TokenInfo(
+            type=tokenize.NEWLINE,
+            string="\n",
+            start=token.end,
+            end=(token.end[0], token.end[1] + 1),
+            line=_line,
+        )
+        self.new_tokens.append(_new_tok)
 
         # Add the appropriate number of NEWLINE tokens based on the type of
         # docstring.
@@ -966,9 +1017,7 @@ class Formatter:
             ).strip()
             if self.args.close_quotes_on_newline and "\n" in summary_wrapped:
                 summary_wrapped = (
-                    f"{summary_wrapped[:-3]}"
-                    f"\n{indentation}"
-                    f"{summary_wrapped[-3:]}"
+                    f"{summary_wrapped[:-3]}\n{indentation}{summary_wrapped[-3:]}"
                 )
             return summary_wrapped
 
@@ -1055,7 +1104,8 @@ class Formatter:
 
                 _docstring_token = tokens[_docstr_idx]
                 _blank_line_count = _get_newlines_by_type(
-                    tokens, _docstr_idx, black=self.args.black
+                    tokens,
+                    _docstr_idx,
                 )
 
                 if (
@@ -1082,7 +1132,8 @@ class Formatter:
 
                 if (
                     (
-                        self.new_tokens[-2].string == tokens[_idx + 1].string
+                        len(self.new_tokens) > 1
+                        and self.new_tokens[-2].string == tokens[_idx + 1].string
                         and _docstring_token.line == tokens[_idx + 1].line
                     )
                     or tokens[_idx + 1].string == "\n"

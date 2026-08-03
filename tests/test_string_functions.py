@@ -199,6 +199,30 @@ def test_do_split_summary(test_key):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
+    ("instring", "expected"),
+    [
+        (
+            ["Return the docstring so the ``.. deprecated::`` block renders.", ""],
+            ["Return the docstring so the ``.. deprecated::`` block renders.", ""],
+        ),
+        (
+            ["Use ``a.b`` here. This is another.", ""],
+            ["Use ``a.b`` here.", "This is another.", ""],
+        ),
+    ],
+)
+def test_do_split_summary_inline_literal(instring, expected):
+    """A period inside an inline literal doesn't end the summary.
+
+    See issue #353.
+    """
+    result = do_split_summary(instring)
+
+    assert result == expected, f"\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
     "test_key",
     [
         "do_strip_docstring",

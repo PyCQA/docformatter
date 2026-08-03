@@ -1,7 +1,7 @@
 exclude: 'tests/'
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
+      rev: v6.0.0
       hooks:
           - id: check-merge-conflict
           - id: check-toml
@@ -11,28 +11,28 @@ repos:
           - id: no-commit-to-branch
           - id: trailing-whitespace
     - repo: https://github.com/pre-commit/pre-commit
-      rev: v4.2.0
+      rev: v4.5.1
       hooks:
           - id: validate_manifest
     - repo: https://github.com/psf/black
-      rev: '25.1.0'
+      rev: '26.3.1'
       hooks:
         - id: black
           types_or: [python, pyi]
           language_version: python3
     - repo: https://github.com/PyCQA/isort
-      rev: 6.0.1
+      rev: 8.0.1
       hooks:
         - id: isort
           args: [--settings-file, ./pyproject.toml]
     - repo: https://github.com/PyCQA/docformatter
-      rev: v1.7.7
+      rev: ab715b8e12b601ba392e7502898e500dde10b4e8
       hooks:
         - id: docformatter
           additional_dependencies: [tomli]
           args: [--in-place, --config, ./pyproject.toml]
     - repo: https://github.com/charliermarsh/ruff-pre-commit
-      rev: 'v0.12.4'
+      rev: 'v0.15.11'
       hooks:
         - id: ruff
           args: [ --config, ./pyproject.toml ]
@@ -43,13 +43,13 @@ repos:
           additional_dependencies: [toml]
           args: [--config, ./pyproject.toml]
     - repo: https://github.com/pre-commit/mirrors-mypy
-      rev: v1.17.0
+      rev: v1.20.1
       hooks:
         - id: mypy
           additional_dependencies: [types-python-dateutil]
           args: [--config-file, ./pyproject.toml]
     - repo: https://github.com/myint/eradicate
-      rev: '3.0.0'
+      rev: '3.0.1'
       hooks:
         - id: eradicate
           args: []

@@ -26,7 +26,6 @@
 # SOFTWARE.
 """This is the docformatter package."""
 
-
 __all__ = ["__version__"]
 
 # docformatter Local Imports
