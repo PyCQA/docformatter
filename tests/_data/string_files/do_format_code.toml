@@ -1251,3 +1251,12 @@ pass
 [issue_355]
 source="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4 spaces of trailing whitespace\n    \n    return x\n"
 expected="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4 spaces of trailing whitespace\n    \n    return x\n"
+
+# Source that does not end with a newline.  tokenize synthesizes a NEWLINE
+# token for it whose line attribute is the empty string (CPython < 3.12); that
+# token must still be treated as part of the preceding line, otherwise
+# untokenize bridges the row gap with a backslash continuation and the
+# formatted file no longer parses.
+[issue_360_no_trailing_newline]
+source="def foo():\n    \"\"\"\n    Hello foo.\n    \"\"\"\n    x = 1"
+expected="def foo():\n    \"\"\"Hello foo.\"\"\"\n    x = 1"

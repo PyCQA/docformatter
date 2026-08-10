@@ -25,6 +25,7 @@ Additional contributions by (sorted by name)
 - Casey Korver <84342833+korverdev@users.noreply.github.com>
 - Daniel Goldman <danielgoldman4@gmail.com>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
+- Eljees <57435526+Eljees@users.noreply.github.com>
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
@@ -46,6 +47,7 @@ Additional contributions by (sorted by name)
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
 - finswimmer <finswimmer77@gmail.com>
+- fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
 - serhiy-yevtushenko <syevtushenko@gmail.com>

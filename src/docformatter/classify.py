@@ -469,12 +469,33 @@ def is_newline_continuation(
     """
     if (
         token.type in (tokenize.NEWLINE, tokenize.NL)
-        and token.line.strip()
+        and not _is_blank_line(token.line)
         and token.line.strip() in prev_token.line.strip()
     ):
         return True
 
     return False
+
+
+def _is_blank_line(line: str) -> bool:
+    """Determine if a physical line is blank.
+
+    A blank line is a non-empty line that holds nothing but whitespace, e.g.
+    "\\n" or "    \\n".  The empty string is *not* a blank line; tokenize uses
+    it as the line of the NEWLINE token it synthesizes for source that has no
+    trailing newline, as well as for DEDENT and ENDMARKER tokens.
+
+    Parameters
+    ----------
+    line : str
+        The physical line the token was read from; tokenize.TokenInfo.line.
+
+    Returns
+    -------
+    bool
+        True if the line holds only whitespace and is not empty.
+    """
+    return bool(line) and not line.strip()
 
 
 def is_string_variable(

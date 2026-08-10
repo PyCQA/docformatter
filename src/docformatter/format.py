@@ -381,16 +381,50 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
     return 0
 
 
-def _get_module_docstring_newlines() -> int:
+def _get_module_docstring_newlines(
+    tokens: list[tokenize.TokenInfo],
+    index: int,
+) -> int:
     """Return number of newlines after a module docstring.
 
     docformatter_8.2: One blank line after a module docstring.
+    docformatter_8.4: Two blank lines after a module docstring if a top-level
+    function or class definition follows it (PEP 8: top-level definitions are
+    surrounded by two blank lines).
+
+    Parameters
+    ----------
+    tokens : list
+        A list of tokens from the source code.
+    index : int
+        The index of the docstring token in the list of tokens.
 
     Returns
     -------
     newlines : int
         The number of newlines to insert after the docstring.
     """
+    j = index + 1
+
+    while j < len(tokens):
+        if tokens[j].type in (
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+        ):
+            j += 1
+            continue
+
+        # A decorated definition is still a definition; skip the decorator line.
+        if tokens[j].type == tokenize.OP and tokens[j].string == "@":
+            return 2
+
+        if _classify.is_definition_line(tokens[j]):
+            return 2
+
+        break
+
     return 1
 
 
@@ -419,7 +453,7 @@ def _get_newlines_by_type(
         return 0
     elif _classify.is_module_docstring(tokens, index):
         # print("Module")
-        return _get_module_docstring_newlines()
+        return _get_module_docstring_newlines(tokens, index)
     elif _classify.is_class_docstring(tokens, index):
         # print("Class")
         return _get_class_docstring_newlines(tokens, index)
