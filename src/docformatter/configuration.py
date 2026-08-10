@@ -28,19 +28,22 @@
 
 # Standard Library Imports
 import argparse
-import contextlib
 import os
 import sys
 from configparser import ConfigParser
 from typing import Dict, Sequence, Union
 
-with contextlib.suppress(ImportError):
+try:
     if sys.version_info >= (3, 11):
         # Standard Library Imports
         import tomllib
     else:
         # Third Party Imports
         import tomli as tomllib
+except ImportError:
+    # Neither the stdlib tomllib (Python < 3.11) nor the tomli backport is
+    # available; TOML configuration files are skipped in that case. See #368.
+    tomllib = None
 
 # docformatter Package Imports
 from docformatter import __pkginfo__
@@ -340,6 +343,11 @@ class Configurater:
 
     def _do_read_toml_configuration(self) -> None:
         """Load configuration information from a *.toml file."""
+        if tomllib is None:
+            # tomli/tomllib is not installed (Python < 3.11 without the tomli
+            # backport); skip reading TOML configuration rather than crashing
+            # with a NameError. See #368.
+            return
         with open(self.config_file, "rb") as f:
             config = tomllib.load(f)
 

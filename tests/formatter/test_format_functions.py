@@ -71,12 +71,19 @@ def _get_docstring_token_and_index(tokens):
         "module_docstring_followed_by_comment_then_code",
         "module_docstring_followed_by_comment_then_string",
         "module_docstring_in_black",
+        "module_docstring_followed_by_def",
+        "module_docstring_followed_by_class",
+        "module_docstring_followed_by_decorated_def",
     ],
 )
 def test_module_docstring_newlines(test_key):
+    source = TEST_STRINGS[test_key]["source"]
     expected = TEST_STRINGS[test_key]["expected"]
 
-    result = _format._get_module_docstring_newlines()
+    tokens = _get_tokens(source)
+    index = _get_docstring_token_and_index(tokens)
+
+    result = _format._get_module_docstring_newlines(tokens, index)
     assert (
         result == expected
     ), f"\nFailed {test_key}:\nExpected {expected}\nGot {result}"
