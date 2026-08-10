@@ -46,6 +46,7 @@ Additional contributions by (sorted by name)
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
 - finswimmer <finswimmer77@gmail.com>
+- fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
 - serhiy-yevtushenko <syevtushenko@gmail.com>
