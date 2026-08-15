@@ -699,3 +699,51 @@ non-cap = ["qBittorrent", "iPad", "iOS", "eBay"]
             "diff": "true",
             "non-cap": '["qBittorrent", "iPad", "iOS", "eBay"]',
         }
+class TestMissingTomlSupport:
+    """Class for testing behaviour when no TOML parser is installed.
+
+    On Python < 3.11 the tomli backport is an optional extra, so a plain
+    ``pip install docformatter`` leaves docformatter unable to read
+    pyproject.toml.  Issue #268 is that this happens without a word.
+    """
+
+    @pytest.mark.unit
+    def test_says_so_when_toml_support_is_missing(self, tmp_path, capsys):
+        """Warn on stderr instead of silently dropping the settings."""
+        # Third Party Imports
+        import docformatter.configuration as configuration
+
+        config_file = tmp_path / "pyproject.toml"
+        config_file.write_text(
+            '[tool.docformatter]\nwrap-summaries = "120"\n', encoding="utf-8"
+        )
+
+        saved = configuration.tomllib
+        configuration.tomllib = None
+        try:
+            uut = Configurater(
+                ["/path/to/docformatter", "--config", str(config_file), ""]
+            )
+            uut.do_parse_arguments()
+        finally:
+            configuration.tomllib = saved
+
+        stderr = capsys.readouterr().err
+        assert str(config_file) in stderr
+        assert "tomli" in stderr
+        # The settings are still dropped; that part is by design (#368).
+        assert uut.args.wrap_summaries == 79
+
+    @pytest.mark.unit
+    def test_stays_quiet_when_toml_support_is_present(self, tmp_path, capsys):
+        """Say nothing on the happy path."""
+        config_file = tmp_path / "pyproject.toml"
+        config_file.write_text(
+            '[tool.docformatter]\nwrap-summaries = "120"\n', encoding="utf-8"
+        )
+
+        uut = Configurater(["/path/to/docformatter", "--config", str(config_file), ""])
+        uut.do_parse_arguments()
+
+        assert capsys.readouterr().err == ""
+        assert uut.args.wrap_summaries == 120

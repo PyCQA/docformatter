@@ -346,7 +346,14 @@ class Configurater:
         if tomllib is None:
             # tomli/tomllib is not installed (Python < 3.11 without the tomli
             # backport); skip reading TOML configuration rather than crashing
-            # with a NameError. See #368.
+            # with a NameError, but say so instead of silently ignoring the
+            # user's settings. See #268 and #368.
+            print(
+                f"docformatter: {self.config_file} was not read because TOML "
+                "support is missing; on Python < 3.11 this needs the tomli "
+                'package: pip install "docformatter[tomli]"',
+                file=sys.stderr,
+            )
             return
         with open(self.config_file, "rb") as f:
             config = tomllib.load(f)
