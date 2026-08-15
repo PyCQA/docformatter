@@ -178,7 +178,11 @@ class Configurater:
             type=str,
             dest="rest_section_adorns",
             default=self.flargs.get(
-                "rest_section_adorns", r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}"
+                "rest-section-adorns",
+                self.flargs.get(
+                    "rest_section_adorns",
+                    r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}",
+                ),
             ),
             help="regex for identifying reST section header adornments",
         )
