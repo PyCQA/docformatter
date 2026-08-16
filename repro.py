@@ -1,7 +1,0 @@
-﻿X = (
-    """#!/bin/bash
-# Ends here.
-# A second line.
-_real="""
-    + "y"
-)
