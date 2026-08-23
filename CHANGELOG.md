@@ -130,6 +130,3 @@ Bug Fixes
 ## [v1.4](https://github.com/PyCQA/docformatter/tree/v1.4) (2020-12-27)
 
 [Full Changelog](https://github.com/PyCQA/docformatter/compare/v1.3.1...v1.4)
-
-
-
