@@ -260,7 +260,7 @@ def _get_attribute_docstring_newlines(
     _num_tokens = len(tokens)
     _offset = 2
 
-    for i in range(index + 2, _num_tokens - index - 1):
+    for i in range(index + 2, _num_tokens):
         if tokens[i].line == "\n":
             _offset += 1
         else:

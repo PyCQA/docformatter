@@ -179,3 +179,24 @@ def test_do_format_code_inline_comment_after_docstring(test_args, args):
     source = '"""This is a comment."""  # noqa: D415\n'
 
     assert uut._do_format_code(source) == source
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS])
+@pytest.mark.parametrize("prefix_lines", [0, 12])
+@pytest.mark.parametrize("blank_lines", [0, 1, 2, 3])
+@pytest.mark.parametrize("definition", ["def f():\n    pass\n", "class C:\n    pass\n"])
+def test_attribute_docstring_before_definition(
+    test_args, args, prefix_lines, blank_lines, definition
+):
+    """Keep two blank lines before definitions regardless of docstring position."""
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    prefix = "".join(f"_filler_{i} = {i}\n" for i in range(prefix_lines))
+    attribute = prefix + 'x = 1\n"""Docstring."""\n'
+    source = attribute + "\n" * blank_lines + definition
+    expected = attribute + "\n\n" + definition
+
+    result = uut._do_format_code(source)
+
+    assert result == expected
+    assert uut._do_format_code(result) == expected
