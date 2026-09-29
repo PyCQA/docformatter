@@ -33,6 +33,7 @@ Additional contributions by (sorted by name)
 - Josef Kemetmüller <josef.kemetmueller@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Kian-Meng Ang <kianmeng.ang@gmail.com>
+- Kothapalli Johnvaraprasad <160283000+Johnkothapalli@users.noreply.github.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
 - Manuel Kaufmann <humitos@gmail.com>
@@ -46,6 +47,7 @@ Additional contributions by (sorted by name)
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
+- Yuriy Tumanov <57435526+Eljees@users.noreply.github.com>
 - finswimmer <finswimmer77@gmail.com>
 - fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>

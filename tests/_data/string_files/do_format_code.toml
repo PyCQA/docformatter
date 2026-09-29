@@ -1245,6 +1245,18 @@ expected='''"""A."""
 pass
 '''
 
+[issue_351]
+source='''async def example() -> None:
+    """Example."""
+    async with lock:
+        pass
+'''
+expected='''async def example() -> None:
+    """Example."""
+    async with lock:
+        pass
+'''
+
 # A blank line with trailing whitespace must not crash the tokenizer round-trip.
 # The "\n" escapes are used so the four trailing spaces on the blank line are
 # explicit and cannot be stripped by editors or formatters.
