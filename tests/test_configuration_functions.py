@@ -747,3 +747,85 @@ class TestMissingTomlSupport:
 
         assert capsys.readouterr().err == ""
         assert uut.args.wrap_summaries == 120
+DEFAULT_ADORNS = r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}"
+
+
+def _write_pyproject(directory, body):
+    """Write a pyproject.toml holding a [tool.docformatter] section."""
+    config_file = directory / "pyproject.toml"
+    config_file.write_text("[tool.docformatter]\n" + body, encoding="utf-8")
+    return str(config_file)
+
+
+class TestRestSectionAdornsConfigKey:
+    """Class for testing the rest-section-adorns configuration file key.
+
+    The command line option is --rest-section-adorns and every other option
+    is read from the configuration file under its hyphenated command line
+    name.  docs/source/configuration.rst tells the user to set the
+    ``rest-section-adorns`` option in the configuration file, so that
+    spelling has to be the one that is honored.
+    """
+
+    @pytest.mark.unit
+    def test_hyphenated_key_is_honored(self, tmp_path):
+        """Read the documented, hyphenated key from pyproject.toml."""
+        config_file = _write_pyproject(tmp_path, 'rest-section-adorns = "[!]{4,}"\n')
+
+        uut = Configurater(["/path/to/docformatter", "--config", config_file, ""])
+        uut.do_parse_arguments()
+
+        assert uut.flargs["rest-section-adorns"] == "[!]{4,}"
+        assert uut.args.rest_section_adorns == "[!]{4,}"
+
+    @pytest.mark.unit
+    def test_underscored_key_is_still_honored(self, tmp_path):
+        """Keep reading the undocumented, underscored key."""
+        config_file = _write_pyproject(tmp_path, 'rest_section_adorns = "[@]{4,}"\n')
+
+        uut = Configurater(["/path/to/docformatter", "--config", config_file, ""])
+        uut.do_parse_arguments()
+
+        assert uut.args.rest_section_adorns == "[@]{4,}"
+
+    @pytest.mark.unit
+    def test_hyphenated_key_wins_over_underscored_key(self, tmp_path):
+        """Prefer the documented spelling when a file carries both."""
+        config_file = _write_pyproject(
+            tmp_path,
+            'rest-section-adorns = "[!]{4,}"\nrest_section_adorns = "[@]{4,}"\n',
+        )
+
+        uut = Configurater(["/path/to/docformatter", "--config", config_file, ""])
+        uut.do_parse_arguments()
+
+        assert uut.args.rest_section_adorns == "[!]{4,}"
+
+    @pytest.mark.unit
+    def test_default_is_used_when_key_is_absent(self, tmp_path):
+        """Fall back to the default adornment regex."""
+        config_file = _write_pyproject(tmp_path, 'wrap-summaries = "79"\n')
+
+        uut = Configurater(["/path/to/docformatter", "--config", config_file, ""])
+        uut.do_parse_arguments()
+
+        assert uut.args.rest_section_adorns == DEFAULT_ADORNS
+
+    @pytest.mark.unit
+    def test_command_line_overrides_the_configuration_file(self, tmp_path):
+        """Let --rest-section-adorns beat the configuration file."""
+        config_file = _write_pyproject(tmp_path, 'rest-section-adorns = "[!]{4,}"\n')
+
+        uut = Configurater(
+            [
+                "/path/to/docformatter",
+                "--config",
+                config_file,
+                "--rest-section-adorns",
+                "[~]{4,}",
+                "",
+            ]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.args.rest_section_adorns == "[~]{4,}"
