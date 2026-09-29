@@ -33,6 +33,7 @@ Additional contributions by (sorted by name)
 - Josef Kemetmüller <josef.kemetmueller@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Kian-Meng Ang <kianmeng.ang@gmail.com>
+- Kothapalli Johnvaraprasad <160283000+Johnkothapalli@users.noreply.github.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
 - Manuel Kaufmann <humitos@gmail.com>
