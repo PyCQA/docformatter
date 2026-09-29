@@ -144,6 +144,7 @@ def test_is_not_attribute_docstring_inside_brackets(source):
         ("is_nested_definition_line_class", is_nested_definition_line),
         ("is_nested_definition_line_function", is_nested_definition_line),
         ("is_nested_definition_line_async_function", is_nested_definition_line),
+        ("is_not_nested_definition_line_async_with", is_nested_definition_line),
         ("is_not_nested_definition_line_function", is_nested_definition_line),
         ("is_newline_continuation", is_newline_continuation),
         ("is_string_variable", is_string_variable),
