@@ -185,6 +185,7 @@ def _do_update_token_indices(
     _end_row = tokens[0].end[0]
     _end_col = tokens[0].end[1]
     _num_tokens = len(tokens)
+    _prev_end_row = tokens[0].end[0]
 
     for i in range(1, _num_tokens):
         _num_rows, _num_cols = _get_num_rows_columns(tokens[i])
@@ -193,9 +194,12 @@ def _do_update_token_indices(
         # the starting row for the current token should be the same as the ending
         # line for the previous token unless both lines are NEWLINES.
         # Also check if tokens are at the same position (handles multiline strings).
+        # Compare against the previous token's row before it was shifted, since the
+        # current token has not been shifted yet.
         is_multiline = _is_multiline_parameter(tokens, i - 1)
         is_same_line = tokens[i].line == tokens[i - 1].line
-        is_same_position = tokens[i].start[0] == tokens[i - 1].end[0]
+        is_same_position = tokens[i].start[0] == _prev_end_row
+        _prev_end_row = tokens[i].end[0]
         # A backslash continuation joins two physical lines without an NL
         # token between them, so the current token always starts on the row
         # after the previous one, even though the rows may look the same once
