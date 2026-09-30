@@ -266,7 +266,7 @@ def _get_attribute_docstring_newlines(
     _num_tokens = len(tokens)
     _offset = 2
 
-    for i in range(index + 2, _num_tokens - index - 1):
+    for i in range(index + 2, _num_tokens):
         if tokens[i].line == "\n":
             _offset += 1
         else:
@@ -593,8 +593,7 @@ class _Untokenizer(tokenize.Untokenizer):
         return super().untokenize(_remember_line(iterable))
 
     def add_backslash_continuation(self, start):
-        """Add backslash continuation characters if the row has increased
-        without encountering a newline token.
+        """Add backslash continuations when rows increase without a newline token.
 
         This also inserts the correct amount of whitespace before the backslash.
         """
@@ -604,15 +603,18 @@ class _Untokenizer(tokenize.Untokenizer):
 
         newline = "\r\n" if self.__prev_line.endswith("\r\n") else "\n"
         line = self.__prev_line.rstrip("\\\r\n")
-        ws = line[len(line.rstrip()):]
+        ws = line[len(line.rstrip()) :]
         self.tokens.append(ws + f"\\{newline}" * row_offset)
         self.prev_col = 0
 
     def add_whitespace(self, start, line=""):
         row, col = start
         if row < self.prev_row or row == self.prev_row and col < self.prev_col:
-            raise ValueError("start ({},{}) precedes previous end ({},{})"
-                             .format(row, col, self.prev_row, self.prev_col))
+            raise ValueError(
+                "start ({},{}) precedes previous end ({},{})".format(
+                    row, col, self.prev_row, self.prev_col
+                )
+            )
         self.add_backslash_continuation(start)
         col_offset = col - self.prev_col
         if col_offset:
@@ -798,9 +800,7 @@ class Formatter:
         blank_line_count : int
             The number of blank lines to add after the docstring.
         """
-        _indent = (
-            token.line[: token.start[1]] if docstring_type != "module" else ""
-        )
+        _indent = token.line[: token.start[1]] if docstring_type != "module" else ""
         _formatted = self._do_format_docstring(_indent, token.string)
         _line = _indent + _formatted
 
@@ -864,9 +864,7 @@ class Formatter:
         docstring_type : str
             The type of the docstring (e.g., module, class, function, attribute).
         """
-        _indent = (
-            token.line[: token.start[1]] if docstring_type != "module" else ""
-        )
+        _indent = token.line[: token.start[1]] if docstring_type != "module" else ""
         _line = _indent + token.string
         _new_token = tokenize.TokenInfo(
             type=tokenize.STRING,
