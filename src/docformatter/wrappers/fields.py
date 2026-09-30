@@ -29,11 +29,12 @@
 # Standard Library Imports
 import re
 import textwrap
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # docformatter Package Imports
+import docformatter.patterns as _patterns
 import docformatter.strings as _strings
-from docformatter.constants import DEFAULT_INDENT
+from docformatter.constants import DEFAULT_INDENT, GOOGLE_WRAPPABLE_SECTIONS
 
 
 def do_wrap_field_lists(  # noqa: PLR0913
@@ -171,3 +172,133 @@ def _do_wrap_field(field_name, field_body, indentation, wrap_length):
         _wrapped_field[_idx] = f"{_indent}{re.sub(' +', ' ', _field.strip())}"
 
     return _wrapped_field
+
+
+def do_wrap_google_description(
+    text: str,
+    indentation: str,
+    wrap_length: int,
+) -> List[str]:
+    """Wrap prose and Google-style Args/Returns entries independently.
+
+    Parameters
+    ----------
+    text : str
+        The description text, already reindented to ``indentation``.
+    indentation : str
+        The indentation to place in front of each description line.
+    wrap_length : int
+        The column at which to wrap long lines.
+
+    Returns
+    -------
+    list[str]
+        The wrapped description lines, each including ``indentation``.
+    """
+    _headers = _patterns.do_find_google_section_headers(text)
+    if not _headers:
+        return _strings.description_to_list(text, indentation, wrap_length)
+
+    _lines: List[str] = []
+    _first_start = _headers[0][0]
+    _prose = text[:_first_start]
+    if _prose.strip():
+        _lines = _strings.description_to_list(
+            _prose,
+            indentation,
+            wrap_length,
+        )
+        while _lines and not _lines[-1]:
+            _lines.pop()
+
+    for _idx, (_start, _body_start, _name) in enumerate(_headers):
+        _section_end = _headers[_idx + 1][0] if _idx + 1 < len(_headers) else len(text)
+        _body = text[_body_start:_section_end]
+
+        if _lines:
+            _lines.append("")
+        _header_line = text[_start:_body_start].splitlines()[0].rstrip()
+        _lines.append(_header_line)
+
+        if _name.lower() in GOOGLE_WRAPPABLE_SECTIONS:
+            _lines.extend(
+                _do_wrap_google_section_body(
+                    _body,
+                    indentation,
+                    wrap_length,
+                )
+            )
+        else:
+            _lines.extend(_do_preserve_section_body(_body))
+
+    while _lines and not _lines[-1]:
+        _lines.pop()
+
+    return _lines
+
+
+def _do_wrap_google_section_body(
+    body: str,
+    indentation: str,
+    wrap_length: int,
+) -> List[str]:
+    """Wrap each parsed Google section entry at wrap_length."""
+    _lines: List[str] = []
+    for _name, _type_hint, _description in _patterns.do_parse_google_entries(body):
+        _lines.extend(
+            _do_wrap_google_entry(
+                _name,
+                _type_hint,
+                _description,
+                indentation,
+                wrap_length,
+            )
+        )
+    return _lines
+
+
+def _do_wrap_google_entry(  # noqa: PLR0913
+    name: Optional[str],
+    type_hint: Optional[str],
+    description: str,
+    indentation: str,
+    wrap_length: int,
+) -> List[str]:
+    """Wrap one Google Args/Returns entry with hanging continuation indent."""
+    _entry_indent = indentation + DEFAULT_INDENT * " "
+
+    if name is None:
+        if not description:
+            return []
+        return textwrap.wrap(
+            description,
+            width=wrap_length,
+            initial_indent=_entry_indent,
+            subsequent_indent=_entry_indent,
+        )
+
+    _type_part = f" ({type_hint})" if type_hint else ""
+    _prefix = f"{name}{_type_part}: "
+    _text = f"{_prefix}{description}".rstrip()
+    _continuation = indentation + (2 * DEFAULT_INDENT) * " "
+
+    _wrapped = textwrap.wrap(
+        _text,
+        width=wrap_length,
+        initial_indent=_entry_indent,
+        subsequent_indent=_continuation,
+    )
+    return _wrapped or [f"{_entry_indent}{_text}"]
+
+
+def _do_preserve_section_body(body: str) -> List[str]:
+    """Return a non-wrappable Google section body with original lines."""
+    _lines: List[str] = []
+    for _line in body.splitlines():
+        if _line.strip():
+            _lines.append(_line.rstrip())
+        elif _lines and _lines[-1]:
+            _lines.append("")
+    while _lines and not _lines[-1]:
+        _lines.pop()
+    return _lines

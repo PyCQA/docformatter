@@ -170,6 +170,27 @@ expected='''def foo():
 	if True:
 	    x = 1'''
 
+[wrapped_indentation]
+source='''def foo():
+	"""This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
+	if True:
+		x = 1'''
+expected='''def foo():
+	"""This is a very, very, very long docstring that should really be reformatted
+	nicely by docformatter."""
+	if True:
+		x = 1'''
+
+[preserve_whitespace]
+source='''def foo(
+	bar
+):
+	pass'''
+expected='''def foo(
+	bar
+):
+	pass'''
+
 [escaped_newlines]
 source='''def foo():
     """
@@ -1245,6 +1266,18 @@ expected='''"""A."""
 pass
 '''
 
+[issue_351]
+source='''async def example() -> None:
+    """Example."""
+    async with lock:
+        pass
+'''
+expected='''async def example() -> None:
+    """Example."""
+    async with lock:
+        pass
+'''
+
 # A blank line with trailing whitespace must not crash the tokenizer round-trip.
 # The "\n" escapes are used so the four trailing spaces on the blank line are
 # explicit and cannot be stripped by editors or formatters.
@@ -1260,3 +1293,30 @@ expected="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4
 [issue_360_no_trailing_newline]
 source="def foo():\n    \"\"\"\n    Hello foo.\n    \"\"\"\n    x = 1"
 expected="def foo():\n    \"\"\"Hello foo.\"\"\"\n    x = 1"
+
+# A backslash continuation after a docstring that gets a blank line inserted
+# must not crash the tokenizer round-trip: the continuation line has no NL
+# token in front of it, so its row must be derived from the previous token.
+[issue_377_backslash_continuation]
+source="class A:\n    \"\"\"Doc.\"\"\"\n    x = 1 \\\n        + 2\n"
+expected="class A:\n    \"\"\"Doc.\"\"\"\n\n    x = 1 \\\n        + 2\n"
+
+[issue_377_module_docstring]
+source="\"\"\"Doc.\"\"\"\nx = 1 \\\n    + 2\n"
+expected="\"\"\"Doc.\"\"\"\n\nx = 1 \\\n    + 2\n"
+[issue_367]
+source='''def build(x):
+    return (
+        f"""a
+{x}""",
+    )
+'''
+expected='''def build(x):
+    return (
+        f"""a
+{x}""",
+    )
+'''
+[issue_366_triple_quote_in_parens_not_docstring]
+source="X = (\n    \"\"\"#!/bin/bash\n# Ends here.\n# A second line.\n_real=\"\"\"\n    + \"y\"\n)\n"
+expected="X = (\n    \"\"\"#!/bin/bash\n# Ends here.\n# A second line.\n_real=\"\"\"\n    + \"y\"\n)\n"
