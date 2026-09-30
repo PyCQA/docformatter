@@ -122,6 +122,14 @@ end = "(3,25)"
 line = '    async def foo():\n'
 expected = true
 
+[is_not_nested_definition_line_async_with]
+type = 1
+string = '    async with lock:\n'
+start = "(3,10)"
+end = "(3,30)"
+line = '    async with lock:\n'
+expected = false
+
 [is_not_nested_definition_line_function]
 type = 1
 string = '    definitely\n'
