@@ -8,6 +8,7 @@ Steven Myint <git@stevenmyint.com>
 
 Additional contributions by (sorted by name)
 --------------------------------------------
+- ANSHUL SINGH <72524975+ekanshul@users.noreply.github.com>
 - Adam Dangoor <adamdangoor@gmail.com>
 - Alec Merdler <alecmerdler@gmail.com>
 - Alexander Biggs <akbiggs@users.noreply.github.com>
@@ -36,6 +37,7 @@ Additional contributions by (sorted by name)
 - Kothapalli Johnvaraprasad <160283000+Johnkothapalli@users.noreply.github.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
+- M001N <mail@dataflowsolutions.sk>
 - Manuel Kaufmann <humitos@gmail.com>
 - Oliver Sieweke <oliver.sieweke@protonmail.com>
 - Paul Angerer <48882462+dabauxi@users.noreply.github.com>
@@ -47,8 +49,11 @@ Additional contributions by (sorted by name)
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
+- Yuriy Tumanov <57435526+Eljees@users.noreply.github.com>
+- akul1809 <158052839+akul-ameya@users.noreply.github.com>
 - finswimmer <finswimmer77@gmail.com>
 - fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
+- kelly <kelly@eclipse.id.au>
 - serhiy-yevtushenko <syevtushenko@gmail.com>

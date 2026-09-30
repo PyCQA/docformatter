@@ -29,12 +29,14 @@
 # Standard Library Imports
 import re
 from re import Match
-from typing import Union
+from typing import List, Optional, Tuple, Union
 
 # docformatter Package Imports
 from docformatter.constants import (
     EPYTEXT_REGEX,
+    GOOGLE_ENTRY_REGEX,
     GOOGLE_REGEX,
+    GOOGLE_SECTION_REGEX,
     NUMPY_REGEX,
     SPHINX_REGEX,
 )
@@ -110,6 +112,96 @@ def do_find_field_lists(
                 _wrap_parameters = False
 
     return _field_idx, _wrap_parameters
+
+
+def do_find_google_section_headers(
+    text: str,
+) -> List[Tuple[int, int, str]]:
+    """Return Google-style section headers found in the description.
+
+    Parameters
+    ----------
+    text : str
+        The docstring description to search.
+
+    Returns
+    -------
+    list[tuple[int, int, str]]
+        Each tuple is ``(start, end, name)`` for one section header.
+        ``end`` is the first character of the section body.
+    """
+    _headers: List[Tuple[int, int, str]] = []
+
+    for _match in re.finditer(
+        GOOGLE_SECTION_REGEX,
+        text,
+        flags=re.IGNORECASE | re.MULTILINE,
+    ):
+        _body_start = _match.end()
+        if _body_start < len(text) and text[_body_start] == "\n":
+            _body_start += 1
+        _headers.append((_match.start(), _body_start, _match.group(1)))
+
+    return _headers
+
+
+def do_parse_google_entries(
+    body: str,
+) -> List[Tuple[Optional[str], Optional[str], str]]:
+    """Parse named or unnamed entries from a Google section body.
+
+    Parameters
+    ----------
+    body : str
+        Text after the section header, up to the next header or the end.
+
+    Returns
+    -------
+    list[tuple[str | None, str | None, str]]
+        Each tuple is ``(name, type_hint, description)``.
+        ``name`` and ``type_hint`` are ``None`` for an unnamed Returns paragraph.
+        Continuation lines are joined into a single description.
+    """
+    _raw_lines = body.splitlines()
+    _nonempty = [line for line in _raw_lines if line.strip()]
+    if not _nonempty:
+        return []
+
+    _entry_pattern = re.compile(GOOGLE_ENTRY_REGEX)
+    _named_mode = _entry_pattern.match(_nonempty[0]) is not None
+
+    if not _named_mode:
+        _description = " ".join(line.strip() for line in _nonempty)
+        return [(None, None, _description)] if _description else []
+
+    _entries: List[Tuple[Optional[str], Optional[str], str]] = []
+    _name: Optional[str] = None
+    _type_hint: Optional[str] = None
+    _parts: List[str] = []
+
+    def _flush() -> None:
+        if _name is None and not _parts:
+            return
+        _description = " ".join(part for part in _parts if part).strip()
+        _entries.append((_name, _type_hint, _description))
+
+    for _line in _raw_lines:
+        if not _line.strip():
+            continue
+
+        _match = _entry_pattern.match(_line)
+        if _match:
+            _flush()
+            _name = _match.group(2)
+            _type_hint = _match.group(3)
+            _rest = _match.group(4).strip()
+            _parts = [_rest] if _rest else []
+            continue
+
+        _parts.append(_line.strip())
+
+    _flush()
+    return _entries
 
 
 def is_field_list(

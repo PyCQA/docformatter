@@ -60,6 +60,59 @@ EPYTEXT_REGEX = r"@[a-zA-Z0-9_\-\s]+:"
 GOOGLE_REGEX = r"^ *[a-zA-Z0-9_\- ]*:$"
 """Regular expression to use for finding Google-style field lists."""
 
+GOOGLE_SECTION_NAMES = (
+    "Args",
+    "Arguments",
+    "Attributes",
+    "Example",
+    "Examples",
+    "Note",
+    "Notes",
+    "Other Parameters",
+    "Raises",
+    "Raise",
+    "Receives",
+    "Receive",
+    "References",
+    "Returns",
+    "Return",
+    "See Also",
+    "Warns",
+    "Warning",
+    "Warnings",
+    "Yields",
+    "Yield",
+)
+"""Section headers recognized as Google-style sections."""
+
+GOOGLE_SECTION_REGEX = r"^[ \t]*(" + "|".join(GOOGLE_SECTION_NAMES) + r")[ \t]*:[ \t]*$"
+"""Regular expression to use for finding Google-style section headers."""
+
+GOOGLE_WRAPPABLE_SECTIONS = frozenset(
+    {
+        "args",
+        "arguments",
+        "return",
+        "returns",
+    }
+)
+"""Google section names whose entries should be wrapped independently."""
+
+GOOGLE_ENTRY_REGEX = (
+    r"^([ \t]*)(\*{0,2}[A-Za-z_][\w]*)[ \t]*(?:\(([^)]*)\))?[ \t]*:" r"[ \t]*(.*)$"
+)
+"""Regular expression to use for finding Google-style section entries.
+
+Notes
+-----
+Matches lines such as::
+
+    host: Hostname used by the database connection.
+    stream (BinaryIO): Binary stream (usually a file object).
+    *args: Variable length argument list.
+    **kwargs: Arbitrary keyword arguments.
+"""
+
 LITERAL_REGEX = r"[\S ]*::"
 """Regular expression to use for finding literal blocks."""
 
