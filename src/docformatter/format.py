@@ -196,8 +196,14 @@ def _do_update_token_indices(
         is_multiline = _is_multiline_parameter(tokens, i - 1)
         is_same_line = tokens[i].line == tokens[i - 1].line
         is_same_position = tokens[i].start[0] == tokens[i - 1].end[0]
+        # A backslash continuation joins two physical lines without an NL
+        # token between them, so the current token always starts on the row
+        # after the previous one, even though the rows may look the same once
+        # the previous token has been shifted.
+        prev_line = tokens[i - 1].line.rstrip("\r\n")
+        is_backslash_continuation = not is_same_line and prev_line.endswith("\\")
 
-        if (
+        if not is_backslash_continuation and (
             is_multiline
             or (is_same_line or is_same_position)
             and tokens[i - 1].type
@@ -575,6 +581,45 @@ def _get_unmatched_start_end_indices(
     return (_start_row, _start_col), (_end_row, _end_col)
 
 
+class _Untokenizer(tokenize.Untokenizer):
+    __line = ""
+
+    def untokenize(self, iterable):
+        def _remember_line(tokens):
+            for tok in tokens:
+                self.__prev_line, self.__line = self.__line, tok[4]
+                yield tok
+
+        return super().untokenize(_remember_line(iterable))
+
+    def add_backslash_continuation(self, start):
+        """Add backslash continuation characters if the row has increased
+        without encountering a newline token.
+
+        This also inserts the correct amount of whitespace before the backslash.
+        """
+        row_offset = start[0] - self.prev_row
+        if row_offset == 0:
+            return
+
+        newline = "\r\n" if self.__prev_line.endswith("\r\n") else "\n"
+        line = self.__prev_line.rstrip("\\\r\n")
+        ws = line[len(line.rstrip()):]
+        self.tokens.append(ws + f"\\{newline}" * row_offset)
+        self.prev_col = 0
+
+    def add_whitespace(self, start, line=""):
+        row, col = start
+        if row < self.prev_row or row == self.prev_row and col < self.prev_col:
+            raise ValueError("start ({},{}) precedes previous end ({},{})"
+                             .format(row, col, self.prev_row, self.prev_col))
+        self.add_backslash_continuation(start)
+        col_offset = col - self.prev_col
+        if col_offset:
+            line = line or self.__line
+            self.tokens.append(line[self.prev_col : col])
+
+
 class FormatResult:
     """Possible exit codes."""
 
@@ -753,7 +798,9 @@ class Formatter:
         blank_line_count : int
             The number of blank lines to add after the docstring.
         """
-        _indent = " " * token.start[1] if docstring_type != "module" else ""
+        _indent = (
+            token.line[: token.start[1]] if docstring_type != "module" else ""
+        )
         _formatted = self._do_format_docstring(_indent, token.string)
         _line = _indent + _formatted
 
@@ -817,7 +864,9 @@ class Formatter:
         docstring_type : str
             The type of the docstring (e.g., module, class, function, attribute).
         """
-        _indent = " " * token.start[1] if docstring_type != "module" else ""
+        _indent = (
+            token.line[: token.start[1]] if docstring_type != "module" else ""
+        )
         _line = _indent + token.string
         _new_token = tokenize.TokenInfo(
             type=tokenize.STRING,
@@ -916,7 +965,7 @@ class Formatter:
 
             # Perform docstring rewriting
             self._do_rewrite_docstring_blocks(tokens)
-            _code = tokenize.untokenize(self.new_tokens)
+            _code = _Untokenizer().untokenize(self.new_tokens)
 
             return _strings.do_normalize_line_endings(
                 _code.splitlines(True), _original_newline
