@@ -144,6 +144,7 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("issue_351", NO_ARGS),
         ("issue_355", NO_ARGS),
         ("issue_360_no_trailing_newline", NO_ARGS),
+        ("issue_367", NO_ARGS),
         ("issue_366_triple_quote_in_parens_not_docstring", NO_ARGS),
     ],
 )

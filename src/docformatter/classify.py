@@ -343,19 +343,23 @@ def is_f_string(token: tokenize.TokenInfo, prev_token: tokenize.TokenInfo) -> bo
     bool
         True if the token is an f-string, False otherwise.
     """
+    # On Python 3.12+, PEP 701 tokenizes an f-string as a FSTRING_START /
+    # FSTRING_MIDDLE / FSTRING_END sequence, so adjacent tokens must be
+    # stitched back together onto the same row.
     if PY312:
         if tokenize.FSTRING_MIDDLE in [token.type, prev_token.type]:
             return True
-    elif any(
-        [
-            token.string.startswith('f"""'),
-            prev_token.string.startswith('f"""'),
-            token.string.startswith("f'''"),
-            prev_token.string.startswith("f'''"),
-        ]
-    ):
-        return True
 
+        return False
+
+    # Before Python 3.12, an f-string is always tokenized as a single STRING
+    # token, so there is nothing to stitch together and this function should
+    # never fire.  Naively checking the string prefix here (regardless of
+    # bracket/assignment context) used to misclassify *any* f\"\"\"/f''' token
+    # -- e.g. one nested inside a parenthesized expression or tuple -- as
+    # needing row-continuation treatment, corrupting the row bookkeeping in
+    # ``_get_unmatched_start_end_indices`` and causing
+    # ``tokenize.untokenize`` to raise ``ValueError`` (see issue #367).
     return False
 
 

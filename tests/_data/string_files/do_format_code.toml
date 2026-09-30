@@ -1273,6 +1273,19 @@ expected="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4
 source="def foo():\n    \"\"\"\n    Hello foo.\n    \"\"\"\n    x = 1"
 expected="def foo():\n    \"\"\"Hello foo.\"\"\"\n    x = 1"
 
+[issue_367]
+source='''def build(x):
+    return (
+        f"""a
+{x}""",
+    )
+'''
+expected='''def build(x):
+    return (
+        f"""a
+{x}""",
+    )
+'''
 [issue_366_triple_quote_in_parens_not_docstring]
 source="X = (\n    \"\"\"#!/bin/bash\n# Ends here.\n# A second line.\n_real=\"\"\"\n    + \"y\"\n)\n"
 expected="X = (\n    \"\"\"#!/bin/bash\n# Ends here.\n# A second line.\n_real=\"\"\"\n    + \"y\"\n)\n"
