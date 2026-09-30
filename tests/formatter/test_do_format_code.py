@@ -72,6 +72,8 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("non_docstring", NO_ARGS),
         ("tabbed_indentation", NO_ARGS),
         ("mixed_indentation", NO_ARGS),
+        ("wrapped_indentation", NO_ARGS),
+        ("preserve_whitespace", NO_ARGS),
         ("escaped_newlines", NO_ARGS),
         ("code_comments", NO_ARGS),
         ("inline_comment", NO_ARGS),

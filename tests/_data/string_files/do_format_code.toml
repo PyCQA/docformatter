@@ -170,6 +170,27 @@ expected='''def foo():
 	if True:
 	    x = 1'''
 
+[wrapped_indentation]
+source='''def foo():
+	"""This is a very, very, very long docstring that should really be reformatted nicely by docformatter."""
+	if True:
+		x = 1'''
+expected='''def foo():
+	"""This is a very, very, very long docstring that should really be reformatted
+	nicely by docformatter."""
+	if True:
+		x = 1'''
+
+[preserve_whitespace]
+source='''def foo(
+	bar
+):
+	pass'''
+expected='''def foo(
+	bar
+):
+	pass'''
+
 [escaped_newlines]
 source='''def foo():
     """
