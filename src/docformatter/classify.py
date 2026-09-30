@@ -450,7 +450,7 @@ def is_nested_definition_line(token: tokenize.TokenInfo) -> bool:
     bool
         True if the token is a nested definition line, False otherwise.
     """
-    return re.match(r"^ {4,}(async|class|def) ", token.line) is not None
+    return re.match(r"^ {4,}(?:async def|class|def) ", token.line) is not None
 
 
 def is_newline_continuation(
