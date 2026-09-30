@@ -50,6 +50,7 @@ Additional contributions by (sorted by name)
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
 - Yuriy Tumanov <57435526+Eljees@users.noreply.github.com>
+- akul1809 <158052839+akul-ameya@users.noreply.github.com>
 - finswimmer <finswimmer77@gmail.com>
 - fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
