@@ -36,6 +36,7 @@ Additional contributions by (sorted by name)
 - Kothapalli Johnvaraprasad <160283000+Johnkothapalli@users.noreply.github.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
+- M001N <mail@dataflowsolutions.sk>
 - Manuel Kaufmann <humitos@gmail.com>
 - Oliver Sieweke <oliver.sieweke@protonmail.com>
 - Paul Angerer <48882462+dabauxi@users.noreply.github.com>
