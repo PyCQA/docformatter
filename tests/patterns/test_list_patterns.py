@@ -66,6 +66,7 @@ with open("tests/_data/string_files/list_patterns.toml", "rb") as f:
         "is_sphinx_list_numpy_style",
         "is_numpy_list_sphinx_style",
         "is_google_list_numpy_style",
+        "is_google_args_sphinx_style",
         "is_type_of_list_strict_wrap",
         "is_type_of_list_non_strict_wrap",
         "is_literal_block",

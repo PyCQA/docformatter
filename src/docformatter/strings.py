@@ -297,6 +297,18 @@ def do_split_description(
         _url_idx,
     )
 
+    _google_headers = _patterns.do_find_google_section_headers(text)
+
+    # Google Args/Returns sections are not Sphinx/Epytext field lists.
+    # Wrap prose and each entry independently.
+    # Do not treat the whole description as a list.
+    if _google_headers and not (_field_idx and _wrap_fields):
+        return _wrappers.do_wrap_google_description(
+            text,
+            indentation,
+            wrap_length,
+        )
+
     if not _url_idx and not (_field_idx and _wrap_fields):
         return description_to_list(
             text,
