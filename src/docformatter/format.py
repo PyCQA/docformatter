@@ -196,8 +196,14 @@ def _do_update_token_indices(
         is_multiline = _is_multiline_parameter(tokens, i - 1)
         is_same_line = tokens[i].line == tokens[i - 1].line
         is_same_position = tokens[i].start[0] == tokens[i - 1].end[0]
+        # A backslash continuation joins two physical lines without an NL
+        # token between them, so the current token always starts on the row
+        # after the previous one, even though the rows may look the same once
+        # the previous token has been shifted.
+        prev_line = tokens[i - 1].line.rstrip("\r\n")
+        is_backslash_continuation = not is_same_line and prev_line.endswith("\\")
 
-        if (
+        if not is_backslash_continuation and (
             is_multiline
             or (is_same_line or is_same_position)
             and tokens[i - 1].type

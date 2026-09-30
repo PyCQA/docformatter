@@ -1273,6 +1273,16 @@ expected="def foo():\n    \"\"\"Summary.\"\"\"\n    x = 1\n    # next line has 4
 source="def foo():\n    \"\"\"\n    Hello foo.\n    \"\"\"\n    x = 1"
 expected="def foo():\n    \"\"\"Hello foo.\"\"\"\n    x = 1"
 
+# A backslash continuation after a docstring that gets a blank line inserted
+# must not crash the tokenizer round-trip: the continuation line has no NL
+# token in front of it, so its row must be derived from the previous token.
+[issue_377_backslash_continuation]
+source="class A:\n    \"\"\"Doc.\"\"\"\n    x = 1 \\\n        + 2\n"
+expected="class A:\n    \"\"\"Doc.\"\"\"\n\n    x = 1 \\\n        + 2\n"
+
+[issue_377_module_docstring]
+source="\"\"\"Doc.\"\"\"\nx = 1 \\\n    + 2\n"
+expected="\"\"\"Doc.\"\"\"\n\nx = 1 \\\n    + 2\n"
 [issue_367]
 source='''def build(x):
     return (
