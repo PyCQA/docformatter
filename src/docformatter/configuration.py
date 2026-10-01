@@ -43,7 +43,7 @@ try:
 except ImportError:
     # Neither the stdlib tomllib (Python < 3.11) nor the tomli backport is
     # available; TOML configuration files are skipped in that case. See #368.
-    tomllib = None
+    tomllib = None  # type: ignore[assignment]
 
 # docformatter Package Imports
 from docformatter import __pkginfo__

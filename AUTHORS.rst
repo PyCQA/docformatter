@@ -30,6 +30,7 @@ Additional contributions by (sorted by name)
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
+- Jamal Ali <jamalkamaladdin@gmail.com>
 - Jonas Haag <jonas@lophus.org>
 - Josef Kemetmüller <josef.kemetmueller@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
@@ -56,4 +57,5 @@ Additional contributions by (sorted by name)
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
 - kelly <kelly@eclipse.id.au>
+- koshiro <163620373+k0shir0@users.noreply.github.com>
 - serhiy-yevtushenko <syevtushenko@gmail.com>
