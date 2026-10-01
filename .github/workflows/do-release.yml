@@ -28,13 +28,13 @@ jobs:
     name: Create New Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Get PR labels
         id: prlabels
-        uses: joerick/pr-labels-action@v1.0.8
+        uses: joerick/pr-labels-action@main
 
       - name: Get release version
         id: relversion
@@ -58,7 +58,7 @@ jobs:
       - name: Cut the release
         id: cutrelease
         if: ${{ env.build_ok == 1 }}
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@main
         with:
           name: "${{ steps.relversion.outputs.new_tag }}"
           tag: "${{ steps.relversion.outputs.new_tag }}"
@@ -71,7 +71,7 @@ jobs:
       - name: Upload wheel to GitHub release
         id: upload-wheel
         if: ${{ env.build_ok == 1 }}
-        uses: shogo82148/actions-upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@main
         with:
           upload_url: ${{ steps.cutrelease.outputs.upload_url }}
           asset_path: ./dist/*.whl
@@ -132,7 +132,7 @@ jobs:
           git diff --exit-code CHANGELOG.md &&
           (echo "### No update" && exit 1) || (echo "### Commit update")
 
-      - uses: EndBug/add-and-commit@v9
+      - uses: EndBug/add-and-commit@main
         name: Commit and push if diff
         if: ${{ env.do_changelog == 1 }}
         with:
@@ -147,7 +147,7 @@ jobs:
       - name: Get next semantic version
         id: nextversion
         if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-next-semvers@v1.2.1
+        uses: WyriHaximus/github-action-next-semvers@master
         with:
           version: ${{ steps.relversion.outputs.version }}
 
@@ -159,7 +159,7 @@ jobs:
 
       - name: Create new minor release milestone
         if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-create-milestone@v1.2.0
+        uses: WyriHaximus/github-action-create-milestone@master
         with:
           title: "${{ steps.nextversion.outputs.v_minor }}"
         env:
@@ -167,7 +167,7 @@ jobs:
 
       - name: Create new major release milestone
         if: ${{ env.do_milestones == 1 }}
-        uses: WyriHaximus/github-action-create-milestone@v1.2.0
+        uses: WyriHaximus/github-action-create-milestone@master
         with:
           title: "${{ steps.nextversion.outputs.v_major }}"
         env:
