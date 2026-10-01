@@ -3,19 +3,71 @@
 # for creating a TokenInfo() object.
 
 [module_docstring_followed_by_string]
+source = '''"""Module docstring."""
+
+MY_CONSTANT = "a string"
+'''
 expected = 1
 
 [module_docstring_followed_by_code]
+source = '''"""Module docstring."""
+
+import os
+'''
 expected = 1
 
 [module_docstring_followed_by_comment_then_code]
+source = '''"""Module docstring."""
+
+# A comment.
+import os
+'''
 expected = 1
 
 [module_docstring_followed_by_comment_then_string]
+source = '''"""Module docstring."""
+
+# A comment.
+MY_CONSTANT = "a string"
+'''
 expected = 1
 
 [module_docstring_in_black]
+source = '''"""Module docstring."""
+
+import os
+'''
 expected = 1
+
+# PEP 8: top-level function and class definitions are surrounded by two blank
+# lines, so a module docstring that is followed by one gets two newlines.
+[module_docstring_followed_by_def]
+source = '''"""Module docstring."""
+
+
+def foo():
+    """Foo."""
+'''
+expected = 2
+
+[module_docstring_followed_by_class]
+source = '''"""Module docstring."""
+
+
+class Foo:
+    """Foo class."""
+'''
+expected = 2
+
+[module_docstring_followed_by_decorated_def]
+source = '''"""Module docstring."""
+
+
+@decorator
+def foo():
+    """Foo."""
+'''
+expected = 2
 
 [class_docstring_followed_by_statement]
 source = '''

@@ -297,6 +297,18 @@ def do_split_description(
         _url_idx,
     )
 
+    _google_headers = _patterns.do_find_google_section_headers(text)
+
+    # Google Args/Returns sections are not Sphinx/Epytext field lists.
+    # Wrap prose and each entry independently.
+    # Do not treat the whole description as a list.
+    if _google_headers and not (_field_idx and _wrap_fields):
+        return _wrappers.do_wrap_google_description(
+            text,
+            indentation,
+            wrap_length,
+        )
+
     if not _url_idx and not (_field_idx and _wrap_fields):
         return description_to_list(
             text,
@@ -383,8 +395,16 @@ def do_split_summary(lines) -> List[str]:
         token = tokens[i]
         sentence.append(token)
 
-        if token.endswith(".") and not any(
-            "".join(sentence).strip().endswith(abbr) for abbr in ABBREVIATIONS
+        _so_far = "".join(sentence)
+
+        # A period inside an unclosed inline literal (``...``) is part of the
+        # literal, not the end of the sentence.
+        _in_inline_literal = _so_far.count("``") % 2 == 1
+
+        if (
+            token.endswith(".")
+            and not _in_inline_literal
+            and not any(_so_far.strip().endswith(abbr) for abbr in ABBREVIATIONS)
         ):
             i += 1
             break

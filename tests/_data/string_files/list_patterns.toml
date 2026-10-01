@@ -137,6 +137,15 @@ strict = true
 style = "numpy"
 expected = true
 
+[is_google_args_sphinx_style]
+instring = """\
+    Args:
+        stream (BinaryIO): Binary stream (usually a file object).
+    """
+strict = false
+style = "sphinx"
+expected = false
+
 [is_literal_block]
 instring = """\
 This is a description.

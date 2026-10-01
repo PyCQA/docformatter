@@ -15,6 +15,10 @@ To use ``docformatter`` from the command line, simply:
 
     $ docformatter name_of_python_file.py
 
+A module-level attribute docstring followed directly by a top-level ``def`` or
+``class`` is separated from that definition by two blank lines. This applies
+wherever the attribute appears in the file, without requiring ``--black``.
+
 ``docformatter`` recognizes a number of options for controlling how the tool
 runs as well as how it will treat various patterns in the docstrings.  The
 help output provides a summary of these options:

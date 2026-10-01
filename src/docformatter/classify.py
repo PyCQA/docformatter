@@ -199,7 +199,37 @@ def is_attribute_docstring(
     if not seen_equal_or_colon:
         return False
 
-    return True
+    # Step 3: A string nested inside brackets is an argument or a collection
+    # element, not an attribute docstring.
+    return not _is_inside_brackets(tokens, index)
+
+
+def _is_inside_brackets(
+    tokens: list[tokenize.TokenInfo],
+    index: int,
+) -> bool:
+    """Return True if the token at index sits inside an unclosed bracket.
+
+    Parameters
+    ----------
+    tokens : list[TokenInfo]
+        A list of tokenized Python source code.
+    index : int
+        Index of the token to check.
+
+    Returns
+    -------
+        True if the token is nested inside brackets, False otherwise.
+    """
+    depth = 0
+    for tok in tokens[0:index]:
+        if tok.type == tokenize.OP:
+            if tok.string in ("(", "[", "{"):
+                depth += 1
+            elif tok.string in (")", "]", "}"):
+                depth -= 1
+
+    return depth > 0
 
 
 def is_class_docstring(
@@ -313,19 +343,23 @@ def is_f_string(token: tokenize.TokenInfo, prev_token: tokenize.TokenInfo) -> bo
     bool
         True if the token is an f-string, False otherwise.
     """
+    # On Python 3.12+, PEP 701 tokenizes an f-string as a FSTRING_START /
+    # FSTRING_MIDDLE / FSTRING_END sequence, so adjacent tokens must be
+    # stitched back together onto the same row.
     if PY312:
         if tokenize.FSTRING_MIDDLE in [token.type, prev_token.type]:
             return True
-    elif any(
-        [
-            token.string.startswith('f"""'),
-            prev_token.string.startswith('f"""'),
-            token.string.startswith("f'''"),
-            prev_token.string.startswith("f'''"),
-        ]
-    ):
-        return True
 
+        return False
+
+    # Before Python 3.12, an f-string is always tokenized as a single STRING
+    # token, so there is nothing to stitch together and this function should
+    # never fire.  Naively checking the string prefix here (regardless of
+    # bracket/assignment context) used to misclassify *any* f\"\"\"/f''' token
+    # -- e.g. one nested inside a parenthesized expression or tuple -- as
+    # needing row-continuation treatment, corrupting the row bookkeeping in
+    # ``_get_unmatched_start_end_indices`` and causing
+    # ``tokenize.untokenize`` to raise ``ValueError`` (see issue #367).
     return False
 
 
@@ -416,7 +450,7 @@ def is_nested_definition_line(token: tokenize.TokenInfo) -> bool:
     bool
         True if the token is a nested definition line, False otherwise.
     """
-    return re.match(r"^ {4,}(async|class|def) ", token.line) is not None
+    return re.match(r"^ {4,}(?:async def|class|def) ", token.line) is not None
 
 
 def is_newline_continuation(
@@ -439,12 +473,33 @@ def is_newline_continuation(
     """
     if (
         token.type in (tokenize.NEWLINE, tokenize.NL)
+        and not _is_blank_line(token.line)
         and token.line.strip() in prev_token.line.strip()
-        and token.line not in {"\n", "\r\n"}
     ):
         return True
 
     return False
+
+
+def _is_blank_line(line: str) -> bool:
+    r"""Determine if a physical line is blank.
+
+    A blank line is a non-empty line that holds nothing but whitespace, e.g.
+    "\n" or "    \n".  The empty string is *not* a blank line; tokenize uses
+    it as the line of the NEWLINE token it synthesizes for source that has no
+    trailing newline, as well as for DEDENT and ENDMARKER tokens.
+
+    Parameters
+    ----------
+    line : str
+        The physical line the token was read from; tokenize.TokenInfo.line.
+
+    Returns
+    -------
+    bool
+        True if the line holds only whitespace and is not empty.
+    """
+    return bool(line) and not line.strip()
 
 
 def is_string_variable(

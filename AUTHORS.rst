@@ -8,6 +8,7 @@ Steven Myint <git@stevenmyint.com>
 
 Additional contributions by (sorted by name)
 --------------------------------------------
+- ANSHUL SINGH <72524975+ekanshul@users.noreply.github.com>
 - Adam Dangoor <adamdangoor@gmail.com>
 - Alec Merdler <alecmerdler@gmail.com>
 - Alexander Biggs <akbiggs@users.noreply.github.com>
@@ -18,32 +19,43 @@ Additional contributions by (sorted by name)
 - Andy Hayden <andyhayden1@gmail.com>
 - Anthony Sottile <asottile@umich.edu>
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
+- Apoorv Darshan <ad13dtu@gmail.com>
 - Asher Foa <asher@toolchain.com>
 - Benjamin Schubert <contact@benschubert.me>
 - Björn Holtvogt <bjoern.holtvogt@gmail.com>
 - Casey Korver <84342833+korverdev@users.noreply.github.com>
 - Daniel Goldman <danielgoldman4@gmail.com>
 - Doyle Rowland <doyle.rowland@reliaqual.com>
+- Eljees <57435526+Eljees@users.noreply.github.com>
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
+- Jamal Ali <jamalkamaladdin@gmail.com>
 - Jonas Haag <jonas@lophus.org>
 - Josef Kemetmüller <josef.kemetmueller@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
 - Kian-Meng Ang <kianmeng.ang@gmail.com>
+- Kothapalli Johnvaraprasad <160283000+Johnkothapalli@users.noreply.github.com>
 - KotlinIsland <65446343+KotlinIsland@users.noreply.github.com>
 - Lisha Li <65045844+lli-fincad@users.noreply.github.com>
+- M001N <mail@dataflowsolutions.sk>
 - Manuel Kaufmann <humitos@gmail.com>
 - Oliver Sieweke <oliver.sieweke@protonmail.com>
 - Paul Angerer <48882462+dabauxi@users.noreply.github.com>
 - Paul Angerer <48882462+etimoz@users.noreply.github.com>
 - Peter Boothe <pboothe@pboothe2.nyc.corp.google.com>
 - Peter Cock <p.j.a.cock@googlemail.com>
+- Sanjay Santhanam <51058514+Sanjays2402@users.noreply.github.com>
 - Sebastian Weigand <s.weigand.phy@gmail.com>
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
+- Yuriy Tumanov <57435526+Eljees@users.noreply.github.com>
+- akul1809 <158052839+akul-ameya@users.noreply.github.com>
 - finswimmer <finswimmer77@gmail.com>
+- fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
+- kelly <kelly@eclipse.id.au>
+- koshiro <163620373+k0shir0@users.noreply.github.com>
 - serhiy-yevtushenko <syevtushenko@gmail.com>

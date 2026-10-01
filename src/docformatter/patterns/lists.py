@@ -35,12 +35,14 @@ from typing import Union
 from docformatter.constants import (
     BULLET_REGEX,
     ENUM_REGEX,
+    GOOGLE_WRAPPABLE_SECTIONS,
     HEURISTIC_MIN_LIST_ASPECT_RATIO,
     OPTION_REGEX,
 )
 
 # docformatter Local Imports
 from .fields import (
+    do_find_google_section_headers,
     is_epytext_field_list,
     is_field_list,
     is_google_field_list,
@@ -112,11 +114,33 @@ def is_type_of_list(
     """
     split_lines = text.rstrip().splitlines()
 
-    if is_heuristic_list(text, strict):
+    # Google Args/Returns entries look like NumPy "name : description" fields.
+    # That would skip wrapping of the entire description.
+    # When a Google section is present, leave wrapping to do_wrap_google_description.
+    # NumPy style keeps the historical skip behaviour.
+    _google_headers = do_find_google_section_headers(text)
+    _has_wrappable_google = style != "numpy" and any(
+        _name.lower() in GOOGLE_WRAPPABLE_SECTIONS for _, _, _name in _google_headers
+    )
+
+    if not _has_wrappable_google and is_heuristic_list(text, strict):
         return True
 
     if is_field_list(text, style):
         return False
+
+    if _has_wrappable_google:
+        return any(
+            (
+                is_bullet_list(line)
+                or is_enumerated_list(line)
+                or is_option_list(line)
+                or is_literal_block(line)
+                or is_inline_math(line)
+                or is_alembic_header(line)
+            )
+            for line in split_lines
+        )
 
     # Check for multi-line patterns (section headers) first.
     # These require looking at consecutive lines together.

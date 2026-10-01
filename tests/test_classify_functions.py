@@ -114,6 +114,23 @@ def test_docstring_classifiers(test_key, classifier):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
+    "source",
+    [
+        'SCRIPT = textwrap.dedent(\n    """\n    import sys\n    """\n)\n',
+        'MAPPING = dict(\n    key="""value""",\n)\n',
+        'ITEMS = [\n    """first""",\n]\n',
+    ],
+)
+def test_is_not_attribute_docstring_inside_brackets(source):
+    """A string nested in brackets is an argument, not an attribute docstring."""
+    tokens = get_tokens(source)
+    index = get_string_index(tokens)
+
+    assert not is_attribute_docstring(tokens, index)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
     "test_key,classifier",
     [
         ("is_code_line", is_code_line),
@@ -127,6 +144,7 @@ def test_docstring_classifiers(test_key, classifier):
         ("is_nested_definition_line_class", is_nested_definition_line),
         ("is_nested_definition_line_function", is_nested_definition_line),
         ("is_nested_definition_line_async_function", is_nested_definition_line),
+        ("is_not_nested_definition_line_async_with", is_nested_definition_line),
         ("is_not_nested_definition_line_function", is_nested_definition_line),
         ("is_newline_continuation", is_newline_continuation),
         ("is_string_variable", is_string_variable),

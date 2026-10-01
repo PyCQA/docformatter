@@ -28,19 +28,22 @@
 
 # Standard Library Imports
 import argparse
-import contextlib
 import os
 import sys
 from configparser import ConfigParser
 from typing import Dict, Sequence, Union
 
-with contextlib.suppress(ImportError):
+try:
     if sys.version_info >= (3, 11):
         # Standard Library Imports
         import tomllib
     else:
         # Third Party Imports
         import tomli as tomllib
+except ImportError:
+    # Neither the stdlib tomllib (Python < 3.11) nor the tomli backport is
+    # available; TOML configuration files are skipped in that case. See #368.
+    tomllib = None  # type: ignore[assignment]
 
 # docformatter Package Imports
 from docformatter import __pkginfo__
@@ -175,7 +178,11 @@ class Configurater:
             type=str,
             dest="rest_section_adorns",
             default=self.flargs.get(
-                "rest_section_adorns", r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}"
+                "rest-section-adorns",
+                self.flargs.get(
+                    "rest_section_adorns",
+                    r"[!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{4,}",
+                ),
             ),
             help="regex for identifying reST section header adornments",
         )
@@ -340,6 +347,18 @@ class Configurater:
 
     def _do_read_toml_configuration(self) -> None:
         """Load configuration information from a *.toml file."""
+        if tomllib is None:
+            # tomli/tomllib is not installed (Python < 3.11 without the tomli
+            # backport); skip reading TOML configuration rather than crashing
+            # with a NameError, but say so instead of silently ignoring the
+            # user's settings. See #268 and #368.
+            print(
+                f"docformatter: {self.config_file} was not read because TOML "
+                "support is missing; on Python < 3.11 this needs the tomli "
+                'package: pip install "docformatter[tomli]"',
+                file=sys.stderr,
+            )
+            return
         with open(self.config_file, "rb") as f:
             config = tomllib.load(f)
 

@@ -111,27 +111,46 @@ class TestDoDetectEncoding:
         uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
-        assert "utf_8" == uut.encoding
+        assert uut.encoding.replace("-", "_") == "utf_8"
 
     @pytest.mark.integration
     @pytest.mark.parametrize("contents", ["# Wow!  docformatter is super-cool.\n"])
     def test_do_detect_encoding_with_non_explicit_setting(
         self, temporary_file, contents
     ):
-        """Return default system encoding when encoding not explicitly set."""
+        """Return UTF-8 when the file has no encoding cookie (PEP 3120)."""
         uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
-        assert "ascii" == uut.encoding
+        assert uut.encoding.replace("-", "_") == "utf_8"
 
     @pytest.mark.integration
     @pytest.mark.parametrize("contents", ["# -*- coding: blah -*-"])
     def test_do_detect_encoding_with_bad_encoding(self, temporary_file, contents):
-        """Default to latin-1 when unknown encoding detected."""
+        """Fall back to the default encoding when the cookie is unknown."""
         uut = Encoder()
         uut.do_detect_encoding(temporary_file)
 
-        assert "ascii" == uut.encoding
+        assert uut.encoding == uut.DEFAULT_ENCODING
+
+    @pytest.mark.integration
+    @pytest.mark.parametrize(
+        "contents",
+        [
+            (
+                '"""Wrap this description so a UTF-8 em dash is in the file — '
+                'and the encoding guess must stay utf-8."""\n'
+            )
+        ],
+    )
+    def test_do_detect_encoding_utf8_em_dash_without_cookie(
+        self, temporary_file, contents
+    ):
+        """Keep PEP 3120 UTF-8 for source that charset-normalizer misguesses."""
+        uut = Encoder()
+        uut.do_detect_encoding(temporary_file)
+
+        assert uut.encoding.replace("-", "_") == "utf_8"
 
     @pytest.mark.integration
     @pytest.mark.parametrize("contents", [""])

@@ -130,6 +130,59 @@ def foo():
     @pytest.mark.parametrize(
         "contents",
         [
+            # UTF-8 em dash; heuristic encoding detection used to flip
+            # between utf-8 and a single-byte encoding and change wraps.
+            "# a_b a_b a_b a_b a_b \n"
+            "class ModelWrapper:\n"
+            '    """``ModelWrapper`` (module-scope, importable in isolation) '
+            "normalizes export-mode output to a tuple.\n"
+            "\n"
+            "    The wrapped model is expected to already be in export mode "
+            "(``forward_export``), which returns a tuple (full\n"
+            "    detector) or a plain list "
+            "(:class:`rfdetr.export._backend._BackboneExport`) — never a "
+            "dict. A dict output means\n"
+            "    the caller forgot the mode-switch, which is a caller bug "
+            "the wrapper must surface loudly rather than silently\n"
+            '    reshape.\n    """\n'
+        ],
+    )
+    def test_in_place_utf8_em_dash_is_idempotent(self, temporary_file, contents):
+        """Repeated in-place runs must not alternate wraps on UTF-8 source."""
+        args = [
+            "my_fake_program",
+            "--wrap-summaries",
+            "120",
+            "--wrap-descriptions",
+            "120",
+            "--in-place",
+            temporary_file,
+        ]
+        main._main(
+            argv=args,
+            standard_out=io.StringIO(),
+            standard_error=None,
+            standard_in=None,
+        )
+        with open(temporary_file, encoding="utf-8") as handle:
+            first = handle.read()
+
+        exit_code = main._main(
+            argv=args,
+            standard_out=io.StringIO(),
+            standard_error=None,
+            standard_in=None,
+        )
+        with open(temporary_file, encoding="utf-8") as handle:
+            second = handle.read()
+
+        assert first == second
+        assert exit_code == 0
+
+    @pytest.mark.system
+    @pytest.mark.parametrize(
+        "contents",
+        [
             '''\
 def foo():
     """
@@ -173,6 +226,37 @@ def foo():
         )
 
         assert ret_code == 1
+
+    @pytest.mark.system
+    def test_no_python_files_exit_code(self, temporary_directory):
+        """Return error code 0 when the paths hold no Python files.
+
+        Passing a non-Python file, or recursing a directory that has no
+        Python files in it, is a no-op and not an error.  See issue #348.
+        """
+        stderr = io.StringIO()
+        text_file = os.path.join(temporary_directory, "example.txt")
+        with open(text_file, "w") as f:
+            f.write("not python\n")
+
+        assert (
+            main._main(
+                argv=["my_fake_program", text_file],
+                standard_out=None,
+                standard_error=stderr,
+                standard_in=None,
+            )
+            == 0
+        )
+        assert (
+            main._main(
+                argv=["my_fake_program", "--check", "--recursive", temporary_directory],
+                standard_out=None,
+                standard_error=stderr,
+                standard_in=None,
+            )
+            == 0
+        )
 
     @pytest.mark.system
     @pytest.mark.parametrize(
