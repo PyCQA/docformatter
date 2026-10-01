@@ -1,7 +1,7 @@
 # This workflow runs when a version tag is pushed.
 #
 # - Get new tag.
-# - If release condidate tag:
+# - If release candidate tag:
 #   - Cut GitHub pre-release.
 name: Prerelease Tag Workflow
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: master
@@ -38,7 +38,7 @@ jobs:
       - name: Cut pre-release
         id: cutprerelease
         if: ${{ env.build_ok == 1 }}
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v7
         with:
           name: ${{ env.tag }}
           tag: ${{ env.tag }}
