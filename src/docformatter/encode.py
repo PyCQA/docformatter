@@ -30,10 +30,8 @@
 import collections
 import locale
 import sys
+import tokenize
 from typing import Dict, List
-
-# Third Party Imports
-from charset_normalizer import from_path  # pylint: disable=import-error
 
 unicode = str
 
@@ -62,21 +60,22 @@ class Encoder:
             The full path name of the file whose encoding is to be detected.
         """
         try:
-            detection_result = from_path(filename).best()
-            if detection_result and detection_result.encoding in ["utf_16", "utf_32"]:
-                # Treat undetectable/binary encodings as failure
+            with open(filename, "rb") as raw_file:
+                encoding, _ = tokenize.detect_encoding(raw_file.readline)
+
+            # tokenize.detect_encoding follows PEP 263/3120: BOM or
+            # encoding cookie, otherwise UTF-8. Heuristic guesses such as
+            # charset-normalizer can flip between utf-8 and a single-byte
+            # encoding on valid UTF-8 source, which changes wrap widths.
+            if encoding.replace("-", "_").lower() in {"utf_16", "utf_32"}:
                 self.encoding = self.DEFAULT_ENCODING
             else:
-                self.encoding = (
-                    detection_result.encoding
-                    if detection_result
-                    else self.DEFAULT_ENCODING
-                )
+                self.encoding = encoding
 
             # Check for correctness of encoding.
             with self.do_open_with_encoding(filename) as check_file:
                 check_file.read()
-        except (SyntaxError, LookupError, UnicodeDecodeError):
+        except (SyntaxError, LookupError, UnicodeDecodeError, OSError):
             self.encoding = self.DEFAULT_ENCODING
 
     def do_find_newline(self, source: List[str]) -> str:
