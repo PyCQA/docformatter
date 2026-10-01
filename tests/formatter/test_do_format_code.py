@@ -150,6 +150,8 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("issue_377_module_docstring", NO_ARGS),
         ("issue_367", NO_ARGS),
         ("issue_366_triple_quote_in_parens_not_docstring", NO_ARGS),
+        ("issue_343_return_raw_string", NO_ARGS),
+        ("issue_343_call_argument", NO_ARGS),
     ],
 )
 def test_do_format_code(test_key, test_args, args):
