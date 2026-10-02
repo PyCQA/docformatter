@@ -2113,4 +2113,4 @@ tomli = ["tomli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "dd641418bd353b63e25924981a2537ba7c04c62894c2efd28d6b3d4b3a7092d6"
+content-hash = "f5cb2ff930c482497d75aa0de249f890684691fc27c18d2d3a8be5c1ee23784d"
