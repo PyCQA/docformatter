@@ -126,3 +126,23 @@ def test_find_py_files(test_key, recursive):
 
     result = list(find_py_files(sources, recursive, exclude))
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.unit
+def test_find_py_files_skips_excluded_directory_and_continues(tmp_path):
+    """Skip an excluded directory without stopping its sibling traversal."""
+    root = tmp_path / "project"
+    excluded = root / "a_excluded"
+    nested_excluded = excluded / "nested"
+    included = root / "z_included"
+    nested_included_excluded = included / "a_excluded"
+    nested_excluded.mkdir(parents=True)
+    nested_included_excluded.mkdir(parents=True)
+    (excluded / "excluded.py").touch()
+    (nested_excluded / "nested.py").touch()
+    (included / "included.py").touch()
+    (nested_included_excluded / "nested_excluded.py").touch()
+
+    result = list(find_py_files([str(root)], recursive=True, exclude=["a_excluded"]))
+
+    assert result == [str(included / "included.py")]
