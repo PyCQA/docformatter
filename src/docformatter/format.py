@@ -318,7 +318,9 @@ def _get_class_docstring_newlines(
             continue
 
         if tokens[j].start[1] < indention_level:
-            return 2
+            # Only top-level definitions get two blank lines.  A nested class
+            # followed by a statement in the enclosing scope gets one.
+            return 2 if tokens[j].start[1] == 0 else 1
 
         break
 
@@ -373,6 +375,11 @@ def _get_function_docstring_newlines(  # noqa: PLR0911
         # There is a line of code following the docstring.
         if _classify.is_code_line(tokens[j]):
             if tokens[j].start[1] == 0:
+                return 1
+
+            # The code belongs to the enclosing scope of a nested definition, so
+            # the blank line is not inside this function's body.
+            if tokens[j].start[1] < tokens[index].start[1]:
                 return 1
 
             return 0

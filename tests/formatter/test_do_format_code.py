@@ -209,3 +209,23 @@ def test_attribute_docstring_before_definition(
 
     assert result == expected
     assert uut._do_format_code(result) == expected
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS, ["--blank", ""]])
+@pytest.mark.parametrize(
+    "source",
+    [
+        'def outer() -> None:\n    """Outer function."""\n\n'
+        '    def inner() -> None:\n        """One-liner docstring."""\n\n'
+        "    next_statement = 1\n",
+        'def outer() -> None:\n    """Outer function."""\n\n'
+        '    class Inner:\n        """One-liner class docstring."""\n\n'
+        '    @some_decorator\n    class Another:\n        """Another class."""\n',
+    ],
+)
+def test_nested_definition_blank_line_kept(test_args, args, source):
+    """Keep the blank line after a nested definition with a one-line docstring."""
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+
+    assert uut._do_format_code(source) == source
