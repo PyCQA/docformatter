@@ -31,6 +31,7 @@ Additional contributions by (sorted by name)
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
 - Jamal Ali <jamalkamaladdin@gmail.com>
+- Joao Azevedo <joao.c.azevedo@gmail.com>
 - Jonas Haag <jonas@lophus.org>
 - Josef Kemetmüller <josef.kemetmueller@gmail.com>
 - Kapshuna Alexander <kapsh@kap.sh>
