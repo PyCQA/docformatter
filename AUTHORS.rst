@@ -51,6 +51,7 @@ Additional contributions by (sorted by name)
 - Sho Iwamoto <sho.iwamoto@pd.infn.it>
 - Swen Kooij <swenkooij@gmail.com>
 - Thomas Denewiler <tdenewiler@gmail.com>
+- WolfGanG <169568318+wolfgang-aura@users.noreply.github.com>
 - Yuriy Tumanov <57435526+Eljees@users.noreply.github.com>
 - akul1809 <158052839+akul-ameya@users.noreply.github.com>
 - finswimmer <finswimmer77@gmail.com>
