@@ -70,7 +70,8 @@ def find_py_files(sources, recursive, exclude=None):
         if recursive and os.path.isdir(_name):
             for root, dirs, children in os.walk(unicode(_name)):
                 if is_excluded(root, exclude):
-                    break
+                    dirs[:] = []
+                    continue
 
                 files = sorted(
                     [
