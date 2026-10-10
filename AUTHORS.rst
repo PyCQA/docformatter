@@ -61,3 +61,4 @@ Additional contributions by (sorted by name)
 - kelly <kelly@eclipse.id.au>
 - koshiro <163620373+k0shir0@users.noreply.github.com>
 - serhiy-yevtushenko <syevtushenko@gmail.com>
+- 점[dot] <jum.apzn@gmail.com>
