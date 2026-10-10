@@ -214,7 +214,7 @@ Based on the table at
 
 # This is the regex used to find URL links:
 #
-# (__ |`{{2}}|`\w[\w. :\n]*|\.\. _?[\w. :]+|')? is used to find in-line links that
+# (__ |`{{2}}|`\w[\w. :#\n]*(?=<)|\.\. _[\w. :]+|')? finds links that
 # should remain on a single line even if it exceeds the wrap length.
 #   __ is used to find to underscores followed by a single space.
 #   This finds patterns like: __ https://sw.kovidgoyal.net/kitty/graphics-protocol/
@@ -222,13 +222,13 @@ Based on the table at
 #   `{{2}} is used to find two back-tick characters.
 #   This finds patterns like: ``http://www.example.com``
 #
-#   `\w[a-zA-Z0-9. :#\n]* matches the back-tick character immediately followed by one
+#   `\w[\w. :#\n]*(?=<) matches the back-tick immediately followed by one
 #   letter, then followed by any number of letters, numbers, periods, spaces, colons,
-#   hash marks or newlines.
+#   hash marks or newlines, followed by an opening angle bracket.
 #   This finds patterns like: `Link text <https://domain.invalid/>`_
 #
-#   \.\. _?[\w. :]+ matches the pattern .. followed one space, then by zero or
-#   one underscore, then any number of letters, periods, spaces, or colons.
+#   \.\. _[\w. :]+ matches the pattern .. followed by a space and an
+#   underscore, then letters, periods, spaces, or colons.
 #   This finds patterns like: .. _a link: https://domain.invalid/
 #
 #   ' matches a single quote.
@@ -245,7 +245,7 @@ Based on the table at
 #   (\S*) matches any non-whitespace character between zero and infinity times.
 #   >? matches the character > between zero and one times.
 URL_REGEX = (
-    rf"(__ |`{{2}}|`\w[\w :#\n]*[.|\.\. _?[\w. :]+|')?<?"
+    rf"(__ |`{{2}}|`\w[\w. :#\n]*(?=<)|\.\. _[\w. :]+|')?<?"
     rf"({URL_PATTERNS}):(\//)?(\S*)>?"
 )
 

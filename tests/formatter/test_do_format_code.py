@@ -229,3 +229,27 @@ def test_nested_definition_blank_line_kept(test_args, args, source):
     uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
 
     assert uut._do_format_code(source) == source
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS])
+@pytest.mark.parametrize("indentation", ["", "    "])
+@pytest.mark.parametrize("target", [".. _a long link reference:", ".. _a.link:"])
+def test_keep_long_hyperlink_target_together(test_args, args, indentation, target):
+    """Preserve hyperlink targets (issue #269, requirement 10.1.3)."""
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    url = (
+        "https://domain.invalid/with/a/really/very/long/path/that/exceeds/normal/width"
+    )
+    source = (
+        ("def example():\n" if indentation else "")
+        + f'{indentation}"""Example.\n\n'
+        + f"{indentation}See the link reference for more information.\n\n"
+        + f"{indentation}{target} {url}\n"
+        + f'{indentation}"""\n'
+    )
+
+    result = uut._do_format_code(source)
+
+    assert result == source
+    assert uut._do_format_code(result) == source

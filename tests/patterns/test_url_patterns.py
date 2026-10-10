@@ -126,3 +126,52 @@ def test_do_skip_link(test_key, index):
 
     result = do_skip_link(source, index)
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "link",
+    [
+        ".. _a link: https://domain.invalid/path",
+        ".. _a.link: https://domain.invalid/path",
+        "__ https://domain.invalid/path",
+        "`Link text <https://domain.invalid/path>`_",
+        "`Link.text <https://domain.invalid/path>`_",
+        "`A <https://domain.invalid/path>`_",
+        "``https://domain.invalid/path``",
+        "'https://domain.invalid/path'",
+    ],
+)
+def test_do_find_complete_link(link):
+    """Include the markup prefix when identifying supported link forms."""
+    source = f"    {link}\n"
+    assert do_find_links(source) == [(4, 4 + len(link))]
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "text",
+    [
+        ".. _a link: no URL here",
+        "`Link text without a URL`_",
+        "A sentence with periods... and no link.",
+    ],
+)
+def test_do_not_find_links_in_plain_text(text):
+    assert do_find_links(text) == []
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "prefix",
+    [
+        ".. a link: ",
+        "`kitty graphics protocol`__.\n\n__ ",
+        "`Link text`_ and then ",
+    ],
+)
+def test_do_not_include_unrelated_markup_in_link(prefix):
+    url = "https://domain.invalid/path"
+    source = prefix + url
+    start = len(prefix) - 3 if prefix.endswith("__ ") else len(prefix)
+    assert do_find_links(source) == [(start, len(source))]
