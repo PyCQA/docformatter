@@ -58,6 +58,7 @@ Additional contributions by (sorted by name)
 - fudian <fudianchn@gmail.com>
 - happlebao <c.x.bao@student.ucc.ie>
 - icp <pangolin@vivaldi.net>
+- joo00der <15151999611@163.com>
 - kelly <kelly@eclipse.id.au>
 - koshiro <163620373+k0shir0@users.noreply.github.com>
 - serhiy-yevtushenko <syevtushenko@gmail.com>
