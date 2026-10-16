@@ -83,3 +83,56 @@ def test_do_wrap_description(test_key, force_wrap):
 
     result = do_wrap_description(source, "    ", 72, force_wrap, False, "", "sphinx")
     assert result == expected, f"\nFailed {test_key}\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("marker", [r"\b", "\b"])
+@pytest.mark.parametrize("indentation", ["", "    "])
+def test_click_paragraph_keeps_lines_and_url(marker, indentation):
+    """Keep explicit Click no-wrap paragraphs while wrapping ordinary prose."""
+    paragraph = (
+        marker + "\nThis is\na paragraph\nwithout rewrapping.\n"
+        "https://example.com/a/very/long/link/that/must/not/be/wrapped"
+    )
+    prose = "This ordinary paragraph is long enough to need wrapping."
+    source = f"{prose}\n\n{paragraph}\n\n{prose}"
+
+    result = do_wrap_description(source, indentation, 35, False, False, "", "sphinx")
+
+    before, protected, after = result.split("\n\n")
+    assert protected == "\n".join(indentation + line for line in paragraph.splitlines())
+    assert "\n" in before and before == after
+    assert (
+        do_wrap_description(result, indentation, 35, False, False, "", "sphinx")
+        == result
+    )
+
+
+@pytest.mark.integration
+def test_click_marker_only_applies_at_start_of_a_paragraph():
+    """Inline or escaped markers do not protect an ordinary paragraph."""
+    for paragraph in [r"Ordinary \b text", r"\\b" + "\nOrdinary text"]:
+        result = do_wrap_description(paragraph, "", 72, False, False, "", "sphinx")
+        assert "\n" not in result
+
+
+@pytest.mark.integration
+def test_force_wrap_overrides_click_marker():
+    """Explicit force wrapping keeps treating descriptions as ordinary prose."""
+    result = do_wrap_description(
+        "\\b\nThis is\na paragraph.", "", 72, True, False, "", "sphinx"
+    )
+    assert result == r"\b This is a paragraph."
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "source",
+    [
+        "\\b\nFirst line\nsecond line.",
+        "\\b\nFirst line.\n\n\\b\nSecond\nparagraph.",
+    ],
+)
+def test_click_paragraphs_without_surrounding_prose(source):
+    """Keep literal paragraphs at either edge and in successive paragraphs."""
+    assert do_wrap_description(source, "", 20, False, False, "", "sphinx") == source
