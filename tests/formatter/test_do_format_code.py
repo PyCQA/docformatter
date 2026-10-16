@@ -253,3 +253,33 @@ def test_keep_long_hyperlink_target_together(test_args, args, indentation, targe
 
     assert result == source
     assert uut._do_format_code(result) == source
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS])
+@pytest.mark.parametrize("indentation", ["", "    "])
+@pytest.mark.parametrize("summary", ["Summary.\n\n", ""])
+@pytest.mark.parametrize(
+    "url", ["", "\nhttps://example.com/a/very/long/link/that/must/not/be/wrapped"]
+)
+def test_preserve_click_no_wrap_paragraphs(test_args, args, indentation, summary, url):
+    """Keep Click markers and their paragraph lines through full formatting."""
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    protected = "\\b\nThis is\na paragraph\nwithout rewrapping."
+    protected += url
+    body = summary + protected + "\n\nOrdinary text\ncontinues here."
+    source = (
+        ("def example():\n" if indentation else "")
+        + indentation
+        + '"""'
+        + body.replace("\n", "\n" + indentation)
+        + "\n"
+        + indentation
+        + '"""\n'
+    )
+
+    result = uut._do_format_code(source)
+
+    assert protected.replace("\n", "\n" + indentation) in result
+    assert "Ordinary text continues here." in result
+    assert uut._do_format_code(result) == result

@@ -1019,6 +1019,32 @@ class Formatter:
         if contents.lstrip().startswith(">>>"):
             return docstring
 
+        # A leading Click no-wrap paragraph is literal content, not a
+        # summary. Preserve it while still formatting subsequent prose.
+        if not self.args.force_wrap and contents.split("\n", 1)[0].strip() in (
+            r"\b",
+            "\b",
+        ):
+            # Restore the first line indentation removed with the quotes.
+            wrapped = _wrappers.do_wrap_description(
+                indentation + contents,
+                indentation=indentation,
+                wrap_length=(
+                    self.args.wrap_descriptions
+                    - indentation.count("\t") * (self.args.tab_width - 1)
+                ),
+                force_wrap=False,
+                strict=self.args.non_strict,
+                rest_sections=self.args.rest_section_adorns,
+                style=self.args.style,
+            ).lstrip()
+            pre_summary = "\n" + indentation if self.args.pre_summary_newline else ""
+            post_description = "\n" if self.args.post_description_blank else ""
+            return (
+                f"{open_quote}{pre_summary}{wrapped}{post_description}\n"
+                f'{indentation}"""'
+            )
+
         # Do not modify docstring if the only thing it contains is a link.
         _links = _patterns.do_find_links(contents)
         with contextlib.suppress(IndexError):

@@ -282,6 +282,25 @@ def do_split_description(
     _lines: List[str] = []
     _text_idx = 0
 
+    # Click uses a standalone backspace escape to keep a paragraph literal.
+    # Protect these paragraphs before URL and field-list wrapping can join
+    # their lines. Other paragraphs still use the regular wrapping rules.
+    _paragraphs = re.split(r"\n(?:[ \t]*\n)+", text)
+    _click_paragraphs = [
+        _paragraph.split("\n", 1)[0].strip() in (r"\b", "\b")
+        for _paragraph in _paragraphs
+    ]
+    if any(_click_paragraphs):
+        for _paragraph, _is_click in zip(_paragraphs, _click_paragraphs):
+            if _is_click:
+                _lines.extend(_paragraph.splitlines())
+            else:
+                _lines.extend(
+                    do_split_description(_paragraph, indentation, wrap_length, style)
+                )
+            _lines.append("")
+        return _lines[:-1]
+
     # Check if the description contains any URLs.
     _url_idx = _patterns.do_find_links(text)
 
