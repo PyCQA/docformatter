@@ -436,17 +436,12 @@ def do_split_summary(lines) -> List[str]:
 
     lines[0] = first_sentence
 
-    # If there is remaining text, it should become the beginning of the description
-    # in a multiline docstring.  Thus, insert a newline and then the remaining text to
-    # the list of lines.
+    # The remaining sentences still belong to the summary, so insert them
+    # directly after the first sentence.  Merging them into a following line
+    # instead would move the blank line separating the summary from the
+    # description into the middle of the summary (issue #315).
     if rest_text:
-        _pos = 1 if len(lines) >= 3 else 0  # noqa: PLR2004
-        _leading_spaces = " " * (len(lines[_pos]) - len(lines[_pos].lstrip()))
-        _internal_spaces = " " * (_pos)
-        lines.insert(1, "")
-        lines[_pos + 1] = (
-            f"{_leading_spaces}{rest_text}{_internal_spaces}{lines[_pos + 1].strip()}"
-        )
+        lines.insert(1, rest_text)
 
     return lines
 

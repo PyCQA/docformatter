@@ -89,6 +89,7 @@ with open("tests/_data/string_files/do_format_code.toml", "rb") as f:
         ("multiple_sentences", NO_ARGS),
         ("multiple_sentences_same_line", NO_ARGS),
         ("multiline_summary", NO_ARGS),
+        ("multiple_sentences_with_description", NO_ARGS),
         ("empty_lines", NO_ARGS),
         ("class_empty_lines", NO_ARGS),
         ("class_empty_lines_2", NO_ARGS),

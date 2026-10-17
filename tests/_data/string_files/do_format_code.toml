@@ -353,6 +353,20 @@ expected='''def foo():
     """
 '''
 
+[multiple_sentences_with_description]
+source='''def foo():
+    """First sentence is here. Second sentence is long and split in two. I even have a third sentence here.
+
+    And other text here.
+    """'''
+expected='''def foo():
+    """First sentence is here. Second sentence is long and split in two. I even
+    have a third sentence here.
+
+    And other text here.
+    """
+'''
+
 [empty_lines]
 source='''def foo():
     """
