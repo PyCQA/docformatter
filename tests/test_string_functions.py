@@ -223,6 +223,58 @@ def test_do_split_summary_inline_literal(instring, expected):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
+    ("instring", "expected"),
+    [
+        (
+            [
+                "First sentence is here. Second sentence is long and split "
+                "in two. I even have a third sentence here.",
+                "",
+                "And other text here.",
+            ],
+            [
+                "First sentence is here.",
+                "Second sentence is long and split in two. I even have a "
+                "third sentence here.",
+                "",
+                "And other text here.",
+            ],
+        ),
+        (
+            [
+                "First sentence is here. Second sentence is long",
+                "and split in two. I even have a third sentence here.",
+                "",
+                "And other text here.",
+            ],
+            [
+                "First sentence is here.",
+                "Second sentence is long",
+                "and split in two. I even have a third sentence here.",
+                "",
+                "And other text here.",
+            ],
+        ),
+    ],
+)
+def test_do_split_summary_keeps_blank_before_description(instring, expected):
+    """The summary remainder does not swallow the description's blank line.
+
+    The remainder of a multi-sentence summary still belongs to the summary, so it is
+    inserted directly after the first sentence.  Merging it into the following line
+    instead moved the blank line separating the summary from the description into the
+    middle of the summary, which let the wrapped summary and the description run
+    together on a single line.
+
+    See issue #315.
+    """
+    result = do_split_summary(instring)
+
+    assert result == expected, f"\nExpected {expected}\nGot {result}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
     "test_key",
     [
         "do_strip_docstring",
