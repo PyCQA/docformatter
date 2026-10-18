@@ -139,6 +139,14 @@ REST_SECTION_REGEX = (
 )
 """Regular expression to use for finding reST section headers."""
 
+# Field names are extensible. Match the reST marker separately so custom fields
+# do not need to be added to Sphinx's legacy, permissive pattern below.
+# https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#field-lists
+REST_FIELD_REGEX = (
+    r":(?![: \t])(?:[^:\\\r\n]|\\.|:(?![ `\t\r\n]|$))*(?<![ \t]):(?=[ \t]|$)"
+)
+"""Regular expression for extensible reST field markers."""
+
 # Complete list:
 # https://www.sphinx-doc.org/en/master/usage/domains/python.html#info-field-lists
 SPHINX_FIELD_PATTERNS = (
