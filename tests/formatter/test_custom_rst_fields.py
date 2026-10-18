@@ -35,7 +35,7 @@ import pytest
 
 # docformatter Package Imports
 from docformatter.format import Formatter
-from docformatter.patterns.fields import do_find_field_lists, is_sphinx_field_list
+from docformatter.patterns.fields import do_find_field_lists
 
 
 @pytest.mark.parametrize(
@@ -54,7 +54,6 @@ def test_custom_field_markers(field):
     indices, wrap = do_find_field_lists(text, "sphinx")
     assert wrap
     assert [text[start:end] for start, end in indices] == [":" + field + ":"]
-    assert is_sphinx_field_list(":" + field + ": body")
 
 
 @pytest.mark.parametrize(
@@ -70,7 +69,6 @@ def test_custom_field_markers(field):
 )
 def test_prose_and_roles_are_not_field_markers(text):
     assert do_find_field_lists(text, "sphinx")[0] == []
-    assert not is_sphinx_field_list(text)
 
 
 @pytest.mark.parametrize("args", [[""], ["--black", ""]])
@@ -98,3 +96,18 @@ def test_custom_field_wrapping_is_indented_and_idempotent(test_args, args, field
     assert end > start + 1
     assert all(line.startswith("        ") for line in lines[start + 1 : end])
     assert formatter._do_format_code(result) == result
+
+
+@pytest.mark.parametrize("args", [[""], ["--black", ""]])
+@pytest.mark.parametrize(
+    "body",
+    [
+        "    - GET first\n    - POST second\n",
+        "    1. GET first\n    2. POST second\n",
+        "    >>> print(1)\n    1\n",
+    ],
+)
+def test_complex_custom_field_body_is_preserved(test_args, args, body):
+    source = '"""Summary.\n\n:calls: Available operations.\n\n' + body + '"""\n'
+    formatter = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    assert formatter._do_format_code(source) == source

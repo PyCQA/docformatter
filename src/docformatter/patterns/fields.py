@@ -290,7 +290,7 @@ def is_sphinx_field_list(line: str) -> Union[Match[str], None]:
     Sphinx field lists have the following pattern:
         :parameter: description
     """
-    return re.match(SPHINX_REGEX, line) or re.match(REST_FIELD_REGEX, line)
+    return re.match(SPHINX_REGEX, line)
 
 
 # TODO: Add a USER_DEFINED_REGEX to constants.py and use that instead of the
