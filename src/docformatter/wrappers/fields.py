@@ -125,8 +125,8 @@ def _do_join_field_body(text: str, field_idx: list[tuple[int, int]], idx: int) -
         [_line.strip() for _line in _field_body.splitlines()]
     ).strip()
 
-    # Add a space before the field body unless the field body is a link.
-    if not _field_body.startswith("`") and _field_body:
+    # Field markers require whitespace before any body, including inline links.
+    if _field_body:
         _field_body = f" {_field_body}"
 
     # Is there a blank line between field lists?  Keep it if so.

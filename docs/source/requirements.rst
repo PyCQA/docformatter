@@ -215,7 +215,7 @@ the requirement falls in, the type of requirement, and whether
     ' docformatter_10.4.1', ' Shall ignore docstrings in other styles when using Sphinx style.', ' Style', ' Shall', ' Yes'
     ' docformatter_10.4.2', ' Shall wrap Sphinx-style parameter descriptions that exceed wrap length when using Sphinx style.', ' Shall', ' Yes'
     ' docformatter_10.4.3', ' Shall ensure one blank space between a field name and field body.', ' Style', ' Shall', ' Yes [PR #220]'
-    ' docformatter_10.4.3.1', ' Shall NOT add a blank space after a field name when the field body is a link.', ' Style', ' Shall', ' Yes [PR #220]'
+    ' docformatter_10.4.3.1', ' Shall add a blank space after a field name when the field body is a link, as required by reST field-marker syntax.', ' Style', ' Shall', ' Yes [Issue #279]'
     ' docformatter_10.4.3.2', ' Shall NOT add a blank space after a field name when there is no field body.', ' Style', ' Shall', ' Yes [PR #220]'
     ' docformatter_10.5', ' Should format docstrings compatible with black.', ' Style', ' Should', ' Yes [PR #192]'
     ' docformatter_10.5.1', ' Should wrap summaries at 88 characters by default in black mode.', ' Style', ' Should', ' Yes'

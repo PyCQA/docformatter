@@ -38,6 +38,7 @@ from docformatter.constants import (
     GOOGLE_REGEX,
     GOOGLE_SECTION_REGEX,
     NUMPY_REGEX,
+    REST_FIELD_REGEX,
     SPHINX_REGEX,
 )
 
@@ -73,10 +74,13 @@ def do_find_field_lists(
         ]
         _wrap_parameters = True
     elif style == "sphinx":
-        _field_idx = [
-            (_field.start(0), _field.end(0))
-            for _field in re.finditer(SPHINX_REGEX, text)
-        ]
+        for _field in re.finditer(
+            rf"^[ \t]*(?P<field>{REST_FIELD_REGEX})|{SPHINX_REGEX}",
+            text,
+            flags=re.MULTILINE,
+        ):
+            _marker_group = "field" if _field.group("field") is not None else 0
+            _field_idx.append(_field.span(_marker_group))
         _wrap_parameters = True
 
     return _field_idx, _wrap_parameters
