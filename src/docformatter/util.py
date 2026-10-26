@@ -73,6 +73,10 @@ def find_py_files(sources, recursive, exclude=None):
                     dirs[:] = []
                     continue
 
+                dirs[:] = [
+                    d for d in dirs if not is_hidden(d) and not is_excluded(d, exclude)
+                ]
+
                 files = sorted(
                     [
                         _file
