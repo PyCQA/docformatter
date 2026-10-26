@@ -12,31 +12,58 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - "pypy3.9"
-          - "3.14"
-          - "3.13"
-          - "3.12"
-          - "3.11"
-          - "3.10"
-        os: [ubuntu-latest]
+        # Include-only matrix: every entry is one complete job. No original
+        # axis exists, so no include can be merged into or overwritten by
+        # another. PyPy 3.11 is the PyPy tox maps; 3.10 is the oldest version
+        # pyproject.toml allows.
+        include:
+          - os: ubuntu-latest
+            python-version: "3.10"
+            tox-env: py310
+            py-expect: "(3, 10)"
+            implementation: cpython
+          - os: ubuntu-latest
+            python-version: "3.11"
+            tox-env: py311
+            py-expect: "(3, 11)"
+            implementation: cpython
+          - os: ubuntu-latest
+            python-version: "3.12"
+            tox-env: py312
+            py-expect: "(3, 12)"
+            implementation: cpython
+          - os: ubuntu-latest
+            python-version: "3.13"
+            tox-env: py313
+            py-expect: "(3, 13)"
+            implementation: cpython
+          - os: ubuntu-latest
+            python-version: "3.14"
+            tox-env: py314
+            py-expect: "(3, 14)"
+            implementation: cpython
+          - os: ubuntu-latest
+            python-version: "pypy-3.11"
+            tox-env: pypy3
+            py-expect: "(3, 11)"
+            implementation: pypy
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
     steps:
-      - name: Setup Python for tox
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.14"
-      - name: Install tox
-        run: python -m pip install tox tox-gh-actions
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }} for test
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install tox
+        run: python -m pip install tox tox-gh-actions
       - name: Setup test suite
-        run: tox -vv --notest
+        run: tox -vv --notest -e ${{ matrix.tox-env }}
       - name: Run tests with tox
-        run: tox -e py --skip-pkg-install
+        run: tox -e ${{ matrix.tox-env }} --skip-pkg-install
+      # tox exits 0 when it skips an env, so assert the interpreter the suite
+      # really used is the one this job is named for.
+      - name: Check the interpreter under test
+        run: .tox/${{ matrix.tox-env }}/bin/python -c 'import sys; print(sys.version, sys.implementation.name); assert sys.version_info[:2] == ${{ matrix.py-expect }}, sys.version_info; assert sys.implementation.name == "${{ matrix.implementation }}", sys.implementation.name'
