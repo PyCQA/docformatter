@@ -31,6 +31,7 @@ Additional contributions by (sorted by name)
 - Elliot Ford <elliot.ford@astrazeneca.com>
 - Eric Hutton <mcflugen@users.noreply.github.com>
 - Filip Kucharczyk <filip.m.kucharczyk@gmail.com>
+- Giorgio Maria Federico Birnthaler <129273127+Dodothereal@users.noreply.github.com>
 - Jamal Ali <jamalkamaladdin@gmail.com>
 - Joao Azevedo <joao.c.azevedo@gmail.com>
 - Jonas Haag <jonas@lophus.org>
