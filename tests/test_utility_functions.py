@@ -146,3 +146,22 @@ def test_find_py_files_skips_excluded_directory_and_continues(tmp_path):
     result = list(find_py_files([str(root)], recursive=True, exclude=["a_excluded"]))
 
     assert result == [str(included / "included.py")]
+
+
+@pytest.mark.unit
+def test_find_py_files_skips_hidden_directory_recursive(tmp_path):
+    """Skip hidden directories when recursing even if not in exclude."""
+    root = tmp_path / "project"
+    hidden = root / ".hidden"
+    nested_hidden = hidden / "nested"
+    visible = root / "visible"
+    nested_hidden.mkdir(parents=True)
+    visible.mkdir(parents=True)
+    (hidden / "hidden.py").touch()
+    (nested_hidden / "nested.py").touch()
+    (visible / "visible.py").touch()
+
+    result = list(find_py_files([str(root)], recursive=True, exclude=None))
+
+    assert result == [str(visible / "visible.py")]
+
