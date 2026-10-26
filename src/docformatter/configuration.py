@@ -84,9 +84,7 @@ class Configurater:
 
         try:
             if self.args_lst is not None:
-                self.config_file = str(
-                    self.args_lst[self.args_lst.index("--config") + 1]
-                )
+                self.config_file = self._do_find_config_argument(self.args_lst)
         except ValueError:
             for _configuration_file in self.configuration_file_lst:
                 if os.path.isfile(_configuration_file):
@@ -95,6 +93,30 @@ class Configurater:
 
         if os.path.isfile(self.config_file):
             self._do_read_configuration_file()
+
+    @staticmethod
+    def _do_find_config_argument(args: Sequence[str]) -> str:
+        """Return the last --config value, in either spelling.
+
+        argparse accepts ``--config PATH`` and ``--config=PATH`` and keeps the
+        last one; ``--`` ends the options.  ValueError means no --config, so
+        the caller searches the current directory.
+        """
+        config_file = None
+        options = args[1:]  # argparse ignores the program name.
+        for _index, _arg in enumerate(options):
+            if _arg == "--":
+                break
+            if _arg == "--config":
+                # IndexError keeps the existing report for a missing value.
+                config_file = str(options[_index + 1])
+            elif _arg.startswith("--config="):
+                config_file = _arg[len("--config=") :]
+
+        if config_file is None:
+            raise ValueError("No --config argument")
+
+        return config_file
 
     def do_parse_arguments(self) -> None:
         """Parse configuration file and command line arguments."""

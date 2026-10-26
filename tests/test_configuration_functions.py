@@ -27,6 +27,10 @@
 # SOFTWARE.
 """Module for testing docformatter's Configurater class."""
 
+# Standard Library Imports
+import subprocess
+import sys
+
 # Third Party Imports
 import pytest
 
@@ -829,3 +833,195 @@ class TestRestSectionAdornsConfigKey:
         uut.do_parse_arguments()
 
         assert uut.args.rest_section_adorns == "[~]{4,}"
+
+
+# filename, configuration body, and the flargs each file type produces.
+CONFIG_FILE_TYPES = [
+    ("pyproject.toml", "[tool.docformatter]\n{options}\n", {"blank": "True"}),
+    ("setup.cfg", "[docformatter]\n{options}\n", {"blank": "true"}),
+    ("tox.ini", "[docformatter]\n{options}\n", {"blank": "true"}),
+]
+
+CONFIG_CASES = pytest.mark.parametrize(
+    "filename,body,expected", CONFIG_FILE_TYPES, ids=["pyproject", "setup-cfg", "tox"]
+)
+
+CONFIG_ARGUMENTS = pytest.mark.parametrize(
+    "config_arguments",
+    [lambda path: ["--config", path], lambda path: [f"--config={path}"]],
+    ids=["separate", "equals"],
+)
+
+SOURCE = 'def f():\n    """Summary.\n\n    Description text.\n    """\n    return 1\n'
+BLANK_SOURCE = (
+    'def f():\n    """Summary.\n\n    Description text.\n\n    """\n    return 1\n'
+)
+
+
+def _run_docformatter(arguments, directory):
+    """Run docformatter in a subprocess and return the completed process."""
+    return subprocess.run(
+        [sys.executable, "-m", "docformatter", *arguments],
+        cwd=str(directory),
+        capture_output=True,
+        text=True,
+    )
+
+
+class TestConfigArgument:
+    """Class for testing the two --config spellings accepted by argparse."""
+
+    @pytest.mark.unit
+    @CONFIG_CASES
+    @CONFIG_ARGUMENTS
+    def test_supported_file_is_read(
+        self, tmp_path, filename, body, expected, config_arguments
+    ):
+        """Read a supported file given as --config PATH or --config=PATH."""
+        config_file = tmp_path / filename
+        config_file.write_text(body.format(options="blank = true"), encoding="utf-8")
+
+        uut = Configurater(
+            ["/path/to/docformatter", *config_arguments(str(config_file)), ""]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.config_file == str(config_file)
+        assert uut.flargs == expected
+        assert uut.args.post_description_blank
+
+    @pytest.mark.unit
+    @CONFIG_ARGUMENTS
+    def test_explicit_path_wins_over_autodiscovery(self, tmp_path, config_arguments):
+        """Use the requested file when the directory holds a different one."""
+        (tmp_path / "setup.cfg").write_text(
+            "[docformatter]\nwrap-summaries = 120\n", encoding="utf-8"
+        )
+        requested = tmp_path / "requested" / "pyproject.toml"
+        requested.parent.mkdir()
+        requested.write_text(
+            "[tool.docformatter]\nwrap-summaries = 70\n", encoding="utf-8"
+        )
+        # Autodiscovery in the working directory would pick this file instead.
+        (tmp_path / "pyproject.toml").write_text(
+            "[tool.docformatter]\nwrap-summaries = 120\n", encoding="utf-8"
+        )
+
+        uut = Configurater(
+            [
+                "/path/to/docformatter",
+                *config_arguments(str(requested)),
+                "",
+            ]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.config_file == str(requested)
+        assert uut.args.wrap_summaries == 70
+
+    @pytest.mark.unit
+    @CONFIG_ARGUMENTS
+    def test_unsupported_file_is_still_ignored(self, tmp_path, config_arguments):
+        """Keep ignoring files outside the documented set of names."""
+        config_file = tmp_path / "custom.toml"
+        config_file.write_text("[tool.docformatter]\nblank = true\n", encoding="utf-8")
+
+        uut = Configurater(
+            ["/path/to/docformatter", *config_arguments(str(config_file)), ""]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.config_file == str(config_file)
+        assert uut.flargs == {}
+        assert not uut.args.post_description_blank
+
+    @pytest.mark.unit
+    def test_mixed_repeated_config_uses_the_last_value(self, tmp_path):
+        """Load the same file argparse reports when --config is repeated."""
+        first = tmp_path / "first" / "pyproject.toml"
+        first.parent.mkdir()
+        first.write_text("[tool.docformatter]\nwrap-summaries = 40\n", encoding="utf-8")
+        second = tmp_path / "second" / "pyproject.toml"
+        second.parent.mkdir()
+        second.write_text("[tool.docformatter]\nblank = true\n", encoding="utf-8")
+
+        uut = Configurater(
+            [
+                "/path/to/docformatter",
+                f"--config={first}",
+                "--config",
+                str(second),
+                "",
+            ]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.args.config == str(second)
+        assert uut.config_file == str(second)
+        assert uut.flargs == {"blank": "True"}
+
+    @pytest.mark.unit
+    def test_stops_at_end_of_options(self, tmp_path):
+        """Ignore --config looking tokens that argparse treats as file names."""
+        requested = tmp_path / "pyproject.toml"
+        requested.write_text("[tool.docformatter]\nblank = true\n", encoding="utf-8")
+        decoy = tmp_path / "--config=decoy.toml"
+        decoy.write_text("[tool.docformatter]\nwrap-summaries = 40\n", encoding="utf-8")
+
+        uut = Configurater(
+            [
+                "/path/to/docformatter",
+                f"--config={requested}",
+                "--",
+                "--config=decoy.toml",
+            ]
+        )
+        uut.do_parse_arguments()
+
+        assert uut.config_file == str(requested)
+        assert uut.flargs == {"blank": "True"}
+
+    @pytest.mark.unit
+    def test_program_name_is_not_read_as_the_argument(self, tmp_path):
+        """Start scanning after the program name argparse would ignore."""
+        uut = Configurater(["--config=sample.toml", "file.py"])
+        uut.do_parse_arguments()
+
+        assert uut.config_file == "./pyproject.toml"
+
+    @pytest.mark.system
+    @CONFIG_CASES
+    @CONFIG_ARGUMENTS
+    def test_supported_file_is_applied_by_the_command(
+        self, tmp_path, filename, body, expected, config_arguments
+    ):
+        """Apply the settings through the real command line."""
+        (tmp_path / filename).write_text(
+            body.format(options="blank = true"), encoding="utf-8"
+        )
+        (tmp_path / "target.py").write_text(SOURCE, encoding="utf-8")
+
+        result = _run_docformatter(
+            [*config_arguments(filename), "--in-place", "target.py"], tmp_path
+        )
+
+        assert result.returncode == 3, result.stderr
+        assert (tmp_path / "target.py").read_text(encoding="utf-8") == BLANK_SOURCE
+
+    @pytest.mark.system
+    def test_explicit_path_beats_directory_file_on_the_command_line(self, tmp_path):
+        """Prefer the requested file over the directory one end to end."""
+        (tmp_path / "pyproject.toml").write_text(
+            "[tool.docformatter]\nblank = false\n", encoding="utf-8"
+        )
+        requested = tmp_path / "requested" / "pyproject.toml"
+        requested.parent.mkdir()
+        requested.write_text("[tool.docformatter]\nblank = true\n", encoding="utf-8")
+        (tmp_path / "target.py").write_text(SOURCE, encoding="utf-8")
+
+        result = _run_docformatter(
+            [f"--config={requested}", "--in-place", "target.py"], tmp_path
+        )
+
+        assert result.returncode == 3, result.stderr
+        assert (tmp_path / "target.py").read_text(encoding="utf-8") == BLANK_SOURCE
