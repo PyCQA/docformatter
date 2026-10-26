@@ -16,6 +16,7 @@ Additional contributions by (sorted by name)
 - Alexander Puck Neuwirth <APN-Pucky@users.noreply.github.com>
 - Alexandre Detiste <alexandre.detiste@gmail.com>
 - Andrew Howe <howeaj@users.noreply.github.com>
+- Andrii Makarenko <123010023+andymkr@users.noreply.github.com>
 - Andy Hayden <andyhayden1@gmail.com>
 - Anthony Sottile <asottile@umich.edu>
 - Antoine Dechaume <AntoineD@users.noreply.github.com>
