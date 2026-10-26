@@ -96,12 +96,7 @@ class Configurater:
 
     @staticmethod
     def _do_find_config_argument(args: Sequence[str]) -> str:
-        """Return the last --config value, in either spelling.
-
-        argparse accepts ``--config PATH`` and ``--config=PATH`` and keeps the
-        last one; ``--`` ends the options.  ValueError means no --config, so
-        the caller searches the current directory.
-        """
+        """Return the last explicit config path before the end-of-options marker."""
         config_file = None
         options = args[1:]  # argparse ignores the program name.
         for _index, _arg in enumerate(options):
