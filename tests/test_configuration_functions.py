@@ -892,8 +892,11 @@ class TestConfigArgument:
 
     @pytest.mark.unit
     @CONFIG_ARGUMENTS
-    def test_explicit_path_wins_over_autodiscovery(self, tmp_path, config_arguments):
+    def test_explicit_path_wins_over_autodiscovery(
+        self, tmp_path, monkeypatch, config_arguments
+    ):
         """Use the requested file when the directory holds a different one."""
+        monkeypatch.chdir(tmp_path)
         (tmp_path / "setup.cfg").write_text(
             "[docformatter]\nwrap-summaries = 120\n", encoding="utf-8"
         )
@@ -982,12 +985,17 @@ class TestConfigArgument:
         assert uut.flargs == {"blank": "True"}
 
     @pytest.mark.unit
-    def test_program_name_is_not_read_as_the_argument(self, tmp_path):
+    def test_program_name_is_not_read_as_the_argument(self, tmp_path, monkeypatch):
         """Start scanning after the program name argparse would ignore."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "pyproject.toml").write_text(
+            "[tool.docformatter]\nblank = true\n", encoding="utf-8"
+        )
         uut = Configurater(["--config=sample.toml", "file.py"])
         uut.do_parse_arguments()
 
         assert uut.config_file == "./pyproject.toml"
+        assert uut.args.post_description_blank
 
     @pytest.mark.system
     @CONFIG_CASES
