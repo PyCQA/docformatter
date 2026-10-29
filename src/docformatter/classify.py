@@ -117,9 +117,9 @@ def do_find_docstring_blocks(tokens: list[TokenInfo]) -> list[tuple[int, int, st
 def _is_standalone_string(tokens: list[TokenInfo], index: int) -> bool:
     """Check that a string is the entire logical statement, not a value expression.
 
-    This is a conservative formatting guard, not a docstring-position classifier.
-    Leave inline, parenthesized, and concatenated strings unchanged because the
-    docstring rewriter expects a single string on its own logical line.
+    This is a conservative formatting guard, not a docstring-position classifier. Leave
+    inline, parenthesized, and concatenated strings unchanged because the docstring
+    rewriter expects a single string on its own logical line.
     """
     for position in range(index - 1, -1, -1):
         previous = tokens[position]
