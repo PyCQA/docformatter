@@ -78,6 +78,9 @@ def do_find_docstring_blocks(tokens: list[TokenInfo]) -> list[tuple[int, int, st
         ):
             continue
 
+        if not _is_standalone_string(tokens, i):
+            continue
+
         if is_module_docstring(tokens, i):
             docstring_blocks.append((0, i, "module"))
             continue
@@ -109,6 +112,35 @@ def do_find_docstring_blocks(tokens: list[TokenInfo]) -> list[tuple[int, int, st
         i += 1
 
     return docstring_blocks
+
+
+def _is_standalone_string(tokens: list[TokenInfo], index: int) -> bool:
+    """Check that a string is the entire logical statement, not a value expression.
+
+    This is a conservative formatting guard, not a docstring-position classifier.
+    Leave inline, parenthesized, and concatenated strings unchanged because the
+    docstring rewriter expects a single string on its own logical line.
+    """
+    for position in range(index - 1, -1, -1):
+        previous = tokens[position]
+        if previous.type in (tokenize.ENCODING, tokenize.NEWLINE):
+            break
+        if previous.type not in (
+            tokenize.COMMENT,
+            tokenize.NL,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+        ):
+            return False
+
+    for position in range(index + 1, len(tokens)):
+        following = tokens[position]
+        if following.type in (tokenize.NEWLINE, tokenize.ENDMARKER):
+            return True
+        if following.type != tokenize.COMMENT:
+            return False
+
+    return True
 
 
 def _do_find_anchor_index(
