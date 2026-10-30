@@ -170,6 +170,35 @@ def test_do_format_code(test_key, test_args, args):
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS])
+@pytest.mark.parametrize("separator", ["", "    ", "\n"])
+def test_do_format_code_preserves_summary_paragraphs(test_args, args, separator):
+    """Preserve the paragraph boundary after splitting a multi-sentence summary."""
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    source = (
+        "def foo():\n"
+        '    """Summary. More detail.\n'
+        f"{separator}\n"
+        "    Another paragraph.\n"
+        '    """\n'
+    )
+    expected = (
+        "def foo():\n"
+        '    """Summary.\n'
+        "\n"
+        "    More detail.\n"
+        "\n"
+        "    Another paragraph.\n"
+        '    """\n'
+    )
+
+    result = uut._do_format_code(source)
+
+    assert result == expected
+    assert uut._do_format_code(result) == result
+
+
+@pytest.mark.integration
 @pytest.mark.order(7)
 @pytest.mark.parametrize("args", [NO_ARGS])
 def test_do_format_code_inline_comment_after_docstring(test_args, args):
