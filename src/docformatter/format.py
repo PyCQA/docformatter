@@ -1071,12 +1071,6 @@ class Formatter:
             # Something probably isn't right with the splitting.
             return docstring
 
-        # Compensate for textwrap counting each tab in indentation as 1
-        # character.
-        tab_compensation = indentation.count("\t") * (self.args.tab_width - 1)
-        self.args.wrap_summaries -= tab_compensation
-        self.args.wrap_descriptions -= tab_compensation
-
         if description:
             return self._do_format_multiline_docstring(
                 indentation,
@@ -1114,12 +1108,16 @@ class Formatter:
         str
             The formatted docstring.
         """
+        # Keep tab compensation local to this docstring.
+        wrap_length = self.args.wrap_summaries - indentation.count("\t") * (
+            self.args.tab_width - 1
+        )
         if self.args.make_summary_multi_line:
             beginning = f"{open_quote}\n{indentation}"
             ending = f'\n{indentation}"""'
             summary_wrapped = _wrappers.do_wrap_summary(
                 _strings.do_normalize_summary(contents, self.args.non_cap),
-                wrap_length=self.args.wrap_summaries,
+                wrap_length=wrap_length,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
             ).strip()
@@ -1129,7 +1127,7 @@ class Formatter:
                 open_quote
                 + _strings.do_normalize_summary(contents, self.args.non_cap)
                 + '"""',
-                wrap_length=self.args.wrap_summaries,
+                wrap_length=wrap_length,
                 initial_indent=indentation,
                 subsequent_indent=indentation,
             ).strip()
@@ -1165,6 +1163,7 @@ class Formatter:
         str
             The formatted docstring.
         """
+        tab_compensation = indentation.count("\t") * (self.args.tab_width - 1)
         # Compensate for triple quotes by temporarily prepending 3 spaces.
         # This temporary prepending is undone below.
         initial_indent = (
@@ -1173,14 +1172,14 @@ class Formatter:
         pre_summary = "\n" + indentation if self.args.pre_summary_newline else ""
         summary = _wrappers.do_wrap_summary(
             _strings.do_normalize_summary(summary, self.args.non_cap),
-            wrap_length=self.args.wrap_summaries,
+            wrap_length=self.args.wrap_summaries - tab_compensation,
             initial_indent=initial_indent,
             subsequent_indent=indentation,
         ).lstrip()
         description = _wrappers.do_wrap_description(
             description,
             indentation=indentation,
-            wrap_length=self.args.wrap_descriptions,
+            wrap_length=self.args.wrap_descriptions - tab_compensation,
             force_wrap=self.args.force_wrap,
             strict=self.args.non_strict,
             rest_sections=self.args.rest_section_adorns,
