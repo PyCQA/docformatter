@@ -222,6 +222,54 @@ def test_do_split_summary_inline_literal(instring, expected):
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("separator", ["", "    "])
+def test_do_split_summary_preserves_paragraph_separator(separator):
+    """Keep the paragraph after the remainder of a multi-sentence summary."""
+    lines = ["First sentence. Second sentence.", separator, "Third paragraph."]
+
+    assert do_split_summary(lines) == [
+        "First sentence.",
+        "",
+        f"{separator}Second sentence.",
+        separator,
+        "Third paragraph.",
+    ]
+
+
+@pytest.mark.unit
+def test_do_split_summary_preserves_paragraph_with_multiple_separators():
+    """Multiple existing blank lines still separate the next paragraph."""
+    lines = ["First sentence. Second sentence.", "", "", "Third paragraph."]
+
+    assert [line.rstrip() for line in do_split_summary(lines)] == [
+        "First sentence.",
+        "",
+        "Second sentence.",
+        "",
+        "Third paragraph.",
+    ]
+
+
+@pytest.mark.unit
+def test_do_split_summary_preserves_continuation_and_paragraph():
+    """Keep the original issue #315 continuation before the next paragraph."""
+    lines = [
+        "First sentence. Second sentence is long",
+        "and continues here.",
+        "",
+        "Third paragraph.",
+    ]
+
+    assert do_split_summary(lines) == [
+        "First sentence.",
+        "",
+        "Second sentence is long and continues here.",
+        "",
+        "Third paragraph.",
+    ]
+
+
+@pytest.mark.unit
 @pytest.mark.parametrize(
     "test_key",
     [

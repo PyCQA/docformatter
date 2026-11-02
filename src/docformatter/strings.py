@@ -444,9 +444,14 @@ def do_split_summary(lines) -> List[str]:
         _leading_spaces = " " * (len(lines[_pos]) - len(lines[_pos].lstrip()))
         _internal_spaces = " " * (_pos)
         lines.insert(1, "")
-        lines[_pos + 1] = (
-            f"{_leading_spaces}{rest_text}{_internal_spaces}{lines[_pos + 1].strip()}"
-        )
+        if _pos and not lines[_pos + 1].strip() and lines[_pos + 2].strip():
+            # Do not replace the only separator before the next paragraph.
+            lines.insert(_pos + 1, f"{_leading_spaces}{rest_text}")
+        else:
+            lines[_pos + 1] = (
+                f"{_leading_spaces}{rest_text}{_internal_spaces}"
+                f"{lines[_pos + 1].strip()}"
+            )
 
     return lines
 
