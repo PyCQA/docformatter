@@ -28,10 +28,11 @@
 
 # Standard Library Imports
 import argparse
+import ast
 import os
 import sys
 from configparser import ConfigParser
-from typing import Dict, Sequence, Union
+from typing import Dict, List, Sequence, Union
 
 try:
     if sys.version_info >= (3, 11):
@@ -113,6 +114,27 @@ class Configurater:
 
         return config_file
 
+    def _do_get_list_option(self, option: str) -> Union[List[str], None]:
+        """Return a list option from the configuration file as a list.
+
+        INI files, and string values in TOML files, give a str.  Read a bracketed list
+        such as ``["build", "dist"]`` as that list and anything else as names separated
+        by whitespace or newlines.
+        """
+        value = self.flargs.get(option, None)
+        if value is None or isinstance(value, list):
+            return value
+
+        value = str(value)
+        try:
+            names = ast.literal_eval(value)
+        except (SyntaxError, ValueError):
+            names = None
+
+        if isinstance(names, list):
+            return [str(name) for name in names]
+        return value.split()
+
     def do_parse_arguments(self) -> None:
         """Parse configuration file and command line arguments."""
         changes = self.parser.add_mutually_exclusive_group()
@@ -149,7 +171,7 @@ class Configurater:
             "-e",
             "--exclude",
             nargs="*",
-            default=self.flargs.get("exclude", None),
+            default=self._do_get_list_option("exclude"),
             help="in recursive mode, exclude directories and files by names",
         )
         self.parser.add_argument(
@@ -157,7 +179,7 @@ class Configurater:
             "--non-cap",
             action="store",
             nargs="*",
-            default=self.flargs.get("non-cap", None),
+            default=self._do_get_list_option("non-cap"),
             help="list of words not to capitalize when they appear as the first word "
             "in the summary",
         )
