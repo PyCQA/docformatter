@@ -1033,3 +1033,71 @@ class TestConfigArgument:
 
         assert result.returncode == 3, result.stderr
         assert (tmp_path / "target.py").read_text(encoding="utf-8") == BLANK_SOURCE
+
+
+# INI values for a list option, and the list the command line would produce.
+INI_LIST_VALUES = pytest.mark.parametrize(
+    "value,expected",
+    [
+        ('["src/", "tests/"]', ["src/", "tests/"]),
+        ("build", ["build"]),
+        ("build dist", ["build", "dist"]),
+        ("\n    build\n    dist", ["build", "dist"]),
+    ],
+    ids=["bracketed", "single", "spaced", "multiline"],
+)
+
+
+class TestListOptionsFromConfigFile:
+    """Class for testing list options read from a configuration file."""
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("filename", ["setup.cfg", "tox.ini"])
+    @INI_LIST_VALUES
+    def test_ini_list_options_are_lists(self, tmp_path, filename, value, expected):
+        """Read exclude and non-cap from an INI file as lists, not strings."""
+        config_file = tmp_path / filename
+        config_file.write_text(
+            f"[docformatter]\nexclude = {value}\nnon-cap = {value}\n",
+            encoding="utf-8",
+        )
+
+        uut = Configurater(["/path/to/docformatter", "--config", str(config_file), ""])
+        uut.do_parse_arguments()
+
+        assert uut.args.exclude == expected
+        assert uut.args.non_cap == expected
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "value,expected",
+        [('"build"', ["build"]), ('["build", "dist"]', ["build", "dist"])],
+        ids=["string", "array"],
+    )
+    def test_toml_list_options_are_lists(self, tmp_path, value, expected):
+        """Read exclude and non-cap from pyproject.toml as lists."""
+        config_file = _write_pyproject(
+            tmp_path, f"exclude = {value}\nnon-cap = {value}\n"
+        )
+
+        uut = Configurater(["/path/to/docformatter", "--config", config_file, ""])
+        uut.do_parse_arguments()
+
+        assert uut.args.exclude == expected
+        assert uut.args.non_cap == expected
+
+    @pytest.mark.system
+    def test_ini_exclude_skips_only_the_named_directory(self, tmp_path):
+        """Check every file except those under the excluded directory."""
+        (tmp_path / "setup.cfg").write_text(
+            "[docformatter]\nexclude = build\n", encoding="utf-8"
+        )
+        for directory in ("build", "pkg"):
+            (tmp_path / directory).mkdir()
+            (tmp_path / directory / "module.py").write_text(SOURCE, encoding="utf-8")
+
+        result = _run_docformatter(["--check", "--recursive", "--blank", "."], tmp_path)
+
+        assert result.returncode == 3, result.stderr
+        assert "pkg" in result.stderr
+        assert "build" not in result.stderr
