@@ -866,6 +866,7 @@ class Formatter:
     def _do_add_unformatted_docstring(
         self,
         token: tokenize.TokenInfo,
+        next_token: tokenize.TokenInfo,
         docstring_type: str,
     ) -> None:
         """Add an unformatted docstring to the new tokens list.
@@ -874,6 +875,8 @@ class Formatter:
         ----------
         token : tokenize.TokenInfo
             The token representing the docstring.
+        next_token : tokenize.TokenInfo
+            The next token after the docstring.
         docstring_type : str
             The type of the docstring (e.g., module, class, function, attribute).
         """
@@ -887,6 +890,10 @@ class Formatter:
             line=_line,
         )
         self.new_tokens.append(_new_token)
+
+        # Keep the comment and its newline after the docstring.
+        if next_token.type == tokenize.COMMENT:
+            return
 
         # Add a token for the newline after the docstring.
         _new_token = tokenize.TokenInfo(
@@ -1247,7 +1254,9 @@ class Formatter:
                         _blank_line_count,
                     )
                 else:
-                    self._do_add_unformatted_docstring(_docstring_token, _type)
+                    self._do_add_unformatted_docstring(
+                        _docstring_token, tokens[_idx + 1], _type
+                    )
 
                 if (
                     (
