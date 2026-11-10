@@ -127,7 +127,7 @@ def _main(argv, standard_out, standard_error, standard_in):
     )
 
     if "-" in configurator.args.files:
-        formator.do_format_standard_in(
+        return formator.do_format_standard_in(
             configurator.parser,
         )
     else:
