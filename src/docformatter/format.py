@@ -687,13 +687,18 @@ class Formatter:
 
         self.new_tokens: list[tokenize.TokenInfo] = []
 
-    def do_format_standard_in(self, parser: argparse.ArgumentParser) -> None:
+    def do_format_standard_in(self, parser: argparse.ArgumentParser) -> int | None:
         """Print formatted text from standard in to standard out.
 
         Parameters
         ----------
         parser : argparse.ArgumentParser
             The argument parser containing the formatting options.
+
+        Return
+        ------
+        code : int | None
+            One of the FormatResult return codes when checking, else None.
         """
         if len(self.args.files) > 1:
             parser.error("cannot mix standard in and regular files")
@@ -711,6 +716,22 @@ class Formatter:
             source = source.decode(encoding)
 
         formatted_source = self._do_format_code(source)
+
+        if self.args.check:
+            if formatted_source != source:
+                # noinspection PyTypeChecker
+                print(unicode("-"), file=self.stderror)
+                if self.args.diff:
+                    diff = difflib.unified_diff(
+                        source.splitlines(),
+                        formatted_source.splitlines(),
+                        "before/-",
+                        "after/-",
+                        lineterm="",
+                    )
+                    self.stdout.write("\n".join(list(diff) + [""]))
+                return FormatResult.format_required
+            return FormatResult.ok
 
         if encoding:
             formatted_source = formatted_source.encode(encoding)

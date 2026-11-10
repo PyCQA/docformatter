@@ -317,6 +317,37 @@ Print my path and return error code
             assert "Print my path" in stdout.getvalue()
         assert stderr.getvalue().strip() == temporary_file
 
+    @pytest.mark.unit
+    @pytest.mark.parametrize("diff", [True, False], ids=["show-diff", "no-diff"])
+    def test_check_mode_standard_in(self, diff):
+        """--check with standard input reports and returns nonzero when needed."""
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        args = ["my_fake_program", "--check", "-"]
+        if diff:
+            args.append("--diff")
+
+        ret_code = main._main(
+            argv=args,
+            standard_out=stdout,
+            standard_error=stderr,
+            standard_in=io.StringIO(
+                '''\
+def foo():
+    """
+    Hello world
+    """
+'''
+            ),
+        )
+
+        assert ret_code == 3  # FormatResult.format_required
+        assert stderr.getvalue().strip() == "-"
+        if diff:
+            assert "Hello world" in stdout.getvalue()
+        else:
+            assert stdout.getvalue() == ""
+
     def test_help_output(self):
         """Ensure help message is printed when passed --help."""
         stdout = io.StringIO()
