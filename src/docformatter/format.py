@@ -1208,6 +1208,7 @@ class Formatter:
         """
         # print(tokens)
         _blocks = _classify.do_find_docstring_blocks(tokens)
+        _new_blocks: list[tuple[int, int, str]] = []
         _skip_indices: set[int] = set()
         self.new_tokens = []
 
@@ -1220,6 +1221,12 @@ class Formatter:
                 _anchor_idx, _docstr_idx, _type = _match
                 _last_idx = _do_skip_newlines(tokens, _docstr_idx)
                 _skip_indices.update(range(_anchor_idx + 1, _last_idx))
+
+                # The indices in _blocks point into the original token list.  Once
+                # a docstring gains or loses blank lines, they no longer match
+                # self.new_tokens, so record where this docstring lands in the new
+                # list for the blank line removal below.
+                _new_blocks.append((_anchor_idx, len(self.new_tokens), _type))
 
                 _docstring_token = tokens[_docstr_idx]
                 _blank_line_count = _get_newlines_by_type(
@@ -1278,5 +1285,5 @@ class Formatter:
 
                 self.new_tokens.append(_new_tok)
 
-        self.new_tokens = _do_remove_preceding_blank_lines(self.new_tokens, _blocks)
+        self.new_tokens = _do_remove_preceding_blank_lines(self.new_tokens, _new_blocks)
         self.new_tokens = _do_update_token_indices(self.new_tokens)
