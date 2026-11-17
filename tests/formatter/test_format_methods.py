@@ -119,7 +119,15 @@ def test_do_add_unformatted_docstring(test_key, args):
         ),
     ]
 
-    uut._do_add_unformatted_docstring(token, "function")
+    next_token = TokenInfo(
+        type=tokenize.NEWLINE,
+        string="\n",
+        start=token.end,
+        end=(token.end[0], token.end[1] + 1),
+        line=token.line,
+    )
+
+    uut._do_add_unformatted_docstring(token, next_token, "function")
     assert (
         uut.new_tokens == expected
     ), f"\nFailed {test_key}\nExpected {expected}\nGot {uut.new_tokens}"
