@@ -1005,6 +1005,13 @@ class Formatter:
         """
         contents, open_quote = _strings.do_strip_docstring(docstring)
 
+        # A line ending in a backslash continues the string on the next line.
+        # Rewrapping would turn the backslash into literal text in the docstring.
+        if any(
+            (len(line) - len(line.rstrip("\\"))) % 2 for line in contents.splitlines()
+        ):
+            return docstring
+
         if (
             self.args.black
             and contents.startswith('"')
