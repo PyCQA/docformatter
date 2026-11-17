@@ -8,6 +8,7 @@ Steven Myint <git@stevenmyint.com>
 
 Additional contributions by (sorted by name)
 --------------------------------------------
+- 0z5a <dinadegttyarenko6@gmail.com>
 - ANSHUL SINGH <72524975+ekanshul@users.noreply.github.com>
 - Adam Dangoor <adamdangoor@gmail.com>
 - Alec Merdler <alecmerdler@gmail.com>
