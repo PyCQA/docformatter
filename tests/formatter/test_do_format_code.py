@@ -241,6 +241,51 @@ def test_attribute_docstring_before_definition(
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("args", [NO_ARGS])
+@pytest.mark.parametrize("count", [1, 9])
+@pytest.mark.parametrize(
+    "block, formatted_block",
+    [
+        # The blank line after each function docstring is removed.
+        (
+            'def function_{i}():\n    """Return {i}."""\n\n    return {i}\n',
+            'def function_{i}():\n    """Return {i}."""\n    return {i}\n',
+        ),
+        # A blank line is added after each class docstring.
+        (
+            'class Class_{i}:\n    """Class {i}."""\n    def method(self):\n'
+            "        pass\n",
+            'class Class_{i}:\n    """Class {i}."""\n\n    def method(self):\n'
+            "        pass\n",
+        ),
+    ],
+    ids=["function", "class"],
+)
+def test_blank_lines_kept_after_many_docstrings(
+    test_args, args, count, block, formatted_block
+):
+    """Keep blank lines between definitions however many docstrings precede them.
+
+    Changing the blank lines after a docstring shifts the position of every later token,
+    which must not move the blank line removal onto other code.
+    """
+    uut = Formatter(test_args, sys.stderr, sys.stdin, sys.stdout)
+    tail = (
+        'def first():\n    """First."""\n    return 1\n\n\n'
+        'def second():\n    """Second."""\n    return 2\n'
+    )
+    source = "".join(block.format(i=i) + "\n\n" for i in range(count)) + tail
+    expected = (
+        "".join(formatted_block.format(i=i) + "\n\n" for i in range(count)) + tail
+    )
+
+    result = uut._do_format_code(source)
+
+    assert result == expected
+    assert uut._do_format_code(result) == expected
+
+
+@pytest.mark.integration
 @pytest.mark.parametrize("args", [NO_ARGS, ["--blank", ""]])
 @pytest.mark.parametrize(
     "source",
