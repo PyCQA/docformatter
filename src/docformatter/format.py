@@ -1065,8 +1065,13 @@ class Formatter:
         if not self.args.force_wrap and (
             _patterns.is_type_of_list(
                 summary,
-                self.args.non_strict,
-                self.args.style,
+                # A wrapped summary can look like a list after the following
+                # prose is removed. Keep the heuristic for single-line summaries.
+                strict=self.args.non_strict
+                or (
+                    "\n" in summary and not _patterns.is_heuristic_list(contents, False)
+                ),
+                style=self.args.style,
             )
             or _patterns.do_find_links(summary)
         ):
