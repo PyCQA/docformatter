@@ -868,6 +868,27 @@ def _run_docformatter(arguments, directory):
     )
 
 
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "configured_mode, cli_mode",
+    [("check", "--in-place"), ("in-place", "--check")],
+)
+def test_cli_mode_overrides_configured_mode(tmp_path, configured_mode, cli_mode):
+    """Only the explicitly selected mode is active when the config sets its opposite."""
+    config_file = tmp_path / "setup.cfg"
+    config_file.write_text(
+        f"[docformatter]\n{configured_mode} = true\n", encoding="utf-8"
+    )
+
+    config = Configurater(
+        ["docformatter", "--config", str(config_file), cli_mode, "file.py"]
+    )
+    config.do_parse_arguments()
+
+    assert config.args.in_place == (cli_mode == "--in-place")
+    assert config.args.check == (cli_mode == "--check")
+
+
 class TestConfigArgument:
     """Class for testing the two --config spellings accepted by argparse."""
 
