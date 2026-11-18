@@ -142,14 +142,12 @@ class Configurater:
             "-i",
             "--in-place",
             action="store_true",
-            default=str(self.flargs.get("in-place", "false")).lower() == "true",
             help="make changes to files instead of printing diffs",
         )
         changes.add_argument(
             "-c",
             "--check",
             action="store_true",
-            default=str(self.flargs.get("check", "false")).lower() == "true",
             help="only check and report incorrectly formatted files",
         )
         self.parser.add_argument(
@@ -193,6 +191,11 @@ class Configurater:
 
         if self.args_lst is not None:
             self.args = self.parser.parse_known_args(self.args_lst[1:])[0]
+            if not (self.args.in_place or self.args.check):
+                self.parser.set_defaults(
+                    in_place=str(self.flargs.get("in-place", False)).lower() == "true",
+                    check=str(self.flargs.get("check", False)).lower() == "true",
+                )
 
         # Default black line length is 88, so use this when not specified
         # otherwise use PEP-8 defaults
