@@ -229,9 +229,12 @@ def do_normalize_summary(summary: str, noncap: Optional[List[str]] = None) -> st
         # non-standard English word.  The search the list of user-defined
         # words not to capitalize.  If none of these exist capitalize the
         # first word of the summary.
+        first_word = summary.split(" ", 1)[0]
+        if first_word == summary and first_word.endswith("."):
+            first_word = first_word[:-1]
         if (
-            all(char not in summary.split(" ", 1)[0] for char in ["_", "."])
-            and summary.split(" ", 1)[0] not in noncap
+            all(char not in first_word for char in ["_", "."])
+            and first_word not in noncap
         ):
             summary = summary[0].upper() + summary[1:]
 
