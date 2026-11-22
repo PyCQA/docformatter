@@ -107,6 +107,9 @@ def test_do_find_shortest_indentation():
         "do_normalize_summary_with_proprer_noun",
         "do_normalize_summary_capitalize_first_letter_with_period",
         "do_normalize_summary_dont_capitalize_first_letter_if_variable",
+        "do_normalize_summary_capitalize_single_word",
+        "do_normalize_summary_capitalize_single_word_with_period",
+        "do_normalize_summary_dont_capitalize_single_word_file_name",
     ],
 )
 def test_do_normalize_summary(test_key):

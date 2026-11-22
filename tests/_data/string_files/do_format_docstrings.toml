@@ -1120,7 +1120,7 @@ source='''"""xx.
 
     :param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb s3://cccc.
 """'''
-expected='''"""xx.
+expected='''"""Xx.
 
     :param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         s3://cccc.
@@ -1131,7 +1131,7 @@ source='''"""xx.
 
     @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb s3://cccc.
     """'''
-expected='''"""xx.
+expected='''"""Xx.
 
     @param a: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         s3://cccc.
