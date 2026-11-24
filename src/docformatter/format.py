@@ -138,6 +138,36 @@ def _do_skip_newlines(
     return j
 
 
+def _do_count_following_blank_lines(
+    tokens: list[tokenize.TokenInfo],
+    docstring_idx: int,
+    last_idx: int,
+) -> int:
+    """Count the blank lines that follow a docstring in the source.
+
+    Parameters
+    ----------
+    tokens : list
+        The tokenized Python source code.
+    docstring_idx : int
+        The index of the docstring token.
+    last_idx : int
+        The index of the first token after the newline tokens that follow the
+        docstring.
+
+    Returns
+    -------
+    int
+        The number of blank lines between the docstring and the next token.
+    """
+    if tokens[docstring_idx + 1].type != tokenize.NEWLINE:
+        return 0
+
+    return sum(
+        1 for _tok in tokens[docstring_idx + 2 : last_idx] if _tok.type == tokenize.NL
+    )
+
+
 def _is_multiline_parameter(tokens: list[tokenize.TokenInfo], index: int) -> bool:
     """Determine if a token is a multiline string parameter.
 
@@ -867,6 +897,7 @@ class Formatter:
         self,
         token: tokenize.TokenInfo,
         docstring_type: str,
+        blank_line_count: int = 0,
     ) -> None:
         """Add an unformatted docstring to the new tokens list.
 
@@ -876,6 +907,9 @@ class Formatter:
             The token representing the docstring.
         docstring_type : str
             The type of the docstring (e.g., module, class, function, attribute).
+        blank_line_count : int
+            The number of blank lines that followed the docstring in the source,
+            which are kept as-is because the docstring itself is left untouched.
         """
         _indent = token.line[: token.start[1]] if docstring_type != "module" else ""
         _line = _indent + token.string
@@ -897,6 +931,12 @@ class Formatter:
             line=_line,
         )
         self.new_tokens.append(_new_token)
+
+        self._do_add_blank_lines(
+            blank_line_count,
+            _new_token.end[0] + 1,
+            _new_token.end[0] + 1,
+        )
 
     def _do_format_file(self, filename: str) -> int:
         """Format docstrings in a file.
@@ -1254,7 +1294,11 @@ class Formatter:
                         _blank_line_count,
                     )
                 else:
-                    self._do_add_unformatted_docstring(_docstring_token, _type)
+                    self._do_add_unformatted_docstring(
+                        _docstring_token,
+                        _type,
+                        _do_count_following_blank_lines(tokens, _docstr_idx, _last_idx),
+                    )
 
                 if (
                     (
